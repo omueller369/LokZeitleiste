@@ -24,7 +24,11 @@ import javax.crypto.spec.PBEKeySpec
 
 private val kinds = listOf("Rufbereitschaft", "Bereitschaft", "Zugfahrt", "Ausfallschicht", "Krank", "Urlaub", "Sonstige Erfassung")
 private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-private data class Entry(val kind: String, val date: String, val start: String, val end: String, val pause: Int, val guest: Int, val note: String)
+private data class Entry(
+    val kind: String, val date: String, val start: String, val end: String,
+    val pause: Int, val guest: Int, val note: String,
+    val away: Boolean = false, val accommodation: String = "", val hotelName: String = ""
+)
 private fun minutes(time: String): Int = LocalTime.parse(time).let { it.hour * 60 + it.minute }
 private fun length(e: Entry): Int {
     val start = minutes(e.start); var end = minutes(e.end)
@@ -46,12 +50,16 @@ private fun load(context: android.content.Context, username: String): List<Entry
     val raw = context.getSharedPreferences("entries_$username", 0).getString("data", "[]")
     val a = JSONArray(raw)
     (0 until a.length()).map { i -> a.getJSONObject(i).let {
-        Entry(it.getString("kind"), it.getString("date"), it.getString("start"), it.getString("end"), it.getInt("pause"), it.getInt("guest"), it.optString("note"))
+        Entry(it.getString("kind"), it.getString("date"), it.getString("start"), it.getString("end"),
+            it.getInt("pause"), it.getInt("guest"), it.optString("note"),
+            it.optBoolean("away", false), it.optString("accommodation"), it.optString("hotelName"))
     } }
 }.getOrDefault(emptyList())
 private fun save(context: android.content.Context, username: String, entries: List<Entry>) {
     val a = JSONArray()
-    entries.forEach { a.put(JSONObject().put("kind", it.kind).put("date", it.date).put("start", it.start).put("end", it.end).put("pause", it.pause).put("guest", it.guest).put("note", it.note)) }
+    entries.forEach { a.put(JSONObject().put("kind", it.kind).put("date", it.date).put("start", it.start)
+        .put("end", it.end).put("pause", it.pause).put("guest", it.guest).put("note", it.note)
+        .put("away", it.away).put("accommodation", it.accommodation).put("hotelName", it.hotelName)) }
     context.getSharedPreferences("entries_$username", 0).edit().putString("data", a.toString()).apply()
 }
 private fun hash(password: String, salt: ByteArray): String {
@@ -133,6 +141,10 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
     var pause by remember { mutableStateOf("0") }
     var guest by remember { mutableStateOf("0") }
     var note by remember { mutableStateOf("") }
+    var away by remember { mutableStateOf(false) }
+    var accommodation by remember { mutableStateOf("") }
+    var hotelName by remember { mutableStateOf("") }
+    var accommodationExpanded by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     val selected = entries.filter { runCatching { YearMonth.from(LocalDate.parse(it.date)) == month }.getOrDefault(false) }.sortedBy { it.date + it.start }
@@ -170,22 +182,55 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     OutlinedTextField(date, { date = it }, label = { Text("Datum (JJJJ-MM-TT)") })
                     OutlinedTextField(start, { start = it }, label = { Text("Beginn (HH:MM)") })
                     OutlinedTextField(end, { end = it }, label = { Text("Ende (HH:MM)") })
-                    OutlinedTextField(pause, { pause = it }, label = { Text("Pause (Minuten)") })
-                    OutlinedTextField(guest, { guest = it }, label = { Text("Gastfahrt (Minuten)") })
-                    OutlinedTextField(note, { note = it }, label = { Text("Notiz") })
+                    if (kind == "Rufbereitschaft") {
+                        Row { Switch(checked = away, onCheckedChange = { away = it })
+                            Text("Auswärts verbracht", modifier = Modifier.padding(12.dp)) }
+                        if (away) {
+                            Box {
+                                OutlinedButton(onClick = { accommodationExpanded = true }) {
+                                    Text((accommodation.ifBlank { "Unterkunft wählen" }) + " ▾")
+                                }
+                                DropdownMenu(accommodationExpanded, onDismissRequest = { accommodationExpanded = false }) {
+                                    listOf("Dienstwohnung", "Hotel").forEach { option ->
+                                        DropdownMenuItem(text = { Text(option) }, onClick = {
+                                            accommodation = option; accommodationExpanded = false
+                                            if (option != "Hotel") hotelName = ""
+                                        })
+                                    }
+                                }
+                            }
+                            if (accommodation == "Hotel") OutlinedTextField(hotelName, { hotelName = it },
+                                label = { Text("Name des Hotels") })
+                        }
+                        Text("Ausbleibe wird später berechnet: voller Kalendertag oder sonstiger Zeitraum.",
+                            style = MaterialTheme.typography.bodySmall)
+                    } else {
+                        OutlinedTextField(pause, { pause = it }, label = { Text("Pause (Minuten)") })
+                        OutlinedTextField(guest, { guest = it }, label = { Text("Gastfahrt (Minuten)") })
+                        OutlinedTextField(note, { note = it }, label = { Text("Notiz") })
+                    }
                     if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
                     Button(onClick = {
-                        val p = pause.toIntOrNull(); val g = guest.toIntOrNull()
-                        val candidate = runCatching { Entry(kind, LocalDate.parse(date).toString(), LocalTime.parse(start).toString(), LocalTime.parse(end).toString(), p!!, g!!, note) }.getOrNull()
+                        val isCall = kind == "Rufbereitschaft"
+                        val p = if (isCall) 0 else pause.toIntOrNull()
+                        val g = if (isCall) 0 else guest.toIntOrNull()
+                        val candidate = runCatching { Entry(kind, LocalDate.parse(date).toString(),
+                            LocalTime.parse(start).toString(), LocalTime.parse(end).toString(), p!!, g!!,
+                            if (isCall) "" else note, isCall && away,
+                            if (isCall && away) accommodation else "",
+                            if (isCall && away && accommodation == "Hotel") hotelName.trim() else "") }.getOrNull()
                         error = when {
                             candidate == null || p == null || g == null || p < 0 || g < 0 -> "Datum, Zeiten und Minuten prüfen."
+                            isCall && away && accommodation !in listOf("Dienstwohnung", "Hotel") -> "Bitte Unterkunft wählen."
+                            isCall && away && accommodation == "Hotel" && hotelName.isBlank() -> "Bitte Hotelnamen angeben."
                             kind == "Urlaub" && entries.any { it.date == candidate.date && it.kind == "Urlaub" } -> "Urlaub ist für diesen Tag bereits erfasst."
                             kind != "Urlaub" && (length(candidate) <= 0 || g > length(candidate)) -> "Dauer muss positiv sein; Gastfahrt darf Dauer nicht übersteigen."
                             else -> ""
                         }
                         if (error.isEmpty() && candidate != null) {
                             entries = entries + candidate; save(context, username, entries)
-                            month = YearMonth.from(LocalDate.parse(candidate.date)); note = ""
+                            month = YearMonth.from(LocalDate.parse(candidate.date))
+                            note = ""; away = false; accommodation = ""; hotelName = ""
                         }
                     }) { Text("Eintrag speichern") }
                 } }
@@ -193,17 +238,20 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     Text("Erfassungen · ${selected.size}", style = MaterialTheme.typography.titleLarge)
                     val scroll = rememberScrollState()
                     Column(Modifier.horizontalScroll(scroll)) {
-                        Row { listOf("Datum", "Art", "Zeitraum", "Pause", "Gastfahrt", "Dauer", "").forEach {
-                            Text(it, Modifier.width(if (it == "Art") 150.dp else 105.dp), style = MaterialTheme.typography.labelMedium)
+                        Row { listOf("Datum", "Art / Unterkunft", "Zeitraum", "Pause", "Gastfahrt", "Dauer", "").forEach {
+                            Text(it, Modifier.width(if (it == "Art / Unterkunft") 220.dp else 105.dp), style = MaterialTheme.typography.labelMedium)
                         } }
                         HorizontalDivider()
                         selected.forEach { entry ->
                             Row {
                                 Text(runCatching { LocalDate.parse(entry.date).format(dateFormat) }.getOrDefault(entry.date), Modifier.width(105.dp))
-                                Text(entry.kind, Modifier.width(150.dp))
+                                Text(if (entry.kind == "Rufbereitschaft" && entry.away)
+                                    "Rufbereitschaft · " + entry.accommodation +
+                                        (if (entry.hotelName.isBlank()) "" else " · " + entry.hotelName)
+                                    else entry.kind, Modifier.width(220.dp))
                                 Text(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${entry.end}", Modifier.width(105.dp))
-                                Text("${entry.pause} min", Modifier.width(105.dp))
-                                Text("${entry.guest} min", Modifier.width(105.dp))
+                                Text(if (entry.kind == "Rufbereitschaft") "—" else "${entry.pause} min", Modifier.width(105.dp))
+                                Text(if (entry.kind == "Rufbereitschaft") "—" else "${entry.guest} min", Modifier.width(105.dp))
                                 Text(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
                                 TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; save(context, username, entries) }) { Text("Löschen") }
                             }
