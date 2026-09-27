@@ -1,0 +1,6 @@
+# Nur für lokalen Debian-Entwicklungsbetrieb hinter Apache.
+services:
+  api:
+    environment:
+      PUBLIC_ORIGIN: http://localhost:8080
+      COOKIE_SECURE: "false"

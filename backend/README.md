@@ -4,22 +4,33 @@ FastAPI stellt die Admin-Oberfläche unter `/admin` und die API für die Android
 
 ## Zunächst lokal: Apache und MySQL
 
-Die folgende Konfiguration ist für einen Entwicklungsrechner mit Apache 2.4, MySQL 8 und Python 3.12 gedacht. Es werden keine echten Tf-Daten für HTTP-Tests verwendet.
+Die folgende Konfiguration ist für Debian mit nativem Apache 2.4 gedacht. Python-API und **MySQL 8.4** laufen lokal in Containern. So bleibt es tatsächlich MySQL: Debians Paket `default-mysql-server` kann stattdessen MariaDB installieren. Für lokale HTTP-Tests keine echten Tf-Daten verwenden.
 
-1. MySQL lokal installieren und eine Datenbank mit eigenem Passwort anlegen. In einer administrativen MySQL-Sitzung:
+1. Apache installieren: `sudo apt update && sudo apt install apache2`. Docker Engine samt Compose-Plugin nach der [offiziellen Debian-Anleitung](https://docs.docker.com/engine/install/debian/) installieren. Vorhandene Docker-Pakete und die Debian-Version dort abgleichen.
+2. Im Ordner `backend` die Datei `.env.example` als `.env` kopieren. `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD` und `DATABASE_URL` auf eigene Werte setzen. Das Passwort innerhalb der Datenbank-URL muss bei Sonderzeichen URL-kodiert werden. Die Datei ist vom Git-Commit ausgeschlossen.
+3. MySQL und die Python-API starten:
 
-   ```sql
-   CREATE DATABASE lokzeitleiste CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   CREATE USER 'lokzeitleiste'@'127.0.0.1' IDENTIFIED BY 'EIGENES_LANGES_PASSWORT';
-   GRANT ALL PRIVILEGES ON lokzeitleiste.* TO 'lokzeitleiste'@'127.0.0.1';
+   ```bash
+   docker compose -f compose.yaml -f compose.local.yaml up -d --build
+   docker compose -f compose.yaml -f compose.local.yaml ps
+   docker compose -f compose.yaml -f compose.local.yaml exec api python -m lokzeitleiste.init_db --create-admin
    ```
 
-2. Im Ordner `backend` eine Python-Umgebung anlegen, `pip install -r requirements.txt` ausführen und `.env.local.example` als `.env.local` mit eigener `DATABASE_URL` kopieren. Sonderzeichen im Passwort innerhalb der URL kodieren. Diese Datei niemals committen.
-3. Die Variablen aus `.env.local` in der lokalen Shell setzen, beispielsweise mit `set -a; . ./.env.local; set +a` unter Bash. Danach `python -m lokzeitleiste.init_db --create-admin` ausführen; Benutzername und Passwort werden interaktiv abgefragt. Den Python-Server mit `uvicorn lokzeitleiste.main:app --host 127.0.0.1 --port 8000` starten.
-4. Apache-Module `proxy` und `proxy_http` aktivieren und [apache/lokzeitleiste-local.conf](apache/lokzeitleiste-local.conf) als lokale VirtualHost-Konfiguration einbinden. Die `Listen`-Zeile darf nicht doppelt existieren. Konfiguration mit `apachectl configtest` prüfen und Apache neu laden. Danach `http://localhost:8080/health` und `http://localhost:8080/admin` aufrufen.
+4. Apache als lokalen Reverse-Proxy aktivieren:
+
+   ```bash
+   sudo a2enmod proxy proxy_http
+   sudo cp apache/lokzeitleiste-local.conf /etc/apache2/sites-available/
+   sudo a2ensite lokzeitleiste-local.conf
+   sudo apache2ctl configtest
+   sudo systemctl reload apache2
+   curl http://localhost:8080/health
+   ```
+
+   Die `Listen 127.0.0.1:8080`-Zeile darf nicht doppelt existieren. Anschließend `http://localhost:8080/admin` öffnen. Das lokale Compose-Override setzt `COOKIE_SECURE=false` ausschließlich für HTTP auf dem Entwicklungsrechner.
 5. In Android Studio einen **Debug-Build im Emulator** mit `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080` konfigurieren. `10.0.2.2` verweist im Emulator auf den Entwicklungsrechner. Nur diese Debug-Adresse darf in der App HTTP verwenden. Tf werden im Admin-Bereich angelegt; danach kann die App Monatsdaten senden.
 
-Die konkreten Installations- und Dienstbefehle für Apache und MySQL hängen vom Betriebssystem ab. Dieser Server ist über die Loopback-Adresse nur vom Entwicklungsrechner beziehungsweise dessen Android-Emulator erreichbar. Ein physisches Tablet erreicht `localhost` des Rechners nicht. Dafür folgt später ein erreichbarer Server mit HTTPS. **Lokales HTTP ist ausschließlich für Entwicklungsdaten gedacht.**
+Dieser Server ist über die Loopback-Adresse nur vom Entwicklungsrechner beziehungsweise dessen Android-Emulator erreichbar. Ein physisches Tablet erreicht `localhost` des Rechners nicht. Dafür folgt später ein erreichbarer Server mit HTTPS. **Lokales HTTP ist ausschließlich für Entwicklungsdaten gedacht.**
 
 ## Spätere Serverumgebung
 

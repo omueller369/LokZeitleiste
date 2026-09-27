@@ -8,9 +8,11 @@ LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für 
 - `backend/`: FastAPI-Webserver mit MySQL. Admins melden sich unter `/admin` an und legen Tf an. Stammdaten pro Tf: Name, Vorname, Personalnummer, monatliche Sollstunden, Urlaubstage, Geburtsdatum und BahnCard 50 oder 100. Monatsdaten und Einträge gehören zu genau einem Tf.
 - `docs/` und `design/`: Anforderungen und Tablet-Vorschauen aus den bisherigen Arbeitsschritten.
 
+Die [Gesamtvorschau](design/gesamtvorschau.html) zeigt Admin-Anmeldung, Tf-Anlage, Monatsdaten, Tf-Anmeldung, Monatsübersicht, alle Erfassungsarten, den Übergang zur Zugfahrt und den LokZeit-Zugfahrtbereich mit Beispieldaten.
+
 ## Start
 
-Die [Backend-Anleitung](backend/README.md) beschreibt den ersten lokalen Aufbau mit Apache, MySQL und Python. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
+Die [Backend-Anleitung](backend/README.md) beschreibt den ersten lokalen Aufbau auf Debian: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 
 Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit bleiben zunächst lokal und sind noch nicht mit den Monatsdaten verbunden.
 
