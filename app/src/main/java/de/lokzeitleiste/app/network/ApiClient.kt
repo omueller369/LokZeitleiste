@@ -7,12 +7,18 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.time.YearMonth
 
 object ApiClient {
     private fun base(): String = BuildConfig.API_BASE_URL.trimEnd('/').also {
-        require(it.startsWith("https://")) { "HTTPS-Serveradresse ist nicht konfiguriert." }
+        val uri = runCatching { URI(it) }.getOrNull()
+        val localEmulator = BuildConfig.DEBUG && uri?.scheme == "http" &&
+            uri.host == "10.0.2.2" && uri.port == 8080 && uri.rawUserInfo == null
+        require((uri?.scheme == "https" && uri.host != null) || localEmulator) {
+            "Serveradresse fehlt: HTTPS oder im Debug-Emulator http://10.0.2.2:8080 konfigurieren."
+        }
     }
     private fun post(path: String, body: JSONObject, token: String? = null): JSONObject {
         val connection = URL(base() + path).openConnection() as HttpURLConnection

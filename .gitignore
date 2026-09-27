@@ -7,6 +7,7 @@ build/
 .DS_Store
 .env
 backend/.env
+backend/.env.local
 __pycache__/
 *.pyc
 .deps/

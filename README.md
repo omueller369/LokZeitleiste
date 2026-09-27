@@ -1,4 +1,4 @@
-# LokZeitleiste v0.5
+# LokZeitleiste v0.6
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -10,13 +10,13 @@ LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für 
 
 ## Start
 
-Die [Backend-Anleitung](backend/README.md) beschreibt MySQL, Admin-Erstanlage, HTTPS und Webserver. Für die App wird beim Build eine HTTPS-Adresse als Gradle-Eigenschaft `lokzeitleisteApiBaseUrl` benötigt, beispielsweise `-PlokzeitleisteApiBaseUrl=https://zeit.example.org`. Die Konfiguration gehört zur jeweiligen Serverumgebung; es ist noch kein Server bereitgestellt.
+Die [Backend-Anleitung](backend/README.md) beschreibt den ersten lokalen Aufbau mit Apache, MySQL und Python. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 
 Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit bleiben zunächst lokal und sind noch nicht mit den Monatsdaten verbunden.
 
 ## Noch offen
 
-- Ein echter Webserver, Domain, TLS-Zertifikat, MySQL-Zugang und die Erstverteilung der Tf-Passwörter fehlen noch.
+- Apache, MySQL und Python-API müssen auf dem vorgesehenen lokalen Rechner installiert und gestartet werden. Für ein physisches Tablet wird später eine erreichbare HTTPS-Adresse benötigt.
 - Es gibt noch keinen vollständigen Abgleich zwischen App und Server: lokale Löschungen werden nicht übertragen, Serverdaten nicht automatisch abgerufen, parallele Geräte nicht zusammengeführt.
 - Die achtstündige Höchstgrenze für Bereitschaft ist weiterhin eine vorläufige Annahme. Rufbereitschaft ist auf 08:00–20:00 Uhr und höchstens acht Stunden beschränkt.
 - Berechnung von Arbeits-, Nacht- und Sonntagsstunden und später Ausbleibe benötigt noch verbindliche Fachregeln. Die bisherigen vorläufigen Regeln stehen in der App und in den früheren Anforderungen.
