@@ -11,70 +11,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import org.json.JSONArray
-import org.json.JSONObject
-import java.security.SecureRandom
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.Base64
-import javax.crypto.SecretKeyFactory
-import javax.crypto.spec.PBEKeySpec
+import de.lokzeitleiste.app.data.*
+import de.lokzeitleiste.app.network.ApiClient
+import de.lokzeitleiste.app.network.TokenVault
+import kotlinx.coroutines.launch
 
 private val kinds = listOf("Rufbereitschaft", "Bereitschaft", "Zugfahrt", "Ausfallschicht", "Krank", "Urlaub", "Sonstige Erfassung")
 private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-private data class Entry(
-    val kind: String, val date: String, val start: String, val end: String,
-    val pause: Int, val guest: Int, val note: String,
-    val away: Boolean = false, val accommodation: String = "", val hotelName: String = ""
-)
-private fun minutes(time: String): Int = LocalTime.parse(time).let { it.hour * 60 + it.minute }
-private fun length(e: Entry): Int {
-    val start = minutes(e.start); var end = minutes(e.end)
-    if (end <= start) end += 1440
-    return (end - start - e.pause).coerceAtLeast(0)
-}
-private fun startAt(e: Entry): LocalDateTime =
-    LocalDate.parse(e.date).atTime(LocalTime.parse(e.start))
-private fun endAt(e: Entry): LocalDateTime {
-    val from = startAt(e)
-    var until = LocalDate.parse(e.date).atTime(LocalTime.parse(e.end))
-    if (!until.isAfter(from)) until = until.plusDays(1)
-    return until
-}
-private fun overlap(e: Entry, condition: (LocalDateTime) -> Boolean): Int {
-    val date = LocalDate.parse(e.date)
-    val from = date.atTime(LocalTime.parse(e.start))
-    val until = from.plusMinutes(length(e).toLong() + e.pause)
-    // Break placement is unknown. Allocate break minutes against the overlap.
-    var count = 0
-    var time = from
-    while (time < until) { if (condition(time)) count++; time = time.plusMinutes(1) }
-    return (count - e.pause.coerceAtMost(count)).coerceAtLeast(0)
-}
-private fun displayTime(n: Int) = "%d:%02d h".format(n / 60, n % 60)
-private fun load(context: android.content.Context, username: String): List<Entry> = runCatching {
-    val raw = context.getSharedPreferences("entries_$username", 0).getString("data", "[]")
-    val a = JSONArray(raw)
-    (0 until a.length()).map { i -> a.getJSONObject(i).let {
-        Entry(it.getString("kind"), it.getString("date"), it.getString("start"), it.getString("end"),
-            it.getInt("pause"), it.getInt("guest"), it.optString("note"),
-            it.optBoolean("away", false), it.optString("accommodation"), it.optString("hotelName"))
-    } }
-}.getOrDefault(emptyList())
-private fun save(context: android.content.Context, username: String, entries: List<Entry>) {
-    val a = JSONArray()
-    entries.forEach { a.put(JSONObject().put("kind", it.kind).put("date", it.date).put("start", it.start)
-        .put("end", it.end).put("pause", it.pause).put("guest", it.guest).put("note", it.note)
-        .put("away", it.away).put("accommodation", it.accommodation).put("hotelName", it.hotelName)) }
-    context.getSharedPreferences("entries_$username", 0).edit().putString("data", a.toString()).apply()
-}
-private fun hash(password: String, salt: ByteArray): String {
-    val spec = PBEKeySpec(password.toCharArray(), salt, 150000, 256)
-    return try { Base64.getEncoder().encodeToString(SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded) }
-    finally { spec.clearPassword() }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,10 +32,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun App() {
     val context = LocalContext.current
-    val auth = remember { context.getSharedPreferences("auth", 0) }
-    var user by remember { mutableStateOf(auth.getString("session", "") ?: "") }
+    val scope = rememberCoroutineScope()
+    var user by remember { mutableStateOf(TokenVault.username(context)) }
     var trainScreen by remember { mutableStateOf(false) }
-    if (user.isBlank()) Login { name -> user = name; auth.edit().putString("session", name).apply() }
+    if (user.isBlank()) LoginScreen { name, token -> TokenVault.save(context, name, token); user = name }
     else if (trainScreen) Column {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = { trainScreen = false }) { Text("← Monatsübersicht") }
@@ -97,51 +43,17 @@ private fun App() {
         }
         Box(Modifier.weight(1f)) { LokZeitApp(user) }
     } else MonthScreen(user, onTrain = { trainScreen = true }, onLogout = {
-        auth.edit().remove("session").apply(); user = ""
+        TokenVault.token(context)?.let { token -> scope.launch { runCatching { ApiClient.logout(token) } } }
+        TokenVault.clear(context); user = ""
     })
-}
-
-@Composable
-private fun Login(onSuccess: (String) -> Unit) {
-    val context = LocalContext.current
-    val auth = remember { context.getSharedPreferences("auth", 0) }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf("") }
-    Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center) {
-        Text("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
-        Text("Lokales Konto auf diesem Gerät anmelden oder anlegen")
-        Spacer(Modifier.height(24.dp))
-        OutlinedTextField(username, { username = it.trim().lowercase() }, label = { Text("Benutzername") })
-        OutlinedTextField(password, { password = it }, label = { Text("Passwort") }, visualTransformation = PasswordVisualTransformation())
-        Text(message, color = MaterialTheme.colorScheme.error)
-        Button(onClick = {
-            val name = username
-            if (!Regex("[a-z0-9._-]{3,32}").matches(name) || password.length < 8) {
-                message = "Benutzername: 3–32 Zeichen (a–z, 0–9, ._-); Passwort: mindestens 8 Zeichen."
-            } else {
-                val stored = auth.getString("account_$name", null)
-                if (stored == null) {
-                    val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
-                    auth.edit().putString("account_$name", Base64.getEncoder().encodeToString(salt) + ":" + hash(password, salt)).apply()
-                    onSuccess(name)
-                } else {
-                    val parts = stored.split(":")
-                    val actual = runCatching { hash(password, Base64.getDecoder().decode(parts[0])) }.getOrNull()
-                    if (parts.size == 2 && java.security.MessageDigest.isEqual((actual ?: "").toByteArray(), parts[1].toByteArray())) onSuccess(name)
-                    else message = "Benutzername oder Passwort stimmt nicht."
-                }
-            }
-        }) { Text("Anmelden / lokales Konto anlegen") }
-        Text("Die Anmeldung bleibt auf diesem Gerät gespeichert. Keine Synchronisierung.", style = MaterialTheme.typography.bodySmall)
-    }
 }
 
 @Composable
 private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> Unit) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var month by remember { mutableStateOf(YearMonth.now()) }
-    var entries by remember(username) { mutableStateOf(load(context, username)) }
+    var entries by remember(username) { mutableStateOf(loadEntries(context, username)) }
     var kind by remember { mutableStateOf(kinds[2]) }
     var date by remember { mutableStateOf(LocalDate.now().toString()) }
     var start by remember { mutableStateOf("06:00") }
@@ -160,6 +72,8 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
     var transitionTime by remember { mutableStateOf("12:00") }
     var trainEnd by remember { mutableStateOf("14:00") }
     var transitionError by remember { mutableStateOf("") }
+    var sending by remember { mutableStateOf(false) }
+    var sendMessage by remember { mutableStateOf("") }
     val selected = entries.filter { runCatching { YearMonth.from(LocalDate.parse(it.date)) == month }.getOrDefault(false) }.sortedBy { it.date + it.start }
     val work = selected.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }.sumOf { length(it) }
     val guests = selected.sumOf { it.guest }
@@ -175,8 +89,24 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("LokZeitleiste", style = MaterialTheme.typography.headlineMedium)
                 OutlinedButton(onClick = onTrain) { Text("Zugfahrt · LokZeit") }
+                Button(enabled = !sending, onClick = {
+                    val token = TokenVault.token(context)
+                    if (token == null) { onLogout(); return@Button }
+                    saveEntries(context, username, entries)
+                    sending = true; sendMessage = ""
+                    scope.launch {
+                        try {
+                            val count = ApiClient.upload(month, selected, token)
+                            sendMessage = "$count Einträge für ${month.monthValue}/${month.year} gesendet."
+                        } catch (error: Exception) {
+                            sendMessage = error.message ?: "Senden fehlgeschlagen."
+                            if (sendMessage.startsWith("Anmeldung abgelaufen")) onLogout()
+                        } finally { sending = false }
+                    }
+                }) { Text(if (sending) "Sende …" else "Monat senden") }
                 TextButton(onClick = onLogout) { Text("Abmelden · $username") }
             }
+            if (sendMessage.isNotBlank()) Text(sendMessage, style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(onClick = { month = month.minusMonths(1) }) { Text("‹") }
                 Text(month.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.GERMAN) + " " + month.year,
@@ -252,7 +182,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                             else -> ""
                         }
                         if (error.isEmpty() && candidate != null) {
-                            entries = entries + candidate; save(context, username, entries)
+                            entries = entries + candidate; saveEntries(context, username, entries)
                             month = YearMonth.from(LocalDate.parse(candidate.date))
                             note = ""; away = false; accommodation = ""; hotelName = ""
                         }
@@ -282,7 +212,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                                         transitionEntry = entry; transitionDate = entry.date
                                         transitionTime = entry.start; transitionError = ""
                                     }) { Text("→ Zugfahrt") }
-                                TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; save(context, username, entries) }) { Text("Löschen") }
+                                TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; saveEntries(context, username, entries) }) { Text("Löschen") }
                             }
                             HorizontalDivider()
                         }
@@ -331,7 +261,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                         if (at == startAt(original)) it.removeAt(index) else it[index] = shortened
                         it.add(trip)
                     }
-                    save(context, username, entries); month = YearMonth.from(at)
+                    saveEntries(context, username, entries); month = YearMonth.from(at)
                     transitionEntry = null
                 }
             }) { Text("Übergang speichern") } },

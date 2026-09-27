@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LokZeitleiste · Administration</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eef3f5;color:#193044;font:15px system-ui,sans-serif}
+header{background:#132c40;color:white;padding:18px max(24px,calc((100vw - 1200px)/2));display:flex;justify-content:space-between;align-items:center}
+main{max-width:1200px;margin:30px auto;padding:0 20px}h1{margin:0;font-size:24px}h2{font-size:20px;margin-top:0}
+.grid{display:grid;grid-template-columns:380px 1fr;gap:22px}.card{background:white;border:1px solid #d8e2e8;border-radius:14px;padding:24px;box-shadow:0 3px 12px #16395312}
+label{display:block;font-weight:650;font-size:13px;margin:12px 0 4px}input,select{padding:11px;border:1px solid #becdd7;border-radius:8px;width:100%;font:inherit}
+button{cursor:pointer;background:#17445b;color:white;border:0;border-radius:8px;padding:11px 17px;font:inherit;font-weight:650}button.secondary{background:#e5edf1;color:#1c4b60}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e9ee}th{font-size:12px;color:#526879}
+.muted{color:#667b89;font-size:13px}.error{color:#a33129}.ok{color:#28734e}#login{max-width:420px;margin:10vh auto}
+@media(max-width:850px){.grid{grid-template-columns:1fr}table{display:block;overflow-x:auto}}
+</style></head><body><header><h1>LokZeitleiste · Administration</h1><button id="logout" class="secondary" hidden>Abmelden</button></header>
+<main><section id="login" class="card"><h2>Admin-Anmeldung</h2><form id="loginForm"><label>Benutzername<input name="username" required autocomplete="username"></label><label>Passwort<input name="password" type="password" required autocomplete="current-password"></label><p id="loginMessage" class="error"></p><button>Anmelden</button></form></section>
+<section id="dashboard" hidden><div class="grid"><div class="card"><h2>Tf anlegen</h2><p class="muted">Konten werden durch Admins angelegt. Das Passwort wird nur bei dieser Eingabe verwendet.</p>
+<form id="tfForm"><div class="two"><label>Vorname<input name="first_name" required></label><label>Name<input name="last_name" required></label></div>
+<div class="two"><label>Personalnummer<input name="personnel_number" required></label><label>Benutzername<input name="username" required minlength="3"></label></div>
+<label>Passwort (mindestens 12 Zeichen)<input name="password" type="password" required minlength="12" autocomplete="new-password"></label>
+<div class="two"><label>Sollstunden (monatlich)<input name="target_hours" type="number" min="0" max="744" step="0.5" required></label><label>Urlaubstage<input name="vacation_days" type="number" min="0" max="366" required></label></div>
+<div class="two"><label>Geburtsdatum<input name="birth_date" type="date" required></label><label>BahnCard<select name="bahncard"><option value="50">50</option><option value="100">100</option></select></label></div>
+<p id="tfMessage"></p><button>Tf anlegen</button></form></div>
+<div class="card"><h2>Tf und Monatsdaten</h2><p class="muted">Einträge werden über die App an den Server gesendet.</p><table><thead><tr><th>Name</th><th>Personalnr.</th><th>Soll / Urlaub</th><th>Monate</th></tr></thead><tbody id="users"></tbody></table>
+<div id="months" class="muted" style="margin-top:22px">Wähle einen Tf für die Monatsdaten.</div></div></div></section></main>
+<script>
+const request=async(path,options={})=>{const response=await fetch(path,{credentials:"same-origin",headers:{"Content-Type":"application/json"},...options});if(!response.ok){let detail;try{detail=(await response.json()).detail}catch{}throw Error(typeof detail==="string"?detail:"Anfrage fehlgeschlagen ("+response.status+")")}return response.json()};
+const show=async()=>{document.getElementById("login").hidden=true;document.getElementById("dashboard").hidden=false;document.getElementById("logout").hidden=false;await refresh()};
+async function refresh(){let users=await request("/api/v1/admin/tf");const body=document.getElementById("users");body.replaceChildren();for(const user of users){let row=document.createElement("tr");let name=document.createElement("button");name.className="secondary";name.textContent=user.first_name+" "+user.last_name;name.onclick=()=>months(user);let c=document.createElement("td");c.append(name);row.append(c);for(const value of [user.personnel_number,(user.target_hours_minutes/60)+" h / "+user.vacation_days+" Tage"]){c=document.createElement("td");c.textContent=value;row.append(c)}c=document.createElement("td");let button=document.createElement("button");button.className="secondary";button.textContent="Anzeigen";button.onclick=()=>months(user);c.append(button);row.append(c);body.append(row)}}
+async function months(user){const list=await request("/api/v1/admin/tf/"+user.id+"/months");const box=document.getElementById("months");box.replaceChildren();let title=document.createElement("h3");title.textContent="Monate · "+user.first_name+" "+user.last_name;box.append(title);if(!list.length){box.append("Noch keine Monatsdaten gesendet.");return}for(const m of list){let button=document.createElement("button");button.className="secondary";button.style.margin="4px";button.textContent=m.month+"/"+m.year+" · "+m.entry_count+" Einträge";button.onclick=async()=>{const entries=await request("/api/v1/admin/tf/"+user.id+"/months/"+m.year+"/"+m.month+"/entries");let pre=document.createElement("pre");pre.style.whiteSpace="pre-wrap";pre.textContent=JSON.stringify(entries,null,2);box.querySelector("pre")?.remove();box.append(pre)};box.append(button)}}
+document.getElementById("loginForm").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);try{await request("/api/v1/admin/login",{method:"POST",body:JSON.stringify(Object.fromEntries(f))});await show()}catch(err){document.getElementById("loginMessage").textContent=err.message}};
+document.getElementById("tfForm").onsubmit=async e=>{e.preventDefault();let data=Object.fromEntries(new FormData(e.target));data.target_hours_minutes=Math.round(Number(data.target_hours)*60);delete data.target_hours;data.vacation_days=Number(data.vacation_days);data.bahncard=Number(data.bahncard);const msg=document.getElementById("tfMessage");try{await request("/api/v1/admin/tf",{method:"POST",body:JSON.stringify(data)});e.target.reset();msg.className="ok";msg.textContent="Tf angelegt.";await refresh()}catch(err){msg.className="error";msg.textContent=err.message}};
+document.getElementById("logout").onclick=async()=>{await request("/api/v1/admin/logout",{method:"POST"});location.reload()};
+request("/api/v1/admin/tf").then(show).catch(()=>{});
+</script></body></html>

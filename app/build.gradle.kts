@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val apiBaseUrl = providers.gradleProperty("lokzeitleisteApiBaseUrl").orElse("").get()
+
 android {
     namespace = "de.lokzeitleiste.app"
     compileSdk = 35
@@ -11,10 +13,11 @@ android {
         applicationId = "de.lokzeitleiste.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "0.4"
+        versionCode = 5
+        versionName = "0.5"
+        buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
     }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
 }
 
 dependencies {
