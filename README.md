@@ -1,4 +1,4 @@
-# LokZeitleiste v0.2
+# LokZeitleiste v0.3
 
 Android-Studio-Projekt für eine monatliche Arbeitszeiterfassung auf einem 10-Zoll-Tablet.
 
@@ -10,6 +10,7 @@ Android-Studio-Projekt für eine monatliche Arbeitszeiterfassung auf einem 10-Zo
 - Footer mit Arbeitszeit, Gastfahrtzeit, Urlaubstagen, Nachtstunden und Sonntagsstunden.
 - Separater Zugfahrtbereich aus LokZeit v0.3: Dienst und Zugnummer, manuelle Standzeiten, GPS-Vorschläge für Ankunft und Abfahrt, OSM-Betriebsstellen mit DS100-Suche, Gründe, Notizen, Korrektur und Löschung. LokZeit selbst bleibt unverändert.
 - Rufbereitschaft erfasst Datum, Beginn und Ende. Bei auswärtigem Aufenthalt werden Dienstwohnung oder Hotel mit Hotelnamen erfasst. Für Rufbereitschaft werden keine Pause, Gastfahrt und Notiz abgefragt.
+- Nach der derzeit vorgegebenen Tarifregel darf Rufbereitschaft nur am selben Tag zwischen 08:00 und 20:00 Uhr liegen und höchstens acht Stunden dauern. Die Eingabe wird beim Speichern dagegen geprüft.
 
 ## Vorläufige Berechnung in v0.1
 

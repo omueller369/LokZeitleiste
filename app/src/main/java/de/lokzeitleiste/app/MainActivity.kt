@@ -183,6 +183,8 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     OutlinedTextField(start, { start = it }, label = { Text("Beginn (HH:MM)") })
                     OutlinedTextField(end, { end = it }, label = { Text("Ende (HH:MM)") })
                     if (kind == "Rufbereitschaft") {
+                        Text("Tarifgrenze: nur 08:00–20:00 Uhr, höchstens 8 Stunden.",
+                            style = MaterialTheme.typography.bodySmall)
                         Row { Switch(checked = away, onCheckedChange = { away = it })
                             Text("Auswärts verbracht", modifier = Modifier.padding(12.dp)) }
                         if (away) {
@@ -221,6 +223,11 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                             if (isCall && away && accommodation == "Hotel") hotelName.trim() else "") }.getOrNull()
                         error = when {
                             candidate == null || p == null || g == null || p < 0 || g < 0 -> "Datum, Zeiten und Minuten prüfen."
+                            isCall && (minutes(candidate.start) < 8 * 60 ||
+                                minutes(candidate.end) > 20 * 60 ||
+                                minutes(candidate.end) <= minutes(candidate.start) ||
+                                length(candidate) > 8 * 60) ->
+                                "Rufbereitschaft: 08:00–20:00 Uhr, höchstens 8 Stunden am selben Tag."
                             isCall && away && accommodation !in listOf("Dienstwohnung", "Hotel") -> "Bitte Unterkunft wählen."
                             isCall && away && accommodation == "Hotel" && hotelName.isBlank() -> "Bitte Hotelnamen angeben."
                             kind == "Urlaub" && entries.any { it.date == candidate.date && it.kind == "Urlaub" } -> "Urlaub ist für diesen Tag bereits erfasst."
