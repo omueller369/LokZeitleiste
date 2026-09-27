@@ -1,4 +1,4 @@
-# LokZeitleiste v0.3
+# LokZeitleiste v0.4
 
 Android-Studio-Projekt für eine monatliche Arbeitszeiterfassung auf einem 10-Zoll-Tablet.
 
@@ -11,6 +11,8 @@ Android-Studio-Projekt für eine monatliche Arbeitszeiterfassung auf einem 10-Zo
 - Separater Zugfahrtbereich aus LokZeit v0.3: Dienst und Zugnummer, manuelle Standzeiten, GPS-Vorschläge für Ankunft und Abfahrt, OSM-Betriebsstellen mit DS100-Suche, Gründe, Notizen, Korrektur und Löschung. LokZeit selbst bleibt unverändert.
 - Rufbereitschaft erfasst Datum, Beginn und Ende. Bei auswärtigem Aufenthalt werden Dienstwohnung oder Hotel mit Hotelnamen erfasst. Für Rufbereitschaft werden keine Pause, Gastfahrt und Notiz abgefragt.
 - Nach der derzeit vorgegebenen Tarifregel darf Rufbereitschaft nur am selben Tag zwischen 08:00 und 20:00 Uhr liegen und höchstens acht Stunden dauern. Die Eingabe wird beim Speichern dagegen geprüft.
+- Bereitschaft wird wie Rufbereitschaft mit Zeitraum und optionaler Auswärtigkeit samt Unterkunft erfasst. Sie kann zu beliebiger Tageszeit und über Mitternacht liegen. Bis zur Bestätigung der Fachregel gilt in v0.4 auch hier eine Höchstdauer von acht Stunden. Die Vorgaben der Personalplanung werden manuell eingetragen; es gibt noch keine Schnittstelle zu einem Planungssystem.
+- Eine gespeicherte Rufbereitschaft oder Bereitschaft kann innerhalb ihres Zeitraums in eine Zugfahrt übergehen. Der Tf trägt Übergangsdatum, Übergangszeit und Ende der Zugfahrt ein. Der ursprüngliche Eintrag wird am Übergang beendet, und eine Zugfahrt mit dem Vermerk über den Ursprung wird angelegt. Erfolgt der Übergang sofort zu Beginn, entfällt der ursprüngliche Eintrag. Der Wechsel erzeugt noch keinen automatischen Dienst oder Standzeitdatensatz im separaten LokZeit-Zugfahrtbereich.
 
 ## Vorläufige Berechnung in v0.1
 

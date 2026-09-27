@@ -35,6 +35,14 @@ private fun length(e: Entry): Int {
     if (end <= start) end += 1440
     return (end - start - e.pause).coerceAtLeast(0)
 }
+private fun startAt(e: Entry): LocalDateTime =
+    LocalDate.parse(e.date).atTime(LocalTime.parse(e.start))
+private fun endAt(e: Entry): LocalDateTime {
+    val from = startAt(e)
+    var until = LocalDate.parse(e.date).atTime(LocalTime.parse(e.end))
+    if (!until.isAfter(from)) until = until.plusDays(1)
+    return until
+}
 private fun overlap(e: Entry, condition: (LocalDateTime) -> Boolean): Int {
     val date = LocalDate.parse(e.date)
     val from = date.atTime(LocalTime.parse(e.start))
@@ -147,6 +155,11 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
     var accommodationExpanded by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var transitionEntry by remember { mutableStateOf<Entry?>(null) }
+    var transitionDate by remember { mutableStateOf(LocalDate.now().toString()) }
+    var transitionTime by remember { mutableStateOf("12:00") }
+    var trainEnd by remember { mutableStateOf("14:00") }
+    var transitionError by remember { mutableStateOf("") }
     val selected = entries.filter { runCatching { YearMonth.from(LocalDate.parse(it.date)) == month }.getOrDefault(false) }.sortedBy { it.date + it.start }
     val work = selected.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }.sumOf { length(it) }
     val guests = selected.sumOf { it.guest }
@@ -182,8 +195,10 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     OutlinedTextField(date, { date = it }, label = { Text("Datum (JJJJ-MM-TT)") })
                     OutlinedTextField(start, { start = it }, label = { Text("Beginn (HH:MM)") })
                     OutlinedTextField(end, { end = it }, label = { Text("Ende (HH:MM)") })
-                    if (kind == "Rufbereitschaft") {
-                        Text("Tarifgrenze: nur 08:00–20:00 Uhr, höchstens 8 Stunden.",
+                    if (kind == "Rufbereitschaft" || kind == "Bereitschaft") {
+                        Text(if (kind == "Rufbereitschaft")
+                            "Tarifgrenze: nur 08:00–20:00 Uhr, höchstens 8 Stunden."
+                            else "Zeiten laut Personalplanung; vorläufig höchstens 8 Stunden, auch über Mitternacht.",
                             style = MaterialTheme.typography.bodySmall)
                         Row { Switch(checked = away, onCheckedChange = { away = it })
                             Text("Auswärts verbracht", modifier = Modifier.padding(12.dp)) }
@@ -213,23 +228,25 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     }
                     if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
                     Button(onClick = {
-                        val isCall = kind == "Rufbereitschaft"
-                        val p = if (isCall) 0 else pause.toIntOrNull()
-                        val g = if (isCall) 0 else guest.toIntOrNull()
+                        val isStandby = kind == "Rufbereitschaft" || kind == "Bereitschaft"
+                        val p = if (isStandby) 0 else pause.toIntOrNull()
+                        val g = if (isStandby) 0 else guest.toIntOrNull()
                         val candidate = runCatching { Entry(kind, LocalDate.parse(date).toString(),
                             LocalTime.parse(start).toString(), LocalTime.parse(end).toString(), p!!, g!!,
-                            if (isCall) "" else note, isCall && away,
-                            if (isCall && away) accommodation else "",
-                            if (isCall && away && accommodation == "Hotel") hotelName.trim() else "") }.getOrNull()
+                            if (isStandby) "" else note, isStandby && away,
+                            if (isStandby && away) accommodation else "",
+                            if (isStandby && away && accommodation == "Hotel") hotelName.trim() else "") }.getOrNull()
                         error = when {
                             candidate == null || p == null || g == null || p < 0 || g < 0 -> "Datum, Zeiten und Minuten prüfen."
-                            isCall && (minutes(candidate.start) < 8 * 60 ||
+                            kind == "Rufbereitschaft" && (minutes(candidate.start) < 8 * 60 ||
                                 minutes(candidate.end) > 20 * 60 ||
                                 minutes(candidate.end) <= minutes(candidate.start) ||
                                 length(candidate) > 8 * 60) ->
                                 "Rufbereitschaft: 08:00–20:00 Uhr, höchstens 8 Stunden am selben Tag."
-                            isCall && away && accommodation !in listOf("Dienstwohnung", "Hotel") -> "Bitte Unterkunft wählen."
-                            isCall && away && accommodation == "Hotel" && hotelName.isBlank() -> "Bitte Hotelnamen angeben."
+                            kind == "Bereitschaft" && length(candidate) > 8 * 60 ->
+                                "Bereitschaft darf vorläufig höchstens 8 Stunden dauern."
+                            isStandby && away && accommodation !in listOf("Dienstwohnung", "Hotel") -> "Bitte Unterkunft wählen."
+                            isStandby && away && accommodation == "Hotel" && hotelName.isBlank() -> "Bitte Hotelnamen angeben."
                             kind == "Urlaub" && entries.any { it.date == candidate.date && it.kind == "Urlaub" } -> "Urlaub ist für diesen Tag bereits erfasst."
                             kind != "Urlaub" && (length(candidate) <= 0 || g > length(candidate)) -> "Dauer muss positiv sein; Gastfahrt darf Dauer nicht übersteigen."
                             else -> ""
@@ -252,14 +269,19 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                         selected.forEach { entry ->
                             Row {
                                 Text(runCatching { LocalDate.parse(entry.date).format(dateFormat) }.getOrDefault(entry.date), Modifier.width(105.dp))
-                                Text(if (entry.kind == "Rufbereitschaft" && entry.away)
-                                    "Rufbereitschaft · " + entry.accommodation +
+                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft") && entry.away)
+                                    entry.kind + " · " + entry.accommodation +
                                         (if (entry.hotelName.isBlank()) "" else " · " + entry.hotelName)
                                     else entry.kind, Modifier.width(220.dp))
                                 Text(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${entry.end}", Modifier.width(105.dp))
-                                Text(if (entry.kind == "Rufbereitschaft") "—" else "${entry.pause} min", Modifier.width(105.dp))
-                                Text(if (entry.kind == "Rufbereitschaft") "—" else "${entry.guest} min", Modifier.width(105.dp))
+                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.pause} min", Modifier.width(105.dp))
+                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.guest} min", Modifier.width(105.dp))
                                 Text(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
+                                if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft"))
+                                    TextButton(onClick = {
+                                        transitionEntry = entry; transitionDate = entry.date
+                                        transitionTime = entry.start; transitionError = ""
+                                    }) { Text("→ Zugfahrt") }
                                 TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; save(context, username, entries) }) { Text("Löschen") }
                             }
                             HorizontalDivider()
@@ -277,5 +299,42 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                 }
             }
         }
+    }
+    transitionEntry?.let { original ->
+        AlertDialog(onDismissRequest = { transitionEntry = null },
+            title = { Text("In Zugfahrt übergehen") },
+            text = { Column {
+                Text("${original.kind}: ${original.date}, ${original.start}–${original.end}. Die Bereitschaft endet am Übergangszeitpunkt.")
+                OutlinedTextField(transitionDate, { transitionDate = it }, label = { Text("Übergangsdatum (JJJJ-MM-TT)") })
+                OutlinedTextField(transitionTime, { transitionTime = it }, label = { Text("Beginn Zugfahrt (HH:MM)") })
+                OutlinedTextField(trainEnd, { trainEnd = it }, label = { Text("Ende Zugfahrt (HH:MM)") })
+                if (transitionError.isNotBlank()) Text(transitionError, color = MaterialTheme.colorScheme.error)
+            } },
+            confirmButton = { Button(onClick = {
+                val at = runCatching { LocalDate.parse(transitionDate).atTime(LocalTime.parse(transitionTime)) }.getOrNull()
+                val finish = runCatching { LocalTime.parse(trainEnd) }.getOrNull()
+                val index = entries.indexOfFirst { it === original }
+                transitionError = when {
+                    at == null || finish == null -> "Datum und Uhrzeiten prüfen."
+                    index < 0 -> "Eintrag wurde inzwischen geändert."
+                    at.isBefore(startAt(original)) || !at.isBefore(endAt(original)) ->
+                        "Übergang muss zwischen Beginn (einschließlich) und Ende liegen."
+                    finish == at.toLocalTime() -> "Bitte ein anderes Ende der Zugfahrt angeben."
+                    else -> ""
+                }
+                if (transitionError.isEmpty() && at != null && finish != null && index >= 0) {
+                    val shortened = original.copy(end = at.toLocalTime().toString())
+                    val trip = Entry("Zugfahrt", at.toLocalDate().toString(),
+                        at.toLocalTime().toString(), finish.toString(), 0, 0,
+                        "Übergang aus ${original.kind}")
+                    entries = entries.toMutableList().also {
+                        if (at == startAt(original)) it.removeAt(index) else it[index] = shortened
+                        it.add(trip)
+                    }
+                    save(context, username, entries); month = YearMonth.from(at)
+                    transitionEntry = null
+                }
+            }) { Text("Übergang speichern") } },
+            dismissButton = { TextButton(onClick = { transitionEntry = null }) { Text("Abbrechen") } })
     }
 }
