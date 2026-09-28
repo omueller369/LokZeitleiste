@@ -1,6 +1,7 @@
 from datetime import date, datetime, timezone
 
-from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
+from sqlalchemy.dialects.mysql import LONGBLOB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -30,6 +31,8 @@ class TfProfile(Base):
     vacation_days: Mapped[int] = mapped_column(Integer, nullable=False)
     birth_date: Mapped[date] = mapped_column(Date, nullable=False)
     bahncard: Mapped[int] = mapped_column(Integer, nullable=False)
+    email: Mapped[str | None] = mapped_column(String(320), nullable=True)
+    federal_state: Mapped[str | None] = mapped_column(String(2), nullable=True)
     user: Mapped[User] = relationship(back_populates="profile")
 
 
@@ -69,3 +72,18 @@ class WorkEntry(Base):
     hotel_name: Mapped[str] = mapped_column(String(200), default="", nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, onupdate=now_utc, nullable=False)
     work_month: Mapped[WorkMonth] = relationship(back_populates="entries")
+
+
+class ReportDispatch(Base):
+    __tablename__ = "report_dispatches"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    work_month_id: Mapped[int] = mapped_column(ForeignKey("work_months.id"), nullable=False)
+    recipient_email: Mapped[str] = mapped_column(String(320), nullable=False)
+    filename: Mapped[str] = mapped_column(String(120), nullable=False)
+    pdf_data: Mapped[bytes | None] = mapped_column(LargeBinary().with_variant(LONGBLOB(), "mysql"), nullable=True)
+    status: Mapped[str] = mapped_column(String(12), default="pending", nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_error: Mapped[str] = mapped_column(String(500), default="", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

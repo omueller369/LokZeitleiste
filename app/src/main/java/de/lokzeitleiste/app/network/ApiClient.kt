@@ -46,7 +46,8 @@ object ApiClient {
         post("/api/v1/tf/logout", JSONObject(), token)
         Unit
     }
-    suspend fun upload(month: YearMonth, entries: List<Entry>, token: String): Int = withContext(Dispatchers.IO) {
+    data class UploadResult(val accepted: Int, val emailQueued: Boolean)
+    suspend fun upload(month: YearMonth, entries: List<Entry>, token: String): UploadResult = withContext(Dispatchers.IO) {
         val items = JSONArray()
         entries.forEach { items.put(JSONObject()
             .put("client_id", it.clientId).put("kind", it.kind).put("date", it.date)
@@ -55,6 +56,6 @@ object ApiClient {
             .put("accommodation", it.accommodation).put("hotel_name", it.hotelName)) }
         val reply = post("/api/v1/me/months/${month.year}/${month.monthValue}/entries",
             JSONObject().put("entries", items), token)
-        reply.getInt("accepted")
+        UploadResult(reply.getInt("accepted"), reply.optString("email_status") == "queued")
     }
 }

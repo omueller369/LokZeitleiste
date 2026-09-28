@@ -2,7 +2,10 @@ from datetime import date, time
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, EmailStr, Field, model_validator
+
+
+FederalState = Literal["BB", "BE", "BW", "BY", "HB", "HE", "HH", "MV", "NI", "NW", "RP", "SH", "SL", "SN", "ST", "TH"]
 
 
 EntryKind = Literal["Rufbereitschaft", "Bereitschaft", "Zugfahrt", "Ausfallschicht", "Krank", "Urlaub", "Sonstige Erfassung"]
@@ -22,6 +25,13 @@ class TfCreate(Credentials):
     vacation_days: int = Field(ge=0, le=366)
     birth_date: date
     bahncard: Literal[50, 100]
+    email: EmailStr
+    federal_state: FederalState
+
+
+class TfDeliveryUpdate(BaseModel):
+    email: EmailStr
+    federal_state: FederalState
 
 
 class EntryIn(BaseModel):

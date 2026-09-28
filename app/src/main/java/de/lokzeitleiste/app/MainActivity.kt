@@ -96,8 +96,9 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     sending = true; sendMessage = ""
                     scope.launch {
                         try {
-                            val count = ApiClient.upload(month, selected, token)
-                            sendMessage = "$count Einträge für ${month.monthValue}/${month.year} gesendet."
+                            val result = ApiClient.upload(month, selected, token)
+                            sendMessage = "${result.accepted} Einträge für ${month.monthValue}/${month.year} übertragen." +
+                                (if (result.emailQueued) " PDF-Bestätigung per E-Mail beauftragt." else "")
                         } catch (error: Exception) {
                             sendMessage = error.message ?: "Senden fehlgeschlagen."
                             if (sendMessage.startsWith("Anmeldung abgelaufen")) onLogout()

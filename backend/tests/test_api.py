@@ -1,6 +1,7 @@
 import unittest
 from datetime import date
 from uuid import uuid4
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -9,7 +10,7 @@ from sqlalchemy.pool import StaticPool
 
 from lokzeitleiste.db import Base, database_session
 from lokzeitleiste.main import app
-from lokzeitleiste.models import User
+from lokzeitleiste.models import ReportDispatch, User
 from lokzeitleiste.security import hash_password
 
 
@@ -22,6 +23,12 @@ class ApiFlowTest(unittest.TestCase):
             with Session(self.engine, expire_on_commit=False) as db:
                 yield db
         app.dependency_overrides[database_session] = test_session
+        self.engine_patch = patch("lokzeitleiste.reports.service.engine", return_value=self.engine)
+        self.smtp_patch = patch.dict("os.environ", {"SMTP_HOST": "smtp.example.test", "SMTP_FROM": "test@example.test"})
+        self.send_patch = patch("lokzeitleiste.reports.service.send_receipt")
+        self.engine_patch.start()
+        self.smtp_patch.start()
+        self.send_mock = self.send_patch.start()
         with Session(self.engine) as db:
             db.add(User(username="admin", password_hash=hash_password("admin-secret-12345"), role="admin"))
             db.commit()
@@ -30,6 +37,9 @@ class ApiFlowTest(unittest.TestCase):
     def tearDown(self):
         self.client.close()
         app.dependency_overrides.clear()
+        self.send_patch.stop()
+        self.smtp_patch.stop()
+        self.engine_patch.stop()
         self.engine.dispose()
 
     def create_tf(self, username, personnel):
@@ -38,6 +48,7 @@ class ApiFlowTest(unittest.TestCase):
             "last_name": "Beispiel", "personnel_number": personnel,
             "target_hours_minutes": 9600, "vacation_days": 30,
             "birth_date": "1990-05-12", "bahncard": 50,
+            "email": username + "@example.com", "federal_state": "BE",
         })
 
     def test_admin_creation_upload_idempotence_and_owner_isolation(self):
@@ -69,11 +80,58 @@ class ApiFlowTest(unittest.TestCase):
         invalid = dict(item, kind="Rufbereitschaft", start="07:00", end="10:00")
         self.assertEqual(self.client.post(path, json={"entries": [invalid]}, headers=headers_one).status_code, 422)
         self.assertEqual(len(self.client.get(path, headers=headers_one).json()), 1)
+        self.assertEqual(self.send_mock.call_count, 2)
+        self.assertTrue(self.send_mock.call_args.kwargs["pdf_data"].startswith(b"%PDF"))
+        with Session(self.engine) as db:
+            self.assertEqual([r.status for r in db.query(ReportDispatch).all()], ["sent", "sent"])
+        summary = self.client.get("/api/v1/me/months/2026/9/summary", headers=headers_one)
+        self.assertEqual(summary.status_code, 200, summary.text)
+        self.assertEqual(summary.json()["totals"]["credited"], 960)
+        self.assertEqual(summary.json()["totals"]["night"], 480)
+        self.assertEqual(self.client.get("/api/v1/me/months/2026/9/summary", headers=headers_two).json()["days"], [])
 
     def test_unauthed_requests_are_rejected(self):
         self.assertEqual(self.client.get("/api/v1/admin/tf").status_code, 401)
         self.assertEqual(self.client.post("/api/v1/me/months/2026/9/entries",
             json={"entries": []}).status_code, 401)
+
+    def test_month_topup_uses_guest_once_and_absence_once_per_day(self):
+        self.client.post("/api/v1/admin/login", json={"username": "admin", "password": "admin-secret-12345"})
+        tf_id = self.create_tf("tf-example", "P-003").json()["id"]
+        token = self.client.post("/api/v1/tf/login", json={"username": "tf-example", "password": "tf-secret-12345"}).json()["access_token"]
+        headers = {"Authorization": "Bearer " + token}
+        def entry(kind, day, start="08:00", end="12:00", guest=0):
+            return {"client_id": str(uuid4()), "kind": kind, "date": day,
+                    "start": start, "end": end, "pause": 0, "guest": guest}
+        items = [entry("Zugfahrt", "2026-09-21", guest=120),
+                 entry("Zugfahrt", "2026-09-22", end="18:00", guest=60),
+                 entry("Urlaub", "2026-09-23"), entry("Krank", "2026-09-24")]
+        response = self.client.post("/api/v1/me/months/2026/9/entries", json={"entries": items}, headers=headers)
+        self.assertEqual(response.status_code, 200, response.text)
+        report = self.client.get(f"/api/v1/admin/tf/{tf_id}/months/2026/9/summary").json()
+        self.assertEqual(report["totals"]["work_without_guest"], 660)
+        self.assertEqual(report["totals"]["guest"], 180)
+        self.assertEqual(report["totals"]["guest_used_for_target"], 120)
+        self.assertEqual(report["totals"]["topup"], 240)
+        self.assertEqual(report["totals"]["credited"], 2040)
+        self.assertEqual((report["vacation_days"], report["sick_days"]), (1, 1))
+        self.assertEqual(len(report["days"]), 4)
+
+    def test_upload_needs_mail_settings_and_failure_remains_retryable(self):
+        self.client.post("/api/v1/admin/login", json={"username": "admin", "password": "admin-secret-12345"})
+        tf_id = self.create_tf("tf-missing", "P-004").json()["id"]
+        token = self.client.post("/api/v1/tf/login", json={"username": "tf-missing", "password": "tf-secret-12345"}).json()["access_token"]
+        headers = {"Authorization": "Bearer " + token}
+        item = {"client_id": str(uuid4()), "kind": "Zugfahrt", "date": "2026-09-10",
+                "start": "08:00", "end": "11:00", "pause": 0, "guest": 0}
+        with patch.dict("os.environ", {"SMTP_HOST": ""}):
+            self.assertEqual(self.client.post("/api/v1/me/months/2026/9/entries", json={"entries": [item]}, headers=headers).status_code, 503)
+        self.assertEqual(self.client.get("/api/v1/me/months/2026/9/entries", headers=headers).json(), [])
+        self.send_mock.side_effect = OSError("SMTP vorübergehend nicht erreichbar")
+        self.assertEqual(self.client.post("/api/v1/me/months/2026/9/entries", json={"entries": [item]}, headers=headers).status_code, 200)
+        status = self.client.get(f"/api/v1/admin/tf/{tf_id}/reports").json()
+        self.assertEqual(status[0]["status"], "failed")
+        self.assertEqual(status[0]["attempts"], 1)
 
 
 if __name__ == "__main__":
