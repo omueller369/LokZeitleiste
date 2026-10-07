@@ -13,6 +13,8 @@ case "${1:-status}" in
     umask 077
     mkdir -p testenv/backups
     target="testenv/backups/mysql-$(date -u +%Y%m%dT%H%M%SZ).sql"
+    # Variablen werden im Datenbankcontainer ausgewertet.
+    # shellcheck disable=SC2016
     "${compose[@]}" exec -T db sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --no-tablespaces -u "$MYSQL_USER" "$MYSQL_DATABASE"' > "$target"
     echo "Sicherung: $target" ;;
   *) echo 'Verwendung: control.sh start|stop|status|logs|admin|backup' >&2; exit 2 ;;

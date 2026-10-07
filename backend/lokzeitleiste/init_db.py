@@ -13,7 +13,7 @@ def main():
     Base.metadata.create_all(engine())
     if len(sys.argv) == 2 and sys.argv[1] == "--create-admin":
         name = input("Admin-Benutzername: ").strip().lower()
-        if not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in name):
+        if not 3 <= len(name) <= 64 or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in name):
             raise SystemExit("Ungültiger Benutzername")
         password = getpass.getpass("Admin-Passwort (mindestens 12 Zeichen): ")
         with Session(engine()) as db:

@@ -4,6 +4,8 @@ FastAPI stellt die Admin-Oberfläche unter `/admin` und die API für die Android
 
 ## Vollständige Testumgebung auf einer Debian-VM
 
+Die [automatische Setup-Routine](../setup/README.md) übernimmt Abhängigkeitsprüfung, Paketinstallation, Containerstart und Apache-Konfiguration: im Repository-Hauptordner `sudo bash setup/install-debian.sh`.
+
 Für Tests einschließlich PDF-E-Mail steht ein separater Stack mit MySQL und Mailpit bereit. Die [Einrichtungsanleitung](testenv/README.md) beschreibt Vorbereitung, Apache, SSH-Tunnel, App-Verbindung, durchgängigen Test und Sicherung. Start: `bash testenv/prepare.sh` und `sudo bash testenv/control.sh start`.
 
 ## Zunächst lokal: Apache und MySQL
