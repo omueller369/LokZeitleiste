@@ -1,0 +1,6 @@
+.env*
+.deps
+__pycache__
+*.pyc
+testenv/certs
+testenv/backups

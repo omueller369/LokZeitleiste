@@ -11,3 +11,6 @@ backend/.env.local
 __pycache__/
 *.pyc
 .deps/
+backend/.env.test
+backend/testenv/certs/
+backend/testenv/backups/
