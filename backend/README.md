@@ -42,6 +42,10 @@ Dieser Server ist über die Loopback-Adresse nur vom Entwicklungsrechner beziehu
 
 Die Datei `compose.yaml` enthält alternativ einen MySQL-Container und den Python-API-Container. Für einen erreichbaren Server wird ein HTTPS-Reverse-Proxy benötigt. Dann `COOKIE_SECURE=true`, `PUBLIC_ORIGIN` auf den exakten HTTPS-Ursprung und im Android-Build eine HTTPS-API-Adresse setzen. Die App lässt HTTP nur im Debug-Emulator an `10.0.2.2:8080` zu.
 
+## Arbeitszeitplanung
+
+Admins können pro Tf einen bearbeitbaren Arbeits-, Urlaubs- und Ruhetagsplan anlegen, XLSX-Dateien mit Importvorschau übernehmen und farbige Monats-/Jahres-PDFs erstellen. Arbeitstage und Urlaub zählen im Plan mit jeweils acht Stunden, Ruhetage mit null; nur ausdrücklich geplante Tage werden berechnet. Regeln, Installation und Excel-Format stehen in der [Modulanleitung](lokzeitleiste/planning/README.md).
+
 ## Funktionen und Grenzen
 
 Admins melden sich über ein HttpOnly-Cookie an, legen Tf mit Name, Vorname, Personalnummer, monatlichen Sollstunden, Urlaubstagen, Geburtsdatum, BahnCard 50 oder 100, E-Mail und Bundesland an und können deren Monate einsehen. Für bereits angelegte Tf sind E-Mail und Bundesland in der Admin-Tabelle nachzutragen. Die App meldet Tf über die API an und sendet den ausgewählten Monat. Einträge werden mit ihrer `client_id` bei erneutem Senden aktualisiert und sind dem angemeldeten Tf zugeordnet. Passwortprüfwerte verwenden PBKDF2-HMAC-SHA256 und zufälligen Salt. App-Tokens sind mit Android Keystore geschützt und verfallen serverseitig nach 365 Tagen.

@@ -21,7 +21,7 @@ from .reports.monthly import summarize_month
 from .reports.service import process_dispatch
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.7")
+app = FastAPI(title="LokZeitleiste API", version="0.9")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -162,6 +162,11 @@ def month_summary(db: Session, tf_id: int, year: int, month: int):
         result = summarize_month(entries, year=year, month=month, federal_state=profile.federal_state)
     except ValueError as exc:
         raise HTTPException(409, str(exc)) from exc
+    from .planning.service import get_month
+    planning = get_month(db, tf_id, year, month)
+    result["planning"] = planning
+    result["target_minutes"] = planning["target_minutes"]
+    result["balance_minutes"] = result["totals"]["credited"] - planning["target_minutes"] if planning["complete"] else None
     result["tf_user_id"] = tf_id
     today = datetime.now(ZoneInfo("Europe/Berlin"))
     result["status"] = "vorläufig" if (year, month) >= (today.year, today.month) else "Monatsende"
@@ -274,3 +279,17 @@ def my_entries(year: int, month: int, user: User = Depends(require_tf), db: Sess
     period = db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id == user.id,
                                               WorkMonth.year == year, WorkMonth.month == month))
     return [entry_dict(e) for e in period.entries] if period else []
+
+
+from .planning.api import create_router
+app.include_router(create_router(require_admin))
+
+
+@app.get("/admin/planning")
+def planning_page():
+    return FileResponse(Path(__file__).parent / "static" / "planning.html")
+
+
+@app.get("/admin/planning.js")
+def planning_script():
+    return FileResponse(Path(__file__).parent / "static" / "planning.js", media_type="text/javascript")

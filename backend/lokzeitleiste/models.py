@@ -87,3 +87,39 @@ class ReportDispatch(Base):
     last_error: Mapped[str] = mapped_column(String(500), default="", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class PlanMonth(Base):
+    __tablename__ = "plan_months"
+    __table_args__ = (UniqueConstraint("tf_user_id", "year", "month"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    month: Mapped[int] = mapped_column(Integer, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    days: Mapped[list["PlanDay"]] = relationship(back_populates="period", cascade="all, delete-orphan")
+
+
+class PlanDay(Base):
+    __tablename__ = "plan_days"
+    __table_args__ = (UniqueConstraint("plan_month_id", "day"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    plan_month_id: Mapped[int] = mapped_column(ForeignKey("plan_months.id"), nullable=False)
+    day: Mapped[date] = mapped_column(Date, nullable=False)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    note: Mapped[str] = mapped_column(String(500), default="", nullable=False)
+    period: Mapped[PlanMonth] = relationship(back_populates="days")
+
+
+class PlanChange(Base):
+    __tablename__ = "plan_changes"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    admin_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    day: Mapped[date] = mapped_column(Date, nullable=False)
+    previous_kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    new_kind: Mapped[str] = mapped_column(String(20), nullable=False)
+    previous_note: Mapped[str] = mapped_column(String(500), nullable=False)
+    new_note: Mapped[str] = mapped_column(String(500), nullable=False)
+    source: Mapped[str] = mapped_column(String(12), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
