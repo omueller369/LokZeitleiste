@@ -11,19 +11,29 @@ Der Setup-Stand liegt im Branch `setup/debian-testumgebung`:
 ```bash
 git clone --branch setup/debian-testumgebung git@github.com:omueller369/LokZeitleiste.git
 cd LokZeitleiste
-bash setup/install-ubuntu.sh --check
-sudo bash setup/install-ubuntu.sh
+bash setup.sh --check
+sudo bash setup.sh
 ```
 
-Nach Übernahme in `main` kann der Branch-Parameter beim Klonen entfallen. Auf einem bestehenden Checkout zuerst lokale Änderungen prüfen, dann den Setup-Branch auschecken. Der Vorprüflauf installiert nichts. Die Installation ergänzt anschließend fehlende Pakete, startet Dienste und fragt bei der ersten Installation nach einem Admin-Benutzernamen und Passwort. Admin-Passwort mindestens zwölf Zeichen. Es werden keine Standardzugangsdaten vergeben.
+Nach Übernahme in `main` kann der Branch-Parameter beim Klonen entfallen. Auf einem bestehenden Checkout zuerst lokale Änderungen prüfen, dann den Setup-Branch auschecken. Der Vorprüflauf installiert nichts. `sudo bash setup.sh` installiert anschließend fehlende Pakete, baut und startet alle Backend-Dienste und legt ohne Rückfragen den Admin **administrator** mit einem zufälligen Passwort an. Ubuntu selbst muss bereits auf dem Server installiert sein.
 
-Der gemeinsame Installer liegt in `setup/install.sh`. `install-ubuntu.sh` und der ältere Einstieg `install-debian.sh` leiten daran weiter.
+Das initiale Admin-Passwort liegt ausschließlich auf dem Server in `/var/lib/lokzeitleiste/admin-initial-password`, im Verzeichnis mit Rechten `700` und als Datei mit Rechten `600`. Anzeigen:
+
+```bash
+sudo cat /var/lib/lokzeitleiste/admin-initial-password
+```
+
+Ein bestehendes aktives Admin-Konto wird beibehalten. Dann wird keine neue Passwortdatei erzeugt. Nach fehlgeschlagener Erstinstallation wird die bereits erzeugte Datei beim nächsten Lauf wiederverwendet. Das Passwort wird nicht im Installationsprotokoll ausgegeben. Die Datei enthält das initiale Passwort; spätere Passwortänderungen aktualisieren sie nicht.
+
+Der gemeinsame Installer liegt in `setup/install.sh`. `setup.sh` aktiviert standardmäßig `--auto-admin`. `install-ubuntu.sh` und der ältere Einstieg `install-debian.sh` leiten ebenfalls an den gemeinsamen Installer weiter; ohne Admin-Optionen fragen diese beiden Einstiege interaktiv nach Zugangsdaten.
 
 Die Routine prüft Betriebssystem, Architektur, systemd, Projektdateien, freien Speicher, benötigte Pakete, Docker/Compose und Ports. Bei bestehenden konkurrierenden Diensten oder Paketkonflikten stoppt sie mit einem konkreten Hinweis. Nutzbare vorhandene Docker-Installationen werden verwendet. Fremde Containerplattformen werden nicht automatisch deinstalliert.
 
 Die Python-Pakete werden beim Containerbuild anhand von `backend/requirements.txt` installiert. Datenbank und API haben Gesundheitsprüfungen; der Versandworker startet nach der Datenbankinitialisierung. Abschließend werden API, Admin-Seite und Mailpit abgefragt. Das SMTP-Testzertifikat wird lokal erzeugt und vom Backend geprüft. Mailpit fängt alle Test-E-Mails ab; echte Empfänger erhalten keine Nachrichten.
 
 ## Installation ohne Eingabe
+
+Der empfohlene Einstieg ist `sudo bash setup.sh`. Alternativ: `sudo bash setup/install-ubuntu.sh --auto-admin`. Für selbst festgelegte Zugangsdaten:
 
 Für eine unbeaufsichtigte Installation eine Passwortdatei außerhalb des Repositorys mit genau einer Zeile und einem Passwort von mindestens zwölf Zeichen bereitstellen. Dateirechte auf `600` setzen. Keine Zugangsdaten in Git speichern.
 

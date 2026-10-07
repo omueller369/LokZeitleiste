@@ -7,6 +7,7 @@ CHECK_ONLY=false
 ADMIN_USER=''
 ADMIN_PASSWORD_FILE=''
 SKIP_ADMIN=false
+AUTO_ADMIN=false
 usage() {
   cat <<'HELP'
 Verwendung:
@@ -14,7 +15,10 @@ Verwendung:
   sudo bash setup/install.sh
   sudo bash setup/install.sh --admin-user USER --admin-password-file /pfad/passwort
   sudo bash setup/install.sh --skip-admin
+  sudo bash setup.sh
+  sudo bash setup/install.sh --auto-admin
 --check ist lesend und installiert nichts. Ohne Optionen wird ein Admin interaktiv angelegt.
+setup.sh verwendet automatisch --auto-admin: zufälliges Passwort, geschützt auf dem Server.
 HELP
 }
 die() { echo "FEHLER: $*" >&2; exit 1; }
@@ -22,12 +26,16 @@ while (($#)); do
   case "$1" in
     --check) CHECK_ONLY=true; shift ;;
     --skip-admin) SKIP_ADMIN=true; shift ;;
+    --auto-admin) AUTO_ADMIN=true; shift ;;
     --admin-user) (($# >= 2)) || die 'Benutzername fehlt'; ADMIN_USER=$2; shift 2 ;;
     --admin-password-file) (($# >= 2)) || die 'Passwortdatei fehlt'; ADMIN_PASSWORD_FILE=$2; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *) die "Unbekannte Option: $1" ;;
   esac
 done
+if [[ "$AUTO_ADMIN" == true ]]; then
+  [[ "$SKIP_ADMIN" == false && -z "$ADMIN_USER" && -z "$ADMIN_PASSWORD_FILE" ]] || die '--auto-admin nicht mit anderen Admin-Optionen kombinieren'
+fi
 [[ -r /etc/os-release ]] || die 'Betriebssystem nicht erkennbar'
 # shellcheck source=/dev/null
 . /etc/os-release
@@ -37,7 +45,7 @@ select_platform || die "Nicht unterstütztes System: ${ID:-?} ${VERSION_ID:-?}. 
 arch=$(dpkg --print-architecture)
 [[ "$arch" == amd64 || "$arch" == arm64 ]] || die 'Der MySQL-Teststack unterstützt hier amd64 oder arm64'
 [[ -d /run/systemd/system ]] || die 'Der Server muss mit systemd gestartet sein'
-for file in backend/compose.test.yaml backend/Dockerfile backend/requirements.txt backend/testenv/prepare.sh backend/testenv/control.sh backend/apache/lokzeitleiste-local.conf; do
+for file in setup/auto-admin.sh backend/compose.test.yaml backend/Dockerfile backend/requirements.txt backend/testenv/prepare.sh backend/testenv/control.sh backend/apache/lokzeitleiste-local.conf; do
   [[ -r "$ROOT_DIR/$file" ]] || die "Projektdatei fehlt: $file"
 done
 if [[ -n "$ADMIN_USER" || -n "$ADMIN_PASSWORD_FILE" ]]; then
@@ -51,7 +59,7 @@ if [[ -n "$ADMIN_USER" || -n "$ADMIN_PASSWORD_FILE" ]]; then
 fi
 if [[ "$CHECK_ONLY" == false ]]; then
   (( EUID == 0 )) || die 'Installation mit sudo ausführen'
-  if [[ "$SKIP_ADMIN" == false && -z "$ADMIN_USER" && ! -t 0 ]]; then
+  if [[ "$SKIP_ADMIN" == false && "$AUTO_ADMIN" == false && -z "$ADMIN_USER" && ! -t 0 ]]; then
     die 'Ohne Terminal: --admin-user und --admin-password-file verwenden'
   fi
 fi
@@ -158,6 +166,9 @@ curl --fail --silent --show-error http://localhost:8080/admin >/dev/null
 curl --fail --silent --show-error http://localhost:8025/api/v1/messages >/dev/null
 compose=(docker compose --project-directory "$BACKEND_DIR" --env-file "$BACKEND_DIR/.env.test" -f "$BACKEND_DIR/compose.test.yaml")
 if [[ "$SKIP_ADMIN" == false ]]; then
+  if [[ "$AUTO_ADMIN" == true ]]; then
+    bash "$ROOT_DIR/setup/auto-admin.sh" /var/lib/lokzeitleiste/admin-initial-password "${compose[@]}"
+  else
   admin_count=$("${compose[@]}" exec -T api python -c 'from sqlalchemy import select, func; from sqlalchemy.orm import Session; from lokzeitleiste.db import engine; from lokzeitleiste.models import User; db=Session(engine()); print(db.scalar(select(func.count()).select_from(User).where(User.role=="admin", User.active==True)))')
   if [[ -n "$ADMIN_USER" ]]; then
     "${compose[@]}" exec -T api python -m lokzeitleiste.bootstrap_admin "$ADMIN_USER" < "$ADMIN_PASSWORD_FILE"
@@ -165,6 +176,7 @@ if [[ "$SKIP_ADMIN" == false ]]; then
     bash "$BACKEND_DIR/testenv/control.sh" admin
   else
     echo 'Aktives Admin-Konto vorhanden; Zugangsdaten werden beibehalten.'
+  fi
   fi
 fi
 echo

@@ -18,7 +18,7 @@ Die Weboberfläche unter `/admin/planning` bietet einen farbigen Monatskalender 
 
 ## Start
 
-Die [automatische Ubuntu-Setup-Routine](setup/README.md) prüft Abhängigkeiten und installiert die vollständige Backend-Testumgebung. Vorprüfung: `bash setup/install-ubuntu.sh --check`; Installation: `sudo bash setup/install-ubuntu.sh`.
+Die [automatische Ubuntu-Setup-Routine](setup/README.md) prüft Abhängigkeiten und installiert die vollständige Backend-Testumgebung einschließlich Admin-Konto ohne Rückfragen. Vorprüfung: `bash setup.sh --check`; Installation: `sudo bash setup.sh`. Das zufällige initiale Admin-Passwort steht nur für root lesbar in `/var/lib/lokzeitleiste/admin-initial-password`.
 
 Die [Backend-Anleitung](backend/README.md) beschreibt die Testumgebung auf Ubuntu Server 26.04.1 LTS: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 

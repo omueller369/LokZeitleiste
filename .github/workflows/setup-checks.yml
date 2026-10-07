@@ -1,9 +1,9 @@
 name: Ubuntu and Debian setup checks
 on:
   push:
-    paths: ['setup/**', 'backend/**', '.github/workflows/setup-checks.yml']
+    paths: ['setup.sh', 'setup/**', 'backend/**', '.github/workflows/setup-checks.yml']
   pull_request:
-    paths: ['setup/**', 'backend/**', '.github/workflows/setup-checks.yml']
+    paths: ['setup.sh', 'setup/**', 'backend/**', '.github/workflows/setup-checks.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -19,10 +19,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
-          for script in setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh; do bash -n "$script"; done
-          shellcheck -x setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh
+          for script in setup.sh setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh; do bash -n "$script"; done
+          shellcheck -x setup.sh setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh
           bash setup/install-ubuntu.sh --help
           bash setup/tests/test-platform.sh
+          bash setup/tests/test-auto-admin.sh
           node --check backend/lokzeitleiste/static/planning.js
       - name: Compose configuration
         working-directory: backend
