@@ -1,6 +1,6 @@
 # Administrativer Arbeitszeit-, Urlaubs- und Ruhetagsplan
 
-Admins öffnen beim jeweiligen Tf den Link **Arbeitszeitplan** oder `/admin/planning`. Der Plan kann für jeden Tf und jeden Monat/Jahr zwischen 2000 und 2100 angelegt und jederzeit geändert werden. Einzelne Tagesarten und Notizen sind bearbeitbar; markierte Tage können gemeinsam umgestellt werden. Speichern aktualisiert Berechnung und Änderungsverlauf.
+Admins öffnen beim jeweiligen Tf den Link **Arbeitszeitplan** oder `/admin/planning`. Der Plan kann für jeden Tf und jeden Monat/Jahr zwischen 2000 und 2100 angelegt und jederzeit geändert werden. Die Weboberfläche bietet Monatskalender, Tagesliste, Jahresansicht und Excel-Import. Ein Klick auf einen Kalendertag öffnet Tagesart und Notiz. Einzelne Tagesarten und Notizen sind bearbeitbar; markierte Tage können gemeinsam umgestellt werden. Speichern aktualisiert Berechnung und Änderungsverlauf.
 
 ## Verbindliche Planregel
 
@@ -43,7 +43,7 @@ Die Exporte zeigen den aktuellen gespeicherten Stand; noch nicht gespeicherte Ä
 
 ## Installation und Datenbank
 
-Das Modul gehört zum vorhandenen Debian-Setup-Branch. Beim neuen Containerstart führt `init_db` `create_all` aus und legt die neuen Tabellen `plan_months`, `plan_days` und `plan_changes` an. Bestehende Tabellen/Einträge werden dafür nicht verändert. Die hinzugefügten Python-Abhängigkeiten werden beim Containerbuild installiert.
+Das Modul gehört zum vorhandenen bestehenden Setup-Branch. Beim neuen Containerstart führt `init_db` `create_all` aus und legt die neuen Tabellen `plan_months`, `plan_days` und `plan_changes` an. Bestehende Tabellen/Einträge werden dafür nicht verändert. Die hinzugefügten Python-Abhängigkeiten werden beim Containerbuild installiert.
 
 Bei einer laufenden Testumgebung im aktuellen Branch:
 
@@ -53,7 +53,7 @@ git pull --ff-only
 sudo bash backend/testenv/control.sh start
 ```
 
-Alternativ die Setup-Routine erneut ausführen. Danach bei `/admin` anmelden und beim Tf **Arbeitszeitplan** öffnen. Der MySQL-Betrieb des neuen Moduls ist noch auf der Debian-VM zu prüfen. Automatisierte Tests verwenden SQLite; sie prüfen Rechte, Berechnung, Revisionen, atomaren Import, fehlerhafte Dateien, Excel-Rundlauf und PDF-Endpunkte.
+Alternativ die Setup-Routine erneut ausführen. Danach bei `/admin` anmelden und beim Tf **Arbeitszeitplan** öffnen. Der MySQL-Betrieb des neuen Moduls ist noch auf der Ubuntu-VM zu prüfen. Automatisierte Tests verwenden SQLite; sie prüfen Rechte, Berechnung, Revisionen, atomaren Import, fehlerhafte Dateien, Excel-Rundlauf und PDF-Endpunkte.
 
 ## API
 

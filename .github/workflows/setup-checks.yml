@@ -1,4 +1,4 @@
-name: Debian setup checks
+name: Ubuntu and Debian setup checks
 on:
   push:
     paths: ['setup/**', 'backend/**', '.github/workflows/setup-checks.yml']
@@ -19,9 +19,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
-          bash -n setup/install-debian.sh backend/testenv/prepare.sh backend/testenv/control.sh
-          shellcheck setup/install-debian.sh backend/testenv/prepare.sh backend/testenv/control.sh
-          bash setup/install-debian.sh --help
+          for script in setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh; do bash -n "$script"; done
+          shellcheck -x setup/*.sh setup/tests/*.sh backend/testenv/prepare.sh backend/testenv/control.sh
+          bash setup/install-ubuntu.sh --help
+          bash setup/tests/test-platform.sh
+          node --check backend/lokzeitleiste/static/planning.js
       - name: Compose configuration
         working-directory: backend
         run: |

@@ -2,13 +2,13 @@
 
 FastAPI stellt die Admin-Oberfläche unter `/admin` und die API für die Android-App bereit. MySQL speichert Admins, Tf-Stammdaten, Sitzungen und Monatsdaten.
 
-## Vollständige Testumgebung auf einer Debian-VM
+## Vollständige Testumgebung auf Ubuntu Server 26.04.1 LTS
 
-Die [automatische Setup-Routine](../setup/README.md) übernimmt Abhängigkeitsprüfung, Paketinstallation, Containerstart und Apache-Konfiguration: im Repository-Hauptordner `sudo bash setup/install-debian.sh`.
+Die [automatische Setup-Routine](../setup/README.md) übernimmt Abhängigkeitsprüfung, Paketinstallation, Containerstart und Apache-Konfiguration: im Repository-Hauptordner `sudo bash setup/install-ubuntu.sh`.
 
 Für Tests einschließlich PDF-E-Mail steht ein separater Stack mit MySQL und Mailpit bereit. Die [Einrichtungsanleitung](testenv/README.md) beschreibt Vorbereitung, Apache, SSH-Tunnel, App-Verbindung, durchgängigen Test und Sicherung. Start: `bash testenv/prepare.sh` und `sudo bash testenv/control.sh start`.
 
-## Zunächst lokal: Apache und MySQL
+## Bestehende manuelle Debian-Einrichtung (optional)
 
 Die folgende Konfiguration ist für Debian mit nativem Apache 2.4 gedacht. Python-API und **MySQL 8.4** laufen lokal in Containern. So bleibt es tatsächlich MySQL: Debians Paket `default-mysql-server` kann stattdessen MariaDB installieren. Für lokale HTTP-Tests keine echten Tf-Daten verwenden.
 

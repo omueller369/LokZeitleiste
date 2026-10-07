@@ -1,4 +1,4 @@
-# LokZeitleiste v0.9
+# LokZeitleiste v0.10
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -14,11 +14,13 @@ Das Backend enthält jetzt ein Modul für tabellarische PDF-Eingangsbestätigung
 
 Das [Planungsmodul](backend/lokzeitleiste/planning/README.md) ergänzt administrative Arbeits-, Urlaubs- und Ruhetagspläne pro Tf, Excel-Import mit Vorschau, planbasierte Monatssollstunden und farbige Monats-/Jahres-PDFs.
 
+Die Weboberfläche unter `/admin/planning` bietet einen farbigen Monatskalender mit Tagesbearbeitung, eine Tagesliste für Sammeländerungen, eine Jahresmatrix und Excel-Import.
+
 ## Start
 
-Die [automatische Debian-Setup-Routine](setup/README.md) prüft Abhängigkeiten und installiert die vollständige Backend-Testumgebung. Vorprüfung: `bash setup/install-debian.sh --check`; Installation: `sudo bash setup/install-debian.sh`.
+Die [automatische Ubuntu-Setup-Routine](setup/README.md) prüft Abhängigkeiten und installiert die vollständige Backend-Testumgebung. Vorprüfung: `bash setup/install-ubuntu.sh --check`; Installation: `sudo bash setup/install-ubuntu.sh`.
 
-Die [Backend-Anleitung](backend/README.md) beschreibt den ersten lokalen Aufbau auf Debian: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
+Die [Backend-Anleitung](backend/README.md) beschreibt die Testumgebung auf Ubuntu Server 26.04.1 LTS: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 
 Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit bleiben zunächst lokal und sind noch nicht mit den Monatsdaten verbunden.
 

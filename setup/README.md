@@ -1,8 +1,8 @@
-# Automatische Setup-Routine für Debian
+# Automatische Setup-Routine für Ubuntu Server 26.04.1 LTS
 
-Die Routine installiert die vollständige **Backend-Testumgebung**: Apache und SSH-Zugang auf Debian, Git, Docker Engine und Compose, Python-API samt Python-Abhängigkeiten, MySQL 8.4, PDF-Versandworker und Mailpit-Testpostfach. Ein aktueller Android-Build gehört nicht zur Serverinstallation; die bestehende App wird anschließend über den Emulator angeschlossen.
+Die Routine installiert die vollständige **Backend-Testumgebung**: Apache und SSH-Zugang auf Ubuntu, Git, Docker Engine und Compose, Python-API samt Python-Abhängigkeiten, MySQL 8.4, PDF-Versandworker und Mailpit-Testpostfach. Ein aktueller Android-Build gehört nicht zur Serverinstallation; die bestehende App wird anschließend über den Emulator angeschlossen.
 
-Unterstützt werden Debian 12 und 13 mit systemd sowie amd64/arm64. Empfohlen: 2 CPU, 4 GB RAM und 20 GB freier Speicher. Internet ist für APT, Docker-Images und Python-Pakete erforderlich. Das private Repository muss bereits mit berechtigtem GitHub-Zugang auf die VM kopiert oder geklont sein. Auf einer frischen Debian-VM kann `sudo apt install git` dafür erforderlich sein.
+Vorgesehen ist **Ubuntu Server 26.04.1 LTS (Resolute)** mit systemd auf amd64/arm64. Ubuntu meldet Point-Releases in `/etc/os-release` üblicherweise als `VERSION_ID=26.04`; beide Schreibweisen werden erkannt. Für bestehende Installationen bleiben Debian 12/13 unterstützt. Empfohlen: 2 CPU, 4 GB RAM und 20 GB freier Speicher. Internet ist für APT, Docker-Images und Python-Pakete erforderlich. Das private Repository muss bereits mit berechtigtem GitHub-Zugang auf die VM kopiert oder geklont sein. Auf einer frischen Ubuntu-VM kann `sudo apt install git` dafür erforderlich sein.
 
 ## Start
 
@@ -11,11 +11,13 @@ Der Setup-Stand liegt im Branch `setup/debian-testumgebung`:
 ```bash
 git clone --branch setup/debian-testumgebung git@github.com:omueller369/LokZeitleiste.git
 cd LokZeitleiste
-bash setup/install-debian.sh --check
-sudo bash setup/install-debian.sh
+bash setup/install-ubuntu.sh --check
+sudo bash setup/install-ubuntu.sh
 ```
 
 Nach Übernahme in `main` kann der Branch-Parameter beim Klonen entfallen. Auf einem bestehenden Checkout zuerst lokale Änderungen prüfen, dann den Setup-Branch auschecken. Der Vorprüflauf installiert nichts. Die Installation ergänzt anschließend fehlende Pakete, startet Dienste und fragt bei der ersten Installation nach einem Admin-Benutzernamen und Passwort. Admin-Passwort mindestens zwölf Zeichen. Es werden keine Standardzugangsdaten vergeben.
+
+Der gemeinsame Installer liegt in `setup/install.sh`. `install-ubuntu.sh` und der ältere Einstieg `install-debian.sh` leiten daran weiter.
 
 Die Routine prüft Betriebssystem, Architektur, systemd, Projektdateien, freien Speicher, benötigte Pakete, Docker/Compose und Ports. Bei bestehenden konkurrierenden Diensten oder Paketkonflikten stoppt sie mit einem konkreten Hinweis. Nutzbare vorhandene Docker-Installationen werden verwendet. Fremde Containerplattformen werden nicht automatisch deinstalliert.
 
@@ -27,7 +29,7 @@ Für eine unbeaufsichtigte Installation eine Passwortdatei außerhalb des Reposi
 
 ```bash
 chmod 600 /geschuetzter/pfad/admin-passwort
-sudo bash setup/install-debian.sh --admin-user administrator --admin-password-file /geschuetzter/pfad/admin-passwort
+sudo bash setup/install-ubuntu.sh --admin-user administrator --admin-password-file /geschuetzter/pfad/admin-passwort
 ```
 
 Das Passwort wird über stdin an den Admin-Bootstrap übergeben und nicht als Kommandozeilenargument oder Umgebungsvariable weitergegeben. Ist dieser aktive Admin bereits vorhanden, bleibt sein Passwort unverändert. Ein vorhandenes Tf-Konto wird niemals in ein Admin-Konto umgewandelt. Nach erfolgreicher Anlage die Passwortdatei geschützt verwahren oder entfernen.
@@ -39,6 +41,7 @@ Mit `--skip-admin` lassen sich nur die Dienste installieren; danach ist der Admi
 Direkt auf der VM:
 
 - Admin und Tf-Stammdaten: http://localhost:8080/admin
+- Planung: http://localhost:8080/admin/planning
 - API-Dokumentation: http://localhost:8080/docs
 - Testpostfach und PDF-Anhänge: http://localhost:8025
 
@@ -62,7 +65,7 @@ Dieser fragt das Admin-Konto ab, legt einen fiktiven Tf an, sendet vier Einträg
 
 Dieselbe Setup-Routine kann erneut gestartet werden. MySQL-Passwörter, Testdaten, Testpostfach und bestehende Admin-Zugangsdaten bleiben erhalten. Änderungen am Code werden neu gebaut. Bei künftigen Schemaänderungen muss eine passende Migration erfolgen; `create_all` verändert bestehende Spalten nicht.
 
-Die Routine installiert fehlende Abhängigkeiten und kann erforderliche Paketupdates durch APT auslösen. Sie führt keine allgemeine Debian-Systemaktualisierung durch. Abweichende Apache-Site-Dateien werden nicht überschrieben. Bei fehlerhaftem Apache-Konfigurationstest wird die neu angelegte Site zurückgenommen und Apache nicht neu geladen. Bereits zuvor installierte Pakete und gestartete Container bleiben bei einem Fehler bestehen, sodass der Lauf nach Korrektur fortgesetzt werden kann.
+Die Routine installiert fehlende Abhängigkeiten und kann erforderliche Paketupdates durch APT auslösen. Sie führt keine allgemeine Betriebssystem-Aktualisierung durch. Abweichende Apache-Site-Dateien werden nicht überschrieben. Bei fehlerhaftem Apache-Konfigurationstest wird die neu angelegte Site zurückgenommen und Apache nicht neu geladen. Bereits zuvor installierte Pakete und gestartete Container bleiben bei einem Fehler bestehen, sodass der Lauf nach Korrektur fortgesetzt werden kann.
 
 ```bash
 sudo bash backend/testenv/control.sh status
@@ -74,6 +77,12 @@ Der Installer führt keinen destruktiven Reset aus. Datenbank-Volumes niemals zu
 
 ## Prüfung
 
-Die GitHub-Prüfung validiert Bash-Syntax, ShellCheck, Compose-Konfiguration und Backend-Tests. Ein tatsächlicher Erstinstallationslauf auf einer Debian-VM und ein Android-Build stehen noch aus. Der Installer wird in GitHub nicht mit Root-Rechten auf einem fremden Server gestartet.
+Die GitHub-Prüfung validiert Bash-Syntax, ShellCheck, Compose-Konfiguration und Backend-Tests. Ein tatsächlicher Erstinstallationslauf auf einer Ubuntu-26.04.1-VM und ein Android-Build stehen noch aus. Der Installer wird in GitHub nicht mit Root-Rechten auf einem fremden Server gestartet.
 
-Grundlagen: [Docker auf Debian](https://docs.docker.com/engine/install/debian/), [Apache-Konfigurationstest](https://httpd.apache.org/docs/2.4/programs/apachectl.html), [Mailpit SMTP/TLS](https://mailpit.axllent.org/docs/configuration/smtp/).
+Grundlagen: [Docker auf Ubuntu](https://docs.docker.com/engine/install/ubuntu/), [Apache-Konfigurationstest](https://httpd.apache.org/docs/2.4/programs/apachectl.html), [Mailpit SMTP/TLS](https://mailpit.axllent.org/docs/configuration/smtp/).
+
+## Weboberfläche des Planungsmoduls
+
+Nach Admin-Anmeldung unter `/admin` beim jeweiligen Tf **Arbeitszeitplan** wählen. Unter `/admin/planning` stehen Monatskalender, Tagesliste, Jahresansicht und Excel-Import als eigene Ansichten bereit. Ein Kalendertag öffnet Tagesart und Notiz; danach die Änderungen speichern. Die Kennzahlen reagieren auf die Eingabe. Die Jahresmatrix und PDF-Exporte zeigen gespeicherte Daten.
+
+Die Tagesliste erlaubt Einzel- und Sammeländerungen. Die Jahresmatrix führt per Klick auf einen Tag zum zugehörigen Monat. Excel wird erst nach Prüfung und Bestätigung übernommen. Monats-/Jahres-PDFs und die Excel-Vorlage lassen sich herunterladen. Anmeldung und Schreibrechte werden vom Backend geprüft.

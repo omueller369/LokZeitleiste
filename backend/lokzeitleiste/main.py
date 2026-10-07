@@ -21,7 +21,7 @@ from .reports.monthly import summarize_month
 from .reports.service import process_dispatch
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.9")
+app = FastAPI(title="LokZeitleiste API", version="0.10")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 

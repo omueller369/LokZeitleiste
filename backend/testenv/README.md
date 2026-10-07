@@ -1,10 +1,12 @@
-# Komplette Debian-Testumgebung in einer VM
+# Komplette Ubuntu-Testumgebung in einer VM
 
 Dieser eigenständige Stack verwendet Apache 2.4 auf der VM und Container für Python-API, MySQL 8.4 und den PDF-Versanddienst. Mailpit nimmt Test-E-Mails mit PDF-Anhang per STARTTLS entgegen. Es versendet sie nicht an echte Postfächer. Die Testdatenbank und das Testpostfach haben eigene persistente Docker-Volumes. Bestehende Datenbanken werden nicht übernommen oder migriert.
 
+Die [automatische Ubuntu-Setup-Routine](../../setup/README.md) übernimmt die Installation: `sudo bash setup/install-ubuntu.sh` im Repository-Hauptordner. Die folgenden Schritte beschreiben den manuellen Aufbau.
+
 ## 1. Voraussetzungen auf der VM
 
-Debian 12 (Bookworm) oder 13 (Trixie), empfohlen 2 CPU, 4 GB RAM und 20 GB freier Speicher. Internet für Paketinstallation, Container und Python-Abhängigkeiten. Vorhandene Dienste auf 8000, 8025 und 8080 prüfen: `sudo ss -ltnp`. Diese Ports müssen frei sein. Bestehenden LokZeitleiste-Lokalstack gegebenenfalls stoppen, ohne Volumes zu löschen.
+Ubuntu Server 26.04.1 LTS (Resolute), empfohlen 2 CPU, 4 GB RAM und 20 GB freier Speicher. Internet für Paketinstallation, Container und Python-Abhängigkeiten. Vorhandene Dienste auf 8000, 8025 und 8080 prüfen: `sudo ss -ltnp`. Diese Ports müssen frei sein. Bestehenden LokZeitleiste-Lokalstack gegebenenfalls stoppen, ohne Volumes zu löschen.
 
 ```bash
 cat /etc/os-release
@@ -13,16 +15,16 @@ sudo apt install apache2 openssh-server git python3 openssl ca-certificates curl
 sudo systemctl enable --now apache2 ssh
 ```
 
-Docker Engine und Compose-Plugin nach https://docs.docker.com/engine/install/debian/ installieren. Falls Docker bereits vorhanden ist, zuerst `sudo docker compose version` prüfen. Docker nicht parallel zu einer anderen Containerinstallation neu installieren. Auf einer frischen VM:
+Docker Engine und Compose-Plugin nach https://docs.docker.com/engine/install/ubuntu/ installieren. Falls Docker bereits vorhanden ist, zuerst `sudo docker compose version` prüfen. Docker nicht parallel zu einer anderen Containerinstallation neu installieren. Auf einer frischen VM:
 
 ```bash
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 . /etc/os-release
 sudo tee /etc/apt/sources.list.d/docker.sources >/dev/null <<EOF_DOCKER
 Types: deb
-URIs: https://download.docker.com/linux/debian
+URIs: https://download.docker.com/linux/ubuntu
 Suites: $VERSION_CODENAME
 Components: stable
 Architectures: $(dpkg --print-architecture)
@@ -78,6 +80,7 @@ Bei NAT mit weitergeleitetem SSH-Port entsprechend `-p PORT` und die Hostadresse
 | Ansicht | Adresse auf dem Entwicklungsrechner |
 |---|---|
 | Admin-Anmeldung und Tf-Stammdaten | http://localhost:8080/admin |
+| Planungsmodul | http://localhost:8080/admin/planning |
 | API-Dokumentation | http://localhost:8080/docs |
 | Monatsdaten, Monatsabrechnung, PDF-Versand | Im Admin-Bereich beim jeweiligen Tf |
 | Testpostfach und PDF-Anhänge | http://localhost:8025 |
@@ -128,6 +131,6 @@ Nur in die dafür vorgesehene Testdatenbank importieren. Bei Fehlern: Apache `su
 
 ## Prüfstatus des bereitgestellten Aufbaus
 
-Skript- und Konfigurationsprüfungen sowie bestehende Backend-Tests können in der Entwicklungsumgebung ausgeführt werden. Der tatsächliche Containerstart, Apache-Konfiguration, MySQL-Lauf, SMTP-TLS und Android-Verbindung müssen auf der Debian-VM mit dem obigen Ablauf geprüft werden. Es besteht noch kein Zugang zur VM.
+Skript- und Konfigurationsprüfungen sowie bestehende Backend-Tests können in der Entwicklungsumgebung ausgeführt werden. Der tatsächliche Containerstart, Apache-Konfiguration, MySQL-Lauf, SMTP-TLS und Android-Verbindung müssen auf der Ubuntu-VM mit dem obigen Ablauf geprüft werden. Es besteht noch kein Zugang zur VM.
 
-Quellen: Docker-Debian-Installation https://docs.docker.com/engine/install/debian/ ; Mailpit STARTTLS https://mailpit.axllent.org/docs/configuration/smtp/ ; Mailpit-Container https://mailpit.axllent.org/docs/install/docker/ .
+Quellen: Docker-Ubuntu-Installation https://docs.docker.com/engine/install/ubuntu/ ; Mailpit STARTTLS https://mailpit.axllent.org/docs/configuration/smtp/ ; Mailpit-Container https://mailpit.axllent.org/docs/install/docker/ .
