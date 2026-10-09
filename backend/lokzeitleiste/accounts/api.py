@@ -4,16 +4,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..db import database_session
-from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User
+from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password
 from .access import MODULES, check_delegation, demand, password_required, permissions
 from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
 
 
-def create_router(admin_dependency, origin, cookie_secure):
-    router = APIRouter()
-
+def account_dependency(origin):
     def account(request: Request, admin_session: str | None = Cookie(default=None),
                 authorization: str | None = Header(default=None), db: Session = Depends(database_session)):
         bearer = authorization and authorization.startswith('Bearer ')
@@ -24,6 +22,14 @@ def create_router(admin_dependency, origin, cookie_secure):
         if not bearer and request.method not in ('GET','HEAD') and origin() and request.headers.get('origin') != origin():
             raise HTTPException(403,'Ungültiger Ursprung')
         return user
+
+    return account
+
+
+def create_router(admin_dependency, origin, cookie_secure, dependency=None):
+    router = APIRouter()
+
+    account = dependency or account_dependency(origin)
 
     @router.post('/api/v1/account/login')
     def login(data: Credentials, request: Request, response: Response, db: Session = Depends(database_session)):
@@ -85,7 +91,7 @@ def create_router(admin_dependency, origin, cookie_secure):
         addresses = db.scalars(select(StaffAddress).where(StaffAddress.user_id == user.id).order_by(StaffAddress.id)).all()
         return {'id':user.id,'username':user.username,'active':user.active,
                 **{key:getattr(profile,key) for key in ('first_name','last_name','nationality','cost_center')},
-                'birth_date':profile.birth_date.isoformat(),
+                'birth_date':profile.birth_date.isoformat(),'has_photo':db.get(ProfilePhoto,user.id) is not None,
                 'addresses':[{key:getattr(a,key) for key in ('street','house_number','postal_code','city')} for a in addresses],
                 'permissions':permissions(db,user),'password_change_required':password_required(db,user)}
 

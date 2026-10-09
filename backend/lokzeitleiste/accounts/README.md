@@ -12,7 +12,7 @@ Die Checkboxen bilden eine Hierarchie: Administration enthält Lesen und Schreib
 |---|---|---|---|
 | Mitarbeiter-Stammdaten | Tf-Stammdaten ansehen | E-Mail und Bundesland ändern | Zusätzlich Tf anlegen und deren Passwort zurücksetzen |
 | Ruhetags- und Urlaubsplanung | Pläne, Verlauf und PDF ansehen | Zusätzlich Pläne bearbeiten und Excel importieren | Umfasst die bisherigen Planungsfunktionen mit Schreibrecht |
-| Arbeitszeitkorrekturen | Einträge, Summen und Korrekturverlauf ansehen | Zusätzlich Zeiten korrigieren und fehlgeschlagene Benachrichtigungen erneut starten | Umfasst die bisherigen Korrekturfunktionen mit Schreibrecht |
+| Arbeitszeiterfassung und Korrekturen | Einträge, Summen und Korrekturverlauf ansehen | Zusätzlich Zeiten erfassen, korrigieren und Datensätze sperren und fehlgeschlagene Benachrichtigungen erneut starten | Zusätzlich gesperrte Datensätze entsperren |
 | Monatsabrechnung und PDF-Versand | Monatswerte und Versandstatus ansehen | Derzeit dieselben Funktionen, da dieses Modul noch keine eigenen Schreibaktionen besitzt | Derzeit dieselben Funktionen |
 | Verwaltungsmitarbeiter und Berechtigungen | Stammdaten und Freigaben ansehen | Stammdaten anderer verwaltbarer Konten ändern, ohne Rechte zu ändern | Zusätzlich Konten anlegen, Freigaben ändern und Passwörter zurücksetzen |
 
@@ -54,3 +54,9 @@ Die Tests prüfen Initiallogin-Sperre, eigenen Passwortwechsel, Reset mit Sitzun
 - `POST /api/v1/account/password`: aktuelles und neues Passwort mit Bestätigung; Cookie oder Tf-Bearer-Token.
 
 Cookie-basierte Schreibzugriffe und Browser-Logins prüfen `PUBLIC_ORIGIN`. Tf-Bearer-Token berechtigen ausschließlich das eigene Konto und niemals zu Verwaltungsmodulen.
+
+## Profilfotos
+
+In Tf-Übersicht (`/admin/tf`) und Verwaltungsmitarbeiterliste (`/admin/staff`) Foto auswählen und **Foto hochladen** wählen. Vorhandene Fotos können ersetzt oder entfernt werden. Unterstützt werden einzelne JPEG-, PNG- und WebP-Bilder bis 5 MB und 12 Megapixel. Der Server überprüft das Bild, berücksichtigt EXIF-Orientierung, entfernt Metadaten und speichert ein JPEG mit maximal 640 × 640 Pixeln.
+
+Fotos benötigen die Lesefreigabe des jeweiligen Mitarbeitermoduls; Upload und Entfernen erfordern Lesen und Schreiben. Verwaltungsmitarbeiter können Fotos anderer Verwaltungskonten nur innerhalb ihrer Delegationsgrenzen ändern. Fotos sind keine öffentlich abrufbaren statischen Dateien und werden in der Datenbank mitgesichert. Endpunkte: `GET`, `POST` (Multipart-Feld `file`) und `DELETE` auf `/api/v1/admin/tf/{id}/photo` beziehungsweise `/api/v1/admin/staff/{id}/photo`.

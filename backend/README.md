@@ -58,11 +58,11 @@ Die Berechnung verwendet lokale Zeit ohne Sommerzeitkorrektur. Solange die App f
 
 ### Monatsabrechnung
 
-`GET /api/v1/me/months/{year}/{month}/summary` liefert die eigene Übersicht; Admins nutzen `GET /api/v1/admin/tf/{tf_id}/months/{year}/{month}/summary` oder die Tabelle in `/admin`. Die Abrechnung wird jeweils aus den gespeicherten Einträgen neu berechnet; laufende und künftige Monate sind als „vorläufig“ markiert. Ein Monatsabschluss mit Sperre oder automatischem E-Mail-Versand gehört noch nicht zu dieser Version.
+`GET /api/v1/me/months/{year}/{month}/summary` liefert die eigene Übersicht; Admins nutzen `GET /api/v1/admin/tf/{tf_id}/months/{year}/{month}/summary` oder die Tabelle in `/admin`. Die Abrechnung wird jeweils aus den gespeicherten Einträgen neu berechnet; laufende und künftige Monate sind als „vorläufig“ markiert. Einträge können einzeln gesperrt werden; ein automatischer Monatsabschluss oder Abschlussversand besteht weiterhin nicht.
 
 Pro Kalendertag zählt geleistete Zeit aus Zugfahrt, Bereitschaft und Sonstiger Erfassung abzüglich Pause. Gastfahrt ist darin enthalten und wird separat ausgewiesen. Nur Tage mit erfasster Arbeit unter acht Stunden erhalten eine Auffüllung auf acht Stunden: zuerst wird die Gastfahrt innerhalb der tatsächlichen Arbeitszeit für das Achtstunden-Ziel genutzt, dann die restliche Lücke ergänzt. Gastfahrt wird nie doppelt addiert. Urlaub und Krankheit zählen mit je acht Stunden pro Tag (pro Datum einmal); freie Tage ohne Eintrag erhalten keine Auffüllung. Sonn-, Feiertags- und Nachtzeit werden informativ zusätzlich ausgewiesen, nicht nochmals in die Stundensumme addiert. Mehrere Einträge gleicher Art am Tag werden summiert; widersprüchliche Kombinationen von Arbeit und Urlaub/Krank oder Urlaub und Krank am selben Tag blockieren die Abrechnung mit HTTP 409 bis zur Korrektur.
 
-Lokal gelöschte Einträge bleiben derzeit auf dem Server; Serverdaten werden noch nicht in die App geladen. Ein gleichzeitiger Betrieb auf mehreren Geräten ist nicht vorgesehen. Es gibt noch keine Passwortzurücksetzung, Dienstplanungsschnittstelle, Ausbleibe-Berechnung oder Kopplung der LokZeit-Standzeiten mit dem Monatsdatensatz. Für spätere Schemaänderungen wird ein Migrationstool benötigt.
+Lokal gelöschte Einträge bleiben derzeit auf dem Server; Serverdaten werden noch nicht in die App geladen. Ein gleichzeitiger Betrieb auf mehreren Geräten ist nicht vorgesehen. Es gibt noch keine Ausbleibe-Berechnung oder Kopplung der LokZeit-Standzeiten mit dem Monatsdatensatz. Für spätere Schemaänderungen wird ein Migrationstool benötigt.
 
 API-Tests: `pip install -r requirements-dev.txt` und `python -m unittest discover -s tests` im Backend-Ordner. Die Tests verwenden SQLite als isolierte Testdatenbank. Der reguläre Betrieb verlangt MySQL.
 
@@ -73,3 +73,7 @@ Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/adm
 ## Benutzerverwaltung
 
 [Verwaltungsmitarbeiter, Modulrechte und Passwortwechsel](lokzeitleiste/accounts/README.md): Einstieg `/admin/staff`, eigener Passwortwechsel `/account`.
+
+## Manuelle Erfassung und Sperren
+
+[Eigene Erfassung, Verwaltung und Sperren](lokzeitleiste/records/README.md): `/my/worktime` für Tf und Verwaltungsmitarbeiter, `/admin/worktime` für berechtigte Verwaltungskonten. Neue Tf anlegen unter `/admin/tf/new`, Übersicht unter `/admin/tf`.

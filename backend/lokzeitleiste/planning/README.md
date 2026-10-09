@@ -70,3 +70,11 @@ Alle Verwaltungsendpunkte erfordern ein aktives Admin-Cookie; Schreibzugriffe zu
 | GET | `/{year}/{month}/pdf` | Monats-PDF |
 | GET | `/{year}/pdf` | Jahres-PDF |
 | GET | `/{year}/history` | Letzte Änderungen |
+
+## Mehrfachauswahl in allen Ansichten
+
+In Monatskalender und Jahresmatrix **Mehrfachauswahl** aktivieren und mehrere Tage antippen. Die Tagesliste und Excel-Vorschau besitzen Auswahlcheckboxen. **Alle Tage der Ansicht wählen** bezieht sich auf den aktuellen Monat, das gesamte Jahr oder die Importzeilen. **Auswahl leeren** entfernt Markierungen. Die gewählte Tagesart wird mit **Auf markierte Tage anwenden** gemeinsam gesetzt; vorhandene Notizen bleiben erhalten, außer bei Ungeplant.
+
+Kalender, Liste und Jahresmatrix teilen ihre Auswahl. Beim Monatswechsel desselben Tf/Jahrs bleiben Auswahl und Änderungen erhalten. Die Jahresübersicht zeigt auch den noch ungespeicherten Entwurf. **Änderungen speichern** übernimmt alle geänderten Tage des Jahres gemeinsam über `POST /api/v1/admin/tf/{tf_id}/plan/{year}/bulk`, mit `days` und `expected_revisions` je betroffenem Monat. Veraltete Revisionen verhindern sämtliche Änderungen. Wechsel des Mitarbeiters/Jahrs oder Neuladen fragt bei ungespeicherten Änderungen nach. PDFs zeigen weiterhin ausschließlich den gespeicherten Stand.
+
+Die Excel-Vorschau hat eine eigene Mehrfachauswahl. Sammeländerungen ändern zunächst nur die geprüften Importzeilen. **Import übernehmen** speichert anschließend die gesamte Vorschau mit den geprüften Monatsrevisionen. Manuelle Entwurfsänderungen müssen davor gespeichert oder verworfen werden.

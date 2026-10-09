@@ -26,7 +26,7 @@ def validate_no_overlap(db, tf_id, entry):
     others = db.scalars(select(WorkEntry).join(WorkMonth).where(
         WorkMonth.tf_user_id == tf_id, WorkEntry.id != entry.id, WorkEntry.kind.in_(WORK_KINDS),
         WorkEntry.entry_date >= entry.entry_date - timedelta(days=1),
-        WorkEntry.entry_date <= entry.entry_date + timedelta(days=1))).all()
+        WorkEntry.entry_date <= entry.entry_date + timedelta(days=1)).with_for_update()).all()
     for other in others:
         other_begin, other_end = interval(other)
         if begin < other_end and other_begin < end:

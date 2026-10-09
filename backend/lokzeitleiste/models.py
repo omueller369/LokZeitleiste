@@ -188,3 +188,29 @@ class AccountAudit(Base):
     target_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     action: Mapped[str] = mapped_column(String(80), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class WorkEntryLock(Base):
+    __tablename__ = "work_entry_locks"
+    entry_id: Mapped[int] = mapped_column(ForeignKey("work_entries.id"), primary_key=True)
+    locked: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    actor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    reason: Mapped[str] = mapped_column(String(1000), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class WorkEntryAudit(Base):
+    __tablename__ = "work_entry_audits"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    entry_id: Mapped[int] = mapped_column(ForeignKey("work_entries.id"), nullable=False, index=True)
+    actor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    action: Mapped[str] = mapped_column(String(30), nullable=False)
+    reason: Mapped[str] = mapped_column(String(1000), default="", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class ProfilePhoto(Base):
+    __tablename__ = "profile_photos"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    image_data: Mapped[bytes] = mapped_column(LargeBinary().with_variant(LONGBLOB(), "mysql"), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, onupdate=now_utc, nullable=False)

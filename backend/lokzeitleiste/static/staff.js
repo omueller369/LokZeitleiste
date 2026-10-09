@@ -5,6 +5,7 @@ async function api(path,options={}){const response=await fetch(path,{credentials
  if(!response.ok){if(response.status===401)location.href='/admin';throw Error(typeof body.detail==='string'?body.detail:'Anfrage fehlgeschlagen ('+response.status+')');}return body;}
 function manageable(user){return me.role==='admin'||(user.id!==me.id&&Object.entries(user.permissions).every(([m,v])=>v<=me.permissions[m]));}
 async function refresh(){users=await api('/api/v1/admin/staff');el('users').replaceChildren();for(const user of users){const tr=document.createElement('tr');
+ const photo=document.createElement('td');profilePhoto(photo,'staff',user.id,me.permissions.staff>=2&&(user.id===me.id||manageable(user)),user.has_photo,refresh);tr.append(photo);
  for(const value of [user.first_name+' '+user.last_name,user.username,user.cost_center,user.password_change_required?'Erforderlich':'Abgeschlossen']){const td=document.createElement('td');td.textContent=value;tr.append(td);}
  const td=document.createElement('td'),open=document.createElement('button');open.textContent=me.permissions.staff>=2&&manageable(user)?'Bearbeiten':'Ansehen';open.onclick=()=>edit(user);td.append(open);
  if(me.permissions.staff===3&&manageable(user)){const reset=document.createElement('button');reset.textContent='Passwort zurücksetzen';reset.style.margin='6px';reset.onclick=()=>{resetTarget=user;el('resetName').textContent=user.username;el('resetPassword').value='';el('resetMessage').textContent='';el('resetDialog').showModal();};td.append(reset);}tr.append(td);el('users').append(tr);}}

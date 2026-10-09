@@ -5,7 +5,7 @@ from sqlalchemy import select
 from ..models import AccountPolicy, ModulePermission, User
 
 MODULES = {"employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
-           "worktime":"Arbeitszeitkorrekturen", "reports":"Monatsabrechnung und PDF-Versand",
+           "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
            "staff":"Verwaltungsmitarbeiter und Berechtigungen"}
 
 
@@ -53,6 +53,12 @@ def authorize_route(db, user, request):
         return
     if path == '/api/v1/admin/tf' and method == 'POST':
         return demand(db,user,'employees',3)
+    if re.fullmatch(r'/api/v1/admin/tf/\d+/photo',path):
+        return demand(db,user,'employees',1 if method=='GET' else 2)
+    if re.fullmatch(r'/api/v1/admin/staff/\d+/photo',path):
+        return demand(db,user,'staff',1 if method=='GET' else 2)
+    if path.startswith('/api/v1/admin/worktime/'):
+        return demand(db,user,'worktime',1 if method=='GET' else 2)
     if path.startswith('/api/v1/admin/staff'):
         return demand(db,user,'staff',1 if method == 'GET' else 2 if method == 'PUT' else 3)
     if re.fullmatch(r'/api/v1/admin/accounts/\d+/reset-password',path) and method == 'POST':

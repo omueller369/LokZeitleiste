@@ -8,10 +8,16 @@ async function show(){const account=await request('/api/v1/account/me');if(accou
  me=await request('/api/v1/admin/me');el('login').hidden=true;el('dashboard').hidden=false;el('logout').hidden=false;
  el('navigation').replaceChildren();link(el('navigation'),'Mein Passwort ändern','/account');
  if(me.permissions.staff)link(el('navigation'),'Verwaltungsmitarbeiter und Rechte','/admin/staff');
- el('createTfCard').hidden=me.permissions.employees<3;document.querySelector('.grid').style.gridTemplateColumns=me.permissions.employees<3?'1fr':'';
- const hasEmployees=['employees','planning','worktime','reports'].some(m=>me.permissions[m]);el('employeeCard').hidden=!hasEmployees;
+ if(me.role==='staff')link(el('navigation'),'Meine Arbeitszeiten','/my/worktime');
+ if(me.permissions.employees>=3)link(el('navigation'),'Tf anlegen','/admin/tf/new');
+ if(['employees','planning','worktime','reports'].some(m=>me.permissions[m]))link(el('navigation'),'Tf-Übersicht','/admin/tf');
+ if(me.permissions.worktime)link(el('navigation'),'Arbeitszeiterfassung und Korrekturen','/admin/worktime');
+ if(me.permissions.planning)link(el('navigation'),'Arbeitszeitplanung','/admin/planning');
+ el('createTfCard').hidden=me.permissions.employees<3||location.pathname!=='/admin/tf/new';document.querySelector('.grid').style.gridTemplateColumns='1fr';
+ const hasEmployees=['employees','planning','worktime','reports'].some(m=>me.permissions[m]);el('employeeCard').hidden=!hasEmployees||location.pathname!=='/admin/tf';
  if(hasEmployees)await refresh();else el('months').textContent='Keine Mitarbeiter-Module freigegeben.';}
 async function refresh(){const users=await request('/api/v1/admin/tf');el('users').replaceChildren();for(const user of users){const tr=document.createElement('tr');
+ const photo=document.createElement('td');if(me.permissions.employees)profilePhoto(photo,'tf',user.id,me.permissions.employees>=2,user.has_photo,refresh);else photo.textContent='—';tr.append(photo);
  for(const text of [user.first_name+' '+user.last_name,user.personnel_number]){const td=document.createElement('td');td.textContent=text;tr.append(td);}
  let td=document.createElement('td');
  if(me.permissions.employees){const email=document.createElement('input');email.type='email';email.value=user.email||'';email.setAttribute('aria-label','E-Mail '+user.first_name);

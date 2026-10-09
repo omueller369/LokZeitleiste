@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy
+from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto
 from .schemas import Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
 from .reports.daily import day_rows
@@ -22,7 +22,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.12")
+app = FastAPI(title="LokZeitleiste API", version="0.13")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -116,7 +116,7 @@ def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(databas
              "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
-             "email": p.email, "federal_state": p.federal_state} for user, p in rows]
+             "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None} for user, p in rows]
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")
@@ -227,8 +227,11 @@ def entry_dict(e: WorkEntry):
 
 @app.post("/api/v1/me/months/{year}/{month}/entries")
 def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: BackgroundTasks,
-                   user: User = Depends(require_tf),
-                   db: Session = Depends(database_session)):
+                   user: User = Depends(require_tf), db: Session = Depends(database_session)):
+    return persist_entries(year,month,batch,background_tasks,user,db)
+
+
+def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None):
     if not (2000 <= year <= 2100 and 1 <= month <= 12):
         raise HTTPException(422, "Ungültiger Monat")
     if any(e.date.year != year or e.date.month != month for e in batch.entries):
@@ -252,6 +255,12 @@ def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: B
         WorkEntry.work_month_id == period.id).with_for_update()).all())
     for item in batch.entries:
         entry = existing.get(str(item.client_id))
+        lock = db.scalar(select(WorkEntryLock).where(WorkEntryLock.entry_id==entry.id).with_for_update()) if entry else None
+        if lock and lock.locked:
+            normalized=item.model_dump(mode='json')
+            normalized['start']=item.start.strftime('%H:%M');normalized['end']=item.end.strftime('%H:%M')
+            if normalized!=entry_dict(entry):
+                raise HTTPException(409,"Arbeitszeitdatensatz ist gesperrt. Das gesamte Paket wurde nicht übernommen.")
         if entry and entry.id in protected and (entry.start_time, entry.end_time) != (
                 item.start.strftime("%H:%M"), item.end.strftime("%H:%M")):
             raise HTTPException(409, "Arbeitszeit wurde administrativ korrigiert. Aktuelle Monatsdaten vom Server laden.")
@@ -274,6 +283,17 @@ def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: B
     dispatch_id = None
     if batch.entries:
         db.flush()
+        from .worktime.service import validate_no_overlap, overview
+        try:
+            for item in batch.entries:
+                row=db.scalar(select(WorkEntry).where(WorkEntry.work_month_id==period.id,WorkEntry.client_id==str(item.client_id)))
+                validate_no_overlap(db,user.id,row)
+            overview(db,user.id,year,month,profile.federal_state,lock=True)
+            y,m=(year+1,1) if month==12 else (year,month+1)
+            overview(db,user.id,y,m,profile.federal_state,lock=True)
+        except ValueError as exc:
+            db.rollback()
+            raise HTTPException(409,str(exc)) from exc
         received = db.scalars(select(WorkEntry).where(
             WorkEntry.work_month_id == period.id,
             WorkEntry.client_id.in_([str(item.client_id) for item in batch.entries]))).all()
@@ -290,6 +310,10 @@ def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: B
         db.add(dispatch)
         db.flush()
         dispatch_id = dispatch.id
+    if manual_actor is not None:
+        from .models import WorkEntryAudit
+        for entry in received:
+            db.add(WorkEntryAudit(entry_id=entry.id,actor_id=manual_actor.id,action='manual_created'))
     db.commit()
     if dispatch_id is not None:
         background_tasks.add_task(process_dispatch, dispatch_id)
@@ -333,8 +357,33 @@ def worktime_script():
     return FileResponse(Path(__file__).parent / "static" / "worktime.js", media_type="text/javascript")
 
 
-from .accounts.api import create_router as account_router
-app.include_router(account_router(require_admin, lambda: PUBLIC_ORIGIN, COOKIE_SECURE))
+from .accounts.api import create_router as account_router, account_dependency
+require_account=account_dependency(lambda: PUBLIC_ORIGIN)
+app.include_router(account_router(require_admin, lambda: PUBLIC_ORIGIN, COOKIE_SECURE,require_account))
+
+from .records.api import create_router as records_router
+app.include_router(records_router(require_account,require_admin,entry_dict,month_summary,persist_entries))
+
+@app.get('/my/worktime')
+def own_worktime_page():
+    return FileResponse(Path(__file__).parent/'static'/'my-worktime.html')
+
+@app.get('/my/worktime.js')
+def own_worktime_script():
+    return FileResponse(Path(__file__).parent/'static'/'my-worktime.js',media_type='text/javascript')
+
+@app.get('/admin/tf/new')
+@app.get('/admin/tf')
+def tf_pages():
+    return FileResponse(Path(__file__).parent/'static'/'admin.html')
+
+@app.get('/responsive.css')
+def responsive_css():
+    return FileResponse(Path(__file__).parent/'static'/'responsive.css',media_type='text/css')
+
+@app.get('/admin/photo-ui.js')
+def photo_ui_script():
+    return FileResponse(Path(__file__).parent/'static'/'photo-ui.js',media_type='text/javascript')
 
 @app.get("/admin/staff")
 def staff_page():
@@ -351,3 +400,10 @@ def account_page():
 @app.get("/account.js")
 def account_script():
     return FileResponse(Path(__file__).parent / "static" / "account.js", media_type="text/javascript")
+
+from .accounts.photos import create_router as photo_router
+app.include_router(photo_router(require_admin))
+
+@app.get('/entry-form.js')
+def entry_form_script():
+    return FileResponse(Path(__file__).parent/'static'/'entry-form.js',media_type='text/javascript')

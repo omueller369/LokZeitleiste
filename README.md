@@ -1,4 +1,4 @@
-# LokZeitleiste v0.12
+# LokZeitleiste v0.13
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -30,9 +30,9 @@ Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden�
 - Es gibt noch keinen vollständigen Abgleich zwischen App und Server: lokale Löschungen werden nicht übertragen, Serverdaten nicht automatisch abgerufen, parallele Geräte nicht zusammengeführt.
 - Die achtstündige Höchstgrenze für Bereitschaft ist weiterhin eine vorläufige Annahme. Rufbereitschaft ist auf 08:00–20:00 Uhr und höchstens acht Stunden beschränkt.
 - Berechnung von Arbeits-, Nacht- und Sonntagsstunden und später Ausbleibe benötigt noch verbindliche Fachregeln. Die bisherigen vorläufigen Regeln stehen in der App und in den früheren Anforderungen.
-- Nach 365 Tagen läuft das Anmeldetoken ab. Danach ist eine neue Anmeldung nötig. Passwortzurücksetzung, weitere Admin-Funktionen und Schema-Migrationen folgen später.
+- Nach 365 Tagen läuft das Anmeldetoken ab. Danach ist eine neue Anmeldung nötig. Ein vollständiges Migrationstool für spätere Änderungen an bestehenden Tabellen steht noch aus.
 
-Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank geprüft. Ein MySQL-Integrationslauf und ein Android-Build waren in dieser Umgebung ohne MySQL-Server bzw. Android SDK nicht möglich. LokZeit selbst wurde nicht verändert.
+Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank geprüft. Ein MySQL-Integrationslauf und ein Android-Build waren in dieser Umgebung ohne MySQL-Server bzw. Android SDK nicht möglich. Die Android-Layouts wurden für schmale Ansichten angepasst; ein Build und Gerätetest stehen noch aus.
 
 ## Arbeitszeitkorrekturen
 
@@ -41,3 +41,9 @@ Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/adm
 ## Verwaltungsmitarbeiter und Passwörter
 
 Unter `/admin/staff` Verwaltungsmitarbeiter mit Stammdaten, mehreren Adressen und Modulrechten anlegen. Neue Konten müssen beim ersten Login ihr Initialpasswort ändern. Mitarbeiter und Administratoren ändern ihr eigenes Passwort unter `/account`; Administratoren können Initialpasswörter zurücksetzen. [Berechtigungen und Bedienung](backend/lokzeitleiste/accounts/README.md). Die Android-App ab Version 0.7 unterstützt Erstlogin und eigenen Passwortwechsel.
+
+## Zeiterfassung, mobile Ansichten und Fotos
+
+Tf und Verwaltungsmitarbeiter erfassen eigene Zeiten unter `/my/worktime`; die Verwaltung kann im Arbeitszeitmodul Einträge erfassen, bearbeiten und sperren. Entsperren erfordert die Modulstufe Administration. [Bedienung und API](backend/lokzeitleiste/records/README.md). Tf-Anlage (`/admin/tf/new`) und Tf-Übersicht (`/admin/tf`) haben getrennte Menüpunkte. Beide Mitarbeitermodule bieten geschützte Foto-Uploads.
+
+Die Planung unterstützt Mehrfachauswahl in Kalender, Tagesliste, Jahresmatrix und Excel-Vorschau. Auswahl und ungespeicherte Änderungen bleiben innerhalb desselben Jahres erhalten; Änderungen über Monatsgrenzen werden gemeinsam gespeichert. Webansichten sind für kleine Bildschirme angepasst, breite Tabellen scrollen innerhalb ihres Bereichs. Android 0.8 ergänzt mobile Layoutanpassungen. Praktische Tests auf Mobilgeräten stehen noch aus.

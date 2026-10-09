@@ -99,7 +99,7 @@ private fun fetchQuery(query: String): List<Station> {
     } finally { connection.disconnect() }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun LokZeitApp(username: String) {
     val context = LocalContext.current
@@ -187,7 +187,7 @@ fun LokZeitApp(username: String) {
                     if (!dutyStarted) { gpsEnabled = false; message = "Dienst beendet" }
                 }) { Text(if (dutyStarted) "Dienst beenden" else "Dienst starten") }
                 OutlinedTextField(trainNumber, { trainNumber = it; prefs.edit().putString("train", it).apply() }, label = { Text("Zugnummer") }, modifier = Modifier.fillMaxWidth())
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = dutyStarted, onClick = {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                             permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
@@ -232,7 +232,7 @@ fun LokZeitApp(username: String) {
                 }) { Text("DS100 suchen") }
                 Text("Ankunft: ${arrival?.let(::stamp) ?: "–"}   Abfahrt: ${departure?.let(::stamp) ?: "–"}")
                 Text("Standzeit: ${elapsed.clock()} · $source")
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = arrival == null, onClick = { arrival = System.currentTimeMillis(); departure = null; source = "Manuell" }) { Text("Ankunft") }
                     Button(enabled = arrival != null && departure == null, onClick = { departure = System.currentTimeMillis() }) { Text("Abfahrt") }
                     if (arrival != null) TextButton(onClick = { reset() }) { Text("Verwerfen") }

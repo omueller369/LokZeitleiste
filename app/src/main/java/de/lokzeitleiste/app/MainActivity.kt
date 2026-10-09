@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun App() {
     val context = LocalContext.current
@@ -41,7 +42,7 @@ private fun App() {
         onSuccess = { name, token -> TokenVault.save(context, name, token); user = name; passwordScreen = false },
         onCancel = { passwordScreen = false })
     else if (trainScreen) Column {
-        Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = { trainScreen = false }) { Text("← Monatsübersicht") }
             Text("Zugfahrten · $user", modifier = Modifier.padding(10.dp))
         }
@@ -52,6 +53,7 @@ private fun App() {
     })
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () -> Unit, onLogout: () -> Unit) {
     val context = LocalContext.current
@@ -90,7 +92,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
     }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(24.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("LokZeitleiste", style = MaterialTheme.typography.headlineMedium)
                 OutlinedButton(onClick = onTrain) { Text("Zugfahrt · LokZeit") }
                 Button(enabled = !sending, onClick = {
@@ -113,14 +115,14 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                 TextButton(onClick = onPassword) { Text("Passwort ändern") }
             }
             if (sendMessage.isNotBlank()) Text(sendMessage, style = MaterialTheme.typography.bodySmall)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { month = month.minusMonths(1) }) { Text("‹") }
                 Text(month.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.GERMAN) + " " + month.year,
                     style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(10.dp))
                 OutlinedButton(onClick = { month = month.plusMonths(1) }) { Text("›") }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                Card(Modifier.width(310.dp)) { Column(Modifier.padding(16.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                Card(Modifier.widthIn(max = 310.dp).fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
                     Text("Neue Erfassung", style = MaterialTheme.typography.titleLarge)
                     Box {
                         OutlinedButton(onClick = { expanded = true }) { Text(kind + " ▾") }
@@ -194,7 +196,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                         }
                     }) { Text("Eintrag speichern") }
                 } }
-                Card(Modifier.weight(1f)) { Column(Modifier.padding(16.dp)) {
+                Card(Modifier.widthIn(max = 900.dp).fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
                     Text("Erfassungen · ${selected.size}", style = MaterialTheme.typography.titleLarge)
                     val scroll = rememberScrollState()
                     Column(Modifier.horizontalScroll(scroll)) {
@@ -227,7 +229,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
             }
         }
         Surface(color = MaterialTheme.colorScheme.primaryContainer) {
-            Row(Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            FlowRow(Modifier.fillMaxWidth().heightIn(max = 170.dp).verticalScroll(rememberScrollState()).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf("Arbeitszeit" to displayTime(work), "Gastfahrt" to displayTime(guests),
                     "Urlaub" to "$holidays Tage", "Nachtstunden*" to displayTime(night),
                     "Sonntagsstunden*" to displayTime(sunday)).forEach { (label, value) ->

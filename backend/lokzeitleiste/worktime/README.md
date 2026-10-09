@@ -1,6 +1,6 @@
 # Administrative Arbeitszeitkorrekturen
 
-Unter `/admin` beim Mitarbeiter **Arbeitszeiten korrigieren** wählen. Direkter Einstieg: `/admin/worktime?tf=ID`. Mitarbeiter, Jahr und Monat auswählen. Die Oberfläche zeigt erfasste Einträge, Tagesarbeitszeit, vollständige ISO-Kalenderwochen von Montag bis Sonntag und Monatsarbeitszeit. Kalenderwochen am Monatsrand enthalten auch Tage aus den Nachbarmonaten.
+Unter `/admin/tf` beim Mitarbeiter **Arbeitszeiten korrigieren** wählen. Direkter Einstieg: `/admin/worktime?tf=ID`. Mitarbeiter, Jahr und Monat auswählen. Die Oberfläche zeigt erfasste Einträge, Tagesarbeitszeit, vollständige ISO-Kalenderwochen von Montag bis Sonntag und Monatsarbeitszeit. Kalenderwochen am Monatsrand enthalten auch Tage aus den Nachbarmonaten.
 
 ## Bearbeitung
 
@@ -45,3 +45,7 @@ Die API legt beim Start die zusätzliche Tabelle `work_time_changes` an. Bestehe
 - `POST /api/v1/admin/tf/{tf_id}/worktime/changes/{change_id}/retry`: fehlgeschlagene Benachrichtigung erneut vormerken.
 
 Alle Endpunkte erfordern Admin-Anmeldung; Schreibzugriffe prüfen den konfigurierten Browser-Ursprung.
+
+## Erweiterung ab v0.13
+
+Das Modul bietet jetzt auch manuelle Erfassung für Tf und Verwaltungsmitarbeiter sowie serverseitige Datensatzsperren. Eigene Zeiten werden unter `/my/worktime` erfasst. [Berechtigungen, Sperren und neue API-Endpunkte](../records/README.md). Bei Verwaltungsmitarbeiter-Korrekturen und eigener Bearbeitung entstehen keine Tf-E-Mail-Aufträge; administrative Tf-Korrekturen behalten den beschriebenen Versand.

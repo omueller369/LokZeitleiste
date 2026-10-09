@@ -1,5 +1,7 @@
 package de.lokzeitleiste.app
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,7 +25,7 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
             onCancel = { scope.launch { runCatching { ApiClient.logout(account.token) } }; pending = null })
         return
     }
-    Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
         Text("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
         Text("Tf-Anmeldung mit dem vom Admin angelegten Konto")
         Spacer(Modifier.height(24.dp))

@@ -1,7 +1,7 @@
 const el = id => document.getElementById(id);
 const clock = n => (n < 0 ? '-' : '') + Math.floor(Math.abs(n) / 60) + ':' + String(Math.abs(n) % 60).padStart(2, '0');
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-let accessLevel = 0;
+let accessLevel = 0, manualForm = null;
 let selected = null, data = null, editing = null, busy = false, dirty = false;
 function message(text, error = false) { el('message').textContent = text; el('message').className = error ? 'error' : 'success';
   if (el('editDialog').open) el('editMessage').textContent = error ? text : ''; }
@@ -19,19 +19,21 @@ function row(body, values) { const tr = document.createElement('tr'); for (const
   const td = document.createElement('td'); td.textContent = value; tr.append(td);
 } body.append(tr); return tr; }
 function render() {
+  el('submitEdit').textContent=data.role==='tf'?'Speichern und benachrichtigen':'Änderung speichern';el('notificationNote').textContent=data.role==='tf'?'Tages-, Wochen- und Monatszeiten werden neu berechnet und eine E-Mail mit Vorher → Nachher vorgemerkt.':'Tages-, Wochen- und Monatszeiten werden neu berechnet.';
   el('content').hidden = false; el('title').textContent = names[selected.month - 1] + ' ' + selected.year;
   el('metrics').replaceChildren();
   for (const [label, value] of [['Monatsarbeitszeit', data.month.totals.work_without_guest + data.month.totals.guest],
       ['Monatsgutschrift', data.month.totals.credited], ['Plansoll inkl. Urlaub', data.month.target_minutes]]) {
     const box = document.createElement('div'), strong = document.createElement('strong');
-    strong.textContent = clock(value) + ' h'; box.append(strong, document.createTextNode(label)); el('metrics').append(box);
+    strong.textContent = value==null?'—':clock(value) + ' h'; box.append(strong, document.createTextNode(label)); el('metrics').append(box);
   }
-  el('planning').textContent = data.month.planning.complete ? 'Saldo: ' + clock(data.month.balance_minutes) + ' h' :
+  el('planning').textContent = !data.month.planning ? 'Verwaltungsmitarbeiter: kein Tf-Arbeitszeitplan hinterlegt.' : data.month.planning.complete ? 'Saldo: ' + clock(data.month.balance_minutes) + ' h' :
     data.month.planning.unplanned_days + ' Tage ungeplant; Saldo wird erst bei vollständigem Plan berechnet.';
   for (const id of ['entries','days','weeks']) el(id).replaceChildren();
   el('empty').hidden = data.entries.length > 0;
   for (const entry of data.entries) {
-    const tr = row(el('entries'), [entry.date, entry.kind]);
+    entry.editable=['Zugfahrt','Sonstige Erfassung','Bereitschaft'].includes(entry.kind)&&!entry.locked;
+    const tr = row(el('entries'), [entry.date, entry.kind+(entry.locked?' · Gesperrt':'')]);
     const inputs = [];
     for (const field of ['start','end']) {
       const td = document.createElement('td'), input = document.createElement('input');
@@ -54,13 +56,13 @@ function render() {
         el('reason').value = ''; el('editMessage').textContent = ''; el('editDialog').showModal();
       }; td.append(button);
     } else td.textContent = 'Keine Zeitkorrektur';
-    tr.append(td);
+    recordLockButton(td,entry,accessLevel,()=>load(true));tr.append(td);
   }
   for (const d of data.days) row(el('days'), [d.date,d.type,...[d.work,d.credited,d.topup,d.night,d.sunday,d.holiday].map(clock)]);
   for (const w of data.weeks) row(el('weeks'), ['KW ' + w.week + '/' + w.iso_year,w.start,w.end,clock(w.totals.work),clock(w.totals.credited)]);
 }
 async function history() {
-  const changes = await api(prefix() + '/changes/history'); el('history').replaceChildren();
+  const changes = data.role==='tf'?await api(prefix() + '/changes/history'):[]; el('history').replaceChildren();
   for (const c of changes) {
     const box = document.createElement('div'); box.className = 'history';
     for (const text of [c.date + ' · Beginn ' + c.previous_start + ' → ' + c.new_start + '; Ende ' + c.previous_end + ' → ' + c.new_end,
@@ -76,7 +78,9 @@ async function history() {
     }
     el('history').append(box);
   }
-  if (!changes.length) el('history').textContent = 'Noch keine Arbeitszeitkorrekturen.';
+  const audits=await api('/api/v1/admin/worktime/users/'+selected.tf+'/audit');
+  for(const item of audits){const p=document.createElement('p');p.textContent=({'manual_created':'Manuell erfasst','manual_updated':'Manuell geändert','locked':'Gesperrt','unlocked':'Entsperrt'}[item.action]||item.action)+' · Eintrag #'+item.entry_id+' · '+item.reason+' · Konto #'+item.actor_id+' · '+item.created_at+' UTC';el('history').append(p);}
+  if (!changes.length&&!audits.length) el('history').textContent = 'Noch keine Änderungen.';
 }
 async function load(force = false) {
   if (dirty && !force && !confirm('Ungespeicherte Zeiteingaben verwerfen?')) {
@@ -84,8 +88,8 @@ async function load(force = false) {
   }
   const next = {tf:el('tf').value,year:Number(el('year').value),month:Number(el('month').value)};
   if (!next.tf || !Number.isInteger(next.year) || next.year < 2000 || next.year > 2100) throw Error('Mitarbeiter und gültiges Jahr wählen.');
-  const result = await api('/api/v1/admin/tf/' + next.tf + '/worktime/months/' + next.year + '/' + next.month);
-  selected = next; data = result; dirty = false; render(); await history(); message('Arbeitszeiten geladen.');
+  const result = await api('/api/v1/admin/worktime/users/' + next.tf + '/months/' + next.year + '/' + next.month);
+  if(dirty)manualForm?.resetEntry();selected = next; data = result; dirty = false; render(); await history(); message('Arbeitszeiten geladen.');
 }
 const action = fn => async () => { try { await fn(); } catch (error) { message(error.message, true); } };
 async function exclusive(fn) {
@@ -99,10 +103,10 @@ el('load').onclick = action(() => exclusive(() => load()));
 el('refreshHistory').onclick = action(() => exclusive(history));
 el('cancelEdit').onclick = () => el('editDialog').close();
 el('editForm').onsubmit = event => { event.preventDefault(); action(() => exclusive(async () => {
-  const result = await api(prefix() + '/entries/' + editing.entry.id, {method:'PATCH',headers:{'Content-Type':'application/json'},
+  const result = await api(data.role==='tf'?prefix() + '/entries/' + editing.entry.id:'/api/v1/admin/worktime/entries/'+editing.entry.id, {method:'PATCH',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({start:editing.start,end:editing.end,expected_updated_at:editing.entry.updated_at,reason:el('reason').value})});
   el('editDialog').close(); dirty = false; await load(true);
-  message(result.changed ? 'Arbeitszeit gespeichert und neu berechnet. E-Mail vorgemerkt; Versandstatus siehe Verlauf.' : 'Zeiten unverändert.');
+  message(result.changed&&data.role==='staff'?'Arbeitszeit gespeichert und neu berechnet.':result.changed ? 'Arbeitszeit gespeichert und neu berechnet. E-Mail vorgemerkt; Versandstatus siehe Verlauf.' : 'Zeiten unverändert.');
 }))(); };
 window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
 (async () => {
@@ -114,9 +118,11 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
     if (account.password_change_required) { location.href = '/account'; return; }
     accessLevel = account.permissions.worktime;
     if (!accessLevel) throw Error('Keine Freigabe für Arbeitszeiten.');
-    const users = await api('/api/v1/admin/tf');
+    el('manualCard').hidden=accessLevel<2;
+    manualForm=attachEntryForm(el('manualForm'),()=>'/api/v1/admin/worktime/users/'+selected.tf+'/entries',async()=>{dirty=false;await load(true);},()=>dirty=true);
+    const users = await api('/api/v1/admin/worktime/users');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
-      option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }
+      option.textContent = (user.role==='staff'?'Verwaltung · ':'Tf · ')+user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }
     const tf = new URLSearchParams(location.search).get('tf'); if (users.some(u => String(u.id) === tf)) el('tf').value = tf;
     if (users.length) await exclusive(() => load()); else message('Zuerst einen Mitarbeiter anlegen.');
   } catch (error) { message(error.message, true); }

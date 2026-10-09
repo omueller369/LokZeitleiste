@@ -1,5 +1,7 @@
 package de.lokzeitleiste.app
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,7 +20,7 @@ fun PasswordChangeScreen(username: String, token: String, mandatory: Boolean = f
     var error by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
         Text("Passwort ändern", style = MaterialTheme.typography.headlineMedium)
         Text("Konto: $username")
         if (mandatory) Text("Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.")

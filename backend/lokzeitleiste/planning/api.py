@@ -89,6 +89,13 @@ def create_router(admin_dependency):
         changes = mutate(db, tf_id, year, data.days, data.expected_revisions, admin, "excel")
         return {"changed_days": changes, "plan": get_year(db, tf_id, year)}
 
+    @router.post("/{year}/bulk")
+    def bulk_plan(tf_id: int, data: ImportInput, year: int = Path(ge=2000, le=2100),
+                  admin: User = Depends(admin_dependency), db: Session = Depends(database_session)):
+        profile_for(db, tf_id)
+        changes = mutate(db, tf_id, year, data.days, data.expected_revisions, admin, "manual")
+        return {"changed_days": changes, "plan": get_year(db, tf_id, year)}
+
     @router.get("/{year}/pdf")
     def year_pdf(tf_id: int, year: int = Path(ge=2000, le=2100), db: Session = Depends(database_session)):
         p = profile_for(db, tf_id)

@@ -4,6 +4,14 @@ const codes = {Arbeitstag: 'A', Urlaub: 'U', Ruhetag: 'R', Ungeplant: '?'};
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 let current = null, saved = null, annual = null, importData = null, dirty = false;
 let accessLevel = 0;
+const selection=new Set(), previewSelection=new Set();let originals=new Map();
+function scopeDays(){return view==='excel'?(importData?.days||[]):view==='year'?annual.months.flatMap(m=>m.days):current.days;}
+function selectedSet(){return view==='excel'?previewSelection:selection;}
+function selectionStatus(){el('selectionCount').textContent=selectedSet().size+' Tage gewählt';el('selectAll').checked=scopeDays().length>0&&scopeDays().every(d=>selectedSet().has(d.date));}
+function toggleDate(date){const set=selectedSet();set.has(date)?set.delete(date):set.add(date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();}
+function changedDays(){return annual.months.flatMap(m=>m.days).filter(d=>JSON.stringify([d.kind,d.note])!==originals.get(d.date));}
+function syncDraft(){dirty=changedDays().length>0;updateMetrics();renderYear();selectionStatus();}
+function renderPreview(){if(!importData)return;el('importDays').replaceChildren();for(const day of importData.days){const tr=document.createElement('tr');tr.dataset.kind=day.kind;const td=document.createElement('td'),check=document.createElement('input');check.type='checkbox';check.checked=previewSelection.has(day.date);check.setAttribute('aria-label',day.date+' auswählen');check.onchange=()=>toggleDate(day.date);td.append(check);tr.append(td);for(const v of [day.date,day.previous_kind,day.kind,day.note]){const c=document.createElement('td');c.textContent=v;tr.append(c);}el('importDays').append(tr);}}
 let view = 'calendar', activeDay = null, loadTicket = 0, busy = false;
 const clock = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
 function message(text, error = false) {
@@ -20,9 +28,9 @@ async function api(path, options = {}) {
   return response.json();
 }
 const prefix = () => '/api/v1/admin/tf/' + saved.tf + '/plan/' + saved.year;
-function clearPreview() { importData = null; el('preview').hidden = true; }
+function clearPreview() { previewSelection.clear();importData = null; el('preview').hidden = true;if(current)selectionStatus(); }
 function switchView(next) {
-  view = next;
+  view = next;selectionStatus();el('selectionTools').hidden=!current||accessLevel<2;
   document.querySelectorAll('[data-view]').forEach(button => button.setAttribute('aria-selected', String(button.dataset.view === view)));
   el('editor').hidden = !current || !['calendar', 'list'].includes(view);
   el('calendar').hidden = view !== 'calendar';
@@ -43,8 +51,8 @@ function updateMetrics() {
 }
 function changeDay(day, kind, note) {
   day.kind = kind; day.note = kind === 'Ungeplant' ? '' : note;
-  dirty = true; updateMetrics(); renderCalendar(); clearPreview();
-  message('Ungespeicherte Änderungen. PDFs und Jahresansicht zeigen den gespeicherten Stand.');
+  syncDraft(); renderCalendar(); clearPreview();
+  message('Ungespeicherte Änderungen. PDFs zeigen den gespeicherten Stand.');
 }
 function renderCalendar() {
   const grid = el('calendar'); grid.replaceChildren();
@@ -61,7 +69,9 @@ function renderCalendar() {
     const note = document.createElement('small'); note.textContent = day.note;
     button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + day.kind + ', bearbeiten');
     button.disabled = accessLevel < 2;
+    button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
     button.onclick = () => {
+      if(el('selectionMode').checked){toggleDate(day.date);return;}
       activeDay = day; el('dayTitle').textContent = 'Tag bearbeiten · ' + day.date;
       el('dayKind').value = day.kind; el('dayNote').value = day.note;
       el('dayNote').disabled = day.kind === 'Ungeplant'; el('dayDialog').showModal();
@@ -74,6 +84,7 @@ function renderDays() {
   for (const day of current.days) {
     const row = document.createElement('tr'); row.dataset.kind = day.kind;
     const check = document.createElement('input'); check.type = 'checkbox'; check.setAttribute('aria-label', day.date + ' auswählen');
+    check.checked=selection.has(day.date);check.onchange=()=>toggleDate(day.date);
     let cell = document.createElement('td'); cell.append(check); row.append(cell);
     for (const value of [day.date, new Date(day.date + 'T12:00:00').toLocaleDateString('de-DE', {weekday: 'long'})]) {
       cell = document.createElement('td'); cell.textContent = value; row.append(cell);
@@ -93,7 +104,7 @@ function renderDays() {
     note.oninput = () => changeDay(day, day.kind, note.value);
     body.append(row);
   }
-  el('selectAll').checked = false;
+  selectionStatus();
 }
 function renderYear() {
   el('yearRows').replaceChildren();
@@ -104,6 +115,7 @@ function renderYear() {
   }
   table.append(head);
   for (const month of annual.months) {
+    for(const [field,kind] of [['work_days','Arbeitstag'],['vacation_days','Urlaub'],['rest_days','Ruhetag'],['unplanned_days','Ungeplant']])month[field]=month.days.filter(d=>d.kind===kind).length;month.work_target_minutes=month.work_days*480;month.target_minutes=(month.work_days+month.vacation_days)*480;
     const row = document.createElement('tr');
     for (const value of [names[month.month - 1], month.work_days, month.vacation_days, month.rest_days,
         month.unplanned_days, clock(month.work_target_minutes) + ' h', clock(month.target_minutes) + ' h']) {
@@ -117,7 +129,8 @@ function renderYear() {
       if (day) {
         const button = document.createElement('button'); button.textContent = codes[day.kind]; button.dataset.kind = day.kind;
         button.title = day.date + ' · ' + day.kind; button.setAttribute('aria-label', button.title);
-        button.onclick = handle(() => exclusive(async () => { el('month').value = month.month; if (await load()) switchView('calendar'); }));
+        button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
+        button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));
         td.append(button);
       }
       matrixRow.append(td);
@@ -125,20 +138,23 @@ function renderYear() {
     const total = document.createElement('td'); total.textContent = clock(month.target_minutes); matrixRow.append(total); table.append(matrixRow);
   }
   el('yearMatrix').replaceChildren(table);
-  el('annualSummary').textContent = 'Gespeicherter Jahresplan: ' + annual.totals.work_days + ' Arbeitstage · ' + annual.totals.vacation_days +
+  for(const field of ['work_days','vacation_days','rest_days','unplanned_days','target_minutes'])annual.totals[field]=annual.months.reduce((n,m)=>n+m[field],0);
+  el('annualSummary').textContent = (dirty?'Ungespeicherter Jahresplan: ':'Gespeicherter Jahresplan: ') + annual.totals.work_days + ' Arbeitstage · ' + annual.totals.vacation_days +
     ' Urlaubstage · ' + clock(annual.totals.target_minutes) + ' h Soll inkl. Urlaub · ' + annual.totals.unplanned_days + ' Tage ungeplant. A = Arbeit, U = Urlaub, R = Ruhe, ? = ungeplant.';
 }
 async function load(force = false) {
-  if (dirty && !force && !confirm('Ungespeicherte Änderungen verwerfen?')) {
+  const sameYear=saved&&saved.tf===el('tf').value&&saved.year===Number(el('year').value);
+  if (dirty && !force && !sameYear && !confirm('Ungespeicherte Änderungen verwerfen?')) {
     el('tf').value = saved.tf; el('year').value = saved.year; el('month').value = saved.month; return false;
   }
   const year = Number(el('year').value), month = Number(el('month').value), tf = el('tf').value;
   if (!tf) throw Error('Zuerst einen Tf in der Verwaltung anlegen.');
   if (year < 2000 || year > 2100 || !Number.isInteger(year)) throw Error('Jahr zwischen 2000 und 2100 wählen.');
+  if(sameYear&&!force){saved.month=month;current=annual.months[month-1];el('title').textContent=names[month-1]+' '+year;el('monthPdf').href=prefix()+'/'+month+'/pdf';updateMetrics();renderDays();renderCalendar();renderYear();switchView(view);return true;}
   const ticket = ++loadTicket, base = '/api/v1/admin/tf/' + tf + '/plan/' + year;
   const [data, yearData, history] = await Promise.all([api(base + '/' + month), api(base), api(base + '/history')]);
   if (ticket !== loadTicket) return false;
-  saved = {tf, year, month}; current = data; annual = yearData; dirty = false; clearPreview();
+  saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note])]));clearPreview();
   el('title').textContent = names[month - 1] + ' ' + year;
   updateMetrics(); renderDays(); renderCalendar(); renderYear(); switchView(view);
   el('monthPdf').href = base + '/' + month + '/pdf'; el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
@@ -160,31 +176,22 @@ async function exclusive(fn) {
     for (const id of ['editor','annual','importer']) el(id).inert = false;
     document.querySelectorAll('[data-view]').forEach(button => button.disabled = false); }
 }
-el('load').onclick = handle(() => exclusive(() => load()));
+el('load').onclick = handle(() => exclusive(async()=>{if(dirty&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;await load(true);}));
 for (const id of ['tf','year','month']) el(id).onchange = handle(() => exclusive(() => load()));
 document.querySelectorAll('[data-view]').forEach(button => button.onclick = () => switchView(button.dataset.view));
 el('dayKind').onchange = () => { el('dayNote').disabled = el('dayKind').value === 'Ungeplant'; if (el('dayNote').disabled) el('dayNote').value = ''; };
 el('closeDay').onclick = () => el('dayDialog').close();
 el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay, el('dayKind').value, el('dayNote').value); renderDays(); el('dayDialog').close(); };
-el('selectAll').onchange = () => el('days').querySelectorAll('input[type=checkbox]').forEach(x => x.checked = el('selectAll').checked);
-el('bulk').onclick = () => { for (const row of el('days').rows) if (row.querySelector('input[type=checkbox]').checked) {
-  const select = row.querySelector('select'); select.value = el('bulkKind').value; select.onchange();
-} };
-el('save').onclick = handle(() => exclusive(async () => {
-  await api(prefix() + '/' + saved.month, {method: 'PUT', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({expected_revision: current.revision, days: current.days.map(({date,kind,note}) => ({date,kind,note}))})});
-  await load(true); message('Monatsplan gespeichert.');
-}));
+el('selectAll').onchange=()=>{for(const d of scopeDays())el('selectAll').checked?selectedSet().add(d.date):selectedSet().delete(d.date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
+el('clearSelection').onclick=()=>{selectedSet().clear();renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
+el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){d.kind=el('bulkKind').value;if(d.kind==='Ungeplant')d.note='';}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
+el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note})=>({date,kind,note})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');}));
 el('inspect').onclick = handle(() => exclusive(async () => {
   if (dirty) throw Error('Bitte Monatsänderungen zuerst speichern oder den Plan neu laden.');
   const file = el('excel').files[0]; if (!file) throw Error('Bitte eine XLSX-Datei auswählen.');
   clearPreview(); const form = new FormData(); form.append('file', file);
   importData = await api(prefix() + '/import/preview', {method: 'POST', body: form}); el('importDays').replaceChildren();
-  for (const day of importData.days) {
-    const row = document.createElement('tr'); row.dataset.kind = day.kind;
-    for (const value of [day.date, day.previous_kind, day.kind, day.note]) { const cell = document.createElement('td'); cell.textContent = value; row.append(cell); }
-    el('importDays').append(row);
-  }
+  renderPreview();selectionStatus();
   el('importCount').textContent = importData.days.length + ' Tageszeilen geprüft. Nur diese Datumszeilen werden übernommen.';
   el('preview').hidden = false; message('Import geprüft. Bitte Vorschau kontrollieren.');
 }));
@@ -206,7 +213,7 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
     accessLevel = account.permissions.planning;
     if (!accessLevel) throw Error('Keine Freigabe für das Planungsmodul.');
     if (accessLevel < 2) {
-      for (const id of ['save','bulk','inspect','confirm','excel','selectAll']) el(id).hidden = true;
+      for (const id of ['save','bulk','inspect','confirm','excel','selectAll','selectionTools']) el(id).hidden = true;
       document.querySelector('[data-view=excel]').hidden = true;
     }
     const users = await api('/api/v1/admin/tf');

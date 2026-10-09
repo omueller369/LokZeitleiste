@@ -12,6 +12,7 @@ from ..reports.daily import WORK_KINDS
 from ..reports.mailer import smtp_configured
 from .service import change_body, overview, process_change, validate_no_overlap
 from ..accounts.access import redact_plan
+from ..records.service import assert_unlocked, entry_view
 
 
 class TimeEdit(BaseModel):
@@ -42,8 +43,7 @@ def create_router(require_admin, month_summary, entry_dict):
             raise HTTPException(409, str(exc)) from exc
         period = db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id == tf_id,
                           WorkMonth.year == year, WorkMonth.month == month))
-        result["entries"] = [dict(entry_dict(e), id=e.id, updated_at=e.updated_at.isoformat(),
-                                  editable=e.kind in WORK_KINDS) for e in sorted(period.entries,
+        result["entries"] = [dict(entry_view(db,e,entry_dict), editable=e.kind in WORK_KINDS) for e in sorted(period.entries,
                                   key=lambda e: (e.entry_date, e.start_time, e.id))] if period else []
         result["month"] = redact_plan(db,viewer,summary)
         return result
@@ -70,6 +70,7 @@ def create_router(require_admin, month_summary, entry_dict):
         if not period:
             raise HTTPException(404, "Eintrag des Mitarbeiters nicht gefunden")
         entry = db.scalar(select(WorkEntry).where(WorkEntry.id == entry_id).with_for_update())
+        assert_unlocked(db,entry.id)
         if entry.kind not in WORK_KINDS:
             raise HTTPException(422, "Nur erfasste Arbeitszeiten können korrigiert werden")
         if data.expected_updated_at.tzinfo or entry.updated_at != data.expected_updated_at:
