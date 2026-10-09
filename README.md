@@ -1,4 +1,4 @@
-# LokZeitleiste v0.11
+# LokZeitleiste v0.12
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -37,3 +37,7 @@ Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank gepr
 ## Arbeitszeitkorrekturen
 
 Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/admin/worktime` bearbeiten. Tages-, Wochen- und Monatswerte werden neu berechnet; jede tatsächliche Änderung erzeugt eine E-Mail mit Vorher-/Nachher-Werten und einen nachvollziehbaren Änderungsverlauf. [Bedienung, Versand und Update](backend/lokzeitleiste/worktime/README.md). In der Testumgebung landen Benachrichtigungen in Mailpit.
+
+## Verwaltungsmitarbeiter und Passwörter
+
+Unter `/admin/staff` Verwaltungsmitarbeiter mit Stammdaten, mehreren Adressen und Modulrechten anlegen. Neue Konten müssen beim ersten Login ihr Initialpasswort ändern. Mitarbeiter und Administratoren ändern ihr eigenes Passwort unter `/account`; Administratoren können Initialpasswörter zurücksetzen. [Berechtigungen und Bedienung](backend/lokzeitleiste/accounts/README.md). Die Android-App ab Version 0.7 unterstützt Erstlogin und eigenen Passwortwechsel.

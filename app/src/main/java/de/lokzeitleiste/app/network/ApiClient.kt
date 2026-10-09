@@ -38,9 +38,17 @@ object ApiClient {
             return JSONObject(content)
         } finally { connection.disconnect() }
     }
-    suspend fun login(username: String, password: String): Pair<String, String> = withContext(Dispatchers.IO) {
+    data class LoginResult(val username: String, val token: String, val passwordChangeRequired: Boolean)
+    suspend fun login(username: String, password: String): LoginResult = withContext(Dispatchers.IO) {
         val reply = post("/api/v1/tf/login", JSONObject().put("username", username).put("password", password))
-        reply.getString("username") to reply.getString("access_token")
+        LoginResult(reply.getString("username"), reply.getString("access_token"), reply.optBoolean("password_change_required"))
+    }
+    suspend fun changePassword(username: String, token: String, current: String, new: String, confirm: String): LoginResult {
+        withContext(Dispatchers.IO) {
+            post("/api/v1/account/password", JSONObject().put("current_password", current)
+                .put("new_password", new).put("confirm_password", confirm), token)
+        }
+        return login(username, new)
     }
     suspend fun logout(token: String) = withContext(Dispatchers.IO) {
         post("/api/v1/tf/logout", JSONObject(), token)

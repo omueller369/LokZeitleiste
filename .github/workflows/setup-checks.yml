@@ -24,8 +24,7 @@ jobs:
           bash setup/install-ubuntu.sh --help
           bash setup/tests/test-platform.sh
           bash setup/tests/test-auto-admin.sh
-          node --check backend/lokzeitleiste/static/planning.js
-          node --check backend/lokzeitleiste/static/worktime.js
+          for script in backend/lokzeitleiste/static/*.js; do node --check "$script"; done
       - name: Compose configuration
         working-directory: backend
         run: |

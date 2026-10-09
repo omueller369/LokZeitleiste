@@ -69,3 +69,7 @@ API-Tests: `pip install -r requirements-dev.txt` und `python -m unittest discove
 ## Arbeitszeitkorrekturen
 
 Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/admin/worktime` bearbeiten. Tages-, Wochen- und Monatswerte werden neu berechnet; jede tatsächliche Änderung erzeugt eine E-Mail mit Vorher-/Nachher-Werten und einen nachvollziehbaren Änderungsverlauf. [Bedienung, Versand und Update](lokzeitleiste/worktime/README.md). In der Testumgebung landen Benachrichtigungen in Mailpit.
+
+## Benutzerverwaltung
+
+[Verwaltungsmitarbeiter, Modulrechte und Passwortwechsel](lokzeitleiste/accounts/README.md): Einstieg `/admin/staff`, eigener Passwortwechsel `/account`.

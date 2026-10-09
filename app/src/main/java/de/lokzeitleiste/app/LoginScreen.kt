@@ -15,7 +15,14 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
+    var pending by remember { mutableStateOf<ApiClient.LoginResult?>(null) }
     val scope = rememberCoroutineScope()
+    pending?.let { account ->
+        PasswordChangeScreen(account.username, account.token, mandatory = true,
+            onSuccess = { name, token -> pending = null; onSuccess(name, token) },
+            onCancel = { scope.launch { runCatching { ApiClient.logout(account.token) } }; pending = null })
+        return
+    }
     Column(Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center) {
         Text("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
         Text("Tf-Anmeldung mit dem vom Admin angelegten Konto")
@@ -28,9 +35,9 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
             busy = true; message = ""
             scope.launch {
                 try {
-                    val (name, token) = ApiClient.login(username.trim().lowercase(), password)
+                    val result = ApiClient.login(username.trim().lowercase(), password)
                     password = ""
-                    onSuccess(name, token)
+                    if (result.passwordChangeRequired) pending = result else onSuccess(result.username, result.token)
                 } catch (error: Exception) {
                     message = error.message ?: "Anmeldung fehlgeschlagen."
                 } finally { busy = false }

@@ -144,3 +144,47 @@ class WorkTimeChange(Base):
     last_error: Mapped[str] = mapped_column(String(500), default="", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
+class AccountPolicy(Base):
+    __tablename__ = "account_policies"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    must_change_password: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+
+
+class StaffProfile(Base):
+    __tablename__ = "staff_profiles"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    first_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(120), nullable=False)
+    nationality: Mapped[str] = mapped_column(String(120), nullable=False)
+    birth_date: Mapped[date] = mapped_column(Date, nullable=False)
+    cost_center: Mapped[str] = mapped_column(String(80), nullable=False)
+
+
+class StaffAddress(Base):
+    __tablename__ = "staff_addresses"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("staff_profiles.user_id"), nullable=False, index=True)
+    street: Mapped[str] = mapped_column(String(200), nullable=False)
+    house_number: Mapped[str] = mapped_column(String(30), nullable=False)
+    postal_code: Mapped[str] = mapped_column(String(20), nullable=False)
+    city: Mapped[str] = mapped_column(String(120), nullable=False)
+
+
+class ModulePermission(Base):
+    __tablename__ = "module_permissions"
+    __table_args__ = (UniqueConstraint("user_id", "module"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    module: Mapped[str] = mapped_column(String(40), nullable=False)
+    level: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class AccountAudit(Base):
+    __tablename__ = "account_audits"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    actor_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    target_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    action: Mapped[str] = mapped_column(String(80), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)

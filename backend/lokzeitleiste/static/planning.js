@@ -3,6 +3,7 @@ const kinds = ['Arbeitstag', 'Urlaub', 'Ruhetag', 'Ungeplant'];
 const codes = {Arbeitstag: 'A', Urlaub: 'U', Ruhetag: 'R', Ungeplant: '?'};
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 let current = null, saved = null, annual = null, importData = null, dirty = false;
+let accessLevel = 0;
 let view = 'calendar', activeDay = null, loadTicket = 0, busy = false;
 const clock = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
 function message(text, error = false) {
@@ -59,6 +60,7 @@ function renderCalendar() {
     const hours = document.createElement('span'); hours.textContent = day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00 h' : '8:00 h';
     const note = document.createElement('small'); note.textContent = day.note;
     button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + day.kind + ', bearbeiten');
+    button.disabled = accessLevel < 2;
     button.onclick = () => {
       activeDay = day; el('dayTitle').textContent = 'Tag bearbeiten · ' + day.date;
       el('dayKind').value = day.kind; el('dayNote').value = day.note;
@@ -78,10 +80,11 @@ function renderDays() {
     }
     const select = document.createElement('select'); select.setAttribute('aria-label', 'Tagesart ' + day.date);
     for (const kind of kinds) { const option = document.createElement('option'); option.textContent = kind; select.append(option); }
+    select.disabled = accessLevel < 2; check.disabled = accessLevel < 2;
     select.value = day.kind; cell = document.createElement('td'); cell.append(select); row.append(cell);
     const hours = document.createElement('td'); hours.textContent = day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00'; row.append(hours);
     const note = document.createElement('input'); note.type = 'text'; note.maxLength = 500; note.value = day.note;
-    note.disabled = day.kind === 'Ungeplant'; note.setAttribute('aria-label', 'Notiz ' + day.date);
+    note.disabled = accessLevel < 2 || day.kind === 'Ungeplant'; note.setAttribute('aria-label', 'Notiz ' + day.date);
     cell = document.createElement('td'); cell.append(note); row.append(cell);
     select.onchange = () => {
       changeDay(day, select.value, note.value); row.dataset.kind = day.kind; note.value = day.note;
@@ -198,6 +201,14 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
   for (let i = 0; i < 12; i++) { const option = document.createElement('option'); option.value = i + 1; option.textContent = names[i]; el('month').append(option); }
   el('month').value = now.getMonth() + 1;
   try {
+    const account = await api('/api/v1/account/me');
+    if (account.password_change_required) { location.href = '/account'; return; }
+    accessLevel = account.permissions.planning;
+    if (!accessLevel) throw Error('Keine Freigabe für das Planungsmodul.');
+    if (accessLevel < 2) {
+      for (const id of ['save','bulk','inspect','confirm','excel','selectAll']) el(id).hidden = true;
+      document.querySelector('[data-view=excel]').hidden = true;
+    }
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }

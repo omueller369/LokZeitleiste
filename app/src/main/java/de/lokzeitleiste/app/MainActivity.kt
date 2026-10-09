@@ -35,21 +35,25 @@ private fun App() {
     val scope = rememberCoroutineScope()
     var user by remember { mutableStateOf(TokenVault.username(context)) }
     var trainScreen by remember { mutableStateOf(false) }
+    var passwordScreen by remember { mutableStateOf(false) }
     if (user.isBlank()) LoginScreen { name, token -> TokenVault.save(context, name, token); user = name }
+    else if (passwordScreen) PasswordChangeScreen(user, TokenVault.token(context) ?: "",
+        onSuccess = { name, token -> TokenVault.save(context, name, token); user = name; passwordScreen = false },
+        onCancel = { passwordScreen = false })
     else if (trainScreen) Column {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Button(onClick = { trainScreen = false }) { Text("← Monatsübersicht") }
             Text("Zugfahrten · $user", modifier = Modifier.padding(10.dp))
         }
         Box(Modifier.weight(1f)) { LokZeitApp(user) }
-    } else MonthScreen(user, onTrain = { trainScreen = true }, onLogout = {
+    } else MonthScreen(user, onTrain = { trainScreen = true }, onPassword = { passwordScreen = true }, onLogout = {
         TokenVault.token(context)?.let { token -> scope.launch { runCatching { ApiClient.logout(token) } } }
         TokenVault.clear(context); user = ""
     })
 }
 
 @Composable
-private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> Unit) {
+private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () -> Unit, onLogout: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var month by remember { mutableStateOf(YearMonth.now()) }
@@ -106,6 +110,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                     }
                 }) { Text(if (sending) "Sende …" else "Monat senden") }
                 TextButton(onClick = onLogout) { Text("Abmelden · $username") }
+                TextButton(onClick = onPassword) { Text("Passwort ändern") }
             }
             if (sendMessage.isNotBlank()) Text(sendMessage, style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

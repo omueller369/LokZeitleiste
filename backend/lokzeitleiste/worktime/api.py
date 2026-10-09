@@ -11,6 +11,7 @@ from ..schemas import EntryIn
 from ..reports.daily import WORK_KINDS
 from ..reports.mailer import smtp_configured
 from .service import change_body, overview, process_change, validate_no_overlap
+from ..accounts.access import redact_plan
 
 
 class TimeEdit(BaseModel):
@@ -32,7 +33,7 @@ def create_router(require_admin, month_summary, entry_dict):
         return profile
 
     @router.get("/months/{year}/{month}")
-    def get_overview(tf_id: int, year: int, month: int, db: Session = Depends(database_session)):
+    def get_overview(tf_id: int, year: int, month: int, viewer: User = Depends(require_admin), db: Session = Depends(database_session)):
         profile = profile_for(db, tf_id)
         summary = month_summary(db, tf_id, year, month)
         try:
@@ -44,7 +45,7 @@ def create_router(require_admin, month_summary, entry_dict):
         result["entries"] = [dict(entry_dict(e), id=e.id, updated_at=e.updated_at.isoformat(),
                                   editable=e.kind in WORK_KINDS) for e in sorted(period.entries,
                                   key=lambda e: (e.entry_date, e.start_time, e.id))] if period else []
-        result["month"] = summary
+        result["month"] = redact_plan(db,viewer,summary)
         return result
 
     @router.get("/changes/history")

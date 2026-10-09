@@ -10,7 +10,7 @@ from sqlalchemy.pool import StaticPool
 
 from lokzeitleiste.db import Base, database_session
 from lokzeitleiste.main import app
-from lokzeitleiste.models import ReportDispatch, User
+from lokzeitleiste.models import AccountPolicy, ReportDispatch, User
 from lokzeitleiste.security import hash_password
 
 
@@ -43,13 +43,19 @@ class ApiFlowTest(unittest.TestCase):
         self.engine.dispose()
 
     def create_tf(self, username, personnel):
-        return self.client.post("/api/v1/admin/tf", json={
+        result = self.client.post("/api/v1/admin/tf", json={
             "username": username, "password": "tf-secret-12345", "first_name": "Mira",
             "last_name": "Beispiel", "personnel_number": personnel,
             "target_hours_minutes": 9600, "vacation_days": 30,
             "birth_date": "1990-05-12", "bahncard": 50,
             "email": username + "@example.com", "federal_state": "BE",
         })
+        # Fachliche Tests verwenden ein Konto nach abgeschlossenem Initialpasswortwechsel.
+        if result.status_code == 201:
+            with Session(self.engine) as db:
+                db.get(AccountPolicy,result.json()['id']).must_change_password=False
+                db.commit()
+        return result
 
     def test_admin_creation_upload_idempotence_and_owner_isolation(self):
         self.assertEqual(self.client.post("/api/v1/admin/login",

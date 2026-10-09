@@ -35,6 +35,10 @@ def main():
         "personnel_number": name, "target_hours_minutes": 9600, "vacation_days": 30,
         "birth_date": "1990-05-12", "bahncard": 50, "email": recipient, "federal_state": "BE"})
     token = request("/api/v1/tf/login", {"username": name, "password": password})["access_token"]
+    personal_password = secrets.token_urlsafe(24)
+    request("/api/v1/account/password", {"current_password":password,"new_password":personal_password,
+            "confirm_password":personal_password}, token)
+    token = request("/api/v1/tf/login", {"username":name,"password":personal_password})["access_token"]
     def entry(kind, date, start="08:00", end="12:00", guest=0):
         return {"client_id": str(uuid.uuid4()), "kind": kind, "date": date,
                 "start": start, "end": end, "pause": 0, "guest": guest}

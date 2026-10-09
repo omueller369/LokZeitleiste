@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange
+from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy
 from .schemas import Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
 from .reports.daily import day_rows
@@ -19,28 +19,32 @@ from .reports.mailer import smtp_configured
 from .reports.pdf import render_receipt_pdf
 from .reports.monthly import summarize_month
 from .reports.service import process_dispatch
+from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.11")
+app = FastAPI(title="LokZeitleiste API", version="0.12")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
 
-def require_tf(authorization: str | None = Header(default=None), db: Session = Depends(database_session)) -> User:
+def require_tf(request: Request, authorization: str | None = Header(default=None), db: Session = Depends(database_session)) -> User:
     token = authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else ""
     user = user_from_token(db, token)
     if not user or user.role != "tf":
         raise HTTPException(401, "Tf-Anmeldung erforderlich")
+    if request.url.path != '/api/v1/tf/logout':
+        ready(db,user)
     return user
 
 
 def require_admin(request: Request, admin_session: str | None = Cookie(default=None),
                   db: Session = Depends(database_session)) -> User:
     user = user_from_token(db, admin_session)
-    if not user or user.role != "admin":
+    if not user or user.role not in ("admin", "staff"):
         raise HTTPException(401, "Admin-Anmeldung erforderlich")
     if request.method not in ("GET", "HEAD") and PUBLIC_ORIGIN and request.headers.get("origin") != PUBLIC_ORIGIN:
         raise HTTPException(403, "Ungültiger Ursprung")
+    authorize_route(db,user,request)
     return user
 
 
@@ -54,15 +58,22 @@ def admin_page():
     return FileResponse(Path(__file__).parent / "static" / "admin.html")
 
 
+@app.get("/admin/admin.js")
+def admin_script():
+    return FileResponse(Path(__file__).parent / "static" / "admin.js", media_type="text/javascript")
+
+
 @app.post("/api/v1/admin/login")
-def admin_login(credentials: Credentials, response: Response, db: Session = Depends(database_session)):
-    user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role == "admin"))
+def admin_login(credentials: Credentials, request: Request, response: Response, db: Session = Depends(database_session)):
+    if PUBLIC_ORIGIN and request.headers.get('origin') != PUBLIC_ORIGIN:
+        raise HTTPException(403, "Ungültiger Ursprung")
+    user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role.in_(("admin", "staff"))))
     if not user or not user.active or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(401, "Anmeldung fehlgeschlagen")
     token = issue_token(db, user)
     response.set_cookie("admin_session", token, httponly=True, secure=COOKIE_SECURE,
                         samesite="strict", max_age=365 * 24 * 3600, path="/")
-    return {"username": user.username}
+    return {"username": user.username, "role":user.role, "password_change_required":password_required(db,user)}
 
 
 @app.post("/api/v1/admin/logout")
@@ -83,6 +94,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
         user = User(username=username, password_hash=hash_password(data.password), role="tf")
         db.add(user)
         db.flush()
+        db.add(AccountPolicy(user_id=user.id,must_change_password=True))
         db.add(TfProfile(user_id=user.id, last_name=data.last_name.strip(), first_name=data.first_name.strip(),
                          personnel_number=data.personnel_number.strip(),
                          target_hours_minutes=data.target_hours_minutes,
@@ -96,8 +108,10 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
 
 
 @app.get("/api/v1/admin/tf")
-def list_tf(_: User = Depends(require_admin), db: Session = Depends(database_session)):
+def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(database_session)):
     rows = db.execute(select(User, TfProfile).join(TfProfile).where(User.role == "tf").order_by(TfProfile.last_name)).all()
+    if permissions(db,viewer)["employees"] == 0:
+        return [{"id":u.id,"first_name":p.first_name,"last_name":p.last_name,"personnel_number":p.personnel_number} for u,p in rows]
     return [{"id": user.id, "username": user.username, "active": user.active,
              "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
@@ -174,12 +188,12 @@ def month_summary(db: Session, tf_id: int, year: int, month: int):
 
 
 @app.get("/api/v1/admin/tf/{tf_id}/months/{year}/{month}/summary")
-def admin_month_summary(tf_id: int, year: int, month: int, _: User = Depends(require_admin),
+def admin_month_summary(tf_id: int, year: int, month: int, viewer: User = Depends(require_admin),
                         db: Session = Depends(database_session)):
     user = db.get(User, tf_id)
     if not user or user.role != "tf":
         raise HTTPException(404, "Tf nicht gefunden")
-    return month_summary(db, tf_id, year, month)
+    return redact_plan(db,viewer,month_summary(db, tf_id, year, month))
 
 
 @app.get("/api/v1/me/months/{year}/{month}/summary")
@@ -193,7 +207,7 @@ def tf_login(credentials: Credentials, db: Session = Depends(database_session)):
     user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role == "tf"))
     if not user or not user.active or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(401, "Anmeldung fehlgeschlagen")
-    return {"access_token": issue_token(db, user), "token_type": "bearer", "username": user.username}
+    return {"access_token": issue_token(db, user), "token_type": "bearer", "username": user.username, "password_change_required":password_required(db,user)}
 
 
 @app.post("/api/v1/tf/logout")
@@ -317,3 +331,23 @@ def worktime_page():
 @app.get("/admin/worktime.js")
 def worktime_script():
     return FileResponse(Path(__file__).parent / "static" / "worktime.js", media_type="text/javascript")
+
+
+from .accounts.api import create_router as account_router
+app.include_router(account_router(require_admin, lambda: PUBLIC_ORIGIN, COOKIE_SECURE))
+
+@app.get("/admin/staff")
+def staff_page():
+    return FileResponse(Path(__file__).parent / "static" / "staff.html")
+
+@app.get("/admin/staff.js")
+def staff_script():
+    return FileResponse(Path(__file__).parent / "static" / "staff.js", media_type="text/javascript")
+
+@app.get("/account")
+def account_page():
+    return FileResponse(Path(__file__).parent / "static" / "account.html")
+
+@app.get("/account.js")
+def account_script():
+    return FileResponse(Path(__file__).parent / "static" / "account.js", media_type="text/javascript")

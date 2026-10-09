@@ -1,6 +1,7 @@
 const el = id => document.getElementById(id);
 const clock = n => (n < 0 ? '-' : '') + Math.floor(Math.abs(n) / 60) + ':' + String(Math.abs(n) % 60).padStart(2, '0');
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+let accessLevel = 0;
 let selected = null, data = null, editing = null, busy = false, dirty = false;
 function message(text, error = false) { el('message').textContent = text; el('message').className = error ? 'error' : 'success';
   if (el('editDialog').open) el('editMessage').textContent = error ? text : ''; }
@@ -34,7 +35,7 @@ function render() {
     const inputs = [];
     for (const field of ['start','end']) {
       const td = document.createElement('td'), input = document.createElement('input');
-      input.type = 'time'; input.step = '60'; input.value = entry[field]; input.disabled = !entry.editable;
+      input.type = 'time'; input.step = '60'; input.value = entry[field]; input.disabled = accessLevel < 2 || !entry.editable;
       input.setAttribute('aria-label', (field === 'start' ? 'Arbeitsbeginn ' : 'Arbeitsende ') + entry.date);
       input.oninput = () => { dirty = true;
         for (const other of el('entries').rows) if (other !== tr) other.querySelectorAll('input,button').forEach(control => control.disabled = true);
@@ -42,7 +43,7 @@ function render() {
     }
     for (const value of [entry.pause + ' min', entry.guest + ' min']) { const td = document.createElement('td'); td.textContent = value; tr.append(td); }
     const td = document.createElement('td');
-    if (entry.editable) {
+    if (accessLevel >= 2 && entry.editable) {
       const button = document.createElement('button'); button.textContent = 'Prüfen';
       button.onclick = () => {
         if (!inputs[0].value || !inputs[1].value) { message('Beginn und Ende eingeben.', true); return; }
@@ -68,7 +69,7 @@ async function history() {
           ' · ' + c.recipient_email + ' · Versuche: ' + c.attempts + (c.last_error ? ' · ' + c.last_error : '')]) {
       const p = document.createElement('p'); p.textContent = text; box.append(p);
     }
-    if (c.email_status === 'failed') {
+    if (accessLevel >= 2 && c.email_status === 'failed') {
       const button = document.createElement('button'); button.textContent = 'E-Mail erneut senden';
       button.onclick = action(() => exclusive(async () => { await api(prefix() + '/changes/' + c.id + '/retry', {method:'POST'});
         await history(); message('Benachrichtigung erneut vorgemerkt.'); })); box.append(button);
@@ -109,6 +110,10 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
   for (let i = 0; i < 12; i++) { const option = document.createElement('option'); option.value = i + 1; option.textContent = names[i]; el('month').append(option); }
   el('month').value = now.getMonth() + 1;
   try {
+    const account = await api('/api/v1/account/me');
+    if (account.password_change_required) { location.href = '/account'; return; }
+    accessLevel = account.permissions.worktime;
+    if (!accessLevel) throw Error('Keine Freigabe für Arbeitszeiten.');
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }
