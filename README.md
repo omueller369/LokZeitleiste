@@ -1,4 +1,4 @@
-# LokZeitleiste v0.13
+# LokZeitleiste v0.14
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -47,3 +47,5 @@ Unter `/admin/staff` Verwaltungsmitarbeiter mit Stammdaten, mehreren Adressen un
 Tf und Verwaltungsmitarbeiter erfassen eigene Zeiten unter `/my/worktime`; die Verwaltung kann im Arbeitszeitmodul Einträge erfassen, bearbeiten und sperren. Entsperren erfordert die Modulstufe Administration. [Bedienung und API](backend/lokzeitleiste/records/README.md). Tf-Anlage (`/admin/tf/new`) und Tf-Übersicht (`/admin/tf`) haben getrennte Menüpunkte. Beide Mitarbeitermodule bieten geschützte Foto-Uploads.
 
 Die Planung unterstützt Mehrfachauswahl in Kalender, Tagesliste, Jahresmatrix und Excel-Vorschau. Auswahl und ungespeicherte Änderungen bleiben innerhalb desselben Jahres erhalten; Änderungen über Monatsgrenzen werden gemeinsam gespeichert. Webansichten sind für kleine Bildschirme angepasst, breite Tabellen scrollen innerhalb ihres Bereichs. Android 0.8 ergänzt mobile Layoutanpassungen. Praktische Tests auf Mobilgeräten stehen noch aus.
+
+Die Arbeitszeitplanung verwendet jetzt automatisch die gesetzlichen Berliner Feiertage. Diese werden mit Namen und eigener Farbe angezeigt und haben immer 0 Sollstunden, auch bei eingetragenem Arbeitstag oder Urlaub. Dies gilt für Webansichten, Monatssaldo, PDF und Excel.

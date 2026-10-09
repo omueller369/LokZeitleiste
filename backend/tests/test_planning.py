@@ -106,3 +106,50 @@ class PlanningTest(unittest.TestCase):
         token = other.post("/api/v1/tf/login", json={"username": "plan-tf", "password": "plan-tf-secret-12345"}).json()["access_token"]
         self.assertEqual(other.get(f"{self.base}/2026/9", headers={"Authorization": "Bearer " + token}).status_code, 401)
         self.assertEqual(self.client.get("/api/v1/admin/tf/9999/plan/2026").status_code, 404); other.close()
+
+    def test_berlin_calendar_2026_exact_and_exceptional_holidays(self):
+        data=self.client.get(f'{self.base}/2026').json()
+        days=[d for m in data['months'] for d in m['days'] if d['is_holiday']]
+        expected={'2026-01-01','2026-03-08','2026-04-03','2026-04-06','2026-05-01','2026-05-14','2026-05-25','2026-10-03','2026-12-25','2026-12-26'}
+        self.assertEqual({d['date'] for d in days},expected)
+        self.assertEqual(data['totals']['holiday_days'],10)
+        self.assertEqual(data['totals']['unplanned_days'],355)
+        self.assertTrue(all(d['target_minutes']==0 and d['holiday_name'] and d['holiday_state']=='BE' for d in days))
+        self.assertTrue(self.client.get(f'{self.base}/2025/5').json()['days'][7]['is_holiday'])
+        self.assertFalse(self.client.get(f'{self.base}/2026/5').json()['days'][7]['is_holiday'])
+        self.assertTrue(self.client.get(f'{self.base}/2028/6').json()['days'][16]['is_holiday'])
+        self.assertFalse(self.client.get(f'{self.base}/2029/6').json()['days'][16]['is_holiday'])
+        # Frauentag gilt erst seit 2019; Brandenburg-spezifischer Ostersonntag gilt nicht in Berlin.
+        self.assertFalse(self.client.get(f'{self.base}/2018/3').json()['days'][7]['is_holiday'])
+        self.assertFalse(self.client.get(f'{self.base}/2026/4').json()['days'][4]['is_holiday'])
+
+    def test_holidays_override_work_vacation_and_do_not_leave_plan_open(self):
+        days=[{'date':f'2026-05-{day:02d}','kind':'Arbeitstag'} for day in range(1,32)]
+        data=self.put(days,month=5).json()
+        self.assertTrue(data['complete']);self.assertEqual(data['holiday_days'],3)
+        self.assertEqual(data['work_days'],28);self.assertEqual(data['target_minutes'],28*480)
+        self.assertEqual(data['days'][0]['kind'],'Arbeitstag')
+        self.assertEqual(data['days'][0]['target_minutes'],0)
+        holiday=[{'date':'2026-05-01','kind':'Urlaub'},{'date':'2026-05-14','kind':'Ungeplant'},{'date':'2026-05-25','kind':'Ruhetag'}]
+        data=self.put(holiday,month=5,revision=1).json()
+        self.assertEqual(data['target_minutes'],28*480);self.assertEqual(data['vacation_days'],0)
+        self.assertEqual(data['rest_days'],0);self.assertEqual(data['unplanned_days'],0);self.assertTrue(data['complete'])
+        summary=self.client.get(f'/api/v1/admin/tf/{self.tf_id}/months/2026/5/summary').json()
+        self.assertEqual(summary['target_minutes'],28*480)
+        self.assertEqual(summary['balance_minutes'],-28*480)
+        self.assertEqual(summary['totals']['credited'],0)
+
+    def test_holidays_excel_preview_bulk_and_export_keep_zero_target(self):
+        preview=self.preview([[date(2026,5,1),'Arbeitstag','Bestehender Dienst','00123'],[date(2026,5,2),'Urlaub','','00123']]).json()
+        self.assertTrue(preview['days'][0]['is_holiday']);self.assertEqual(preview['days'][0]['target_minutes'],0)
+        payload={'days':[{k:d[k] for k in ('date','kind','note')} for d in preview['days']], 'expected_revisions':preview['expected_revisions']}
+        data=self.client.post(f'{self.base}/2026/import',json=payload).json()['plan']['months'][4]
+        self.assertEqual(data['target_minutes'],480);self.assertEqual(data['work_days'],0)
+        self.assertEqual(self.client.post(f'{self.base}/2026/bulk',json={'days':[{'date':'2026-05-01','kind':'Urlaub'}],'expected_revisions':{'5':1}}).status_code,200)
+        data=self.client.get(f'{self.base}/2026/5').json();self.assertEqual(data['target_minutes'],480);self.assertEqual(data['vacation_days'],1)
+        content=self.client.get(f'{self.base}/2026/template.xlsx').content
+        book=load_workbook(io.BytesIO(content));sheet=book['Plan']
+        row=next(r for r in sheet.iter_rows(min_row=2) if r[0].value.date()==date(2026,5,1))
+        self.assertEqual(row[0].fill.fgColor.rgb,'00E9DFF5');self.assertIn('Soll: 0 Stunden',row[0].comment.text)
+        self.assertEqual(row[1].value,'Urlaub');self.assertEqual(row[2].value,'') if row[2].value=='' else self.assertIsNone(row[2].value)
+        self.assertEqual(self.client.post(f'{self.base}/2026/import/preview',files={'file':('plan.xlsx',content)}).status_code,200)

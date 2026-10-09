@@ -10,6 +10,7 @@ from .schemas import MonthInput, ImportInput
 from .service import get_month, get_year, apply_days, RevisionConflict
 from .excel import parse_excel, template, MAX_FILE
 from .pdf import render_plan_pdf
+from .holidays import holiday_info
 
 
 def create_router(admin_dependency):
@@ -75,7 +76,8 @@ def create_router(admin_dependency):
             updates = []
             for item in days:
                 old = cached[item.date.month]["days"][item.date.day - 1]
-                updates.append({**item.model_dump(mode="json"), "previous_kind": old["kind"],
+                updates.append({**item.model_dump(mode="json"), **holiday_info(item.date),
+                                "target_minutes":0 if holiday_info(item.date)["is_holiday"] or item.kind not in ("Arbeitstag","Urlaub") else 480, "previous_kind": old["kind"],
                                 "previous_note": old["note"]})
             return {"days": updates, "expected_revisions": revisions,
                     "rule": "Nur enthaltene Datumszeilen werden geändert. Ungeplant entfernt eine Tagesplanung."}

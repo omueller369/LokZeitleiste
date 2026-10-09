@@ -22,7 +22,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.13")
+app = FastAPI(title="LokZeitleiste API", version="0.14")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 

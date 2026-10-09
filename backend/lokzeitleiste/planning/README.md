@@ -13,11 +13,11 @@ Nur ausdrücklich geplante Tage werden berücksichtigt:
 | Ruhetag | 0 | 0 |
 | Ungeplant | offen | noch unberechnet |
 
-Monatliches Arbeitssoll = Anzahl Arbeitstage × 8 Stunden. Soll inklusive Urlaub = Arbeitssoll + Anzahl Urlaubstage × 8 Stunden. Die Jahreswerte addieren die zwölf Monate, inklusive Schaltjahr. Wochenenden und Feiertage werden nicht automatisch zu Ruhetagen. **Ungeplant** hebt eine vorhandene Tagesplanung samt Notiz auf; ausgelassene Datumszeilen bleiben unverändert.
+Monatliches Arbeitssoll = Anzahl Arbeitstage × 8 Stunden. Soll inklusive Urlaub = Arbeitssoll + Anzahl Urlaubstage × 8 Stunden. Die Jahreswerte addieren die zwölf Monate, inklusive Schaltjahr. Wochenenden werden nicht automatisch zu Ruhetagen. Gesetzliche Berliner Feiertage werden automatisch mit 0 Sollstunden berücksichtigt. **Ungeplant** hebt eine vorhandene Tagesplanung samt Notiz auf; ausgelassene Datumszeilen bleiben unverändert.
 
 Die tatsächliche Monatsabrechnung aus App-Einträgen erhält `planning`, `target_minutes` und `balance_minutes`. Der Saldo wird nur bei vollständig geplantem Monat berechnet: tatsächlich gutgeschriebene Minuten minus Plansoll inklusive Urlaub. Solange Tage ungeplant sind, bleibt der Saldo leer. Der allgemeine Sollstundenwert in den Tf-Stammdaten wird nicht überschrieben. Die Monatssollberechnung nutzt den datumsbezogenen Plan.
 
-Ein geplanter Urlaubstag erhält acht Stunden **im Plan**. Er erzeugt keinen tatsächlichen App-Arbeitszeiteintrag. In der bisherigen Ist-Abrechnung werden die aus der App übermittelten Urlaubs- und Krankheitstage weiter mit jeweils acht Stunden berücksichtigt. So wird Urlaub nicht doppelt gutgeschrieben; zukünftige Planungen verändern keine empfangenen Tagesbelege.
+Ein geplanter Urlaubstag an einem Nichtfeiertag erhält acht Stunden **im Plan**. Er erzeugt keinen tatsächlichen App-Arbeitszeiteintrag. In der bisherigen Ist-Abrechnung werden die aus der App übermittelten Urlaubs- und Krankheitstage weiter mit jeweils acht Stunden berücksichtigt. So wird Urlaub nicht doppelt gutgeschrieben; zukünftige Planungen verändern keine empfangenen Tagesbelege.
 
 ## Excel
 
@@ -37,7 +37,7 @@ Alle Änderungen eines Imports erfolgen gemeinsam. Wird zwischen Vorschau und Ü
 
 - Monatsplan: farbiger Kalender auf A4, Kennzahlen und gegebenenfalls Notizen auf Folgeseiten.
 - Jahresplan: Jahresmatrix auf A3 quer, 12 Monate mit Tageskennzeichen und Monatssummen.
-- Blau = Arbeitstag, Grün = Urlaub, Orange = Ruhetag, Grau = ungeplant. Kennzeichen A/U/R/? und Legende erlauben auch einen Schwarzweiß-Ausdruck.
+- Blau = Arbeitstag, Grün = Urlaub, Orange = Ruhetag, Grau = ungeplant, Violett = Berliner Feiertag (F, 0 h Soll). Kennzeichen A/U/R/? und Legende erlauben auch einen Schwarzweiß-Ausdruck.
 
 Die Exporte zeigen den aktuellen gespeicherten Stand; noch nicht gespeicherte Änderungen erscheinen nicht im PDF. Die Pläne werden heruntergeladen, nicht automatisch per E-Mail versandt. Muster mit fiktiven Daten liegen unter `design/Plan-Monat-Muster.pdf` und `design/Plan-Jahr-Muster.pdf`.
 
@@ -78,3 +78,11 @@ In Monatskalender und Jahresmatrix **Mehrfachauswahl** aktivieren und mehrere Ta
 Kalender, Liste und Jahresmatrix teilen ihre Auswahl. Beim Monatswechsel desselben Tf/Jahrs bleiben Auswahl und Änderungen erhalten. Die Jahresübersicht zeigt auch den noch ungespeicherten Entwurf. **Änderungen speichern** übernimmt alle geänderten Tage des Jahres gemeinsam über `POST /api/v1/admin/tf/{tf_id}/plan/{year}/bulk`, mit `days` und `expected_revisions` je betroffenem Monat. Veraltete Revisionen verhindern sämtliche Änderungen. Wechsel des Mitarbeiters/Jahrs oder Neuladen fragt bei ungespeicherten Änderungen nach. PDFs zeigen weiterhin ausschließlich den gespeicherten Stand.
 
 Die Excel-Vorschau hat eine eigene Mehrfachauswahl. Sammeländerungen ändern zunächst nur die geprüften Importzeilen. **Import übernehmen** speichert anschließend die gesamte Vorschau mit den geprüften Monatsrevisionen. Manuelle Entwurfsänderungen müssen davor gespeichert oder verworfen werden.
+
+## Berliner Feiertagskalender ab v0.14
+
+Für alle Tf-Pläne gilt der gesetzliche Feiertagskalender Berlin (BE), unabhängig vom Bundesland der Tf-Stammdaten. Das bestehende Bundesland bleibt für die Ist-Arbeitszeit-/Feiertagsberechnung erhalten. Feiertage erhalten Namen, eigene Farbe und Kennzeichen F in Kalender, Tagesliste, Jahresmatrix, Importvorschau und PDF. Excel markiert Feiertage violett, nennt Namen und 0 Sollstunden im Datumskommentar und führt sie zusätzlich im Blatt „Feiertage Berlin“ auf. Das importierbare Blatt „Plan“ behält seine vier Spalten.
+
+An gesetzlichen Berliner Feiertagen ist das Plansoll immer 0 Minuten. Dies gilt auch bei gespeicherter oder neu importierter Tagesart Arbeitstag/Urlaub. Bestehende Tagesarten und Notizen bleiben als Planangaben erhalten; für erforderliche Arbeitstage, Urlaubs-Sollgutschrift, Ruhetage und offene Tage werden Feiertage separat gezählt. Ein ungeplanter Feiertag verhindert keinen vollständigen Plan. Mehrfachauswahl und manuelle Änderungen können die Feiertagsregel nicht aufheben. Tatsächlich geleistete/erfasste Zeiten bleiben unverändert.
+
+Die API liefert je Tag `is_holiday`, `holiday_name`, `holiday_state` und das korrigierte `target_minutes`, je Monat/Jahr zusätzlich `holiday_days`. Die bestehende holidays-Abhängigkeit (mindestens 0.105) berechnet bewegliche Feiertage und historisch geltende Feiertage einschließlich einmaliger Berliner Feiertage. Ersatzfeiertage und Schulferien werden nicht als gesetzliche Feiertage übernommen. Quelle und Abgleich: [Berliner Feiertage 2026/2027](https://www.berlin.de/tourismus/infos/1887651-1721039-feiertage-schulferien.html), [einmaliger Feiertag 17. Juni 2028](https://www.berlin.de/sen/bjf/service/kalender/ferien/termine/). Bei späteren Gesetzesänderungen Kalenderabhängigkeit aktualisieren und erneut prüfen. Keine Datenbankmigration erforderlich.

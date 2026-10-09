@@ -13,7 +13,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from .excel import COLORS
 
 MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
-CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?"}
+CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F"}
 DARK = colors.HexColor("#173E55")
 
 FONT_DIR = Path(reportlab.__file__).parent / "fonts"
@@ -53,7 +53,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                                       ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 8)]))
     story += [summary_table, Spacer(1, 12)]
     legend = [[f"{CODES[k]} - {k}" for k in CODES]]
-    table = Table(legend, colWidths=[doc.width / 4] * 4, rowHeights=25)
+    table = Table(legend, colWidths=[doc.width / len(CODES)] * len(CODES), rowHeights=25)
     table.setStyle(TableStyle([("BACKGROUND", (i, 0), (i, 0), colors.HexColor("#" + COLORS[k])) for i, k in enumerate(CODES)] + [("FONTNAME", (0, 0), (-1, -1), "PlanSans")] +
                              [("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                               ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
@@ -66,7 +66,8 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
             cells = [MONTHS[month["month"]]]
             for column in range(1, 32):
                 if column <= len(month["days"]):
-                    kind = month["days"][column - 1]["kind"]
+                    item=month["days"][column-1]
+                    kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                     cells.append(CODES[kind])
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[kind])))
                 else:
@@ -93,8 +94,8 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     cells.append("")
                     continue
                 item = plan["days"][day - 1]
-                kind = item["kind"]
-                hours = "8:00 h" if item["target_minutes"] else "0:00 h" if kind == "Ruhetag" else "Offen"
+                kind = "Feiertag" if item.get("is_holiday") else item["kind"]
+                hours = "8:00 h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
                 cells.append(Paragraph(f"<b>{day:02d}</b><br/>{CODES[kind]} - {kind}<br/>{hours}", styles["PlanCell"]))
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
             rows.append(cells)
@@ -104,9 +105,13 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                    ("LEFTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), 6),
                    ("GRID", (0, 0), (-1, -1), 1, colors.white)]))
         story.append(table)
-    story += [Spacer(1, 12), Paragraph("Nur ausdrücklich geplante Arbeitstage werden berücksichtigt. Urlaub = 8 h, Ruhetag = 0 h. "
-              "Ungeplante Tage sind offen; Wochenenden und Feiertage werden nicht automatisch umgeplant.", styles["Normal"])]
+    story += [Spacer(1, 12), Paragraph("Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. "
+              "Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.", styles["Normal"])]
+    story += [Spacer(1,8), Paragraph(f"Feiertage Berlin: {sums['holiday_days']} Tage mit 0 h Soll.",styles["Normal"])]
     if not yearly:
+        for item in plan["days"]:
+            if item.get("is_holiday"):
+                story.append(Paragraph(f"{item['date']}: Feiertag - {escape(item['holiday_name'])} (0 h Soll)",styles["Normal"]))
         notes = [d for d in plan["days"] if d["note"]]
         if notes:
             story += [Spacer(1, 12), Paragraph("Notizen", styles["Heading2"])]

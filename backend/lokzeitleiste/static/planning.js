@@ -11,7 +11,7 @@ function selectionStatus(){el('selectionCount').textContent=selectedSet().size+'
 function toggleDate(date){const set=selectedSet();set.has(date)?set.delete(date):set.add(date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();}
 function changedDays(){return annual.months.flatMap(m=>m.days).filter(d=>JSON.stringify([d.kind,d.note])!==originals.get(d.date));}
 function syncDraft(){dirty=changedDays().length>0;updateMetrics();renderYear();selectionStatus();}
-function renderPreview(){if(!importData)return;el('importDays').replaceChildren();for(const day of importData.days){const tr=document.createElement('tr');tr.dataset.kind=day.kind;const td=document.createElement('td'),check=document.createElement('input');check.type='checkbox';check.checked=previewSelection.has(day.date);check.setAttribute('aria-label',day.date+' auswählen');check.onchange=()=>toggleDate(day.date);td.append(check);tr.append(td);for(const v of [day.date,day.previous_kind,day.kind,day.note]){const c=document.createElement('td');c.textContent=v;tr.append(c);}el('importDays').append(tr);}}
+function renderPreview(){if(!importData)return;el('importDays').replaceChildren();for(const day of importData.days){const tr=document.createElement('tr');tr.dataset.kind=day.is_holiday?'Feiertag':day.kind;const td=document.createElement('td'),check=document.createElement('input');check.type='checkbox';check.checked=previewSelection.has(day.date);check.setAttribute('aria-label',day.date+' auswählen');check.onchange=()=>toggleDate(day.date);td.append(check);tr.append(td);for(const v of [day.date,day.previous_kind,day.is_holiday?'Feiertag · '+day.holiday_name+' · 0:00 h (Plan: '+day.kind+')':day.kind,day.note]){const c=document.createElement('td');c.textContent=v;tr.append(c);}el('importDays').append(tr);}}
 let view = 'calendar', activeDay = null, loadTicket = 0, busy = false;
 const clock = n => Math.floor(n / 60) + ':' + String(n % 60).padStart(2, '0');
 function message(text, error = false) {
@@ -39,10 +39,10 @@ function switchView(next) {
   el('importer').hidden = !current || view !== 'excel';
 }
 function updateMetrics() {
-  const counts = Object.fromEntries(kinds.map(kind => [kind, current.days.filter(day => day.kind === kind).length]));
+  const counts = Object.fromEntries(kinds.map(kind => [kind, current.days.filter(day => day.kind === kind&&!day.is_holiday).length]));
   el('metrics').replaceChildren();
   for (const [label, value] of [['Arbeitstage', counts.Arbeitstag], ['Urlaubstage', counts.Urlaub],
-      ['Ruhetage', counts.Ruhetag], ['Arbeitssoll', clock(counts.Arbeitstag * 480) + ' h'],
+      ['Ruhetage', counts.Ruhetag], ['Feiertage Berlin', current.days.filter(d=>d.is_holiday).length], ['Arbeitssoll', clock(counts.Arbeitstag * 480) + ' h'],
       ['Soll inkl. Urlaub', clock((counts.Arbeitstag + counts.Urlaub) * 480) + ' h']]) {
     const box = document.createElement('div'), strong = document.createElement('strong');
     strong.textContent = value; box.append(strong, document.createTextNode(label)); el('metrics').append(box);
@@ -62,12 +62,12 @@ function renderCalendar() {
   const offset = (new Date(saved.year, saved.month - 1, 1).getDay() + 6) % 7;
   for (let i = 0; i < offset; i++) grid.append(document.createElement('div'));
   for (const day of current.days) {
-    const button = document.createElement('button'); button.className = 'day'; button.type = 'button'; button.dataset.kind = day.kind;
+    const button = document.createElement('button'); button.className = 'day'; button.type = 'button'; button.dataset.kind = day.is_holiday?'Feiertag':day.kind;
     const number = document.createElement('b'); number.textContent = Number(day.date.slice(-2));
-    const label = document.createElement('span'); label.textContent = day.kind;
-    const hours = document.createElement('span'); hours.textContent = day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00 h' : '8:00 h';
+    const label = document.createElement('span'); label.textContent = day.is_holiday?'Feiertag · '+day.holiday_name:day.kind;
+    const hours = document.createElement('span'); hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00 h' : '8:00 h';
     const note = document.createElement('small'); note.textContent = day.note;
-    button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + day.kind + ', bearbeiten');
+    button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + (day.is_holiday?'Feiertag '+day.holiday_name+', 0 Sollstunden':day.kind) + ', bearbeiten');
     button.disabled = accessLevel < 2;
     button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
     button.onclick = () => {
@@ -82,7 +82,7 @@ function renderCalendar() {
 function renderDays() {
   const body = el('days'); body.replaceChildren();
   for (const day of current.days) {
-    const row = document.createElement('tr'); row.dataset.kind = day.kind;
+    const row = document.createElement('tr'); row.dataset.kind = day.is_holiday?'Feiertag':day.kind;
     const check = document.createElement('input'); check.type = 'checkbox'; check.setAttribute('aria-label', day.date + ' auswählen');
     check.checked=selection.has(day.date);check.onchange=()=>toggleDate(day.date);
     let cell = document.createElement('td'); cell.append(check); row.append(cell);
@@ -92,14 +92,14 @@ function renderDays() {
     const select = document.createElement('select'); select.setAttribute('aria-label', 'Tagesart ' + day.date);
     for (const kind of kinds) { const option = document.createElement('option'); option.textContent = kind; select.append(option); }
     select.disabled = accessLevel < 2; check.disabled = accessLevel < 2;
-    select.value = day.kind; cell = document.createElement('td'); cell.append(select); row.append(cell);
-    const hours = document.createElement('td'); hours.textContent = day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00'; row.append(hours);
+    select.value = day.kind; cell = document.createElement('td'); cell.append(select);if(day.is_holiday){const badge=document.createElement('span');badge.textContent='Feiertag · '+day.holiday_name;badge.className='holiday-label';cell.append(badge);}row.append(cell);
+    const hours = document.createElement('td'); hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00'; row.append(hours);
     const note = document.createElement('input'); note.type = 'text'; note.maxLength = 500; note.value = day.note;
     note.disabled = accessLevel < 2 || day.kind === 'Ungeplant'; note.setAttribute('aria-label', 'Notiz ' + day.date);
     cell = document.createElement('td'); cell.append(note); row.append(cell);
     select.onchange = () => {
-      changeDay(day, select.value, note.value); row.dataset.kind = day.kind; note.value = day.note;
-      note.disabled = day.kind === 'Ungeplant'; hours.textContent = day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00';
+      changeDay(day, select.value, note.value); row.dataset.kind = day.is_holiday?'Feiertag':day.kind; note.value = day.note;
+      note.disabled = day.kind === 'Ungeplant'; hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00';
     };
     note.oninput = () => changeDay(day, day.kind, note.value);
     body.append(row);
@@ -115,7 +115,7 @@ function renderYear() {
   }
   table.append(head);
   for (const month of annual.months) {
-    for(const [field,kind] of [['work_days','Arbeitstag'],['vacation_days','Urlaub'],['rest_days','Ruhetag'],['unplanned_days','Ungeplant']])month[field]=month.days.filter(d=>d.kind===kind).length;month.work_target_minutes=month.work_days*480;month.target_minutes=(month.work_days+month.vacation_days)*480;
+    for(const [field,kind] of [['work_days','Arbeitstag'],['vacation_days','Urlaub'],['rest_days','Ruhetag'],['unplanned_days','Ungeplant']])month[field]=month.days.filter(d=>d.kind===kind&&!d.is_holiday).length;month.holiday_days=month.days.filter(d=>d.is_holiday).length;month.work_target_minutes=month.work_days*480;month.target_minutes=(month.work_days+month.vacation_days)*480;
     const row = document.createElement('tr');
     for (const value of [names[month.month - 1], month.work_days, month.vacation_days, month.rest_days,
         month.unplanned_days, clock(month.work_target_minutes) + ' h', clock(month.target_minutes) + ' h']) {
@@ -127,8 +127,8 @@ function renderYear() {
     for (let i = 0; i < 31; i++) {
       const td = document.createElement('td'), day = month.days[i];
       if (day) {
-        const button = document.createElement('button'); button.textContent = codes[day.kind]; button.dataset.kind = day.kind;
-        button.title = day.date + ' · ' + day.kind; button.setAttribute('aria-label', button.title);
+        const button = document.createElement('button'); button.textContent = day.is_holiday?'F':codes[day.kind]; button.dataset.kind = day.is_holiday?'Feiertag':day.kind;
+        button.title = day.date + ' · ' + (day.is_holiday?'Feiertag · '+day.holiday_name+' · 0:00 h':day.kind); button.setAttribute('aria-label', button.title);
         button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
         button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));
         td.append(button);
@@ -138,9 +138,9 @@ function renderYear() {
     const total = document.createElement('td'); total.textContent = clock(month.target_minutes); matrixRow.append(total); table.append(matrixRow);
   }
   el('yearMatrix').replaceChildren(table);
-  for(const field of ['work_days','vacation_days','rest_days','unplanned_days','target_minutes'])annual.totals[field]=annual.months.reduce((n,m)=>n+m[field],0);
+  for(const field of ['holiday_days','work_days','vacation_days','rest_days','unplanned_days','target_minutes'])annual.totals[field]=annual.months.reduce((n,m)=>n+m[field],0);
   el('annualSummary').textContent = (dirty?'Ungespeicherter Jahresplan: ':'Gespeicherter Jahresplan: ') + annual.totals.work_days + ' Arbeitstage · ' + annual.totals.vacation_days +
-    ' Urlaubstage · ' + clock(annual.totals.target_minutes) + ' h Soll inkl. Urlaub · ' + annual.totals.unplanned_days + ' Tage ungeplant. A = Arbeit, U = Urlaub, R = Ruhe, ? = ungeplant.';
+    ' Urlaubstage · ' + clock(annual.totals.target_minutes) + ' h Soll inkl. Urlaub · ' + annual.totals.unplanned_days + ' Tage ungeplant · '+annual.totals.holiday_days+' Feiertage Berlin mit 0 h Soll. A = Arbeit, U = Urlaub, R = Ruhe, F = Feiertag, ? = ungeplant.';
 }
 async function load(force = false) {
   const sameYear=saved&&saved.tf===el('tf').value&&saved.year===Number(el('year').value);

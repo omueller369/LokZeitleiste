@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from ..models import PlanChange, PlanDay, PlanMonth
 from .schemas import DayInput
+from .holidays import holiday_info
 
 KINDS = ("Arbeitstag", "Urlaub", "Ruhetag", "Ungeplant")
 
@@ -20,11 +21,13 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
     for number in range(1, calendar.monthrange(year, month)[1] + 1):
         item = stored.get(number)
         kind = item.kind if item else "Ungeplant"
-        days.append({"date": date(year, month, number).isoformat(), "kind": kind,
-                     "note": item.note if item else "", "target_minutes": 480 if kind in ("Arbeitstag", "Urlaub") else 0})
-    counts = {kind: sum(d["kind"] == kind for d in days) for kind in KINDS}
+        day=date(year,month,number)
+        info=holiday_info(day)
+        days.append({"date": day.isoformat(), "kind": kind, **info,
+                     "note": item.note if item else "", "target_minutes": 480 if kind in ("Arbeitstag", "Urlaub") and not info["is_holiday"] else 0})
+    counts = {kind: sum(d["kind"] == kind and not d["is_holiday"] for d in days) for kind in KINDS}
     return {"year": year, "month": month, "revision": period.revision if period else 0,
-            "days": days, "work_days": counts["Arbeitstag"], "vacation_days": counts["Urlaub"],
+            "days": days, "holiday_days":sum(d["is_holiday"] for d in days), "holiday_state":"BE", "work_days": counts["Arbeitstag"], "vacation_days": counts["Urlaub"],
             "rest_days": counts["Ruhetag"], "unplanned_days": counts["Ungeplant"],
             "work_target_minutes": counts["Arbeitstag"] * 480,
             "vacation_minutes": counts["Urlaub"] * 480,
@@ -34,7 +37,7 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
 
 def get_year(db: Session, tf_id: int, year: int) -> dict:
     months = [get_month(db, tf_id, year, m) for m in range(1, 13)]
-    keys = ("work_days", "vacation_days", "rest_days", "unplanned_days", "work_target_minutes", "vacation_minutes", "target_minutes")
+    keys = ("holiday_days", "work_days", "vacation_days", "rest_days", "unplanned_days", "work_target_minutes", "vacation_minutes", "target_minutes")
     return {"year": year, "months": months, "totals": {key: sum(m[key] for m in months) for key in keys},
             "complete": all(m["complete"] for m in months)}
 

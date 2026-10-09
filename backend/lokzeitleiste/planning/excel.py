@@ -4,13 +4,14 @@ from io import BytesIO
 from zipfile import ZipFile
 
 from openpyxl import Workbook, load_workbook
+from openpyxl.comments import Comment
 from openpyxl.styles import Font, PatternFill
 from openpyxl.worksheet.datavalidation import DataValidation
 from .schemas import DayInput
 
 MAX_FILE = 2 * 1024 * 1024
 MAX_UNPACKED = 20 * 1024 * 1024
-COLORS = {"Arbeitstag": "DCEBF9", "Urlaub": "DBF1E3", "Ruhetag": "FFE8CC", "Ungeplant": "EEF0F3"}
+COLORS = {"Arbeitstag": "DCEBF9", "Urlaub": "DBF1E3", "Ruhetag": "FFE8CC", "Ungeplant": "EEF0F3", "Feiertag":"E9DFF5"}
 
 
 def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[DayInput]:
@@ -91,13 +92,15 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
         for item in month["days"]:
             sheet.append([date.fromisoformat(item["date"]), item["kind"], item["note"], personnel_number])
             row = sheet.max_row
+            if item.get("is_holiday"):
+                sheet.cell(row,1).comment=Comment("Feiertag Berlin: "+item["holiday_name"]+". Soll: 0 Stunden, unabhängig von der Tagesart.","LokZeitleiste")
             sheet.cell(row, 1).number_format = "DD.MM.YYYY"
             sheet.cell(row, 4).number_format = "@"
             # Nutzereingaben bleiben Text, auch wenn sie mit '=' beginnen.
             for column in (2, 3, 4):
                 sheet.cell(row, column).data_type = "s"
             for cell in sheet[row]:
-                cell.fill = PatternFill("solid", fgColor=COLORS[item["kind"]])
+                cell.fill = PatternFill("solid", fgColor=COLORS["Feiertag" if item.get("is_holiday") else item["kind"]])
     for cell in sheet[1]:
         cell.fill = PatternFill("solid", fgColor="173E55")
         cell.font = Font(color="FFFFFF", bold=True)
@@ -111,6 +114,17 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
     validation.showErrorMessage = True
     sheet.add_data_validation(validation)
     validation.add(f"B2:B{sheet.max_row}")
+    info=book.create_sheet('Feiertage Berlin')
+    info.append(['Datum','Gesetzlicher Feiertag Berlin','Sollstunden'])
+    for month in year_plan['months']:
+        for item in month['days']:
+            if item.get('is_holiday'):
+                info.append([date.fromisoformat(item['date']),item['holiday_name'],0])
+                info.cell(info.max_row,1).number_format='DD.MM.YYYY'
+                info.cell(info.max_row,2).data_type='s'
+                for cell in info[info.max_row]:cell.fill=PatternFill('solid',fgColor=COLORS['Feiertag'])
+    info.column_dimensions['A'].width=16;info.column_dimensions['B'].width=65;info.column_dimensions['C'].width=16
+    info.freeze_panes='A2'
     buffer = BytesIO()
     book.save(buffer)
     return buffer.getvalue()
