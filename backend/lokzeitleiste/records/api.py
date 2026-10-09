@@ -11,6 +11,7 @@ from ..models import StaffProfile, TfProfile, User, WorkEntry, WorkEntryAudit, W
 from ..schemas import EntryBatch, EntryIn
 from ..worktime.service import validate_no_overlap
 from ..reports.daily import WORK_KINDS
+from ..reports.intervals import set_end_date,entry_end_date,touched_months
 from ..worktime.api import TimeEdit
 from .service import assert_unlocked, entry_view, user_overview
 
@@ -30,10 +31,9 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
             raise HTTPException(404,'Mitarbeiter nicht gefunden')
         return user
 
-    def check_periods(db,user,day,entry_dict,month_summary):
-        user_overview(db,user,day.year,day.month,entry_dict,month_summary,lock=True)
-        following=date(day.year+1,1,1) if day.month==12 else date(day.year,day.month+1,1)
-        if following.year<=2100:user_overview(db,user,following.year,following.month,entry_dict,month_summary,lock=True)
+    def check_periods(db,user,entry,entry_dict,month_summary):
+        for year,month in touched_months(entry.entry_date,entry_end_date(entry)):
+            user_overview(db,user,year,month,entry_dict,month_summary,lock=True)
 
     def create(db,actor,user,item,tasks):
         if not 2000 <= item.date.year <= 2100:
@@ -60,10 +60,11 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
             entry=WorkEntry(work_month_id=period.id,client_id=str(item.client_id),kind=item.kind,entry_date=item.date,
                 start_time=item.start.strftime('%H:%M'),end_time=item.end.strftime('%H:%M'),pause_minutes=item.pause,
                 guest_minutes=item.guest,note=item.note,away=item.away,accommodation=item.accommodation,hotel_name=item.hotel_name)
+            set_end_date(entry,item.end_date)
             db.add(entry);db.flush()
             try:
                 validate_no_overlap(db,user.id,entry)
-                check_periods(db,user,item.date,entry_dict,month_summary)
+                check_periods(db,user,entry,entry_dict,month_summary)
             except ValueError as exc:
                 db.rollback();raise HTTPException(409,str(exc)) from exc
         if user.role=='staff':
@@ -106,18 +107,19 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
         if user.role=='tf' and db.scalar(select(WorkTimeChange.id).where(WorkTimeChange.entry_id==entry_id).limit(1)):
             raise HTTPException(409,'Administrativ korrigierte Zeiten können nur durch die Verwaltung geändert werden')
         try:
-            item=EntryIn.model_validate(dict(entry_dict(entry),start=data.start,end=data.end))
+            item=EntryIn.model_validate(dict(entry_dict(entry),start=data.start,end=data.end,**({"end_date":data.end_date} if "end_date" in data.model_fields_set else {})))
         except ValidationError as exc:raise HTTPException(422,exc.errors()[0]['msg']) from exc
         reason=data.reason.strip()
         if not reason:raise HTTPException(422,'Änderungsgrund erforderlich')
-        old=(entry.start_time,entry.end_time)
+        old=(entry.start_time,entry.end_time,entry.explicit_end_date)
         entry.start_time,entry.end_time=item.start.strftime('%H:%M'),item.end.strftime('%H:%M')
-        if old==(entry.start_time,entry.end_time):return {'changed':False}
+        set_end_date(entry,item.end_date)
+        if old==(entry.start_time,entry.end_time,entry.explicit_end_date):return {'changed':False}
         entry.updated_at=now_utc()
         try:
             validate_no_overlap(db,owner,entry)
             db.flush()
-            check_periods(db,user,entry.entry_date,entry_dict,month_summary)
+            check_periods(db,user,entry,entry_dict,month_summary)
         except ValueError as exc:db.rollback();raise HTTPException(409,str(exc)) from exc
         db.add(WorkEntryAudit(entry_id=entry_id,actor_id=actor.id,action='manual_updated',reason=reason))
         db.commit();return {'changed':True}

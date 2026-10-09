@@ -1,3 +1,4 @@
+function endDate(entry){if(entry.end_date)return entry.end_date;const d=new Date(entry.date+'T12:00:00');if(entry.end<=entry.start)d.setDate(d.getDate()+1);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
 const el = id => document.getElementById(id);
 const clock = n => (n < 0 ? '-' : '') + Math.floor(Math.abs(n) / 60) + ':' + String(Math.abs(n) % 60).padStart(2, '0');
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -35,10 +36,10 @@ function render() {
     entry.editable=['Zugfahrt','Sonstige Erfassung','Bereitschaft'].includes(entry.kind)&&!entry.locked;
     const tr = row(el('entries'), [entry.date, entry.kind+(entry.locked?' · Gesperrt':'')]);
     const inputs = [];
-    for (const field of ['start','end']) {
+    for (const field of ['start','end','end_date']) {
       const td = document.createElement('td'), input = document.createElement('input');
-      input.type = 'time'; input.step = '60'; input.value = entry[field]; input.disabled = accessLevel < 2 || !entry.editable;
-      input.setAttribute('aria-label', (field === 'start' ? 'Arbeitsbeginn ' : 'Arbeitsende ') + entry.date);
+      input.type = field==='end_date'?'date':'time'; input.step = field==='end_date'?'1':'60'; input.value = field==='end_date'?endDate(entry):entry[field];if(field==='end_date')input.min=entry.date; input.disabled = accessLevel < 2 || !entry.editable;
+      input.setAttribute('aria-label', (field === 'start' ? 'Arbeitsbeginn ' : field==='end_date'?'Datum Arbeitsende ':'Arbeitsende ') + entry.date);
       input.oninput = () => { dirty = true;
         for (const other of el('entries').rows) if (other !== tr) other.querySelectorAll('input,button').forEach(control => control.disabled = true);
       }; inputs.push(input); td.append(input); tr.append(td);
@@ -48,11 +49,11 @@ function render() {
     if (accessLevel >= 2 && entry.editable) {
       const button = document.createElement('button'); button.textContent = 'Prüfen';
       button.onclick = () => {
-        if (!inputs[0].value || !inputs[1].value) { message('Beginn und Ende eingeben.', true); return; }
-        if (inputs[0].value === entry.start && inputs[1].value === entry.end) { message('Zeiten unverändert.'); return; }
-        editing = {entry, start: inputs[0].value, end: inputs[1].value};
+        if (!inputs[0].value || !inputs[1].value||!inputs[2].value) { message('Beginn und Ende eingeben.', true); return; }
+        if (inputs[0].value === entry.start && inputs[1].value === entry.end&&inputs[2].value===endDate(entry)) { message('Zeiten unverändert.'); return; }
+        editing = {entry, start: inputs[0].value, end: inputs[1].value,end_date:inputs[2].value};
         el('comparison').textContent = entry.date + ' · ' + entry.kind + ': Beginn ' + entry.start + ' → ' + editing.start +
-          '; Ende ' + entry.end + ' → ' + editing.end;
+          '; Ende ' + entry.end + ' → ' + editing.end+'; Enddatum '+endDate(entry)+' → '+editing.end_date;
         el('reason').value = ''; el('editMessage').textContent = ''; el('editDialog').showModal();
       }; td.append(button);
     } else td.textContent = 'Keine Zeitkorrektur';
@@ -66,7 +67,7 @@ async function history() {
   for (const c of changes) {
     const box = document.createElement('div'); box.className = 'history';
     for (const text of [c.date + ' · Beginn ' + c.previous_start + ' → ' + c.new_start + '; Ende ' + c.previous_end + ' → ' + c.new_end,
-        'Grund: ' + c.reason, 'Admin #' + c.admin_id + ' · ' + c.created_at + ' UTC',
+        'Enddatum: '+(c.end_date_change||'nach bisheriger Mitternachtsregel'), 'Grund: ' + c.reason, 'Admin #' + c.admin_id + ' · ' + c.created_at + ' UTC',
         'E-Mail: ' + ({pending:'vorgemerkt',sent:'versendet',failed:'fehlgeschlagen'}[c.email_status] || c.email_status) +
           ' · ' + c.recipient_email + ' · Versuche: ' + c.attempts + (c.last_error ? ' · ' + c.last_error : '')]) {
       const p = document.createElement('p'); p.textContent = text; box.append(p);
@@ -104,7 +105,7 @@ el('refreshHistory').onclick = action(() => exclusive(history));
 el('cancelEdit').onclick = () => el('editDialog').close();
 el('editForm').onsubmit = event => { event.preventDefault(); action(() => exclusive(async () => {
   const result = await api(data.role==='tf'?prefix() + '/entries/' + editing.entry.id:'/api/v1/admin/worktime/entries/'+editing.entry.id, {method:'PATCH',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({start:editing.start,end:editing.end,expected_updated_at:editing.entry.updated_at,reason:el('reason').value})});
+    body:JSON.stringify({start:editing.start,end:editing.end,end_date:editing.end_date,expected_updated_at:editing.entry.updated_at,reason:el('reason').value})});
   el('editDialog').close(); dirty = false; await load(true);
   message(result.changed&&data.role==='staff'?'Arbeitszeit gespeichert und neu berechnet.':result.changed ? 'Arbeitszeit gespeichert und neu berechnet. E-Mail vorgemerkt; Versandstatus siehe Verlauf.' : 'Zeiten unverändert.');
 }))(); };

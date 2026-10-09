@@ -66,6 +66,8 @@ def authorize_route(db, user, request):
         if not target:
             raise HTTPException(404, "Konto nicht gefunden")
         return demand(db,user,'employees' if target.role == 'tf' else 'staff',3)
+    if re.fullmatch(r'/api/v1/admin/tf/\d+',path) and method=='PUT':
+        return demand(db,user,'employees',2)
     if re.fullmatch(r'/api/v1/admin/tf/\d+/delivery',path):
         return demand(db,user,'employees',1 if method == 'GET' else 2)
     if re.fullmatch(r'/api/v1/admin/tf/\d+/reports',path):

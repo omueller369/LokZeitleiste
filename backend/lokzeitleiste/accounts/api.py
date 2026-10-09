@@ -8,6 +8,7 @@ from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password
 from .access import MODULES, check_delegation, demand, password_required, permissions
+from .photos import decode_photo, save_photo
 from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
 
 
@@ -113,6 +114,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     @router.post('/api/v1/admin/staff',status_code=201)
     def create(data: StaffCreate,actor: User = Depends(admin_dependency),db: Session = Depends(database_session)):
         check_delegation(db,actor,data.permissions)
+        image=decode_photo(data.photo_base64)
         try:
             user = User(username=data.username,password_hash=hash_password(data.initial_password),role='staff')
             db.add(user); db.flush()
@@ -123,6 +125,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
                 setattr(profile,key,getattr(data,key))
             db.flush()
             save_profile(db,user,profile,data)
+            save_photo(db,user.id,image)
             db.add(AccountPolicy(user_id=user.id,must_change_password=True))
             db.add(AccountAudit(actor_id=actor.id,target_id=user.id,action='staff_created'))
             db.commit()
@@ -140,7 +143,9 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         if data.permissions != permissions(db,user):
             demand(db,actor,'staff',3)
         check_delegation(db,actor,data.permissions,user)
+        image=decode_photo(data.photo_base64)
         save_profile(db,user,profile,data)
+        save_photo(db,user.id,image)
         # Rechteänderungen beenden alle Sitzungen; erneute Anmeldung übernimmt die Freigaben.
         db.execute(delete(SessionToken).where(SessionToken.user_id == user.id))
         db.add(AccountAudit(actor_id=actor.id,target_id=user.id,action='staff_profile_permissions_updated'))

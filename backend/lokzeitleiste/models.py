@@ -72,6 +72,11 @@ class WorkEntry(Base):
     hotel_name: Mapped[str] = mapped_column(String(200), default="", nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, onupdate=now_utc, nullable=False)
     work_month: Mapped[WorkMonth] = relationship(back_populates="entries")
+    date_override: Mapped["WorkEntryDates | None"] = relationship(cascade="all, delete-orphan",uselist=False)
+
+    @property
+    def explicit_end_date(self):
+        return self.date_override.end_date if self.date_override else None
 
 
 class ReportDispatch(Base):
@@ -214,3 +219,9 @@ class ProfilePhoto(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
     image_data: Mapped[bytes] = mapped_column(LargeBinary().with_variant(LONGBLOB(), "mysql"), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, onupdate=now_utc, nullable=False)
+
+
+class WorkEntryDates(Base):
+    __tablename__ = "work_entry_dates"
+    entry_id: Mapped[int] = mapped_column(ForeignKey("work_entries.id"),primary_key=True)
+    end_date: Mapped[date] = mapped_column(Date,nullable=False)

@@ -1,4 +1,6 @@
 import io
+import base64
+import binascii
 import warnings
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import Response
@@ -29,6 +31,21 @@ def normalize(content):
                 return result.getvalue()
     except (UnidentifiedImageError,OSError,Image.DecompressionBombError,Image.DecompressionBombWarning,ValueError) as exc:
         raise HTTPException(422,str(exc) if isinstance(exc,ValueError) else 'Ungültiges oder zu großes Foto') from exc
+
+
+def decode_photo(value):
+    if value is None:return None
+    try:content=base64.b64decode(value,validate=True)
+    except (binascii.Error,ValueError) as exc:raise HTTPException(422,'Ungültiges Fotoformat') from exc
+    if len(content)>MAX_BYTES:raise HTTPException(413,'Foto darf höchstens 5 MB groß sein')
+    return normalize(content)
+
+
+def save_photo(db,user_id,image):
+    if image is not None:
+        item=db.get(ProfilePhoto,user_id)
+        if item is None:item=ProfilePhoto(user_id=user_id);db.add(item)
+        item.image_data=image
 
 
 def create_router(require_admin):

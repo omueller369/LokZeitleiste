@@ -150,6 +150,6 @@ class PlanningTest(unittest.TestCase):
         content=self.client.get(f'{self.base}/2026/template.xlsx').content
         book=load_workbook(io.BytesIO(content));sheet=book['Plan']
         row=next(r for r in sheet.iter_rows(min_row=2) if r[0].value.date()==date(2026,5,1))
-        self.assertEqual(row[0].fill.fgColor.rgb,'00E9DFF5');self.assertIn('Soll: 0 Stunden',row[0].comment.text)
+        self.assertEqual(row[0].fill.type,'linear');self.assertEqual([s.color.rgb for s in row[0].fill.stop],['00E9DFF5','00E9DFF5','00DBF1E3','00DBF1E3']);self.assertIn('Soll: 0 Stunden',row[0].comment.text)
         self.assertEqual(row[1].value,'Urlaub');self.assertEqual(row[2].value,'') if row[2].value=='' else self.assertIsNone(row[2].value)
         self.assertEqual(self.client.post(f'{self.base}/2026/import/preview',files={'file':('plan.xlsx',content)}).status_code,200)

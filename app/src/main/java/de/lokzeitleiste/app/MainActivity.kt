@@ -1,6 +1,7 @@
 package de.lokzeitleiste.app
 
 import android.os.Bundle
+import android.app.DatePickerDialog
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.horizontalScroll
@@ -62,6 +63,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
     var entries by remember(username) { mutableStateOf(loadEntries(context, username)) }
     var kind by remember { mutableStateOf(kinds[2]) }
     var date by remember { mutableStateOf(LocalDate.now().toString()) }
+    var endDate by remember { mutableStateOf(LocalDate.now().toString()) }
     var start by remember { mutableStateOf("06:00") }
     var end by remember { mutableStateOf("14:00") }
     var pause by remember { mutableStateOf("0") }
@@ -81,14 +83,15 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
     var sending by remember { mutableStateOf(false) }
     var sendMessage by remember { mutableStateOf("") }
     val selected = entries.filter { runCatching { YearMonth.from(LocalDate.parse(it.date)) == month }.getOrDefault(false) }.sortedBy { it.date + it.start }
-    val work = selected.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }.sumOf { length(it) }
-    val guests = selected.sumOf { it.guest }
+    val calculationEntries = entries.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }
+    val work = calculationEntries.sumOf { monthMinutes(it, month) }
+    val guests = calculationEntries.sumOf { monthMinutes(it, month, guestOnly = true) }
     val holidays = selected.count { it.kind == "Urlaub" }
-    val night = selected.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }.sumOf {
-        overlap(it) { t -> t.hour >= 22 || t.hour < 6 }
+    val night = calculationEntries.sumOf {
+        monthOverlap(it, month) { t -> t.hour >= 22 || t.hour < 6 }
     }
-    val sunday = selected.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }.sumOf {
-        overlap(it) { t -> t.dayOfWeek == DayOfWeek.SUNDAY }
+    val sunday = calculationEntries.sumOf {
+        monthOverlap(it, month) { t -> t.dayOfWeek == DayOfWeek.SUNDAY }
     }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(24.dp)) {
@@ -130,8 +133,16 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                             kinds.forEach { option -> DropdownMenuItem(text = { Text(option) }, onClick = { kind = option; expanded = false }) }
                         }
                     }
-                    OutlinedTextField(date, { date = it }, label = { Text("Datum (JJJJ-MM-TT)") })
+                    OutlinedTextField(date, { if (endDate == date) endDate = it; date = it }, label = { Text("Datum (JJJJ-MM-TT)") })
                     OutlinedTextField(start, { start = it }, label = { Text("Beginn (HH:MM)") })
+                    OutlinedTextField(endDate, {}, readOnly = true, label = { Text("Datum Arbeitsende") }, trailingIcon = {
+                        TextButton(onClick = {
+                            val chosen = runCatching { LocalDate.parse(endDate) }.getOrDefault(LocalDate.now())
+                            val picker = DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d).toString() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth)
+                            runCatching { LocalDate.parse(date).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }.getOrNull()?.let { picker.datePicker.minDate = it }
+                            picker.show()
+                        }) { Text("Datum") }
+                    })
                     OutlinedTextField(end, { end = it }, label = { Text("Ende (HH:MM)") })
                     if (kind == "Rufbereitschaft" || kind == "Bereitschaft") {
                         Text(if (kind == "Rufbereitschaft")
@@ -173,9 +184,11 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                             LocalTime.parse(start).toString(), LocalTime.parse(end).toString(), p!!, g!!,
                             if (isStandby) "" else note, isStandby && away,
                             if (isStandby && away) accommodation else "",
-                            if (isStandby && away && accommodation == "Hotel") hotelName.trim() else "") }.getOrNull()
+                            if (isStandby && away && accommodation == "Hotel") hotelName.trim() else "",endDate=LocalDate.parse(endDate).toString()) }.getOrNull()
                         error = when {
                             candidate == null || p == null || g == null || p < 0 || g < 0 -> "Datum, Zeiten und Minuten prüfen."
+                            !endAt(candidate).isAfter(startAt(candidate)) -> "Arbeitsende muss nach dem Arbeitsbeginn liegen. Späteres Enddatum wählen."
+                            kind in listOf("Urlaub", "Krank") && candidate.endDate != candidate.date -> "Urlaub/Krank werden je Tag einzeln erfasst."
                             kind == "Rufbereitschaft" && (minutes(candidate.start) < 8 * 60 ||
                                 minutes(candidate.end) > 20 * 60 ||
                                 minutes(candidate.end) <= minutes(candidate.start) ||
@@ -211,7 +224,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                                     entry.kind + " · " + entry.accommodation +
                                         (if (entry.hotelName.isBlank()) "" else " · " + entry.hotelName)
                                     else entry.kind, Modifier.width(220.dp))
-                                Text(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${entry.end}", Modifier.width(105.dp))
+                                Text(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${endAt(entry).toLocalDate()} ${entry.end}", Modifier.width(105.dp))
                                 Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.pause} min", Modifier.width(105.dp))
                                 Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.guest} min", Modifier.width(105.dp))
                                 Text(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
@@ -261,10 +274,10 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                     else -> ""
                 }
                 if (transitionError.isEmpty() && at != null && finish != null && index >= 0) {
-                    val shortened = original.copy(end = at.toLocalTime().toString())
+                    val shortened = original.copy(end = at.toLocalTime().toString(), endDate = at.toLocalDate().toString())
                     val trip = Entry("Zugfahrt", at.toLocalDate().toString(),
                         at.toLocalTime().toString(), finish.toString(), 0, 0,
-                        "Übergang aus ${original.kind}")
+                        "Übergang aus ${original.kind}",endDate=at.toLocalDate().plusDays(if (finish <= at.toLocalTime()) 1L else 0L).toString())
                     entries = entries.toMutableList().also {
                         if (at == startAt(original)) it.removeAt(index) else it[index] = shortened
                         it.add(trip)

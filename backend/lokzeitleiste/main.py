@@ -9,10 +9,11 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from pydantic import ValidationError
 
 from .db import database_session
-from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto
-from .schemas import Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
+from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
+from .schemas import TfProfileUpdate, EntryIn, Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
 from .reports.daily import day_rows
 from .reports.mailer import smtp_configured
@@ -22,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.14")
+app = FastAPI(title="LokZeitleiste API", version="0.15")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -87,6 +88,8 @@ def admin_logout(response: Response, admin_session: str | None = Cookie(default=
 
 @app.post("/api/v1/admin/tf", status_code=201)
 def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = Depends(database_session)):
+    from .accounts.photos import decode_photo,save_photo
+    image=decode_photo(data.photo_base64)
     username = data.username.strip().lower()
     if not username or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in username):
         raise HTTPException(422, "Ungültiger Benutzername")
@@ -100,6 +103,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
                          target_hours_minutes=data.target_hours_minutes,
                          vacation_days=data.vacation_days, birth_date=data.birth_date, bahncard=data.bahncard,
                          email=str(data.email), federal_state=data.federal_state))
+        save_photo(db,user.id,image)
         db.commit()
         return {"id": user.id, "username": user.username}
     except IntegrityError:
@@ -117,6 +121,24 @@ def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(databas
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
              "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None} for user, p in rows]
+
+
+@app.put("/api/v1/admin/tf/{tf_id}")
+def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),db:Session=Depends(database_session)):
+    from .accounts.photos import decode_photo,save_photo
+    user=db.scalar(select(User).where(User.id==tf_id).with_for_update())
+    profile=db.get(TfProfile,tf_id)
+    if not user or user.role!='tf' or not profile:raise HTTPException(404,'Tf nicht gefunden')
+    image=decode_photo(data.photo_base64)
+    try:
+        for field in ('last_name','first_name','personnel_number','target_hours_minutes','vacation_days','birth_date','bahncard','email','federal_state'):
+            value=getattr(data,field)
+            setattr(profile,field,value.strip() if isinstance(value,str) else value)
+        save_photo(db,tf_id,image)
+        db.commit()
+        return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
+    except IntegrityError as exc:
+        db.rollback();raise HTTPException(409,'Personalnummer bereits vergeben') from exc
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")
@@ -164,14 +186,10 @@ def month_summary(db: Session, tf_id: int, year: int, month: int):
     profile = db.get(TfProfile, tf_id)
     if not profile or not profile.federal_state:
         raise HTTPException(409, "Bundesland des Tf fehlt im Admin-Profil")
-    periods = [(year, month)]
-    periods.append((year - 1, 12) if month == 1 else (year, month - 1))
-    entries = []
-    for y, m in periods:
-        period = db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id == tf_id,
-                                                  WorkMonth.year == y, WorkMonth.month == m))
-        if period:
-            entries.extend(period.entries)
+    from .reports.intervals import period_entries
+    from datetime import date
+    import calendar
+    entries=period_entries(db,tf_id,date(year,month,1),date(year,month,calendar.monthrange(year,month)[1]))
     try:
         result = summarize_month(entries, year=year, month=month, federal_state=profile.federal_state)
     except ValueError as exc:
@@ -219,7 +237,7 @@ def tf_logout(authorization: str | None = Header(default=None), _: User = Depend
 
 
 def entry_dict(e: WorkEntry):
-    return {"client_id": e.client_id, "kind": e.kind, "date": e.entry_date.isoformat(),
+    return {"end_date":e.explicit_end_date.isoformat() if e.explicit_end_date else None,"client_id": e.client_id, "kind": e.kind, "date": e.entry_date.isoformat(),
             "start": e.start_time, "end": e.end_time, "pause": e.pause_minutes,
             "guest": e.guest_minutes, "note": e.note, "away": e.away,
             "accommodation": e.accommodation, "hotel_name": e.hotel_name}
@@ -250,6 +268,13 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
         db.flush()
     existing = {e.client_id: e for e in db.scalars(select(WorkEntry).where(
         WorkEntry.work_month_id == period.id).with_for_update()).all()}
+    from .reports.intervals import set_end_date, touched_months, entry_end_date
+    # Alte Apps ohne Enddatum dürfen ein explizit gespeichertes Enddatum nicht löschen.
+    try:
+        batch=EntryBatch(entries=[EntryIn.model_validate(dict(item.model_dump(),end_date=(existing[str(item.client_id)].explicit_end_date
+            if item.end_date is None and str(item.client_id) in existing else item.end_date))) for item in batch.entries])
+    except ValidationError as exc:
+        raise HTTPException(422,'Ungültiger Zeitraum mit gespeichertem Enddatum: '+str(exc.errors()[0]['msg'])) from exc
     # Ein alter App-Stand darf eine administrative Zeitkorrektur nicht zurücksetzen.
     protected = set(db.scalars(select(WorkTimeChange.entry_id).join(WorkEntry).where(
         WorkEntry.work_month_id == period.id).with_for_update()).all())
@@ -261,8 +286,8 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
             normalized['start']=item.start.strftime('%H:%M');normalized['end']=item.end.strftime('%H:%M')
             if normalized!=entry_dict(entry):
                 raise HTTPException(409,"Arbeitszeitdatensatz ist gesperrt. Das gesamte Paket wurde nicht übernommen.")
-        if entry and entry.id in protected and (entry.start_time, entry.end_time) != (
-                item.start.strftime("%H:%M"), item.end.strftime("%H:%M")):
+        if entry and entry.id in protected and (entry.start_time,entry.end_time,entry.explicit_end_date) != (
+                item.start.strftime('%H:%M'),item.end.strftime('%H:%M'),item.end_date):
             raise HTTPException(409, "Arbeitszeit wurde administrativ korrigiert. Aktuelle Monatsdaten vom Server laden.")
     for item in batch.entries:
         key = str(item.client_id)
@@ -280,6 +305,9 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
         entry.away = item.away
         entry.accommodation = item.accommodation
         entry.hotel_name = item.hotel_name
+        old_end_date=entry.explicit_end_date
+        set_end_date(entry,item.end_date)
+        if old_end_date!=item.end_date:entry.updated_at=now_utc()
     dispatch_id = None
     if batch.entries:
         db.flush()
@@ -288,9 +316,11 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
             for item in batch.entries:
                 row=db.scalar(select(WorkEntry).where(WorkEntry.work_month_id==period.id,WorkEntry.client_id==str(item.client_id)))
                 validate_no_overlap(db,user.id,row)
-            overview(db,user.id,year,month,profile.federal_state,lock=True)
-            y,m=(year+1,1) if month==12 else (year,month+1)
-            overview(db,user.id,y,m,profile.federal_state,lock=True)
+            periods={(year,month)}
+            for item in batch.entries:
+                row=db.scalar(select(WorkEntry).where(WorkEntry.work_month_id==period.id,WorkEntry.client_id==str(item.client_id)))
+                periods.update(touched_months(row.entry_date,entry_end_date(row)))
+            for y,m in periods:overview(db,user.id,y,m,profile.federal_state,lock=True)
         except ValueError as exc:
             db.rollback()
             raise HTTPException(409,str(exc)) from exc

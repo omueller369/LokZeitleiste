@@ -22,6 +22,28 @@ for name, filename in [("PlanSans", "Vera.ttf"), ("PlanSans-Bold", "VeraBd.ttf")
 pdfmetrics.registerFontFamily("PlanSans", normal="PlanSans", bold="PlanSans-Bold", italic="PlanSans-Italic", boldItalic="PlanSans-BoldItalic")
 
 
+class DiagonalTable(Table):
+    def __init__(self,*args,diagonal_cells=None,**kwargs):
+        self.diagonal_cells=diagonal_cells or {}
+        super().__init__(*args,**kwargs)
+
+    def _drawCell(self,cellval,cellstyle,pos,size):
+        kind=self.diagonal_cells.get(pos)
+        if kind:
+            x,y=pos;w,h=size
+            canvas=self.canv;canvas.saveState();canvas.setFillColor(colors.HexColor('#'+COLORS[kind]))
+            path=canvas.beginPath();path.moveTo(x,y);path.lineTo(x+w,y);path.lineTo(x+w,y+h);path.close()
+            canvas.drawPath(path,fill=1,stroke=0);canvas.restoreState()
+        super()._drawCell(cellval,cellstyle,pos,size)
+
+    def draw(self):
+        # ReportLab passes positions instead of row/column indices to _drawCell.
+        original=self.diagonal_cells
+        self.diagonal_cells={(self._colpositions[c],self._rowpositions[r+1]):kind for (c,r),kind in original.items()}
+        try:super().draw()
+        finally:self.diagonal_cells=original
+
+
 def clock(minutes):
     return f"{minutes // 60}:{minutes % 60:02d}"
 
@@ -62,13 +84,15 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
         header = ["Monat"] + [str(i) for i in range(1, 32)] + ["A", "U", "R", "?", "Soll h"]
         rows = [header]
         fills = []
+        diagonal = {}
         for row, month in enumerate(plan["months"], start=1):
             cells = [MONTHS[month["month"]]]
             for column in range(1, 32):
                 if column <= len(month["days"]):
                     item=month["days"][column-1]
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                    cells.append(CODES[kind])
+                    cells.append(CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else ""))
+                    if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=item["kind"]
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[kind])))
                 else:
                     cells.append("")
@@ -77,7 +101,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
             cells.append(clock(month["target_minutes"]))
             rows.append(cells)
         widths = [78] + [(doc.width - 248) / 31] * 31 + [25] * 4 + [70]
-        table = Table(rows, colWidths=widths, rowHeights=[26] + [30] * 12, repeatRows=1)
+        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=widths, rowHeights=[26] + [30] * 12, repeatRows=1)
         table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK),
                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("TEXTCOLOR", (0, 1), (-1, -1), DARK),
                    ("FONTNAME", (0, 0), (-1, 0), "PlanSans-Bold"), ("FONTSIZE", (0, 0), (-1, -1), 9),
@@ -87,6 +111,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     else:
         rows = [["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]]
         fills = []
+        diagonal = {}
         for row, week in enumerate(calendar.Calendar().monthdayscalendar(plan["year"], plan["month"]), start=1):
             cells = []
             for col, day in enumerate(week):
@@ -95,18 +120,20 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     continue
                 item = plan["days"][day - 1]
                 kind = "Feiertag" if item.get("is_holiday") else item["kind"]
+                if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(col,row)]=item["kind"]
+                status=CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
                 hours = "8:00 h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
-                cells.append(Paragraph(f"<b>{day:02d}</b><br/>{CODES[kind]} - {kind}<br/>{hours}", styles["PlanCell"]))
+                cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}", styles["PlanCell"]))
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
             rows.append(cells)
-        table = Table(rows, colWidths=[doc.width / 7] * 7, rowHeights=[25] + [66] * (len(rows) - 1))
+        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=[doc.width / 7] * 7, rowHeights=[25] + [66] * (len(rows) - 1))
         table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                    ("FONTSIZE", (0, 0), (-1, 0), 9), ("VALIGN", (0, 0), (-1, -1), "TOP"),
                    ("LEFTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), 6),
                    ("GRID", (0, 0), (-1, -1), 1, colors.white)]))
         story.append(table)
     story += [Spacer(1, 12), Paragraph("Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. "
-              "Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.", styles["Normal"])]
+              "Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.", styles["Normal"])]
     story += [Spacer(1,8), Paragraph(f"Feiertage Berlin: {sums['holiday_days']} Tage mit 0 h Soll.",styles["Normal"])]
     if not yearly:
         for item in plan["days"]:

@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, time, datetime, timedelta
 from typing import Literal
 from uuid import UUID
 
@@ -18,6 +18,7 @@ class Credentials(BaseModel):
 
 class TfCreate(Credentials):
     password: str = Field(min_length=12)
+    photo_base64: str | None = Field(default=None,max_length=6990510)
     last_name: str = Field(min_length=1, max_length=120)
     first_name: str = Field(min_length=1, max_length=120)
     personnel_number: str = Field(min_length=1, max_length=40)
@@ -38,6 +39,7 @@ class EntryIn(BaseModel):
     client_id: UUID
     kind: EntryKind
     date: date
+    end_date: date | None = None
     start: time
     end: time
     pause: int = Field(ge=0, le=1440)
@@ -54,7 +56,15 @@ class EntryIn(BaseModel):
             raise ValueError("Uhrzeiten müssen lokale Stunden und Minuten ohne Sekunden enthalten")
         begin = self.start.hour * 60 + self.start.minute
         finish = self.end.hour * 60 + self.end.minute
-        span = finish - begin if finish > begin else finish + 1440 - begin
+        if self.end_date is not None:
+            if self.end_date<self.date or not 2000<=self.date.year<=self.end_date.year<=2100:
+                raise ValueError("Enddatum muss am oder nach dem Beginn liegen (2000 bis 2100)")
+            span=(self.end_date-self.date).days*1440+finish-begin
+            if span<=0:raise ValueError("Arbeitsende muss nach dem Arbeitsbeginn liegen")
+            if self.kind in ("Urlaub","Krank") and self.end_date!=self.date:
+                raise ValueError("Urlaub und Krank werden je Tag einzeln erfasst")
+        else:
+            span = finish - begin if finish > begin else finish + 1440 - begin
         if self.kind == "Rufbereitschaft":
             if begin < 480 or finish > 1200 or finish <= begin or span > 480:
                 raise ValueError("Rufbereitschaft: 08:00–20:00 Uhr, höchstens acht Stunden")
@@ -83,3 +93,16 @@ class EntryBatch(BaseModel):
         if len(ids) != len(set(ids)):
             raise ValueError("client_id darf im selben Paket nur einmal vorkommen")
         return self
+
+
+class TfProfileUpdate(BaseModel):
+    last_name: str = Field(min_length=1,max_length=120)
+    first_name: str = Field(min_length=1,max_length=120)
+    personnel_number: str = Field(min_length=1,max_length=40)
+    target_hours_minutes: int = Field(ge=0,le=744*60)
+    vacation_days: int = Field(ge=0,le=366)
+    birth_date: date
+    bahncard: Literal[50,100]
+    email: EmailStr
+    federal_state: FederalState
+    photo_base64: str | None = Field(default=None,max_length=6990510)

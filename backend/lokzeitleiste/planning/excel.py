@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.comments import Comment
-from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import Font, PatternFill, GradientFill
 from openpyxl.worksheet.datavalidation import DataValidation
 from .schemas import DayInput
 
@@ -100,7 +100,10 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
             for column in (2, 3, 4):
                 sheet.cell(row, column).data_type = "s"
             for cell in sheet[row]:
-                cell.fill = PatternFill("solid", fgColor=COLORS["Feiertag" if item.get("is_holiday") else item["kind"]])
+                if item.get('is_holiday') and item['kind']!='Ungeplant':
+                    from openpyxl.styles.fills import Stop
+                    cell.fill=GradientFill(type='linear',degree=45,stop=[Stop(COLORS['Feiertag'],0),Stop(COLORS['Feiertag'],0.499),Stop(COLORS[item['kind']],0.5),Stop(COLORS[item['kind']],1)])
+                else:cell.fill = PatternFill("solid", fgColor=COLORS["Feiertag" if item.get("is_holiday") else item["kind"]])
     for cell in sheet[1]:
         cell.fill = PatternFill("solid", fgColor="173E55")
         cell.font = Font(color="FFFFFF", bold=True)

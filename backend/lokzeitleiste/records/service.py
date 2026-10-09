@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from ..models import TfProfile, WorkEntry, WorkEntryLock, WorkMonth, WorkTimeChange
 from ..reports.monthly import summarize_month
+from ..reports.intervals import period_entries
 from ..worktime.service import overview
 
 
@@ -38,10 +39,7 @@ def user_overview(db,user,year,month,entry_dict,month_summary, *, lock=False):
         else:
             first=date(year,month,1)
             following=date(year+1,1,1) if month==12 else date(year,month+1,1)
-            query=select(WorkEntry).join(WorkMonth).where(WorkMonth.tf_user_id==user.id,
-                WorkEntry.entry_date>=first-timedelta(days=1),WorkEntry.entry_date<following)
-            if lock:query=query.with_for_update()
-            entries=list(db.scalars(query).all())
+            entries=period_entries(db,user.id,first,following-timedelta(days=1),lock=lock)
             summary = summarize_month(entries,year=year,month=month,federal_state=None)
             summary.update(target_minutes=None,balance_minutes=None,planning=None)
     except ValueError as exc:

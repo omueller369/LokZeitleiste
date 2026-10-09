@@ -5,6 +5,7 @@ from itertools import groupby
 import holidays
 
 from ..models import WorkEntry
+from .intervals import interval, entry_end_date
 
 
 WORK_KINDS = {"Bereitschaft", "Zugfahrt", "Sonstige Erfassung"}
@@ -37,14 +38,11 @@ def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
     if not entries:
         return []
     years = {entry.entry_date.year for entry in entries}
-    years.update(entry.entry_date.year + 1 for entry in entries)
+    years.update(y for entry in entries for y in range(entry.entry_date.year,entry_end_date(entry).year+1))
     public_holidays = holidays.country_holidays("DE", subdiv=federal_state, years=years, language="de")
     result = []
     for entry in sorted(entries, key=lambda e: (e.entry_date, e.start_time, e.client_id)):
-        begin = datetime.combine(entry.entry_date, time.fromisoformat(entry.start_time))
-        finish = datetime.combine(entry.entry_date, time.fromisoformat(entry.end_time))
-        if finish <= begin:
-            finish += timedelta(days=1)
+        begin, finish = interval(entry)
         is_work = entry.kind in WORK_KINDS
         pause = entry.pause_minutes if is_work else 0
         active_end = max(begin, finish - timedelta(minutes=pause)) if is_work else begin

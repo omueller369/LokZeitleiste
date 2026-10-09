@@ -1,5 +1,5 @@
 const el=id=>document.getElementById(id);
-let me=null,modules=[],users=[],current=null,resetTarget=null,dirty=false,busy=false;
+let me=null,modules=[],users=[],current=null,resetTarget=null,dirty=false,busy=false,selectedPhoto=null;
 function message(text,error=false){el('message').textContent=text;el('message').className=error?'error':'ok';el('formMessage').textContent=error?text:'';}
 async function api(path,options={}){const response=await fetch(path,{credentials:'same-origin',...options});const body=await response.json().catch(()=>({}));
  if(!response.ok){if(response.status===401)location.href='/admin';throw Error(typeof body.detail==='string'?body.detail:'Anfrage fehlgeschlagen ('+response.status+')');}return body;}
@@ -14,6 +14,7 @@ function addAddress(data={}){if(el('addresses').children.length>=10){message('H�
  const remove=document.createElement('button');remove.type='button';remove.textContent='Adresse entfernen';remove.onclick=()=>{if(el('addresses').children.length===1){message('Mindestens eine Adresse erforderlich.',true);return;}box.remove();dirty=true;};box.append(remove);el('addresses').append(box);}
 function discard(){return !dirty||confirm('Ungespeicherte Änderungen verwerfen?');}
 function edit(user=null){if(!discard())return;current=user;dirty=false;const form=el('staffForm');form.reset();el('editor').hidden=false;el('editorTitle').textContent=user?'Konto · '+user.username:'Verwaltungsmitarbeiter anlegen';
+ selectedPhoto?.close();selectedPhoto=photoSelection(el('staffPhotoSelection'),user?'/api/v1/admin/staff/'+user.id+'/photo':null,!!user?.has_photo,()=>dirty=true);
  const writable=me.permissions.staff>=2&&(!user||manageable(user));
  for(const key of ['first_name','last_name','username','nationality','birth_date','cost_center'])form.elements[key].value=user?.[key]||'';
  form.elements.username.disabled=!!user||!writable;form.elements.initial_password.required=!user;el('initial').hidden=!!user;
@@ -28,7 +29,7 @@ function edit(user=null){if(!discard())return;current=user;dirty=false;const for
 el('new').onclick=()=>edit();el('addAddress').onclick=()=>{addAddress();dirty=true;};el('cancel').onclick=()=>{if(discard()){dirty=false;el('editor').hidden=true;}};
 el('staffForm').oninput=()=>dirty=true;
 el('staffForm').onsubmit=async event=>{event.preventDefault();if(busy)return;busy=true;el('save').disabled=true;el('editor').inert=true;el('users').closest('section').inert=true;el('new').disabled=true;try{
- const data=Object.fromEntries(new FormData(event.target));delete data.username;if(!current)data.username=event.target.elements.username.value;
+ const data=Object.fromEntries(new FormData(event.target));data.photo_base64=await selectedPhoto.value();delete data.username;if(!current)data.username=event.target.elements.username.value;
  if(current)delete data.initial_password;
  data.addresses=[...el('addresses').children].map(box=>Object.fromEntries([...box.querySelectorAll('input')].map(input=>[input.dataset.field,input.value])));
  data.permissions=Object.fromEntries([...el('permissions').rows].map(tr=>[tr.dataset.module,Math.max(0,...[...tr.querySelectorAll('input:checked')].map(c=>Number(c.dataset.level)))]));

@@ -1,4 +1,4 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, date
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field, ValidationError
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from ..db import database_session
 from ..models import TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, now_utc
 from ..schemas import EntryIn
+from ..reports.intervals import set_end_date, entry_end_date, touched_months
 from ..reports.daily import WORK_KINDS
 from ..reports.mailer import smtp_configured
 from .service import change_body, overview, process_change, validate_no_overlap
@@ -18,6 +19,7 @@ from ..records.service import assert_unlocked, entry_view
 class TimeEdit(BaseModel):
     start: time
     end: time
+    end_date: date | None = None
     expected_updated_at: datetime
     reason: str = Field(min_length=1, max_length=1000)
 
@@ -56,6 +58,7 @@ def create_router(require_admin, month_summary, entry_dict):
         return [{"id": c.id, "entry_id": c.entry_id, "date": c.entry_date.isoformat(),
                  "previous_start": c.previous_start, "previous_end": c.previous_end,
                  "new_start": c.new_start, "new_end": c.new_end, "reason": c.reason,
+                 "end_date_change":c.email_body.rsplit("\nEnddatum: ",1)[1] if "\nEnddatum: " in c.email_body else None,
                  "admin_id": c.admin_user_id, "created_at": c.created_at.isoformat(),
                  "recipient_email": c.recipient_email, "email_status": c.status,
                  "attempts": c.attempts, "last_error": c.last_error} for c in items]
@@ -79,23 +82,24 @@ def create_router(require_admin, month_summary, entry_dict):
         if not reason:
             raise HTTPException(422, "Änderungsgrund erforderlich")
         try:
-            validated = EntryIn.model_validate(dict(entry_dict(entry), start=data.start, end=data.end))
+            validated = EntryIn.model_validate(dict(entry_dict(entry), start=data.start, end=data.end, **({"end_date":data.end_date} if "end_date" in data.model_fields_set else {})))
         except ValidationError as exc:
             raise HTTPException(422, "Ungültiger Zeitraum: " + str(exc.errors()[0]["msg"])) from exc
         new_start, new_end = validated.start.strftime("%H:%M"), validated.end.strftime("%H:%M")
-        if (entry.start_time, entry.end_time) == (new_start, new_end):
+        if (entry.start_time, entry.end_time,entry.explicit_end_date) == (new_start, new_end,validated.end_date):
             return {"changed": False, "email_status": "unchanged"}
         if not profile.email:
             raise HTTPException(409, "E-Mail-Adresse des Mitarbeiters fehlt")
         if not smtp_configured():
             raise HTTPException(503, "E-Mail-Versand ist auf dem Server noch nicht eingerichtet")
-        # Jede Schicht kann höchstens bis zum Folgetag reichen, auch über Monats-/Jahresgrenzen.
-        next_day = entry.entry_date + timedelta(days=1)
-        periods = {(entry.entry_date.year, entry.entry_date.month), (next_day.year, next_day.month)}
+        old_date=entry_end_date(entry)
+        new_date=validated.end_date or (entry.entry_date+timedelta(days=1) if new_end<=new_start else entry.entry_date)
+        periods=touched_months(entry.entry_date,max(old_date,new_date))
         try:
             before = {p: overview(db, tf_id, *p, profile.federal_state, lock=True) for p in periods}
             old_start, old_end = entry.start_time, entry.end_time
             entry.start_time, entry.end_time = new_start, new_end
+            set_end_date(entry,validated.end_date)
             entry.updated_at = now_utc()
             validate_no_overlap(db, tf_id, entry)
             db.flush()
@@ -106,7 +110,7 @@ def create_router(require_admin, month_summary, entry_dict):
         change = WorkTimeChange(entry_id=entry.id, tf_user_id=tf_id, admin_user_id=admin.id,
             entry_date=entry.entry_date, previous_start=old_start, previous_end=old_end,
             new_start=new_start, new_end=new_end, reason=reason, recipient_email=profile.email,
-            email_body=change_body(profile, entry, old_start, old_end, reason, before, after), status="pending")
+            email_body=change_body(profile, entry, old_start, old_end, reason, before, after)+f"\nEnddatum: {old_date} → {entry_end_date(entry)}", status="pending")
         db.add(change)
         db.flush()
         change_id = change.id

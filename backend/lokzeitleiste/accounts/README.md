@@ -60,3 +60,9 @@ Cookie-basierte Schreibzugriffe und Browser-Logins prüfen `PUBLIC_ORIGIN`. Tf-B
 In Tf-Übersicht (`/admin/tf`) und Verwaltungsmitarbeiterliste (`/admin/staff`) Foto auswählen und **Foto hochladen** wählen. Vorhandene Fotos können ersetzt oder entfernt werden. Unterstützt werden einzelne JPEG-, PNG- und WebP-Bilder bis 5 MB und 12 Megapixel. Der Server überprüft das Bild, berücksichtigt EXIF-Orientierung, entfernt Metadaten und speichert ein JPEG mit maximal 640 × 640 Pixeln.
 
 Fotos benötigen die Lesefreigabe des jeweiligen Mitarbeitermoduls; Upload und Entfernen erfordern Lesen und Schreiben. Verwaltungsmitarbeiter können Fotos anderer Verwaltungskonten nur innerhalb ihrer Delegationsgrenzen ändern. Fotos sind keine öffentlich abrufbaren statischen Dateien und werden in der Datenbank mitgesichert. Endpunkte: `GET`, `POST` (Multipart-Feld `file`) und `DELETE` auf `/api/v1/admin/tf/{id}/photo` beziehungsweise `/api/v1/admin/staff/{id}/photo`.
+
+## Fotos beim Anlegen und Bearbeiten ab v0.15
+
+Tf-Anlage und Verwaltungsmitarbeiter-Formular enthalten direkt eine optionale Fotoauswahl mit Vorschau. Nach Auswahl **Speichern** wählen. Das Foto wird zusammen mit den Stammdaten in einer Datenbanktransaktion gespeichert; ein ungültiges Foto verhindert die Kontoanlage bzw. Profiländerung vollständig. Ohne neue Auswahl bleibt ein bestehendes Foto erhalten.
+
+In der Tf-Übersicht öffnet **Tf bearbeiten** den vollständigen Stammdatendialog mit Fotoauswahl. Lesen und Schreiben im Mitarbeitermodul erlaubt Profilbearbeitung; Kontoanlage und Passwort-Reset benötigen weiterhin Administration. Der Benutzername wird nicht verändert. `PUT /api/v1/admin/tf/{id}` akzeptiert Tf-Stammdaten. Tf-Anlage, Tf-Bearbeitung und Verwaltungsmitarbeiter-Anlage/-Bearbeitung akzeptieren optional `photo_base64` (reine Base64-Bildbytes ohne Data-URL-Präfix). Bildformate, Größenbegrenzungen, Metadatenentfernung und Berechtigungen bleiben wie bei den bestehenden Foto-Endpunkten.

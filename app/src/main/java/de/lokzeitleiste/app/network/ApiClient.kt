@@ -59,7 +59,7 @@ object ApiClient {
         val items = JSONArray()
         entries.forEach { items.put(JSONObject()
             .put("client_id", it.clientId).put("kind", it.kind).put("date", it.date)
-            .put("start", it.start).put("end", it.end).put("pause", it.pause)
+            .put("start", it.start).put("end", it.end).put("end_date", it.endDate ?: JSONObject.NULL).put("pause", it.pause)
             .put("guest", it.guest).put("note", it.note).put("away", it.away)
             .put("accommodation", it.accommodation).put("hotel_name", it.hotelName)) }
         val reply = post("/api/v1/me/months/${month.year}/${month.monthValue}/entries",

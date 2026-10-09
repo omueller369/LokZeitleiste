@@ -8,7 +8,7 @@ Jeweils einen Eintrag bearbeiten: Arbeitsbeginn und Arbeitsende ändern, **Prüf
 
 Bearbeitbar sind erfasste Arbeitszeiten der Arten Zugfahrt, Bereitschaft und Sonstige Erfassung. Urlaub und Krank bleiben bei der bisherigen Acht-Stunden-Regel; Rufbereitschaft und Ausfallschicht erzeugen nach der bisherigen Berechnung keine geleistete Arbeitszeit und werden hier nicht geändert. Das Planungsmodul bleibt der separate Einstieg für Soll-Arbeitstage, Urlaub und Ruhetage.
 
-Pausen, Gastfahrt, Datum und Eintragsart bleiben unverändert. Ungültige Zeiträume, zu lange Bereitschaft, Überschneidungen mit anderen Arbeitszeiten und Konflikte mit Abwesenheiten werden abgewiesen. Das Ende liegt am Folgetag, wenn es vor oder gleich dem Beginn liegt. Die vorhandene Berechnung arbeitet mit lokalen Uhrzeiten und teilt Nachtschichten an Mitternacht auf; sie berechnet keine zusätzliche Sommer-/Winterzeitkorrektur.
+Pausen, Gastfahrt, Datum und Eintragsart bleiben unverändert. Ungültige Zeiträume, zu lange Bereitschaft, Überschneidungen mit anderen Arbeitszeiten und Konflikte mit Abwesenheiten werden abgewiesen. Bei ausdrücklich gewähltem Enddatum wird dieser Tag verwendet; Ende muss nach Beginn liegen. Alte Einträge ohne Enddatum verwenden weiter die bisherige Mitternachtsregel. Die vorhandene Berechnung arbeitet mit lokalen Uhrzeiten und teilt Nachtschichten an Mitternacht auf; sie berechnet keine zusätzliche Sommer-/Winterzeitkorrektur.
 
 **Arbeitszeit** entspricht der geleisteten Zeit nach Pause einschließlich Gastfahrt. **Gutschrift** enthält zusätzlich die bestehende Auffüllung auf acht Stunden je Arbeitstag sowie Urlaub/Krank. Eine kürzere Schicht kann deshalb die Arbeitszeit reduzieren, während die Gutschrift unverändert bleibt. Sonntags-, Feiertags- und Nachtminuten werden ebenfalls aus den korrigierten Zeiten neu ermittelt. Auch der Monats-Saldo gegen den Arbeitszeitplan verwendet die korrigierte Gutschrift.
 
@@ -49,3 +49,5 @@ Alle Endpunkte erfordern Admin-Anmeldung; Schreibzugriffe prüfen den konfigurie
 ## Erweiterung ab v0.13
 
 Das Modul bietet jetzt auch manuelle Erfassung für Tf und Verwaltungsmitarbeiter sowie serverseitige Datensatzsperren. Eigene Zeiten werden unter `/my/worktime` erfasst. [Berechtigungen, Sperren und neue API-Endpunkte](../records/README.md). Bei Verwaltungsmitarbeiter-Korrekturen und eigener Bearbeitung entstehen keine Tf-E-Mail-Aufträge; administrative Tf-Korrekturen behalten den beschriebenen Versand.
+
+Ab v0.15 kann auch das Enddatum korrigiert werden. Die E-Mail und der Verlauf zeigen dessen Vorher-/Nachher-Werte. Monatsgrenzen und Zeiträume mit Beginn in früheren Monaten werden in den Summen berücksichtigt.

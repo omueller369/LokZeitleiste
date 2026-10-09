@@ -10,6 +10,7 @@ from ..db import engine
 from ..models import WorkEntry, WorkMonth, WorkTimeChange, now_utc
 from ..reports.monthly import summarize_month
 from ..reports.daily import WORK_KINDS
+from ..reports.intervals import interval, period_entries
 from ..reports.mailer import send_time_change
 from ..reports.service import MAX_ATTEMPTS
 
@@ -18,15 +19,9 @@ FIELDS = ("work_without_guest", "guest", "topup", "vacation", "sick", "credited"
 
 
 def validate_no_overlap(db, tf_id, entry):
-    def interval(item):
-        begin = datetime.combine(item.entry_date, time.fromisoformat(item.start_time))
-        end = datetime.combine(item.entry_date, time.fromisoformat(item.end_time))
-        return begin, end + timedelta(days=1) if end <= begin else end
     begin, end = interval(entry)
-    others = db.scalars(select(WorkEntry).join(WorkMonth).where(
-        WorkMonth.tf_user_id == tf_id, WorkEntry.id != entry.id, WorkEntry.kind.in_(WORK_KINDS),
-        WorkEntry.entry_date >= entry.entry_date - timedelta(days=1),
-        WorkEntry.entry_date <= entry.entry_date + timedelta(days=1)).with_for_update()).all()
+    others=[e for e in period_entries(db,tf_id,begin.date(),end.date(),lock=True)
+            if e.id!=entry.id and e.kind in WORK_KINDS]
     for other in others:
         other_begin, other_end = interval(other)
         if begin < other_end and other_begin < end:
@@ -39,13 +34,7 @@ def overview(db, tf_id, year, month, state, *, lock=False):
     begin = first - timedelta(days=first.weekday())
     end = last + timedelta(days=6 - last.weekday())
     # Den Vortag einbeziehen: Schichten dürfen über Mitternacht reichen.
-    query = select(WorkEntry).join(WorkMonth).where(
-        WorkMonth.tf_user_id == tf_id, WorkEntry.entry_date >= begin - timedelta(days=1),
-        WorkEntry.entry_date <= end)
-    # Korrekturen brauchen unter MySQL einen aktuellen Locking Read statt eines alten Snapshots.
-    if lock:
-        query = query.with_for_update()
-    entries = list(db.scalars(query).all())
+    entries=period_entries(db,tf_id,begin,end,lock=lock)
     days = []
     cursor = date((begin - timedelta(days=1)).year, (begin - timedelta(days=1)).month, 1)
     while cursor <= end:
