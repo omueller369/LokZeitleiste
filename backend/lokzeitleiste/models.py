@@ -123,3 +123,24 @@ class PlanChange(Base):
     new_note: Mapped[str] = mapped_column(String(500), nullable=False)
     source: Mapped[str] = mapped_column(String(12), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class WorkTimeChange(Base):
+    __tablename__ = "work_time_changes"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    entry_id: Mapped[int] = mapped_column(ForeignKey("work_entries.id"), nullable=False, index=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    admin_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    entry_date: Mapped[date] = mapped_column(Date, nullable=False)
+    previous_start: Mapped[str] = mapped_column(String(5), nullable=False)
+    previous_end: Mapped[str] = mapped_column(String(5), nullable=False)
+    new_start: Mapped[str] = mapped_column(String(5), nullable=False)
+    new_end: Mapped[str] = mapped_column(String(5), nullable=False)
+    reason: Mapped[str] = mapped_column(String(1000), nullable=False)
+    recipient_email: Mapped[str] = mapped_column(String(320), nullable=False)
+    email_body: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(12), default="pending", nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_error: Mapped[str] = mapped_column(String(500), default="", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+    sent_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

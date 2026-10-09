@@ -25,6 +25,7 @@ jobs:
           bash setup/tests/test-platform.sh
           bash setup/tests/test-auto-admin.sh
           node --check backend/lokzeitleiste/static/planning.js
+          node --check backend/lokzeitleiste/static/worktime.js
       - name: Compose configuration
         working-directory: backend
         run: |

@@ -10,14 +10,7 @@ def smtp_configured() -> bool:
 
 
 def send_receipt(*, recipient: str, filename: str, pdf_data: bytes):
-    if not smtp_configured():
-        raise RuntimeError("SMTP_HOST, SMTP_FROM und SMTP_SECURITY müssen gesetzt sein")
-    host = os.environ["SMTP_HOST"]
-    security = os.getenv("SMTP_SECURITY", "ssl")
-    port = int(os.getenv("SMTP_PORT", "465" if security == "ssl" else "587"))
-    sender = os.environ["SMTP_FROM"]
     message = EmailMessage()
-    message["From"] = sender
     message["To"] = recipient
     message["Subject"] = "LokZeitleiste: Eingang Ihrer Arbeitszeiten"
     message.set_content(
@@ -25,6 +18,25 @@ def send_receipt(*, recipient: str, filename: str, pdf_data: bytes):
         "Dies ist keine Entgelt- oder Tarifabrechnung."
     )
     message.add_attachment(pdf_data, maintype="application", subtype="pdf", filename=filename)
+    _send_message(message)
+
+
+def send_time_change(*, recipient: str, body: str):
+    message = EmailMessage()
+    message["To"] = recipient
+    message["Subject"] = "LokZeitleiste: Ihre Arbeitszeit wurde angepasst"
+    message.set_content(body)
+    _send_message(message)
+
+
+def _send_message(message: EmailMessage):
+    if not smtp_configured():
+        raise RuntimeError("SMTP_HOST, SMTP_FROM und SMTP_SECURITY müssen gesetzt sein")
+    host = os.environ["SMTP_HOST"]
+    security = os.getenv("SMTP_SECURITY", "ssl")
+    port = int(os.getenv("SMTP_PORT", "465" if security == "ssl" else "587"))
+    sender = os.environ["SMTP_FROM"]
+    message["From"] = sender
     context = ssl.create_default_context()
     if security == "ssl":
         connection = smtplib.SMTP_SSL(host, port, timeout=20, context=context)

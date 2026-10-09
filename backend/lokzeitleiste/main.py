@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth
+from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange
 from .schemas import Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
 from .reports.daily import day_rows
@@ -21,7 +21,7 @@ from .reports.monthly import summarize_month
 from .reports.service import process_dispatch
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.10")
+app = FastAPI(title="LokZeitleiste API", version="0.11")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -219,18 +219,28 @@ def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: B
         raise HTTPException(422, "Ungültiger Monat")
     if any(e.date.year != year or e.date.month != month for e in batch.entries):
         raise HTTPException(422, "Eintrag gehört nicht zum angeforderten Monat")
+    db.scalar(select(User).where(User.id == user.id).with_for_update())
     profile = db.get(TfProfile, user.id)
     if not profile or not profile.email or not profile.federal_state:
         raise HTTPException(409, "E-Mail-Adresse und Bundesland des Tf fehlen im Admin-Profil")
     if batch.entries and not smtp_configured():
         raise HTTPException(503, "E-Mail-Versand ist auf dem Server noch nicht eingerichtet")
     period = db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id == user.id,
-                                              WorkMonth.year == year, WorkMonth.month == month))
+                                              WorkMonth.year == year, WorkMonth.month == month).with_for_update())
     if not period:
         period = WorkMonth(tf_user_id=user.id, year=year, month=month)
         db.add(period)
         db.flush()
-    existing = {e.client_id: e for e in period.entries}
+    existing = {e.client_id: e for e in db.scalars(select(WorkEntry).where(
+        WorkEntry.work_month_id == period.id).with_for_update()).all()}
+    # Ein alter App-Stand darf eine administrative Zeitkorrektur nicht zurücksetzen.
+    protected = set(db.scalars(select(WorkTimeChange.entry_id).join(WorkEntry).where(
+        WorkEntry.work_month_id == period.id).with_for_update()).all())
+    for item in batch.entries:
+        entry = existing.get(str(item.client_id))
+        if entry and entry.id in protected and (entry.start_time, entry.end_time) != (
+                item.start.strftime("%H:%M"), item.end.strftime("%H:%M")):
+            raise HTTPException(409, "Arbeitszeit wurde administrativ korrigiert. Aktuelle Monatsdaten vom Server laden.")
     for item in batch.entries:
         key = str(item.client_id)
         entry = existing.get(key)
@@ -293,3 +303,17 @@ def planning_page():
 @app.get("/admin/planning.js")
 def planning_script():
     return FileResponse(Path(__file__).parent / "static" / "planning.js", media_type="text/javascript")
+
+
+from .worktime.api import create_router as worktime_router
+app.include_router(worktime_router(require_admin, month_summary, entry_dict))
+
+
+@app.get("/admin/worktime")
+def worktime_page():
+    return FileResponse(Path(__file__).parent / "static" / "worktime.html")
+
+
+@app.get("/admin/worktime.js")
+def worktime_script():
+    return FileResponse(Path(__file__).parent / "static" / "worktime.js", media_type="text/javascript")

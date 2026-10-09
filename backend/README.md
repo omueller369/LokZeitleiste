@@ -65,3 +65,7 @@ Pro Kalendertag zählt geleistete Zeit aus Zugfahrt, Bereitschaft und Sonstiger 
 Lokal gelöschte Einträge bleiben derzeit auf dem Server; Serverdaten werden noch nicht in die App geladen. Ein gleichzeitiger Betrieb auf mehreren Geräten ist nicht vorgesehen. Es gibt noch keine Passwortzurücksetzung, Dienstplanungsschnittstelle, Ausbleibe-Berechnung oder Kopplung der LokZeit-Standzeiten mit dem Monatsdatensatz. Für spätere Schemaänderungen wird ein Migrationstool benötigt.
 
 API-Tests: `pip install -r requirements-dev.txt` und `python -m unittest discover -s tests` im Backend-Ordner. Die Tests verwenden SQLite als isolierte Testdatenbank. Der reguläre Betrieb verlangt MySQL.
+
+## Arbeitszeitkorrekturen
+
+Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/admin/worktime` bearbeiten. Tages-, Wochen- und Monatswerte werden neu berechnet; jede tatsächliche Änderung erzeugt eine E-Mail mit Vorher-/Nachher-Werten und einen nachvollziehbaren Änderungsverlauf. [Bedienung, Versand und Update](lokzeitleiste/worktime/README.md). In der Testumgebung landen Benachrichtigungen in Mailpit.
