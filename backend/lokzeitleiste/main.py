@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.15")
+app = FastAPI(title="LokZeitleiste API", version="0.16")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -437,3 +437,15 @@ app.include_router(photo_router(require_admin))
 @app.get('/entry-form.js')
 def entry_form_script():
     return FileResponse(Path(__file__).parent/'static'/'entry-form.js',media_type='text/javascript')
+
+
+from .tf_overview import create_router as tf_hours_router
+app.include_router(tf_hours_router(require_admin, month_summary))
+
+@app.get('/admin/tf/hours')
+def tf_hours_page():
+    return FileResponse(Path(__file__).parent/'static'/'tf-hours.html')
+
+@app.get('/admin/tf/hours.js')
+def tf_hours_script():
+    return FileResponse(Path(__file__).parent/'static'/'tf-hours.js', media_type='text/javascript')

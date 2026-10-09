@@ -1,4 +1,4 @@
-# LokZeitleiste v0.15
+# LokZeitleiste v0.16
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -50,8 +50,10 @@ Die Planung unterstützt Mehrfachauswahl in Kalender, Tagesliste, Jahresmatrix u
 
 Die Arbeitszeitplanung verwendet jetzt automatisch die gesetzlichen Berliner Feiertage. Diese werden mit Namen und eigener Farbe angezeigt und haben immer 0 Sollstunden, auch bei eingetragenem Arbeitstag oder Urlaub. Dies gilt für Webansichten, Monatssaldo, PDF und Excel.
 
-## Erweiterungen v0.15
+## Erweiterungen v0.16
 
 Feiertage mit geplanter Arbeit, Urlaub oder Ruhe zeigen Feiertagsfarbe und Statusfarbe diagonal in Webansichten, PDF und Excel. Das Feiertags-Soll bleibt 0 h. Fotos können direkt beim Anlegen und Bearbeiten von Tf und Verwaltungsmitarbeitern ausgewählt und mit dem Profil gespeichert werden. Tf-Stammdaten besitzen jetzt einen vollständigen Bearbeitungsdialog.
 
 Die Zeiterfassung und Zeitkorrektur haben ein eigenes Enddatum. Neue Erfassungen beginnen mit gleichem Beginn-/Enddatum; für Schichten über Mitternacht einen späteren Tag wählen. Tages-, Wochen- und Monatswerte berücksichtigen den tatsächlichen Zeitraum. Android 0.9 ergänzt Enddatumsauswahl, Speicherung und monatsbezogene Aufteilung. Ein Android-Build und Tests auf echten Geräten stehen noch aus.
+
+Tf-Stundenübersicht: In der Tf-Liste „Stundenübersicht“ wählen. Tagesdetails, Monatskalender und Jahreskalender vergleichen geleistete Arbeitszeit (inklusive Gastfahrt, ohne Pausen) mit dem Plansoll. Die separate Gutschrift enthält Auffüllung, Urlaub und Krankheit. Farben und diagonale Berliner Feiertagsmarkierungen entsprechen der Arbeitszeitplanung. Offene Planung wird als vorläufig markiert und erhält keinen abschließenden Saldo. Lesefreigaben für Planung und zusätzlich Arbeitszeit oder Berichte sind erforderlich. API: `GET /api/v1/admin/tf/{tf_id}/hours/{year}`. Keine Datenbankmigration erforderlich.

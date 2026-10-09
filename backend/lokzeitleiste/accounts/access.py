@@ -53,6 +53,11 @@ def authorize_route(db, user, request):
         return
     if path == '/api/v1/admin/tf' and method == 'POST':
         return demand(db,user,'employees',3)
+    if re.fullmatch(r'/api/v1/admin/tf/\d+/hours/\d+',path) and method == 'GET':
+        levels = permissions(db,user)
+        if not (levels['planning'] and (levels['worktime'] or levels['reports'])):
+            raise HTTPException(403, 'Planung und Arbeitszeit oder Berichte müssen zum Lesen freigegeben sein.')
+        return
     if re.fullmatch(r'/api/v1/admin/tf/\d+/photo',path):
         return demand(db,user,'employees',1 if method=='GET' else 2)
     if re.fullmatch(r'/api/v1/admin/staff/\d+/photo',path):

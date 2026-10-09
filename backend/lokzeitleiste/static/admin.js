@@ -27,6 +27,7 @@ async function refresh(){const users=await request('/api/v1/admin/tf');el('users
  if(me.permissions.employees>=2){const edit=document.createElement('button');edit.textContent='Tf bearbeiten';edit.onclick=()=>tfDialog(user);td.append(edit);const save=document.createElement('button');save.textContent='Speichern';save.onclick=async()=>{save.disabled=true;try{await request('/api/v1/admin/tf/'+user.id+'/delivery',{method:'PATCH',body:JSON.stringify({email:email.value,federal_state:state.value})});await refresh();}catch(error){alert(error.message);}finally{save.disabled=false;}};td.append(save);}
  }else td.textContent='Nicht freigegeben';tr.append(td);td=document.createElement('td');td.textContent=me.permissions.employees?user.target_hours_minutes/60+' h / '+user.vacation_days+' Tage':'—';tr.append(td);
  td=document.createElement('td');if(me.permissions.worktime||me.permissions.reports){const button=document.createElement('button');button.textContent='Monatsdaten';button.onclick=()=>months(user).catch(error=>alert(error.message));td.append(button);}
+ if(me.permissions.planning&&(me.permissions.worktime||me.permissions.reports))link(td,'Stundenübersicht','/admin/tf/hours?tf='+user.id);
  if(me.permissions.planning)link(td,'Arbeitszeitplan','/admin/planning?tf='+user.id);
  if(me.permissions.worktime)link(td,'Arbeitszeiten korrigieren','/admin/worktime?tf='+user.id);
  if(me.permissions.employees===3){const reset=document.createElement('button');reset.textContent='Passwort zurücksetzen';reset.onclick=()=>resetDialog(user);td.append(reset);}
