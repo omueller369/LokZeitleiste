@@ -1,4 +1,4 @@
-# LokZeitleiste v0.18
+# LokZeitleiste v0.19
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -81,3 +81,11 @@ Das Menü erscheint auf allen Backend-Modulseiten und berücksichtigt die Freiga
 Alle Webansichten und die Android-App unterstützen die Flaggenauswahl für Deutsch (Standard), Englisch, Polnisch, Russisch, Türkisch, Arabisch und Spanisch. Ausgaben und Meldungen verwenden den gemeinsamen Übersetzungskatalog; Arabisch wird rechts-nach-links angezeigt. Android-Version 0.10 neu bauen/installieren.
 
 Update im Branch `setup/debian-testumgebung`: `git pull --ff-only`, anschließend `sudo bash setup.sh`. Die neuen Tabellen für Modelle, Zuweisungen, Postfächer, Entwürfe und Kontosprachen werden automatisch angelegt; bestehende Spalten bleiben erhalten. Für E-Mail-Postfächer die privaten `MAILBOX_*`-Werte ergänzen. Die reale IMAP-/SMTP-Verbindung, MySQL-Integration und der Android-Build müssen auf der Zielumgebung geprüft werden.
+
+## Erweiterungen v0.19
+
+TF und Verwaltungsmitarbeiter werden in Tabellen mit Links für Ansicht und Bearbeitung angezeigt. Foto-Upload ist auf Anlage und Bearbeitung begrenzt; die Ansicht bleibt schreibgeschützt. Passwortzurücksetzen ist in der Bearbeitung erreichbar.
+
+E-Mail-Konten erhalten pro TF gespeicherte, änderbare Anbieter- und Servereinstellungen: Googlemail, Apple/iCloud, WEB.DE, Yahoo, Microsoft sowie manuelle IMAP-/SMTP-Server. Microsoft verwendet OAuth2 mit Gerätecode und Token-Erneuerung. Die Registrierung einer Microsoft-App und die private Konfiguration ihrer Client-ID sind erforderlich. Details: [Postfach-Einrichtung](backend/lokzeitleiste/mailbox/README.md).
+
+Bestehende globale Mailserverangaben bleiben für bisherige Konten gültig, bis eigene Serverangaben gespeichert werden. Neue Tabellen werden beim Start über das bestehende Datenbankschema-Setup angelegt; vorhandene Konten werden nicht gelöscht. Anbieter-Verbindungen und Microsoft-App-Freigaben wurden mit simulierten Antworten geprüft; echte Konten müssen auf dem Zielserver eingerichtet und getestet werden.

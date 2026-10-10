@@ -272,3 +272,20 @@ class UserLocale(Base):
     __tablename__ = 'user_locales'
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
     language: Mapped[str] = mapped_column(String(2), default='de', nullable=False)
+
+
+class MailboxSettings(Base):
+    __tablename__ = 'mailbox_settings'
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('mailbox_accounts.tf_user_id'), primary_key=True)
+    config_json: Mapped[str] = mapped_column(Text, nullable=False)
+    tokens_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class MailboxAuthorization(Base):
+    __tablename__ = 'mailbox_authorizations'
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('mailbox_accounts.tf_user_id'), primary_key=True)
+    actor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    device_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    next_poll_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    interval: Mapped[int] = mapped_column(Integer, nullable=False)

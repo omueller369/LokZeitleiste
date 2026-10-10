@@ -11,6 +11,8 @@ from html.parser import HTMLParser
 from cryptography.fernet import Fernet, InvalidToken
 from fastapi import HTTPException
 
+from .providers import settings
+
 MAX_MESSAGE = 10 * 1024 * 1024
 
 
@@ -39,9 +41,17 @@ def host(name):
 def connection(account):
     client = None
     try:
-        client = imaplib.IMAP4_SSL(host('MAILBOX_IMAP_HOST'), int(os.getenv('MAILBOX_IMAP_PORT', '993')),
-                                  ssl_context=ssl.create_default_context(), timeout=15)
-        client.login(account.username, password(account))
+        cfg=settings(account)
+        if not cfg['imap_host']:raise HTTPException(409,'Mailserver ist noch nicht eingerichtet: MAILBOX_IMAP_HOST')
+        if cfg['imap_security']=='ssl':client=imaplib.IMAP4_SSL(cfg['imap_host'],cfg['imap_port'],ssl_context=ssl.create_default_context(),timeout=15)
+        else:
+            client=imaplib.IMAP4(cfg['imap_host'],cfg['imap_port'],timeout=15)
+            client.starttls(ssl_context=ssl.create_default_context())
+        if cfg['provider']=='microsoft':
+            from .oauth import access_token
+            token=access_token(account)
+            client.authenticate('XOAUTH2',lambda _:('user='+account.username+'\x01auth=Bearer '+token+'\x01\x01').encode())
+        else:client.login(account.username,password(account))
         yield client
     except (imaplib.IMAP4.error, OSError, ValueError) as exc:
         raise HTTPException(502, 'Postfachverbindung fehlgeschlagen. Server und Zugangsdaten prüfen.') from exc
@@ -133,22 +143,26 @@ def send(account, data):
     if len(msg.as_bytes()) > MAX_MESSAGE:
         raise HTTPException(413,'Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.')
     try:
-        security=os.getenv('MAILBOX_SMTP_SECURITY','ssl')
-        server=host('MAILBOX_SMTP_HOST')
-        port=int(os.getenv('MAILBOX_SMTP_PORT','465' if security=='ssl' else '587'))
+        cfg=settings(account);security=cfg['smtp_security'];server=cfg['smtp_host'];port=cfg['smtp_port']
+        if not server:raise HTTPException(409,'Mailserver ist noch nicht eingerichtet: MAILBOX_SMTP_HOST')
         if security not in ('ssl','starttls'):
             raise HTTPException(409,'Postfach-SMTP benötigt SSL oder STARTTLS.')
         with (smtplib.SMTP_SSL(server,port,timeout=15,context=ssl.create_default_context()) if security=='ssl' else smtplib.SMTP(server,port,timeout=15)) as client:
             if security=='starttls':
                 client.starttls(context=ssl.create_default_context())
-            client.login(account.username,password(account))
+            username=cfg.get('smtp_username') or account.username
+            if cfg['provider']=='microsoft':
+                from .oauth import access_token
+                token=access_token(account)
+                client.auth('XOAUTH2',lambda challenge=None:'' if challenge else 'user='+username+'\x01auth=Bearer '+token+'\x01\x01')
+            else:client.login(username,password(account))
             refused=client.send_message(msg)
             if refused:
                 raise HTTPException(502,'Mindestens ein Empfänger wurde abgelehnt. Zustellung kann teilweise erfolgt sein; Empfänger vor erneutem Senden prüfen.')
     except (smtplib.SMTPException,OSError,ValueError) as exc:
         raise HTTPException(502,'E-Mail-Versand fehlgeschlagen. Keine automatische Wiederholung; Postfach und Server prüfen.') from exc
     warning=''
-    sent_folder=os.getenv('MAILBOX_SENT_FOLDER','Sent')
+    sent_folder=settings(account)['sent_folder']
     try:
         with connection(account) as client:
             status,_=client.append(folder_name(sent_folder),'\\Seen',imaplib.Time2Internaldate(__import__('time').time()),msg.as_bytes())

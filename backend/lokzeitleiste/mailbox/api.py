@@ -1,3 +1,5 @@
+import json
+from datetime import timedelta
 import base64
 import email
 import re
@@ -6,16 +8,25 @@ from urllib.parse import quote
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
 from pydantic import BaseModel, EmailStr, Field, field_validator
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 from ..db import database_session
-from ..models import MailboxAccount, User, MailDraft
-from . import service
+from ..models import MailboxAccount, MailboxSettings, MailboxAuthorization, User, MailDraft, now_utc
+from . import service, oauth
+from .providers import ServerInput, PROVIDERS, settings
 
 
 class ConfigInput(BaseModel):
+    servers: ServerInput | None = None
     address: EmailStr
     username: str = Field(min_length=1,max_length=320)
     password: str | None = Field(default=None,min_length=1,max_length=4096)
+    @field_validator('username')
+    @classmethod
+    def valid_username(cls,value):
+        value=value.strip()
+        if not value or any(ord(c)<32 for c in value):raise ValueError('Ungültige Eingabe')
+        return value
 
 
 class AttachmentInput(BaseModel):
@@ -61,21 +72,70 @@ def create_router(require_admin):
     def account(db,tf_id):
         target(db,tf_id);value=db.get(MailboxAccount,tf_id)
         if not value: raise HTTPException(409,'Für diesen Tf ist noch kein Postfach eingerichtet.')
+        value._settings=db.get(MailboxSettings,tf_id);value._db=db
         return value
 
     @router.get('/config')
     def config(tf_id:int,db:Session=Depends(database_session)):
         target(db,tf_id);value=db.get(MailboxAccount,tf_id)
-        return dict(configured=bool(value),address=value.address if value else '',username=value.username if value else '')
+        if value:value=account(db,tf_id)
+        cfg=settings(value) if value else dict(PROVIDERS['manual'],provider='manual',smtp_username='')
+        return dict(configured=bool(value),address=value.address if value else '',username=value.username if value else '',servers=cfg,providers=PROVIDERS,oauth_connected=bool(value and value._settings and value._settings.tokens_encrypted),microsoft_available=bool(__import__('os').getenv('MAILBOX_MICROSOFT_CLIENT_ID')))
 
     @router.put('/config')
     def save_config(tf_id:int,data:ConfigInput,db:Session=Depends(database_session)):
-        target(db,tf_id);value=db.get(MailboxAccount,tf_id)
-        if not value and not data.password: raise HTTPException(422,'Postfachpasswort erforderlich')
-        encrypted=service.cipher().encrypt(data.password.encode()).decode() if data.password else value.password_encrypted
-        if not value: value=MailboxAccount(tf_user_id=tf_id);db.add(value)
+        target(db,tf_id);value=db.get(MailboxAccount,tf_id);row=db.get(MailboxSettings,tf_id)
+        old=settings(account(db,tf_id)) if value else None
+        cfg=data.servers.model_dump() if data.servers else old
+        microsoft=bool(cfg and cfg['provider']=='microsoft')
+        changed=bool(value and (({k:v for k,v in (cfg or {}).items() if k!='sent_folder'}!={k:v for k,v in (old or {}).items() if k!='sent_folder'}) or data.username!=value.username or str(data.address)!=value.address))
+        if not microsoft and not data.password and (not value or changed or (old and old['provider']=='microsoft')):
+            raise HTTPException(422,'Bei geändertem Konto oder Server das Postfachpasswort erneut eingeben.')
+        service.cipher()
+        encrypted='' if microsoft else service.cipher().encrypt(data.password.encode()).decode() if data.password else (value.password_encrypted if value else '')
+        if not value:value=MailboxAccount(tf_user_id=tf_id);db.add(value)
         value.address,value.username,value.password_encrypted=str(data.address),data.username,encrypted
+        db.flush()
+        if cfg:
+            if not row:row=MailboxSettings(tf_user_id=tf_id);db.add(row)
+            row.config_json=json.dumps(cfg)
+            if changed or not microsoft:row.tokens_encrypted=None
+        db.execute(delete(MailboxAuthorization).where(MailboxAuthorization.tf_user_id==tf_id))
         db.commit();return dict(configured=True)
+
+    @router.post('/microsoft/start')
+    def start_microsoft(tf_id:int,actor:User=Depends(require_admin),db:Session=Depends(database_session)):
+        value=account(db,tf_id)
+        if settings(value)['provider']!='microsoft':raise HTTPException(409,'Zuerst Microsoft als Anbieter speichern.')
+        client,_=oauth.application();service.cipher()
+        result=oauth.request_token('devicecode',dict(client_id=client,scope=oauth.SCOPES))
+        if not result.get('device_code') or not result.get('user_code'):raise HTTPException(502,'Microsoft-Anmeldung fehlgeschlagen.')
+        now=now_utc();interval=max(5,int(result.get('interval',5)))
+        row=db.get(MailboxAuthorization,(tf_id,actor.id))
+        if not row:row=MailboxAuthorization(tf_user_id=tf_id,actor_id=actor.id);db.add(row)
+        row.device_encrypted=oauth.seal(dict(device_code=result['device_code'],client_id=client,tenant=oauth.application()[1],username=value.username))
+        row.expires_at=now+timedelta(seconds=min(1800,int(result.get('expires_in',900))))
+        row.next_poll_at=now+timedelta(seconds=interval);row.interval=interval
+        db.commit();return dict(user_code=result['user_code'],verification_uri='https://microsoft.com/devicelogin',interval=interval)
+
+    @router.post('/microsoft/finish')
+    def finish_microsoft(tf_id:int,actor:User=Depends(require_admin),db:Session=Depends(database_session)):
+        value=account(db,tf_id)
+        row=db.scalar(select(MailboxAuthorization).where(MailboxAuthorization.tf_user_id==tf_id,MailboxAuthorization.actor_id==actor.id).with_for_update())
+        now=now_utc()
+        if not row or row.expires_at<=now:raise HTTPException(409,'Microsoft-Anmeldung abgelaufen. Erneut starten.')
+        if now<row.next_poll_at:return dict(connected=False,pending=True,interval=row.interval)
+        device=oauth.unseal(row.device_encrypted);client,tenant=oauth.application()
+        if settings(value)['provider']!='microsoft' or device['client_id']!=client or device['tenant']!=tenant or device['username']!=value.username:
+            raise HTTPException(409,'Microsoft-Anmeldung abgelaufen. Erneut starten.')
+        result=oauth.request_token('token',dict(client_id=client,grant_type='urn:ietf:params:oauth:grant-type:device_code',device_code=device['device_code']))
+        error=result.get('error')
+        if error in ('authorization_pending','slow_down'):
+            if error=='slow_down':row.interval+=5
+            row.next_poll_at=now+timedelta(seconds=row.interval);db.commit();return dict(connected=False,pending=True,interval=row.interval)
+        if error:
+            db.delete(row);db.commit();raise HTTPException(409,'Microsoft-Anmeldung fehlgeschlagen. Erneut starten.')
+        oauth.store_tokens(value._settings,result);db.delete(row);db.commit();return dict(connected=True,pending=False)
 
     @router.get('/folders')
     def folders(tf_id:int,db:Session=Depends(database_session)):
