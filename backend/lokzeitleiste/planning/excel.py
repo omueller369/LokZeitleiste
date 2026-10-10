@@ -8,6 +8,7 @@ from openpyxl.comments import Comment
 from openpyxl.styles import Font, PatternFill, GradientFill
 from openpyxl.worksheet.datavalidation import DataValidation
 from .schemas import DayInput
+from .duties import SHIFTS
 from ..i18n import translate, request_language
 
 MAX_FILE = 2 * 1024 * 1024
@@ -31,23 +32,26 @@ def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[Day
         if "Plan" not in book.sheetnames:
             raise ValueError("Excel benötigt ein Blatt mit dem Namen Plan")
         sheet = book["Plan"]
-        if (sheet.max_row or 0) > 367 or (sheet.max_column or 0) > 4:
-            raise ValueError("Blatt Plan: höchstens 366 Tageszeilen und vier Spalten")
+        if (sheet.max_row or 0) > 367 or (sheet.max_column or 0) > 5:
+            raise ValueError("Blatt Plan: höchstens 366 Tageszeilen und fünf Spalten")
         sheet.reset_dimensions()
-        rows = sheet.iter_rows(max_col=5, max_row=368)
+        rows = sheet.iter_rows(max_col=6, max_row=368)
         header_row = next(rows)
-        if header_row[4].value not in (None, ""):
-            raise ValueError("Blatt Plan benötigt höchstens vier Spalten")
+        if header_row[5].value not in (None, ""):
+            raise ValueError("Blatt Plan benötigt höchstens fünf Spalten")
         headers = [str(c.value or "").strip() for c in header_row[:4]]
         if headers[:2] != ["Datum", "Art"] or headers[2] not in ("", "Notiz") or headers[3] not in ("", "Personalnummer"):
             raise ValueError("Spalten: Datum, Art, optional Notiz, optional Personalnummer")
+        if str(header_row[4].value or "").strip() not in ("","Schicht"):raise ValueError("Optionale fünfte Spalte: Schicht")
         result, seen = [], set()
         for number, row in enumerate(rows, start=2):
             values = [c.value for c in row]
             if all(v in (None, "") for v in values):
                 continue
-            if number > 367 or values[4] not in (None, ""):
-                raise ValueError("Blatt Plan: höchstens 366 Tageszeilen und vier Spalten")
+            if number > 367 or values[5] not in (None, ""):
+                raise ValueError("Blatt Plan: höchstens 366 Tageszeilen und fünf Spalten")
+            shift=str(values[4] or "").strip() or None
+            if shift not in (None,*SHIFTS):raise ValueError("Schicht: standard, border_day oder border_night")
             values = values[:4]
             if any(c.data_type == "f" for c in row):
                 raise ValueError(f"Zeile {number}: Formeln sind nicht erlaubt")
@@ -68,7 +72,7 @@ def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[Day
             if person is not None and str(person).strip() != personnel_number:
                 raise ValueError(f"Zeile {number}: Personalnummer passt nicht zum ausgewählten Tf (als Text eingeben)")
             try:
-                item = DayInput(date=day, kind=str(kind or "").strip(), note=str(note or ""))
+                item = DayInput(date=day, kind=str(kind or "").strip(), note=str(note or ""),shift=shift)
             except ValueError as exc:
                 raise ValueError(f"Zeile {number}: Art muss Arbeitstag, Urlaub, Ruhetag oder Ungeplant sein; Notiz höchstens 500 Zeichen") from exc
             result.append(item)
@@ -92,24 +96,24 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
     for month in year_plan['months']:
         for item in month['days']:
             view.append([date.fromisoformat(item['date']),translate(item['kind']),item['target_minutes']/60,
-                         translate(item['holiday_name']) if item.get('is_holiday') else '',item['note']])
+                         translate(item['holiday_name']) if item.get('is_holiday') else '',item['note'],translate(item.get('shift_label',''))])
             for cell in view[view.max_row]:
                 if isinstance(cell.value,str):cell.data_type='s'
-    for column in 'ABCDE':view.column_dimensions[column].width=25
+    for column in 'ABCDEF':view.column_dimensions[column].width=25
     view.freeze_panes='A2'
     sheet = book.active
     sheet.title = "Plan"
-    sheet.append(["Datum", "Art", "Notiz", "Personalnummer"])
+    sheet.append(["Datum", "Art", "Notiz", "Personalnummer","Schicht"])
     for month in year_plan["months"]:
         for item in month["days"]:
-            sheet.append([date.fromisoformat(item["date"]), item["kind"], item["note"], personnel_number])
+            sheet.append([date.fromisoformat(item["date"]), item["kind"], item["note"], personnel_number,item.get("shift","standard")])
             row = sheet.max_row
             if item.get("is_holiday"):
                 sheet.cell(row,1).comment=Comment("Feiertag Berlin: "+item["holiday_name"]+". Soll: 0 Stunden, unabhängig von der Tagesart.","LokZeitleiste")
             sheet.cell(row, 1).number_format = "DD.MM.YYYY"
             sheet.cell(row, 4).number_format = "@"
             # Nutzereingaben bleiben Text, auch wenn sie mit '=' beginnen.
-            for column in (2, 3, 4):
+            for column in (2, 3, 4,5):
                 sheet.cell(row, column).data_type = "s"
             for cell in sheet[row]:
                 if item.get('is_holiday') and item['kind']!='Ungeplant':
@@ -119,7 +123,7 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
     for cell in sheet[1]:
         cell.fill = PatternFill("solid", fgColor="173E55")
         cell.font = Font(color="FFFFFF", bold=True)
-    for col, width in {"A": 16, "B": 18, "C": 45, "D": 22}.items():
+    for col, width in {"A": 16, "B": 18, "C": 45, "D": 22,"E":20}.items():
         sheet.column_dimensions[col].width = width
     sheet.freeze_panes = "A2"
     sheet.auto_filter.ref = sheet.dimensions
@@ -129,6 +133,8 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
     validation.showErrorMessage = True
     sheet.add_data_validation(validation)
     validation.add(f"B2:B{sheet.max_row}")
+    shift_validation=DataValidation(type="list",formula1='"standard,border_day,border_night"',allow_blank=True)
+    sheet.add_data_validation(shift_validation);shift_validation.add(f"E2:E{sheet.max_row}")
     info=book.create_sheet('Feiertage Berlin')
     info.append(['Datum','Gesetzlicher Feiertag Berlin','Sollstunden'])
     for month in year_plan['months']:

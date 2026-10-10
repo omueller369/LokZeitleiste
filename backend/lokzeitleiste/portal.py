@@ -11,11 +11,18 @@ from .db import database_session
 from .models import User, TfProfile, StaffProfile, ShiftModel, ShiftAssignment
 from .planning.service import get_month, apply_days, RevisionConflict
 from .planning.schemas import DayInput
+from .planning.duties import duty_info, resolve_shift, driver_type
 
 
 class CycleBlock(BaseModel):
     kind: Literal['Arbeitstag', 'Ruhetag']
     days: int = Field(ge=1, le=366)
+    shift: Literal["standard","border_day","border_night"] = "standard"
+
+    @model_validator(mode="after")
+    def rest_shift(self):
+        if self.kind=="Ruhetag":self.shift="standard"
+        return self
 
 
 class ModelInput(BaseModel):
@@ -61,7 +68,7 @@ def assignment_preview(db, data):
         raise HTTPException(404, 'Schichtmodell oder Tf nicht gefunden')
     if model.revision != data.expected_model_revision:
         raise HTTPException(409, 'Schichtmodell wurde geändert. Bitte neu laden.')
-    cycle = [b['kind'] for b in json.loads(model.blocks) for _ in range(b['days'])]
+    cycle = [b for b in json.loads(model.blocks) for _ in range(b['days'])]
     periods, revisions, days = {}, {}, []
     cursor = data.start
     skipped = 0
@@ -71,11 +78,13 @@ def assignment_preview(db, data):
             periods[key] = get_month(db, data.tf_id, cursor.year, cursor.month)
             revisions[key] = periods[key]['revision']
         previous = periods[key]['days'][cursor.day-1]
-        kind = cycle[(cursor-data.cycle_start).days % len(cycle)]
+        block=cycle[(cursor-data.cycle_start).days % len(cycle)];kind=block['kind']
+        try:shift=resolve_shift(db,data.tf_id,kind,block.get('shift','standard'))
+        except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         eligible = data.overwrite or previous['kind'] == 'Ungeplant'
         if not eligible:
             skipped += 1
-        days.append(dict(previous, previous_kind=previous['kind'], new_kind=kind, apply=eligible))
+        days.append(dict(previous, previous_kind=previous['kind'],previous_shift=previous['shift'], new_kind=kind,apply=eligible,**{('new_'+key):value for key,value in duty_info(cursor,kind,shift,previous['is_holiday']).items()}))
         cursor += timedelta(days=1)
     return dict(model=model_dict(model), days=days, expected_revisions=revisions, skipped_days=skipped,
                 apply_days=sum(d['apply'] for d in days))
@@ -89,7 +98,7 @@ def create_router(require_admin):
         rows = []
         for user, profile in db.execute(select(User, TfProfile).join(TfProfile).where(User.role == 'tf')):
             rows.append(dict(id=user.id, role='tf', first_name=profile.first_name, last_name=profile.last_name,
-                             username=user.username, identifier=profile.personnel_number, active=user.active))
+                             username=user.username, identifier=profile.personnel_number, active=user.active,driver_type=driver_type(db,user.id)))
         for user, profile in db.execute(select(User, StaffProfile).join(StaffProfile, User.id == StaffProfile.user_id).where(User.role == 'staff')):
             rows.append(dict(id=user.id, role='staff', first_name=profile.first_name, last_name=profile.last_name,
                              username=user.username, identifier=profile.cost_center, active=user.active))
@@ -134,7 +143,7 @@ def create_router(require_admin):
             preview = assignment_preview(db, data)
             if preview['expected_revisions'] != data.expected_revisions:
                 raise RevisionConflict('Plan zwischenzeitlich geändert')
-            selected = [DayInput(date=date.fromisoformat(d['date']), kind=d['new_kind'], note='Schichtmodell: '+preview['model']['name']) for d in preview['days'] if d['apply']]
+            selected = [DayInput(date=date.fromisoformat(d['date']), kind=d['new_kind'], note='Schichtmodell: '+preview['model']['name'],shift=d['new_shift']) for d in preview['days'] if d['apply']]
             count = 0
             for year in sorted({d.date.year for d in selected}):
                 days = [d for d in selected if d.date.year == year]

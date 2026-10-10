@@ -47,8 +47,9 @@ def connection(account):
         else:
             client=imaplib.IMAP4(cfg['imap_host'],cfg['imap_port'],timeout=15)
             client.starttls(ssl_context=ssl.create_default_context())
-        if cfg['provider']=='microsoft':
-            from .oauth import access_token
+        if cfg['provider']=='microsoft' or (cfg['provider']=='google' and cfg.get('auth_method')=='oauth2'):
+            if cfg['provider']=='google':from .google import access_token
+            else:from .oauth import access_token
             token=access_token(account)
             client.authenticate('XOAUTH2',lambda _:('user='+account.username+'\x01auth=Bearer '+token+'\x01\x01').encode())
         else:client.login(account.username,password(account))
@@ -151,8 +152,9 @@ def send(account, data):
             if security=='starttls':
                 client.starttls(context=ssl.create_default_context())
             username=cfg.get('smtp_username') or account.username
-            if cfg['provider']=='microsoft':
-                from .oauth import access_token
+            if cfg['provider']=='microsoft' or (cfg['provider']=='google' and cfg.get('auth_method')=='oauth2'):
+                if cfg['provider']=='google':from .google import access_token
+                else:from .oauth import access_token
                 token=access_token(account)
                 client.auth('XOAUTH2',lambda challenge=None:'' if challenge else 'user='+username+'\x01auth=Bearer '+token+'\x01\x01')
             else:client.login(username,password(account))

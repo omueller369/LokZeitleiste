@@ -289,3 +289,32 @@ class MailboxAuthorization(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     next_poll_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     interval: Mapped[int] = mapped_column(Integer, nullable=False)
+
+
+class TfDutyProfile(Base):
+    __tablename__ = 'tf_duty_profiles'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    driver_type: Mapped[str] = mapped_column(String(16), nullable=False, default='route')
+
+
+class PlanDuty(Base):
+    __tablename__ = 'plan_duties'
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    shift: Mapped[str] = mapped_column(String(16), nullable=False)
+
+
+class PlanDutyAudit(Base):
+    __tablename__ = 'plan_duty_audits'
+    change_id: Mapped[int] = mapped_column(ForeignKey('plan_changes.id'), primary_key=True)
+    previous_shift: Mapped[str] = mapped_column(String(16), nullable=False)
+    new_shift: Mapped[str] = mapped_column(String(16), nullable=False)
+
+
+class MailboxOAuthState(Base):
+    __tablename__ = 'mailbox_oauth_states'
+    state_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    actor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

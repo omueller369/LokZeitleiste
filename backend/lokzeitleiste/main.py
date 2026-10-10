@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.19")
+app = FastAPI(title="LokZeitleiste API", version="0.20")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -103,6 +103,8 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
                          target_hours_minutes=data.target_hours_minutes,
                          vacation_days=data.vacation_days, birth_date=data.birth_date, bahncard=data.bahncard,
                          email=str(data.email), federal_state=data.federal_state))
+        from .models import TfDutyProfile
+        db.add(TfDutyProfile(user_id=user.id,driver_type=data.driver_type))
         save_photo(db,user.id,image)
         db.commit()
         return {"id": user.id, "username": user.username}
@@ -113,11 +115,12 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
 
 @app.get("/api/v1/admin/tf")
 def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(database_session)):
+    from .planning.duties import driver_type
     rows = db.execute(select(User, TfProfile).join(TfProfile).where(User.role == "tf").order_by(TfProfile.last_name)).all()
     if permissions(db,viewer)["employees"] == 0:
-        return [{"id":u.id,"first_name":p.first_name,"last_name":p.last_name,"personnel_number":p.personnel_number} for u,p in rows]
+        return [{"id":u.id,"first_name":p.first_name,"last_name":p.last_name,"personnel_number":p.personnel_number,"driver_type":driver_type(db,u.id)} for u,p in rows]
     return [{"id": user.id, "username": user.username, "active": user.active,
-             "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,
+             "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,"driver_type":driver_type(db,user.id),
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
              "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None} for user, p in rows]
@@ -134,6 +137,11 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
         for field in ('last_name','first_name','personnel_number','target_hours_minutes','vacation_days','birth_date','bahncard','email','federal_state'):
             value=getattr(data,field)
             setattr(profile,field,value.strip() if isinstance(value,str) else value)
+        if data.driver_type is not None:
+            from .models import TfDutyProfile
+            role=db.get(TfDutyProfile,tf_id)
+            if not role:role=TfDutyProfile(user_id=tf_id);db.add(role)
+            role.driver_type=data.driver_type
         save_photo(db,tf_id,image)
         db.commit()
         return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
@@ -480,6 +488,8 @@ def backend_navigation_script():
 
 from .mailbox.api import create_router as mailbox_router
 app.include_router(mailbox_router(require_admin))
+from .mailbox.google import create_router as google_mail_router
+app.include_router(google_mail_router(require_admin,lambda:PUBLIC_ORIGIN))
 
 @app.get('/admin/email')
 def email_page():

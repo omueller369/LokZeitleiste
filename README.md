@@ -1,4 +1,4 @@
-# LokZeitleiste v0.19
+# LokZeitleiste v0.20
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -89,3 +89,17 @@ TF und Verwaltungsmitarbeiter werden in Tabellen mit Links für Ansicht und Bear
 E-Mail-Konten erhalten pro TF gespeicherte, änderbare Anbieter- und Servereinstellungen: Googlemail, Apple/iCloud, WEB.DE, Yahoo, Microsoft sowie manuelle IMAP-/SMTP-Server. Microsoft verwendet OAuth2 mit Gerätecode und Token-Erneuerung. Die Registrierung einer Microsoft-App und die private Konfiguration ihrer Client-ID sind erforderlich. Details: [Postfach-Einrichtung](backend/lokzeitleiste/mailbox/README.md).
 
 Bestehende globale Mailserverangaben bleiben für bisherige Konten gültig, bis eigene Serverangaben gespeichert werden. Neue Tabellen werden beim Start über das bestehende Datenbankschema-Setup angelegt; vorhandene Konten werden nicht gelöscht. Anbieter-Verbindungen und Microsoft-App-Freigaben wurden mit simulierten Antworten geprüft; echte Konten müssen auf dem Zielserver eingerichtet und getestet werden.
+
+## Erweiterungen v0.20 – Grenzdienst Polen
+
+TF werden beim Anlegen und Bearbeiten als Strecken-TF, Grenz-TF oder beides geführt. Die TF-Tabelle zeigt den Typ und kann danach gefiltert werden (Grenz-/Streckenfilter schließen „beides“ ein). Bestehende Konten gelten zunächst als Strecken-TF.
+
+Schichtmodellblöcke und Tagespläne unterscheiden Streckendienst (8 h), Grenzdienst Tag (09:00–21:00, 12 h) und Grenzdienst Nacht (21:00–09:00 am Folgetag, 12 h). Grenzschichten dürfen Grenz-TF und beiden Typen zugewiesen werden. Urlaub bleibt 8 h, Ruhe 0 h, Berliner gesetzliche Feiertage 0 h Soll. Die vollständige Nachtschicht wird im Plan dem Startdatum zugeordnet, auch bei Monats-/Jahreswechsel. Die Uhrzeiten sind lokale Planzeiten; das feste Plansoll beträgt auch bei Zeitumstellung 12 h. Tatsächliche Arbeitszeiterfassungen bleiben getrennt und werden nicht automatisch aus dem Plan erzeugt.
+
+Die Tages-, Monats- und Jahressummen sowie Dienstzeitübersicht, PDF und Excel verwenden die gespeicherte Schicht. Manuelle neue Arbeitstage ohne Schichtangabe erhalten für reine Grenz-TF die Tagschicht; für Strecken-TF und „beides“ Streckendienst. Schichtmodelle wählen den Dienst ausdrücklich. Bestehende Modelle bleiben Streckendienst. Vorhandene Tagespläne ändern sich durch die bloße Änderung des TF-Typs nicht rückwirkend. Schichtwechsel werden mit Revision und Vorher-/Nachher-Werten protokolliert.
+
+Excel: Die bisherigen vier Spalten bleiben gültig. Eine optionale fünfte Spalte `Schicht` verwendet `standard`, `border_day` oder `border_night`. Vorlagen exportieren diese Spalte, damit Grenzschichten beim erneuten Import erhalten bleiben. Ohne Schichtangabe bleiben bestehende Arbeitstag-Schichten erhalten; bei neuen Tagen gilt die obige Standardregel.
+
+Die Grenzdienst-Schichtfolge (Anzahl Tag-, Nacht- und Ruhetage) ist im Schichtmodell frei einzustellen; eine betriebliche Folge ist noch nicht vorgegeben. Pausen werden weiterhin in der tatsächlichen Zeiterfassung eingegeben; 12 h bezeichnet hier das Plansoll für den genannten Dienstzeitraum.
+
+Googlemail: Button „Mit Google verbinden“ mit OAuth2/API-Kontoanbindung, automatischer Adressübernahme und Token-Erneuerung. Auf dem Server müssen Google-Client-ID, Client-Secret und öffentliche HTTPS-Adresse einmalig eingerichtet sein. iCloud: Button mit vereinfachtem Dialog (Adresse + Apple-App-Passwort), automatische Serverwerte; keine öffentliche Apple-Mail-OAuth-API für diese eigene Anwendung integriert. Details und Einrichtung im [Postfach-Handbuch](backend/lokzeitleiste/mailbox/README.md).

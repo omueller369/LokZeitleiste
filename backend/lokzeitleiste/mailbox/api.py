@@ -84,10 +84,12 @@ def create_router(require_admin):
 
     @router.put('/config')
     def save_config(tf_id:int,data:ConfigInput,db:Session=Depends(database_session)):
-        target(db,tf_id);value=db.get(MailboxAccount,tf_id);row=db.get(MailboxSettings,tf_id)
+        target(db,tf_id)
+        db.scalar(select(User).where(User.id==tf_id).with_for_update())
+        value=db.get(MailboxAccount,tf_id);row=db.get(MailboxSettings,tf_id)
         old=settings(account(db,tf_id)) if value else None
         cfg=data.servers.model_dump() if data.servers else old
-        microsoft=bool(cfg and cfg['provider']=='microsoft')
+        microsoft=bool(cfg and (cfg['provider']=='microsoft' or (cfg['provider']=='google' and cfg.get('auth_method')=='oauth2')))
         changed=bool(value and (({k:v for k,v in (cfg or {}).items() if k!='sent_folder'}!={k:v for k,v in (old or {}).items() if k!='sent_folder'}) or data.username!=value.username or str(data.address)!=value.address))
         if not microsoft and not data.password and (not value or changed or (old and old['provider']=='microsoft')):
             raise HTTPException(422,'Bei geändertem Konto oder Server das Postfachpasswort erneut eingeben.')

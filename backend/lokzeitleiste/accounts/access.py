@@ -60,7 +60,7 @@ def authorize_route(db, user, request):
             demand(db,user,'planning',2 if path.endswith('/assign') else 1)
         return
     if path.startswith('/api/v1/admin/email/'):
-        return demand(db,user,'email',3 if (path.endswith('/config') and method=='PUT') or '/microsoft/' in path else 1 if method=='GET' else 2)
+        return demand(db,user,'email',3 if (path.endswith('/config') and method=='PUT') or '/microsoft/' in path or '/google/' in path else 1 if method=='GET' else 2)
     if path == '/api/v1/admin/tf' and method == 'POST':
         return demand(db,user,'employees',3)
     if re.fullmatch(r'/api/v1/admin/tf/\d+/hours/\d+',path) and method == 'GET':

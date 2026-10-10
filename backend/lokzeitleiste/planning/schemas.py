@@ -7,6 +7,7 @@ PlanKind = Literal["Arbeitstag", "Urlaub", "Ruhetag", "Ungeplant"]
 
 class DayInput(BaseModel):
     date: date
+    shift: Literal["standard","border_day","border_night"] | None = None
     kind: PlanKind
     note: str = Field(default="", max_length=500)
 

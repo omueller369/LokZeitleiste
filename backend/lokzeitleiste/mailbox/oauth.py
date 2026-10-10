@@ -56,6 +56,7 @@ def access_token(account):
     from sqlalchemy import select
     from ..models import MailboxSettings
     row=db.scalar(select(MailboxSettings).where(MailboxSettings.tf_user_id==account.tf_user_id).with_for_update().execution_options(populate_existing=True))
+    if not row or json.loads(row.config_json).get('provider')!='microsoft' or not row.tokens_encrypted:raise HTTPException(409,'Microsoft-Zugang erneut verbinden.')
     previous=unseal(row.tokens_encrypted)
     if previous['expires_at']>time.time()+60:
         db.commit();return previous['access_token']

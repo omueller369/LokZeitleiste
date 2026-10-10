@@ -3,6 +3,11 @@ const kinds = ['Arbeitstag', 'Urlaub', 'Ruhetag', 'Ungeplant'];
 const codes = {Arbeitstag: 'A', Urlaub: 'U', Ruhetag: 'R', Ungeplant: '?'};
 const planColors={Arbeitstag:'#dcebf9',Urlaub:'#dbf1e3',Ruhetag:'#ffe8cc'};
 function planColor(node,day){node.dataset.status=day.kind;node.style.backgroundImage=day.is_holiday&&planColors[day.kind]?'linear-gradient(135deg, #e9dff5 0%, #e9dff5 50%, '+planColors[day.kind]+' 50%, '+planColors[day.kind]+' 100%)':'';}
+const shiftLabels={standard:'Streckendienst',border_day:'Grenzdienst Tag',border_night:'Grenzdienst Nacht'};
+function dayCode(day){return day.kind==='Arbeitstag'&&day.shift==='border_day'?'GT':day.kind==='Arbeitstag'&&day.shift==='border_night'?'GN':codes[day.kind];}
+function dutyLabel(day){return day.kind==='Arbeitstag'&&day.shift!=='standard'?shiftLabels[day.shift]+' · '+(day.shift==='border_day'?'09:00–21:00':'21:00–09:00 Folgetag'):'';}
+function updateDuty(day){day.shift=day.kind==='Arbeitstag'?(day.shift||'standard'):'standard';day.planned_minutes=day.kind==='Arbeitstag'?(day.shift==='standard'?480:720):day.kind==='Urlaub'?480:0;day.target_minutes=day.is_holiday?0:day.planned_minutes;}
+function shiftOptions(select){select.replaceChildren();for(const [value,label]of Object.entries(shiftLabels)){const o=document.createElement('option');o.value=value;o.textContent=label;o.disabled=value!=='standard'&&annual?.driver_type==='route';select.append(o);}}
 function planLabel(day){return day.is_holiday?'Feiertag · '+day.holiday_name+(day.kind!=='Ungeplant'?' · '+day.kind:''):day.kind;}
 const names = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 let current = null, saved = null, annual = null, importData = null, dirty = false;
@@ -12,7 +17,7 @@ function scopeDays(){return view==='excel'?(importData?.days||[]):view==='year'?
 function selectedSet(){return view==='excel'?previewSelection:selection;}
 function selectionStatus(){el('selectionCount').textContent=selectedSet().size+' Tage gewählt';el('selectAll').checked=scopeDays().length>0&&scopeDays().every(d=>selectedSet().has(d.date));}
 function toggleDate(date){const set=selectedSet();set.has(date)?set.delete(date):set.add(date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();}
-function changedDays(){return annual.months.flatMap(m=>m.days).filter(d=>JSON.stringify([d.kind,d.note])!==originals.get(d.date));}
+function changedDays(){return annual.months.flatMap(m=>m.days).filter(d=>JSON.stringify([d.kind,d.note,d.shift||'standard'])!==originals.get(d.date));}
 function syncDraft(){dirty=changedDays().length>0;updateMetrics();renderYear();selectionStatus();}
 function renderPreview(){if(!importData)return;el('importDays').replaceChildren();for(const day of importData.days){const tr=document.createElement('tr');tr.dataset.kind=day.is_holiday?'Feiertag':day.kind;planColor(tr,day);const td=document.createElement('td'),check=document.createElement('input');check.type='checkbox';check.checked=previewSelection.has(day.date);check.setAttribute('aria-label',day.date+' auswählen');check.onchange=()=>toggleDate(day.date);td.append(check);tr.append(td);for(const v of [day.date,day.previous_kind,day.is_holiday?'Feiertag · '+day.holiday_name+' · 0:00 h (Plan: '+day.kind+')':day.kind,day.note]){const c=document.createElement('td');c.textContent=v;tr.append(c);}el('importDays').append(tr);}}
 let view = 'calendar', activeDay = null, loadTicket = 0, busy = false;
@@ -45,16 +50,17 @@ function updateMetrics() {
   const counts = Object.fromEntries(kinds.map(kind => [kind, current.days.filter(day => day.kind === kind&&!day.is_holiday).length]));
   el('metrics').replaceChildren();
   for (const [label, value] of [['Arbeitstage', counts.Arbeitstag], ['Urlaubstage', counts.Urlaub],
-      ['Ruhetage', counts.Ruhetag], ['Feiertage Berlin', current.days.filter(d=>d.is_holiday).length], ['Arbeitssoll', clock(counts.Arbeitstag * 480) + ' h'],
-      ['Soll inkl. Urlaub', clock((counts.Arbeitstag + counts.Urlaub) * 480) + ' h']]) {
+      ['Ruhetage', counts.Ruhetag], ['Feiertage Berlin', current.days.filter(d=>d.is_holiday).length], ['Arbeitssoll', clock(current.days.filter(d=>d.kind==='Arbeitstag').reduce((n,d)=>n+d.target_minutes,0)) + ' h'],
+      ['Soll inkl. Urlaub', clock(current.days.reduce((n,d)=>n+d.target_minutes,0)) + ' h']]) {
     const box = document.createElement('div'), strong = document.createElement('strong');
     strong.textContent = value; box.append(strong, document.createTextNode(label)); el('metrics').append(box);
   }
   el('status').textContent = (dirty ? 'Ungespeichert · ' : '') + (counts.Ungeplant ? counts.Ungeplant + ' Tage ungeplant' : 'Vollständig geplant');
 }
-function changeDay(day, kind, note) {
+function changeDay(day, kind, note,shift=null) {
+  day.shift=kind==='Arbeitstag'?(shift||(day.kind==='Arbeitstag'?day.shift:annual.driver_type==='border'?'border_day':'standard')):'standard';
   day.kind = kind; day.note = kind === 'Ungeplant' ? '' : note;
-  syncDraft(); renderCalendar(); clearPreview();
+  updateDuty(day);syncDraft(); renderCalendar(); clearPreview();
   message('Ungespeicherte Änderungen. PDFs zeigen den gespeicherten Stand.');
 }
 function renderCalendar() {
@@ -68,15 +74,15 @@ function renderCalendar() {
     const button = document.createElement('button'); button.className = 'day'; button.type = 'button'; button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
     const number = document.createElement('b'); number.textContent = Number(day.date.slice(-2));
     const label = document.createElement('span'); label.textContent = planLabel(day);
-    const hours = document.createElement('span'); hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00 h' : '8:00 h';
+    const hours = document.createElement('span'); hours.textContent = day.kind==='Ungeplant'&&!day.is_holiday?'Offen':clock(day.target_minutes)+' h';
     const note = document.createElement('small'); note.dataset.i18nIgnore='true'; note.textContent = day.note;
-    button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + (day.is_holiday?planLabel(day)+', 0 Sollstunden':day.kind) + ', bearbeiten');
+    const duty=document.createElement('small');duty.textContent=dutyLabel(day);button.append(number, label, hours,duty, note); button.setAttribute('aria-label', day.date + ', ' + (day.is_holiday?planLabel(day)+', 0 Sollstunden':day.kind) + ', bearbeiten');
     button.disabled = accessLevel < 2;
     button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
     button.onclick = () => {
       if(el('selectionMode').checked){toggleDate(day.date);return;}
       activeDay = day; el('dayTitle').textContent = 'Tag bearbeiten · ' + day.date;
-      el('dayKind').value = day.kind; el('dayNote').value = day.note;
+      shiftOptions(el('dayShift'));el('dayShift').value=day.shift||'standard';el('dayShift').disabled=day.kind!=='Arbeitstag';el('dayKind').value = day.kind; el('dayNote').value = day.note;
       el('dayNote').disabled = day.kind === 'Ungeplant'; el('dayDialog').showModal();
     };
     grid.append(button);
@@ -96,14 +102,15 @@ function renderDays() {
     for (const kind of kinds) { const option = document.createElement('option'); option.textContent = kind; select.append(option); }
     select.disabled = accessLevel < 2; check.disabled = accessLevel < 2;
     select.value = day.kind; cell = document.createElement('td'); cell.append(select);if(day.is_holiday){const badge=document.createElement('span');badge.textContent=planLabel(day);badge.className='holiday-label';cell.append(badge);}row.append(cell);
-    const hours = document.createElement('td'); hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00'; row.append(hours);
+    const duty=document.createElement('select');shiftOptions(duty);duty.value=day.shift||'standard';duty.disabled=accessLevel<2||day.kind!=='Arbeitstag';duty.setAttribute('aria-label','Schicht '+day.date);cell=document.createElement('td');cell.append(duty);row.append(cell);const hours = document.createElement('td'); hours.textContent=clock(day.target_minutes);row.append(hours);
     const note = document.createElement('input'); note.type = 'text'; note.maxLength = 500; note.value = day.note;
     note.disabled = accessLevel < 2 || day.kind === 'Ungeplant'; note.setAttribute('aria-label', 'Notiz ' + day.date);
     cell = document.createElement('td'); cell.append(note); row.append(cell);
     select.onchange = () => {
       changeDay(day, select.value, note.value); row.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(row,day);if(day.is_holiday)row.querySelector('.holiday-label').textContent=planLabel(day); note.value = day.note;
-      note.disabled = day.kind === 'Ungeplant'; hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00' : '8:00';
+      note.disabled = day.kind === 'Ungeplant';duty.disabled=day.kind!=='Arbeitstag';duty.value=day.shift;hours.textContent=clock(day.target_minutes);
     };
+    duty.onchange=()=>{changeDay(day,day.kind,note.value,duty.value);hours.textContent=clock(day.target_minutes);};
     note.oninput = () => changeDay(day, day.kind, note.value);
     body.append(row);
   }
@@ -118,7 +125,7 @@ function renderYear() {
   }
   table.append(head);
   for (const month of annual.months) {
-    for(const [field,kind] of [['work_days','Arbeitstag'],['vacation_days','Urlaub'],['rest_days','Ruhetag'],['unplanned_days','Ungeplant']])month[field]=month.days.filter(d=>d.kind===kind&&!d.is_holiday).length;month.holiday_days=month.days.filter(d=>d.is_holiday).length;month.work_target_minutes=month.work_days*480;month.target_minutes=(month.work_days+month.vacation_days)*480;
+    for(const [field,kind] of [['work_days','Arbeitstag'],['vacation_days','Urlaub'],['rest_days','Ruhetag'],['unplanned_days','Ungeplant']])month[field]=month.days.filter(d=>d.kind===kind&&!d.is_holiday).length;month.holiday_days=month.days.filter(d=>d.is_holiday).length;month.work_target_minutes=month.days.filter(d=>d.kind==='Arbeitstag').reduce((n,d)=>n+d.target_minutes,0);month.target_minutes=month.days.reduce((n,d)=>n+d.target_minutes,0);
     const row = document.createElement('tr');
     for (const value of [names[month.month - 1], month.work_days, month.vacation_days, month.rest_days,
         month.unplanned_days, clock(month.work_target_minutes) + ' h', clock(month.target_minutes) + ' h']) {
@@ -130,7 +137,7 @@ function renderYear() {
     for (let i = 0; i < 31; i++) {
       const td = document.createElement('td'), day = month.days[i];
       if (day) {
-        const button = document.createElement('button'); button.textContent = day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+codes[day.kind]:''):codes[day.kind]; button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
+        const button = document.createElement('button'); button.textContent = day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day); button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
         button.title = day.date + ' · ' + (day.is_holiday?planLabel(day)+' · 0:00 h':day.kind); button.setAttribute('aria-label', button.title);
         button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
         button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));
@@ -157,13 +164,13 @@ async function load(force = false) {
   const ticket = ++loadTicket, base = '/api/v1/admin/tf/' + tf + '/plan/' + year;
   const [data, yearData, history] = await Promise.all([api(base + '/' + month), api(base), api(base + '/history')]);
   if (ticket !== loadTicket) return false;
-  saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note])]));clearPreview();
+  saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note,d.shift||'standard'])]));clearPreview();shiftOptions(el('bulkShift'));el('bulkShift').value=annual.driver_type==='border'?'border_day':'standard';
   el('title').textContent = names[month - 1] + ' ' + year;
   updateMetrics(); renderDays(); renderCalendar(); renderYear(); switchView(view);
   el('monthPdf').href = base + '/' + month + '/pdf';if(el('viewerMonthPdf'))el('viewerMonthPdf').href=el('monthPdf').href; el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
   el('history').replaceChildren();
   for (const item of history) {
-    const line = document.createElement('p'); line.textContent = item.date + ': ' + item.previous_kind + ' → ' + item.new_kind +
+    const line = document.createElement('p'); line.textContent = item.date + ': ' + item.previous_kind+' · '+shiftLabels[item.previous_shift||'standard'] + ' → ' + item.new_kind+' · '+shiftLabels[item.new_shift||'standard'] +
       ' · ' + (item.source === 'excel' ? 'Excel-Import' : item.source === 'shift'?'Schichtmodell':'Manuell') + ' · Admin #' + item.admin_id + ' · ' + item.changed_at + ' UTC'; el('history').append(line);
   }
   if (!history.length) el('history').textContent = 'Noch keine Planänderungen.';
@@ -182,13 +189,13 @@ async function exclusive(fn) {
 el('load').onclick = handle(() => exclusive(async()=>{if(dirty&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;await load(true);}));
 for (const id of ['tf','year','month']) el(id).onchange = handle(() => exclusive(() => load()));
 document.querySelectorAll('[data-view]').forEach(button => button.onclick = () => switchView(button.dataset.view));
-el('dayKind').onchange = () => { el('dayNote').disabled = el('dayKind').value === 'Ungeplant'; if (el('dayNote').disabled) el('dayNote').value = ''; };
+el('dayKind').onchange = () => {el('dayShift').disabled=el('dayKind').value!=='Arbeitstag';if(el('dayKind').value==='Arbeitstag'&&activeDay.kind!=='Arbeitstag')el('dayShift').value=annual.driver_type==='border'?'border_day':'standard'; el('dayNote').disabled = el('dayKind').value === 'Ungeplant'; if (el('dayNote').disabled) el('dayNote').value = ''; };
 el('closeDay').onclick = () => el('dayDialog').close();
-el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay, el('dayKind').value, el('dayNote').value); renderDays(); el('dayDialog').close(); };
+el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay, el('dayKind').value, el('dayNote').value,el('dayShift').value); renderDays(); el('dayDialog').close(); };
 el('selectAll').onchange=()=>{for(const d of scopeDays())el('selectAll').checked?selectedSet().add(d.date):selectedSet().delete(d.date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
 el('clearSelection').onclick=()=>{selectedSet().clear();renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
-el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){d.kind=el('bulkKind').value;if(d.kind==='Ungeplant')d.note='';}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
-el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note})=>({date,kind,note})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');}));
+el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){d.kind=el('bulkKind').value;d.shift=d.kind==='Arbeitstag'?el('bulkShift').value:'standard';if(d.kind==='Ungeplant')d.note='';updateDuty(d);}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
+el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note,shift})=>({date,kind,note,shift})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');}));
 el('inspect').onclick = handle(() => exclusive(async () => {
   if (dirty) throw Error('Bitte Monatsänderungen zuerst speichern oder den Plan neu laden.');
   const file = el('excel').files[0]; if (!file) throw Error('Bitte eine XLSX-Datei auswählen.');
@@ -201,7 +208,7 @@ el('inspect').onclick = handle(() => exclusive(async () => {
 el('confirm').onclick = handle(() => exclusive(async () => {
   if (!importData) throw Error('Zuerst Import prüfen.'); if (dirty) throw Error('Ungespeicherte Monatsänderungen vorhanden.');
   const result = await api(prefix() + '/import', {method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({days: importData.days.map(({date,kind,note}) => ({date,kind,note})), expected_revisions: importData.expected_revisions})});
+    body: JSON.stringify({days: importData.days.map(({date,kind,note,shift}) => ({date,kind,note,shift})), expected_revisions: importData.expected_revisions})});
   await load(true); message(result.changed_days + ' Tagesplanungen aus Excel übernommen.');
 }));
 el('cancel').onclick = clearPreview;

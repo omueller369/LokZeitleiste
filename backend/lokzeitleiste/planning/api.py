@@ -5,12 +5,13 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from ..db import database_session
-from ..models import User, TfProfile, PlanChange
+from ..models import User, TfProfile, PlanChange, PlanDutyAudit
 from .schemas import MonthInput, ImportInput
 from .service import get_month, get_year, apply_days, RevisionConflict
 from .excel import parse_excel, template, MAX_FILE
 from .pdf import render_plan_pdf
 from .holidays import holiday_info
+from .duties import duty_info, resolve_shift
 
 
 def create_router(admin_dependency):
@@ -48,7 +49,8 @@ def create_router(admin_dependency):
         rows = db.scalars(select(PlanChange).where(PlanChange.tf_user_id == tf_id,
                           PlanChange.day >= date(year, 1, 1), PlanChange.day <= date(year, 12, 31))
                           .order_by(PlanChange.id.desc()).limit(100)).all()
-        return [{"date": r.day.isoformat(), "previous_kind": r.previous_kind, "new_kind": r.new_kind,
+        audits={a.change_id:a for a in db.scalars(select(PlanDutyAudit).where(PlanDutyAudit.change_id.in_([r.id for r in rows])))}
+        return [{"previous_shift":audits[r.id].previous_shift if r.id in audits else "standard","new_shift":audits[r.id].new_shift if r.id in audits else "standard","date": r.day.isoformat(), "previous_kind": r.previous_kind, "new_kind": r.new_kind,
                  "previous_note": r.previous_note, "new_note": r.new_note, "source": r.source,
                  "admin_id": r.admin_user_id, "changed_at": r.created_at.isoformat()} for r in rows]
 
@@ -76,8 +78,10 @@ def create_router(admin_dependency):
             updates = []
             for item in days:
                 old = cached[item.date.month]["days"][item.date.day - 1]
+                try:shift=resolve_shift(db,tf_id,item.kind,item.shift,old["shift"],old["kind"])
+                except ValueError as exc:raise HTTPException(422,str(exc)) from exc
                 updates.append({**item.model_dump(mode="json"), **holiday_info(item.date),
-                                "target_minutes":0 if holiday_info(item.date)["is_holiday"] or item.kind not in ("Arbeitstag","Urlaub") else 480, "previous_kind": old["kind"],
+                                **duty_info(item.date,item.kind,shift,holiday_info(item.date)["is_holiday"]),"previous_shift":old["shift"], "previous_kind": old["kind"],
                                 "previous_note": old["note"]})
             return {"days": updates, "expected_revisions": revisions,
                     "rule": "Nur enthaltene Datumszeilen werden geändert. Ungeplant entfernt eine Tagesplanung."}

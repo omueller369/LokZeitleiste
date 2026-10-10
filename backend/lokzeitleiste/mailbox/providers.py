@@ -17,6 +17,7 @@ PROVIDERS = {
 
 class ServerInput(BaseModel):
     provider: Literal['manual','google','apple','webde','yahoo','microsoft'] = 'manual'
+    auth_method: Literal["password","oauth2"] = "password"
     imap_host: str = Field(min_length=1,max_length=253)
     imap_port: int = Field(ge=1,le=65535)
     imap_security: Literal['ssl','starttls']
@@ -44,6 +45,7 @@ class ServerInput(BaseModel):
     def microsoft_servers(self):
         if self.provider=='microsoft' and (self.imap_host!='outlook.office365.com' or self.smtp_host not in ('smtp-mail.outlook.com','smtp.office365.com') or self.imap_port!=993 or self.imap_security!='ssl' or self.smtp_port!=587 or self.smtp_security!='starttls'):
             raise ValueError('Microsoft benötigt die vorgegebenen Server und OAuth2.')
+        if self.provider=='google' and self.auth_method=='oauth2' and (self.imap_host!='imap.gmail.com' or self.smtp_host!='smtp.gmail.com' or self.imap_port!=993 or self.imap_security!='ssl' or (self.smtp_port,self.smtp_security) not in ((587,'starttls'),(465,'ssl'))):raise ValueError('Google OAuth2 benötigt die vorgegebenen Google-Server.')
         return self
 
 

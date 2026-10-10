@@ -13,7 +13,7 @@ Nur ausdrücklich geplante Tage werden berücksichtigt:
 | Ruhetag | 0 | 0 |
 | Ungeplant | offen | noch unberechnet |
 
-Monatliches Arbeitssoll = Anzahl Arbeitstage × 8 Stunden. Soll inklusive Urlaub = Arbeitssoll + Anzahl Urlaubstage × 8 Stunden. Die Jahreswerte addieren die zwölf Monate, inklusive Schaltjahr. Wochenenden werden nicht automatisch zu Ruhetagen. Gesetzliche Berliner Feiertage werden automatisch mit 0 Sollstunden berücksichtigt. **Ungeplant** hebt eine vorhandene Tagesplanung samt Notiz auf; ausgelassene Datumszeilen bleiben unverändert.
+Monatliches Arbeitssoll = Summe der Tages-Sollzeiten: Streckendienst 8 Stunden, Grenzdienst Tag/Nacht 12 Stunden; Feiertage bleiben 0. Soll inklusive Urlaub = Arbeitssoll + Anzahl Urlaubstage × 8 Stunden. Die Jahreswerte addieren die zwölf Monate, inklusive Schaltjahr. Wochenenden werden nicht automatisch zu Ruhetagen. Gesetzliche Berliner Feiertage werden automatisch mit 0 Sollstunden berücksichtigt. **Ungeplant** hebt eine vorhandene Tagesplanung samt Notiz auf; ausgelassene Datumszeilen bleiben unverändert.
 
 Die tatsächliche Monatsabrechnung aus App-Einträgen erhält `planning`, `target_minutes` und `balance_minutes`. Der Saldo wird nur bei vollständig geplantem Monat berechnet: tatsächlich gutgeschriebene Minuten minus Plansoll inklusive Urlaub. Solange Tage ungeplant sind, bleibt der Saldo leer. Der allgemeine Sollstundenwert in den Tf-Stammdaten wird nicht überschrieben. Die Monatssollberechnung nutzt den datumsbezogenen Plan.
 
@@ -28,6 +28,7 @@ Die Verwaltung exportiert eine aktuelle XLSX-Vorlage für das gewählte Jahr und
 - Spalte B `Art`: `Arbeitstag`, `Urlaub`, `Ruhetag` oder `Ungeplant`.
 - Optional Spalte C `Notiz`: höchstens 500 Zeichen.
 - Optional Spalte D `Personalnummer`: als Text, passend zum ausgewählten Tf. Führende Nullen erhalten.
+- Optional Spalte E `Schicht`: `standard`, `border_day` oder `border_night`.
 
 Vor dem Import zeigt die Oberfläche Datum, bisherige und neue Tagesart sowie die neue Notiz. Erst **Import übernehmen** speichert die Änderungen. Es werden nur die enthaltenen Datumszeilen geändert; „Ungeplant“ entfernt die Planung dieses Tages. Doppelte Daten, fremde Personalnummern, falsches Jahr, ungültige Tagesarten, Formeln, Makros und übergroße Dateien werden abgelehnt. Maximal 2 MB Datei, 20 MB entpackt und 366 Tageszeilen. Alte `.xls`-Dateien bitte zuerst als `.xlsx` speichern. Abweichende bestehende Excel-Layouts müssen in dieses Format gebracht werden.
 
@@ -81,7 +82,7 @@ Die Excel-Vorschau hat eine eigene Mehrfachauswahl. Sammeländerungen ändern zu
 
 ## Berliner Feiertagskalender ab v0.14
 
-Für alle Tf-Pläne gilt der gesetzliche Feiertagskalender Berlin (BE), unabhängig vom Bundesland der Tf-Stammdaten. Das bestehende Bundesland bleibt für die Ist-Arbeitszeit-/Feiertagsberechnung erhalten. Feiertage erhalten Namen, eigene Farbe und Kennzeichen F in Kalender, Tagesliste, Jahresmatrix, Importvorschau und PDF. Excel markiert Feiertage violett, nennt Namen und 0 Sollstunden im Datumskommentar und führt sie zusätzlich im Blatt „Feiertage Berlin“ auf. Das importierbare Blatt „Plan“ behält seine vier Spalten.
+Für alle Tf-Pläne gilt der gesetzliche Feiertagskalender Berlin (BE), unabhängig vom Bundesland der Tf-Stammdaten. Das bestehende Bundesland bleibt für die Ist-Arbeitszeit-/Feiertagsberechnung erhalten. Feiertage erhalten Namen, eigene Farbe und Kennzeichen F in Kalender, Tagesliste, Jahresmatrix, Importvorschau und PDF. Excel markiert Feiertage violett, nennt Namen und 0 Sollstunden im Datumskommentar und führt sie zusätzlich im Blatt „Feiertage Berlin“ auf. Das importierbare Blatt „Plan“ behält die bisherigen vier Spalten und ergänzt optional eine fünfte Spalte `Schicht`.
 
 An gesetzlichen Berliner Feiertagen ist das Plansoll immer 0 Minuten. Dies gilt auch bei gespeicherter oder neu importierter Tagesart Arbeitstag/Urlaub. Bestehende Tagesarten und Notizen bleiben als Planangaben erhalten; für erforderliche Arbeitstage, Urlaubs-Sollgutschrift, Ruhetage und offene Tage werden Feiertage separat gezählt. Ein ungeplanter Feiertag verhindert keinen vollständigen Plan. Mehrfachauswahl und manuelle Änderungen können die Feiertagsregel nicht aufheben. Tatsächlich geleistete/erfasste Zeiten bleiben unverändert.
 

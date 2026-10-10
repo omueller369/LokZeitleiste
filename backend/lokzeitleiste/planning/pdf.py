@@ -57,7 +57,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
         if hasattr(style, "fontName"):
             style.fontName = "PlanSans-Bold" if style.fontName == "Helvetica-Bold" else "PlanSans"
     styles.add(ParagraphStyle("PlanHeader", fontName="PlanSans-Bold", fontSize=8, leading=11, textColor=colors.white))
-    styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=9, leading=13, textColor=DARK))
+    styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=8, leading=10, textColor=DARK))
     title = f"Jahresplan {plan['year']}" if yearly else f"Monatsplan {MONTHS[plan['month']]} {plan['year']}"
     story = [Paragraph("LokZeitleiste · " + title, styles["Title"]),
              Paragraph(f"Tf {escape(name)} · Personalnummer {escape(personnel_number)}", styles["Normal"]), Spacer(1, 12)]
@@ -92,7 +92,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 if column <= len(month["days"]):
                     item=month["days"][column-1]
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                    cells.append(CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else ""))
+                    cells.append(("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else ""))
                     if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=item["kind"]
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[kind])))
                 else:
@@ -124,8 +124,9 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                 if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(col,row)]=item["kind"]
                 status=CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
-                hours = "8:00 h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
-                cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}", styles["PlanCell"]))
+                hours = clock(item["target_minutes"])+" h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
+                duty=("<br/>GT 09:00-21:00" if item.get("shift")=="border_day" else "<br/>GN 21:00-09:00 +1" if item.get("shift")=="border_night" else "")
+                cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}{duty}", styles["PlanCell"]))
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
             rows.append(cells)
         rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
@@ -137,6 +138,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
         story.append(table)
     story += [Spacer(1, 12), Paragraph("Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. "
               "Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.", styles["Normal"])]
+    story += [Paragraph("GT = Grenzdienst Tag 09:00-21:00; GN = Grenzdienst Nacht 21:00-09:00 am Folgetag. Grenzdienst = 12 h Plansoll, Streckendienst = 8 h. Die Nachtschicht zählt zum Startdatum.",styles["Normal"])]
     story += [Spacer(1,8), Paragraph(f"Feiertage Berlin: {sums['holiday_days']} Tage mit 0 h Soll.",styles["Normal"])]
     if not yearly:
         for item in plan["days"]:

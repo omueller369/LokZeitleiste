@@ -7,3 +7,5 @@ Zur Zuweisung Tf, Zeitraum (beide Grenztage inklusive) und Zyklusbeginn auswähl
 Die Zuweisung darf bis zu fünf Jahre umfassen und über Monats-/Jahresgrenzen laufen. Berliner Feiertage bleiben mit 0 Sollstunden markiert, unabhängig vom Modellstatus. Die erzeugten Tage sind anschließend im normalen Jahres-/Monatsplan editierbar. Modell und Zeitraum werden als Snapshot in `shift_assignments` protokolliert; der Tagesverlauf trägt die Quelle `shift`.
 
 Neue Rechte: `shifts` lesen zeigt Modelle und Zuweisungen; schreiben erlaubt Modellpflege. Vorschau benötigt zusätzlich Planung lesen, Übernahme zusätzlich Planung schreiben. Neue Tabellen: `shift_models`, `shift_assignments`; die API legt sie beim Start an. Gleichzeitige Änderungen werden über Modell- und Monatsrevisionen abgefangen.
+
+Grenzdienstblöcke ergänzen die Tagesart um `shift`: `standard` (8 h Streckendienst), `border_day` (09:00–21:00, 12 h), `border_night` (21:00–09:00 Folgetag, 12 h). Ruhetage haben immer 0 h. Grenzschichten erfordern TF-Typ `border` oder `both`. Die Schicht wird dem Startdatum zugeordnet und in Revision/Audit gespeichert. Alte Modelle ohne `shift` bleiben `standard`.

@@ -17,6 +17,7 @@ class Credentials(BaseModel):
 
 
 class TfCreate(Credentials):
+    driver_type: Literal["route","border","both"] = "route"
     password: str = Field(min_length=12)
     photo_base64: str | None = Field(default=None,max_length=6990510)
     last_name: str = Field(min_length=1, max_length=120)
@@ -96,6 +97,7 @@ class EntryBatch(BaseModel):
 
 
 class TfProfileUpdate(BaseModel):
+    driver_type: Literal["route","border","both"] | None = None
     last_name: str = Field(min_length=1,max_length=120)
     first_name: str = Field(min_length=1,max_length=120)
     personnel_number: str = Field(min_length=1,max_length=40)
