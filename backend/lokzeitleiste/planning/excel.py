@@ -8,6 +8,7 @@ from openpyxl.comments import Comment
 from openpyxl.styles import Font, PatternFill, GradientFill
 from openpyxl.worksheet.datavalidation import DataValidation
 from .schemas import DayInput
+from ..i18n import translate, request_language
 
 MAX_FILE = 2 * 1024 * 1024
 MAX_UNPACKED = 20 * 1024 * 1024
@@ -85,6 +86,17 @@ def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[Day
 
 def template(year_plan: dict, personnel_number: str) -> bytes:
     book = Workbook()
+    view = book.create_sheet(translate('Stundenansicht'))
+    view.sheet_view.rightToLeft = request_language.get() == 'ar'
+    view.append([translate(v) for v in ('Datum','Tagesart','Plansoll','Feiertag','Notiz')])
+    for month in year_plan['months']:
+        for item in month['days']:
+            view.append([date.fromisoformat(item['date']),translate(item['kind']),item['target_minutes']/60,
+                         translate(item['holiday_name']) if item.get('is_holiday') else '',item['note']])
+            for cell in view[view.max_row]:
+                if isinstance(cell.value,str):cell.data_type='s'
+    for column in 'ABCDE':view.column_dimensions[column].width=25
+    view.freeze_panes='A2'
     sheet = book.active
     sheet.title = "Plan"
     sheet.append(["Datum", "Art", "Notiz", "Personalnummer"])

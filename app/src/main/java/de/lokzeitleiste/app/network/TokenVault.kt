@@ -30,6 +30,7 @@ object TokenVault {
         val bytes = cipher.iv + cipher.doFinal(token.toByteArray(Charsets.UTF_8))
         prefs(context).edit().putString("username", username)
             .putString("sealed_token", Base64.encodeToString(bytes, Base64.NO_WRAP)).apply()
+        de.lokzeitleiste.app.LanguageRuntime.accountVersion++
     }
     fun token(context: Context): String? {
         val raw = prefs(context).getString("sealed_token", null) ?: return null
@@ -42,5 +43,5 @@ object TokenVault {
     }
     fun username(context: Context): String =
         if (token(context) != null) prefs(context).getString("username", "") ?: "" else ""
-    fun clear(context: Context) { prefs(context).edit().clear().apply() }
+    fun clear(context: Context) { prefs(context).edit().clear().apply(); de.lokzeitleiste.app.LanguageRuntime.accountVersion++ }
 }

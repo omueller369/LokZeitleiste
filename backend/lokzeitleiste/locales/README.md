@@ -1,0 +1,13 @@
+# Mehrsprachigkeit
+
+Sprachen: Deutsch (`de`, Standard), Englisch (`en`), Polnisch (`pl`), Russisch (`ru`), Türkisch (`tr`), Arabisch (`ar`), Spanisch (`es`). Die Flaggen-Sprachwahl steht im Kopf aller Webansichten und in der Android-App. Web und Android speichern die Auswahl pro Konto über `GET/PUT /api/v1/account/locale`; ohne Anmeldung wird sie auf dem Gerät gespeichert. Auch vor dem verpflichtenden Erstpasswortwechsel ist die Sprachwahl möglich. Nach dem Login wird die vorhandene Kontosprache geladen.
+
+`translations.tsv` enthält die redaktionell angefertigten Übersetzungen; eine Zeile pro deutschem Quelltext und sieben Spalten. `python tools/build-translations.py` validiert vollständige, eindeutige Einträge und erzeugt `catalog.json` für Backend/Web sowie `app/src/main/assets/catalog.json`. Bei Erweiterungen beide erzeugten Dateien committen. Die Übersetzungen sind lokal verfügbar; es wird kein externer Übersetzungsdienst verwendet.
+
+Web: `i18n.js` übersetzt statische und nachgeladene Beschriftungen, Meldungen, Tooltips, Kalendernamen und Menüs. Formularwerte bleiben unverändert; deutsche Tagesarten und der XLSX-Importvertrag bleiben intern stabil. Nutzerdaten, Postfachinhalte und Planungsnotizen werden nicht automatisch übersetzt. `data-i18n-ignore` schützt weitere frei eingegebene Texte. Neue ganze Sätze in den Katalog aufnehmen; dynamische Zahlen/Datumswerte bleiben erhalten. Browser-/Betriebssystemdialoge gehören zur jeweiligen Plattform.
+
+Die Sprache wird als `Accept-Language` an die API gesendet. PDF-Downloadlinks erhalten zusätzlich `lang`. API-Domainfehler und Validierungshinweise werden lokalisiert; Validierungsantworten geben sensible Eingaben nicht zurück. Plan-PDFs verwenden die gewählte Sprache. Eingangsbestätigungs-PDFs und Benachrichtigungen verwenden die Kontosprache des Tf. Der XLSX-Export enthält neben dem stabilen Blatt `Plan` eine übersetzte Ansicht; dieses zusätzliche Blatt ist nicht der Importvertrag.
+
+Arabisch: Web und Compose wechseln auf rechts-nach-links. PDFs nutzen DejaVu Sans, arabic-reshaper und python-bidi für verbundene Schrift und Leserichtung. Das Dockerimage installiert `fonts-dejavu-core`. Bei direktem Python-Betrieb ohne diese Fonts `LOKZEITLEISTE_FONT_DIR` auf das DejaVu-Verzeichnis setzen; die ReportLab-Fallbackfonts sind für nichtlateinische Schrift ungeeignet.
+
+Android 0.10 bietet die Sprachwahl auf allen Bildschirmen, lokalisierte Labels und Monatsnamen sowie API-Synchronisierung. Die Auswahl ändert keine gespeicherten Erfassungsarten. Android-Build und Gerätetest müssen in einer Umgebung mit SDK erfolgen; sie sind hier nicht durchgeführt. Übersetzungen sollten bei fachlichen Änderungen zusätzlich von Muttersprachlern geprüft werden.

@@ -1,4 +1,4 @@
-# LokZeitleiste v0.16
+# LokZeitleiste v0.18
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -50,10 +50,34 @@ Die Planung unterstützt Mehrfachauswahl in Kalender, Tagesliste, Jahresmatrix u
 
 Die Arbeitszeitplanung verwendet jetzt automatisch die gesetzlichen Berliner Feiertage. Diese werden mit Namen und eigener Farbe angezeigt und haben immer 0 Sollstunden, auch bei eingetragenem Arbeitstag oder Urlaub. Dies gilt für Webansichten, Monatssaldo, PDF und Excel.
 
-## Erweiterungen v0.16
+## Erweiterungen v0.18
 
 Feiertage mit geplanter Arbeit, Urlaub oder Ruhe zeigen Feiertagsfarbe und Statusfarbe diagonal in Webansichten, PDF und Excel. Das Feiertags-Soll bleibt 0 h. Fotos können direkt beim Anlegen und Bearbeiten von Tf und Verwaltungsmitarbeitern ausgewählt und mit dem Profil gespeichert werden. Tf-Stammdaten besitzen jetzt einen vollständigen Bearbeitungsdialog.
 
-Die Zeiterfassung und Zeitkorrektur haben ein eigenes Enddatum. Neue Erfassungen beginnen mit gleichem Beginn-/Enddatum; für Schichten über Mitternacht einen späteren Tag wählen. Tages-, Wochen- und Monatswerte berücksichtigen den tatsächlichen Zeitraum. Android 0.9 ergänzt Enddatumsauswahl, Speicherung und monatsbezogene Aufteilung. Ein Android-Build und Tests auf echten Geräten stehen noch aus.
+Die Zeiterfassung und Zeitkorrektur haben ein eigenes Enddatum. Neue Erfassungen beginnen mit gleichem Beginn-/Enddatum; für Schichten über Mitternacht einen späteren Tag wählen. Tages-, Wochen- und Monatswerte berücksichtigen den tatsächlichen Zeitraum. Android 0.10 ergänzt Enddatumsauswahl, Speicherung und monatsbezogene Aufteilung. Ein Android-Build und Tests auf echten Geräten stehen noch aus.
 
 Tf-Stundenübersicht: In der Tf-Liste „Stundenübersicht“ wählen. Tagesdetails, Monatskalender und Jahreskalender vergleichen geleistete Arbeitszeit (inklusive Gastfahrt, ohne Pausen) mit dem Plansoll. Die separate Gutschrift enthält Auffüllung, Urlaub und Krankheit. Farben und diagonale Berliner Feiertagsmarkierungen entsprechen der Arbeitszeitplanung. Offene Planung wird als vorläufig markiert und erhält keinen abschließenden Saldo. Lesefreigaben für Planung und zusätzlich Arbeitszeit oder Berichte sind erforderlich. API: `GET /api/v1/admin/tf/{tf_id}/hours/{year}`. Keine Datenbankmigration erforderlich.
+
+## Backend-Menü ab Version 0.18
+
+1. Administration (Gruppentitel ohne Modulaufruf)
+   - 1.1 Verwaltung: gemeinsame Übersicht aller VM und Tf mit Suche und Filter
+   - 1.2 VM (Verwaltungsmitarbeiter) anlegen
+   - 1.3 TF (Triebfahrzeugführer) anlegen
+2. Personalplanung
+   - 2.1 Personalplanung TF Übersicht
+   - 2.2 Schichtplan: Modelle und Zeitraumzuweisung
+3. Triebfahrzeugführer
+   - 3.1 Dienstplan: Monatsansicht der Planung ohne Bearbeitung
+   - 3.2 Dienstzeit: Stundenübersicht mit Monatswahl sowie Tag/Jahr
+   - 3.3 Email: Tf-Postfächer
+4. Sonstiges (Platzhalter ohne Funktion)
+5. Abmelden
+
+Das Menü erscheint auf allen Backend-Modulseiten und berücksichtigt die Freigaben. Bestehende Stammdaten-, Passwort- und Arbeitszeitkorrekturansichten bleiben als ergänzende Links verfügbar. Neue Checkboxmodule sind „Verwaltung: alle Mitarbeiter“, „Schichtmodelle und Zuweisungen“ und „Tf-E-Mail-Postfächer“. Administratoren erhalten alle Rechte; bestehende Verwaltungsmitarbeiter müssen für neue Module ausdrücklich freigeschaltet werden.
+
+[Schichtmodelle und Zuweisungen](backend/lokzeitleiste/planning/SHIFTS.md) · [Postfach-Einrichtung](backend/lokzeitleiste/mailbox/README.md) · [Mehrsprachigkeit](backend/lokzeitleiste/locales/README.md)
+
+Alle Webansichten und die Android-App unterstützen die Flaggenauswahl für Deutsch (Standard), Englisch, Polnisch, Russisch, Türkisch, Arabisch und Spanisch. Ausgaben und Meldungen verwenden den gemeinsamen Übersetzungskatalog; Arabisch wird rechts-nach-links angezeigt. Android-Version 0.10 neu bauen/installieren.
+
+Update im Branch `setup/debian-testumgebung`: `git pull --ff-only`, anschließend `sudo bash setup.sh`. Die neuen Tabellen für Modelle, Zuweisungen, Postfächer, Entwürfe und Kontosprachen werden automatisch angelegt; bestehende Spalten bleiben erhalten. Für E-Mail-Postfächer die privaten `MAILBOX_*`-Werte ergänzen. Die reale IMAP-/SMTP-Verbindung, MySQL-Integration und der Android-Build müssen auf der Zielumgebung geprüft werden.

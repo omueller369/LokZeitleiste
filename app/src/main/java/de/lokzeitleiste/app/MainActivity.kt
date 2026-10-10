@@ -26,7 +26,7 @@ private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MaterialTheme { App() } }
+        setContent { MaterialTheme { LanguageShell { App() } } }
     }
 }
 
@@ -44,8 +44,8 @@ private fun App() {
         onCancel = { passwordScreen = false })
     else if (trainScreen) Column {
         FlowRow(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = { trainScreen = false }) { Text("← Monatsübersicht") }
-            Text("Zugfahrten · $user", modifier = Modifier.padding(10.dp))
+            Button(onClick = { trainScreen = false }) { LocalizedText("← Monatsübersicht") }
+            LocalizedText("Zugfahrten · $user", modifier = Modifier.padding(10.dp))
         }
         Box(Modifier.weight(1f)) { LokZeitApp(user) }
     } else MonthScreen(user, onTrain = { trainScreen = true }, onPassword = { passwordScreen = true }, onLogout = {
@@ -96,8 +96,8 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(24.dp)) {
             FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("LokZeitleiste", style = MaterialTheme.typography.headlineMedium)
-                OutlinedButton(onClick = onTrain) { Text("Zugfahrt · LokZeit") }
+                LocalizedText("LokZeitleiste", style = MaterialTheme.typography.headlineMedium)
+                OutlinedButton(onClick = onTrain) { LocalizedText("Zugfahrt · LokZeit") }
                 Button(enabled = !sending, onClick = {
                     val token = TokenVault.token(context)
                     if (token == null) { onLogout(); return@Button }
@@ -113,52 +113,52 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                             if (sendMessage.startsWith("Anmeldung abgelaufen")) onLogout()
                         } finally { sending = false }
                     }
-                }) { Text(if (sending) "Sende …" else "Monat senden") }
-                TextButton(onClick = onLogout) { Text("Abmelden · $username") }
-                TextButton(onClick = onPassword) { Text("Passwort ändern") }
+                }) { LocalizedText(if (sending) "Sende …" else "Monat senden") }
+                TextButton(onClick = onLogout) { LocalizedText("Abmelden · $username") }
+                TextButton(onClick = onPassword) { LocalizedText("Passwort ändern") }
             }
-            if (sendMessage.isNotBlank()) Text(sendMessage, style = MaterialTheme.typography.bodySmall)
+            if (sendMessage.isNotBlank()) LocalizedText(sendMessage, style = MaterialTheme.typography.bodySmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { month = month.minusMonths(1) }) { Text("‹") }
-                Text(month.month.getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.GERMAN) + " " + month.year,
+                OutlinedButton(onClick = { month = month.minusMonths(1) }) { LocalizedText("‹") }
+                LocalizedText(month.month.getDisplayName(java.time.format.TextStyle.FULL, LanguageRuntime.locale()) + " " + month.year,
                     style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(10.dp))
-                OutlinedButton(onClick = { month = month.plusMonths(1) }) { Text("›") }
+                OutlinedButton(onClick = { month = month.plusMonths(1) }) { LocalizedText("›") }
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Card(Modifier.widthIn(max = 310.dp).fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
-                    Text("Neue Erfassung", style = MaterialTheme.typography.titleLarge)
+                    LocalizedText("Neue Erfassung", style = MaterialTheme.typography.titleLarge)
                     Box {
-                        OutlinedButton(onClick = { expanded = true }) { Text(kind + " ▾") }
+                        OutlinedButton(onClick = { expanded = true }) { LocalizedText(kind + " ▾") }
                         DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
-                            kinds.forEach { option -> DropdownMenuItem(text = { Text(option) }, onClick = { kind = option; expanded = false }) }
+                            kinds.forEach { option -> DropdownMenuItem(text = { LocalizedText(option) }, onClick = { kind = option; expanded = false }) }
                         }
                     }
-                    OutlinedTextField(date, { if (endDate == date) endDate = it; date = it }, label = { Text("Datum (JJJJ-MM-TT)") })
-                    OutlinedTextField(start, { start = it }, label = { Text("Beginn (HH:MM)") })
-                    OutlinedTextField(endDate, {}, readOnly = true, label = { Text("Datum Arbeitsende") }, trailingIcon = {
+                    OutlinedTextField(date, { if (endDate == date) endDate = it; date = it }, label = { LocalizedText("Datum (JJJJ-MM-TT)") })
+                    OutlinedTextField(start, { start = it }, label = { LocalizedText("Beginn (HH:MM)") })
+                    OutlinedTextField(endDate, {}, readOnly = true, label = { LocalizedText("Datum Arbeitsende") }, trailingIcon = {
                         TextButton(onClick = {
                             val chosen = runCatching { LocalDate.parse(endDate) }.getOrDefault(LocalDate.now())
                             val picker = DatePickerDialog(context, { _, y, m, d -> endDate = LocalDate.of(y, m + 1, d).toString() }, chosen.year, chosen.monthValue - 1, chosen.dayOfMonth)
                             runCatching { LocalDate.parse(date).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli() }.getOrNull()?.let { picker.datePicker.minDate = it }
                             picker.show()
-                        }) { Text("Datum") }
+                        }) { LocalizedText("Datum") }
                     })
-                    OutlinedTextField(end, { end = it }, label = { Text("Ende (HH:MM)") })
+                    OutlinedTextField(end, { end = it }, label = { LocalizedText("Ende (HH:MM)") })
                     if (kind == "Rufbereitschaft" || kind == "Bereitschaft") {
-                        Text(if (kind == "Rufbereitschaft")
+                        LocalizedText(if (kind == "Rufbereitschaft")
                             "Tarifgrenze: nur 08:00–20:00 Uhr, höchstens 8 Stunden."
                             else "Zeiten laut Personalplanung; vorläufig höchstens 8 Stunden, auch über Mitternacht.",
                             style = MaterialTheme.typography.bodySmall)
                         Row { Switch(checked = away, onCheckedChange = { away = it })
-                            Text("Auswärts verbracht", modifier = Modifier.padding(12.dp)) }
+                            LocalizedText("Auswärts verbracht", modifier = Modifier.padding(12.dp)) }
                         if (away) {
                             Box {
                                 OutlinedButton(onClick = { accommodationExpanded = true }) {
-                                    Text((accommodation.ifBlank { "Unterkunft wählen" }) + " ▾")
+                                    LocalizedText((accommodation.ifBlank { "Unterkunft wählen" }) + " ▾")
                                 }
                                 DropdownMenu(accommodationExpanded, onDismissRequest = { accommodationExpanded = false }) {
                                     listOf("Dienstwohnung", "Hotel").forEach { option ->
-                                        DropdownMenuItem(text = { Text(option) }, onClick = {
+                                        DropdownMenuItem(text = { LocalizedText(option) }, onClick = {
                                             accommodation = option; accommodationExpanded = false
                                             if (option != "Hotel") hotelName = ""
                                         })
@@ -166,16 +166,16 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                                 }
                             }
                             if (accommodation == "Hotel") OutlinedTextField(hotelName, { hotelName = it },
-                                label = { Text("Name des Hotels") })
+                                label = { LocalizedText("Name des Hotels") })
                         }
-                        Text("Ausbleibe wird später berechnet: voller Kalendertag oder sonstiger Zeitraum.",
+                        LocalizedText("Ausbleibe wird später berechnet: voller Kalendertag oder sonstiger Zeitraum.",
                             style = MaterialTheme.typography.bodySmall)
                     } else {
-                        OutlinedTextField(pause, { pause = it }, label = { Text("Pause (Minuten)") })
-                        OutlinedTextField(guest, { guest = it }, label = { Text("Gastfahrt (Minuten)") })
-                        OutlinedTextField(note, { note = it }, label = { Text("Notiz") })
+                        OutlinedTextField(pause, { pause = it }, label = { LocalizedText("Pause (Minuten)") })
+                        OutlinedTextField(guest, { guest = it }, label = { LocalizedText("Gastfahrt (Minuten)") })
+                        OutlinedTextField(note, { note = it }, label = { LocalizedText("Notiz") })
                     }
-                    if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+                    if (error.isNotBlank()) LocalizedText(error, color = MaterialTheme.colorScheme.error)
                     Button(onClick = {
                         val isStandby = kind == "Rufbereitschaft" || kind == "Bereitschaft"
                         val p = if (isStandby) 0 else pause.toIntOrNull()
@@ -207,33 +207,33 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                             month = YearMonth.from(LocalDate.parse(candidate.date))
                             note = ""; away = false; accommodation = ""; hotelName = ""
                         }
-                    }) { Text("Eintrag speichern") }
+                    }) { LocalizedText("Eintrag speichern") }
                 } }
                 Card(Modifier.widthIn(max = 900.dp).fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
-                    Text("Erfassungen · ${selected.size}", style = MaterialTheme.typography.titleLarge)
+                    LocalizedText("Erfassungen · ${selected.size}", style = MaterialTheme.typography.titleLarge)
                     val scroll = rememberScrollState()
                     Column(Modifier.horizontalScroll(scroll)) {
                         Row { listOf("Datum", "Art / Unterkunft", "Zeitraum", "Pause", "Gastfahrt", "Dauer", "").forEach {
-                            Text(it, Modifier.width(if (it == "Art / Unterkunft") 220.dp else 105.dp), style = MaterialTheme.typography.labelMedium)
+                            LocalizedText(it, Modifier.width(if (it == "Art / Unterkunft") 220.dp else 105.dp), style = MaterialTheme.typography.labelMedium)
                         } }
                         HorizontalDivider()
                         selected.forEach { entry ->
                             Row {
-                                Text(runCatching { LocalDate.parse(entry.date).format(dateFormat) }.getOrDefault(entry.date), Modifier.width(105.dp))
-                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft") && entry.away)
+                                LocalizedText(runCatching { LocalDate.parse(entry.date).format(dateFormat) }.getOrDefault(entry.date), Modifier.width(105.dp))
+                                LocalizedText(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft") && entry.away)
                                     entry.kind + " · " + entry.accommodation +
                                         (if (entry.hotelName.isBlank()) "" else " · " + entry.hotelName)
                                     else entry.kind, Modifier.width(220.dp))
-                                Text(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${endAt(entry).toLocalDate()} ${entry.end}", Modifier.width(105.dp))
-                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.pause} min", Modifier.width(105.dp))
-                                Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.guest} min", Modifier.width(105.dp))
-                                Text(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
+                                LocalizedText(if (entry.kind == "Urlaub") "Ganzer Tag" else "${entry.start}–${endAt(entry).toLocalDate()} ${entry.end}", Modifier.width(105.dp))
+                                LocalizedText(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.pause} min", Modifier.width(105.dp))
+                                LocalizedText(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.guest} min", Modifier.width(105.dp))
+                                LocalizedText(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
                                 if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft"))
                                     TextButton(onClick = {
                                         transitionEntry = entry; transitionDate = entry.date
                                         transitionTime = entry.start; transitionError = ""
-                                    }) { Text("→ Zugfahrt") }
-                                TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; saveEntries(context, username, entries) }) { Text("Löschen") }
+                                    }) { LocalizedText("→ Zugfahrt") }
+                                TextButton(onClick = { entries = entries.toMutableList().also { it.remove(entry) }; saveEntries(context, username, entries) }) { LocalizedText("Löschen") }
                             }
                             HorizontalDivider()
                         }
@@ -246,20 +246,20 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                 listOf("Arbeitszeit" to displayTime(work), "Gastfahrt" to displayTime(guests),
                     "Urlaub" to "$holidays Tage", "Nachtstunden*" to displayTime(night),
                     "Sonntagsstunden*" to displayTime(sunday)).forEach { (label, value) ->
-                    Column { Text(value, style = MaterialTheme.typography.titleLarge); Text(label) }
+                    Column { LocalizedText(value, style = MaterialTheme.typography.titleLarge); LocalizedText(label) }
                 }
             }
         }
     }
     transitionEntry?.let { original ->
         AlertDialog(onDismissRequest = { transitionEntry = null },
-            title = { Text("In Zugfahrt übergehen") },
+            title = { LocalizedText("In Zugfahrt übergehen") },
             text = { Column {
-                Text("${original.kind}: ${original.date}, ${original.start}–${original.end}. Die Bereitschaft endet am Übergangszeitpunkt.")
-                OutlinedTextField(transitionDate, { transitionDate = it }, label = { Text("Übergangsdatum (JJJJ-MM-TT)") })
-                OutlinedTextField(transitionTime, { transitionTime = it }, label = { Text("Beginn Zugfahrt (HH:MM)") })
-                OutlinedTextField(trainEnd, { trainEnd = it }, label = { Text("Ende Zugfahrt (HH:MM)") })
-                if (transitionError.isNotBlank()) Text(transitionError, color = MaterialTheme.colorScheme.error)
+                LocalizedText("${original.kind}: ${original.date}, ${original.start}–${original.end}. Die Bereitschaft endet am Übergangszeitpunkt.")
+                OutlinedTextField(transitionDate, { transitionDate = it }, label = { LocalizedText("Übergangsdatum (JJJJ-MM-TT)") })
+                OutlinedTextField(transitionTime, { transitionTime = it }, label = { LocalizedText("Beginn Zugfahrt (HH:MM)") })
+                OutlinedTextField(trainEnd, { trainEnd = it }, label = { LocalizedText("Ende Zugfahrt (HH:MM)") })
+                if (transitionError.isNotBlank()) LocalizedText(transitionError, color = MaterialTheme.colorScheme.error)
             } },
             confirmButton = { Button(onClick = {
                 val at = runCatching { LocalDate.parse(transitionDate).atTime(LocalTime.parse(transitionTime)) }.getOrNull()
@@ -285,7 +285,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                     saveEntries(context, username, entries); month = YearMonth.from(at)
                     transitionEntry = null
                 }
-            }) { Text("Übergang speichern") } },
-            dismissButton = { TextButton(onClick = { transitionEntry = null }) { Text("Abbrechen") } })
+            }) { LocalizedText("Übergang speichern") } },
+            dismissButton = { TextButton(onClick = { transitionEntry = null }) { LocalizedText("Abbrechen") } })
     }
 }

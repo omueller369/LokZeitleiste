@@ -20,16 +20,17 @@ object ApiClient {
             "Serveradresse fehlt: HTTPS oder im Debug-Emulator http://10.0.2.2:8080 konfigurieren."
         }
     }
-    private fun post(path: String, body: JSONObject, token: String? = null): JSONObject {
+    private fun post(path: String, body: JSONObject, token: String? = null, method: String = "POST"): JSONObject {
         val connection = URL(base() + path).openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
+        connection.requestMethod = method
         connection.connectTimeout = 15000
         connection.readTimeout = 30000
-        connection.doOutput = true
+        connection.doOutput = method != "GET"
+        connection.setRequestProperty("Accept-Language", de.lokzeitleiste.app.LanguageRuntime.code)
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
         if (token != null) connection.setRequestProperty("Authorization", "Bearer $token")
         try {
-            connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+            if (method != "GET") connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
             val stream = if (connection.responseCode in 200..299) connection.inputStream else connection.errorStream
             val content = stream?.bufferedReader()?.use { it.readText() } ?: ""
             if (connection.responseCode !in 200..299)
@@ -66,4 +67,11 @@ object ApiClient {
             JSONObject().put("entries", items), token)
         UploadResult(reply.getInt("accepted"), reply.optString("email_status") == "queued")
     }
+    suspend fun getLanguage(token: String): JSONObject = withContext(Dispatchers.IO) {
+        post("/api/v1/account/locale", JSONObject(), token, "GET")
+    }
+    suspend fun setLanguage(token: String, language: String): JSONObject = withContext(Dispatchers.IO) {
+        post("/api/v1/account/locale", JSONObject().put("language", language), token, "PUT")
+    }
+
 }

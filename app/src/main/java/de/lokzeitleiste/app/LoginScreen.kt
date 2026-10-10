@@ -26,13 +26,13 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
         return
     }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
-        Text("Tf-Anmeldung mit dem vom Admin angelegten Konto")
+        LocalizedText("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
+        LocalizedText("Tf-Anmeldung mit dem vom Admin angelegten Konto")
         Spacer(Modifier.height(24.dp))
-        OutlinedTextField(username, { username = it }, label = { Text("Benutzername") })
-        OutlinedTextField(password, { password = it }, label = { Text("Passwort") },
+        OutlinedTextField(username, { username = it }, label = { LocalizedText("Benutzername") })
+        OutlinedTextField(password, { password = it }, label = { LocalizedText("Passwort") },
             visualTransformation = PasswordVisualTransformation())
-        if (message.isNotBlank()) Text(message, color = MaterialTheme.colorScheme.error)
+        if (message.isNotBlank()) LocalizedText(message, color = MaterialTheme.colorScheme.error)
         Button(enabled = !busy, onClick = {
             busy = true; message = ""
             scope.launch {
@@ -44,7 +44,7 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
                     message = error.message ?: "Anmeldung fehlgeschlagen."
                 } finally { busy = false }
             }
-        }) { Text(if (busy) "Anmeldung läuft …" else "Anmelden") }
-        Text("Die Anmeldung bleibt auf diesem Gerät gespeichert.", style = MaterialTheme.typography.bodySmall)
+        }) { LocalizedText(if (busy) "Anmeldung läuft …" else "Anmelden") }
+        LocalizedText("Die Anmeldung bleibt auf diesem Gerät gespeichert.", style = MaterialTheme.typography.bodySmall)
     }
 }

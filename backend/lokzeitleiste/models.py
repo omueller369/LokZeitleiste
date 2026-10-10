@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, LargeBinary, String, Text, UniqueConstraint
-from sqlalchemy.dialects.mysql import LONGBLOB
+from sqlalchemy.dialects.mysql import LONGBLOB, MEDIUMTEXT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -225,3 +225,50 @@ class WorkEntryDates(Base):
     __tablename__ = "work_entry_dates"
     entry_id: Mapped[int] = mapped_column(ForeignKey("work_entries.id"),primary_key=True)
     end_date: Mapped[date] = mapped_column(Date,nullable=False)
+
+
+class ShiftModel(Base):
+    __tablename__ = 'shift_models'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    blocks: Mapped[str] = mapped_column(Text, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+
+class ShiftAssignment(Base):
+    __tablename__ = 'shift_assignments'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    model_id: Mapped[int] = mapped_column(ForeignKey('shift_models.id'), nullable=False)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    admin_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    cycle_start: Mapped[date] = mapped_column(Date, nullable=False)
+    model_snapshot: Mapped[str] = mapped_column(Text, nullable=False)
+    overwrite: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    changed_days: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class MailboxAccount(Base):
+    __tablename__ = 'mailbox_accounts'
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    address: Mapped[str] = mapped_column(String(320), nullable=False)
+    username: Mapped[str] = mapped_column(String(320), nullable=False)
+    password_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, onupdate=now_utc, nullable=False)
+
+
+class MailDraft(Base):
+    __tablename__ = 'mail_drafts'
+    actor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    tf_user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    recipient: Mapped[str] = mapped_column(String(2000), default='', nullable=False)
+    subject: Mapped[str] = mapped_column(String(300), default='', nullable=False)
+    body: Mapped[str] = mapped_column(Text().with_variant(MEDIUMTEXT(), 'mysql'), default='', nullable=False)
+
+
+class UserLocale(Base):
+    __tablename__ = 'user_locales'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    language: Mapped[str] = mapped_column(String(2), default='de', nullable=False)

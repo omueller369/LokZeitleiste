@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.16")
+app = FastAPI(title="LokZeitleiste API", version="0.18")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -332,7 +332,7 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
                                       personnel_number=profile.personnel_number,
                                       federal_state=profile.federal_state, year=year, month=month,
                                       received_at=received_at,
-                                      rows=day_rows(received, profile.federal_state))
+                                      rows=day_rows(received, profile.federal_state), lang=user_language(db,user.id))
         dispatch = ReportDispatch(tf_user_id=user.id, work_month_id=period.id,
                                   recipient_email=profile.email,
                                   filename=f"LokZeitleiste-Eingang-{year}-{month:02d}.pdf",
@@ -449,3 +449,101 @@ def tf_hours_page():
 @app.get('/admin/tf/hours.js')
 def tf_hours_script():
     return FileResponse(Path(__file__).parent/'static'/'tf-hours.js', media_type='text/javascript')
+
+
+from .portal import create_router as portal_router
+app.include_router(portal_router(require_admin))
+
+@app.get('/admin/staff/new')
+def staff_create_page():
+    return FileResponse(Path(__file__).parent/'static'/'staff.html')
+
+@app.get('/admin/directory')
+def directory_page():
+    return FileResponse(Path(__file__).parent/'static'/'directory.html')
+
+@app.get('/admin/directory.js')
+def directory_script():
+    return FileResponse(Path(__file__).parent/'static'/'directory.js', media_type='text/javascript')
+
+@app.get('/admin/shifts')
+def shifts_page():
+    return FileResponse(Path(__file__).parent/'static'/'shifts.html')
+
+@app.get('/admin/shifts.js')
+def shifts_script():
+    return FileResponse(Path(__file__).parent/'static'/'shifts.js', media_type='text/javascript')
+
+@app.get('/admin/backend-nav.js')
+def backend_navigation_script():
+    return FileResponse(Path(__file__).parent/'static'/'backend-nav.js', media_type='text/javascript')
+
+from .mailbox.api import create_router as mailbox_router
+app.include_router(mailbox_router(require_admin))
+
+@app.get('/admin/email')
+def email_page():
+    return FileResponse(Path(__file__).parent/'static'/'email.html')
+
+@app.get('/admin/email.js')
+def email_script():
+    return FileResponse(Path(__file__).parent/'static'/'email.js', media_type='text/javascript')
+
+@app.get('/admin/portal.css')
+def portal_styles():
+    return FileResponse(Path(__file__).parent/'static'/'portal.css', media_type='text/css')
+
+@app.get('/admin/portal-ui.js')
+def portal_ui_script():
+    return FileResponse(Path(__file__).parent/'static'/'portal-ui.js', media_type='text/javascript')
+
+
+from .i18n import language, request_language, translate, user_language
+from .models import UserLocale
+from pydantic import BaseModel
+from typing import Literal
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+@app.middleware('http')
+async def localized_requests(request: Request, call_next):
+    token=request_language.set(language(request.query_params.get('lang') or request.headers.get('accept-language')))
+    try:
+        return await call_next(request)
+    finally:
+        request_language.reset(token)
+
+@app.exception_handler(StarletteHTTPException)
+async def localized_error(request: Request, exc):
+    return JSONResponse({'detail':translate(exc.detail)}, status_code=exc.status_code, headers=exc.headers)
+
+class LocaleInput(BaseModel):
+    language: Literal['de','en','pl','ru','tr','ar','es']
+
+@app.get('/api/v1/account/locale')
+def get_locale(user: User=Depends(require_account), db: Session=Depends(database_session)):
+    return {'language':user_language(db,user.id),'configured':db.get(UserLocale,user.id) is not None}
+
+@app.put('/api/v1/account/locale')
+def set_locale(data: LocaleInput, user: User=Depends(require_account), db: Session=Depends(database_session)):
+    value=db.get(UserLocale,user.id)
+    if not value:
+        value=UserLocale(user_id=user.id);db.add(value)
+    value.language=data.language;db.commit()
+    return {'language':value.language}
+
+@app.get('/i18n.js')
+def translations_script():
+    return FileResponse(Path(__file__).parent/'static'/'i18n.js', media_type='text/javascript')
+
+@app.get('/locales/catalog.json')
+def translations_catalog():
+    return FileResponse(Path(__file__).parent/'locales'/'catalog.json', media_type='application/json')
+
+from fastapi.exceptions import RequestValidationError
+
+@app.exception_handler(RequestValidationError)
+async def localized_validation_error(request: Request, exc):
+    # Never echo passwords, mailbox credentials or complete uploaded files in error responses.
+    fields=[{'field':'.'.join(str(part) for part in error['loc']), 'type':error['type']} for error in exc.errors()]
+    return JSONResponse({'detail':translate('Eingaben sind ungültig. Bitte Pflichtfelder und Werte prüfen.'),'fields':fields},status_code=422)

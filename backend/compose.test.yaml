@@ -5,6 +5,13 @@ x-app: &app
   restart: unless-stopped
   environment: &env
     DATABASE_URL: mysql+pymysql://lokzeitleiste:${MYSQL_PASSWORD:?prepare.sh ausführen}@db:3306/lokzeitleiste?charset=utf8mb4
+    MAILBOX_IMAP_HOST: ${MAILBOX_IMAP_HOST:-}
+    MAILBOX_IMAP_PORT: ${MAILBOX_IMAP_PORT:-993}
+    MAILBOX_SMTP_HOST: ${MAILBOX_SMTP_HOST:-}
+    MAILBOX_SMTP_PORT: ${MAILBOX_SMTP_PORT:-465}
+    MAILBOX_SMTP_SECURITY: ${MAILBOX_SMTP_SECURITY:-ssl}
+    MAILBOX_SENT_FOLDER: ${MAILBOX_SENT_FOLDER:-Sent}
+    MAILBOX_ENCRYPTION_KEY: ${MAILBOX_ENCRYPTION_KEY:-}
     PUBLIC_ORIGIN: http://localhost:8080
     COOKIE_SECURE: "false"
     SMTP_HOST: mailpit

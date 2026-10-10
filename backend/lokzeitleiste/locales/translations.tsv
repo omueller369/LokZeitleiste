@@ -1,0 +1,659 @@
+de|en|pl|ru|tr|ar|es
+Administration|Administration|Administracja|Администрирование|Yönetim|الإدارة|Administración
+Verwaltung|Employee management|Zarządzanie pracownikami|Управление сотрудниками|Personel yönetimi|إدارة الموظفين|Gestión de empleados
+Alle Mitarbeiter|All employees|Wszyscy pracownicy|Все сотрудники|Tüm çalışanlar|جميع الموظفين|Todos los empleados
+Verwaltungsmitarbeiter|Administrative employees|Pracownicy administracyjni|Административные сотрудники|İdari personel|الموظفون الإداريون|Personal administrativo
+Triebfahrzeugführer|Train drivers|Maszyniści|Машинисты|Makinistler|سائقو القطارات|Maquinistas
+Personalplanung|Staff scheduling|Planowanie personelu|Планирование персонала|Personel planlaması|تخطيط الموظفين|Planificación de personal
+Personalplanung TF Übersicht|Train driver scheduling overview|Przegląd planowania maszynistów|Обзор планирования машинистов|Makinist planlama görünümü|نظرة عامة على تخطيط السائقين|Resumen de planificación de maquinistas
+VM (Verwaltungsmitarbeiter) anlegen|Create administrative employee|Dodaj pracownika administracyjnego|Добавить административного сотрудника|İdari çalışan ekle|إضافة موظف إداري|Crear empleado administrativo
+TF (Triebfahrzeugführer) anlegen|Create train driver|Dodaj maszynistę|Добавить машиниста|Makinist ekle|إضافة سائق قطار|Crear maquinista
+Dienstplan|Duty roster|Grafik służb|График работы|Görev çizelgesi|جدول المناوبات|Cuadrante de servicios
+Dienstzeit|Working hours|Czas pracy|Рабочее время|Çalışma süresi|ساعات العمل|Horas de trabajo
+Schichtplan|Shift schedule|Plan zmian|Сменный график|Vardiya planı|جدول الورديات|Plan de turnos
+Sonstiges|Other|Pozostałe|Прочее|Diğer|أخرى|Otros
+Abmelden|Log out|Wyloguj|Выйти|Çıkış yap|تسجيل الخروج|Cerrar sesión
+Anmelden|Log in|Zaloguj|Войти|Giriş yap|تسجيل الدخول|Iniciar sesión
+Admin-Anmeldung|Administrator login|Logowanie administratora|Вход администратора|Yönetici girişi|دخول المسؤول|Acceso de administrador
+Benutzername|Username|Nazwa użytkownika|Имя пользователя|Kullanıcı adı|اسم المستخدم|Nombre de usuario
+Passwort|Password|Hasło|Пароль|Parola|كلمة المرور|Contraseña
+Initialpasswort|Initial password|Hasło początkowe|Первоначальный пароль|İlk parola|كلمة المرور الأولية|Contraseña inicial
+Passwort ändern|Change password|Zmień hasło|Изменить пароль|Parolayı değiştir|تغيير كلمة المرور|Cambiar contraseña
+Mein Passwort ändern|Change my password|Zmień moje hasło|Изменить мой пароль|Parolamı değiştir|تغيير كلمة مروري|Cambiar mi contraseña
+Aktuelles Passwort|Current password|Aktualne hasło|Текущий пароль|Mevcut parola|كلمة المرور الحالية|Contraseña actual
+Neues Passwort (mindestens 12 Zeichen)|New password (at least 12 characters)|Nowe hasło (co najmniej 12 znaków)|Новый пароль (не менее 12 символов)|Yeni parola (en az 12 karakter)|كلمة مرور جديدة (12 حرفًا على الأقل)|Nueva contraseña (mínimo 12 caracteres)
+Neues Passwort wiederholen|Repeat new password|Powtórz nowe hasło|Повторите новый пароль|Yeni parolayı tekrar girin|تكرار كلمة المرور الجديدة|Repetir nueva contraseña
+Passwort wiederholen|Repeat password|Powtórz hasło|Повторите пароль|Parolayı tekrar girin|تكرار كلمة المرور|Repetir contraseña
+Passwort zurücksetzen|Reset password|Zresetuj hasło|Сбросить пароль|Parolayı sıfırla|إعادة تعيين كلمة المرور|Restablecer contraseña
+Passwortwechsel|Password change|Zmiana hasła|Смена пароля|Parola değişikliği|تغيير كلمة المرور|Cambio de contraseña
+Neues Initialpasswort|New initial password|Nowe hasło początkowe|Новый первоначальный пароль|Yeni ilk parola|كلمة مرور أولية جديدة|Nueva contraseña inicial
+Passwort speichern|Save password|Zapisz hasło|Сохранить пароль|Parolayı kaydet|حفظ كلمة المرور|Guardar contraseña
+Zur Anmeldung|Go to login|Do logowania|К странице входа|Giriş sayfasına|إلى تسجيل الدخول|Ir al acceso
+Konto|Account|Konto|Учётная запись|Hesap|الحساب|Cuenta
+Mein Konto / Passwort|My account / password|Moje konto / hasło|Мой аккаунт / пароль|Hesabım / parolam|حسابي / كلمة المرور|Mi cuenta / contraseña
+Vorname|First name|Imię|Имя|Ad|الاسم الأول|Nombre
+Nachname|Last name|Nazwisko|Фамилия|Soyad|اسم العائلة|Apellidos
+Name|Name|Nazwa|Имя|Ad|الاسم|Nombre
+Nationalität|Nationality|Obywatelstwo|Гражданство|Uyruk|الجنسية|Nacionalidad
+Geburtsdatum|Date of birth|Data urodzenia|Дата рождения|Doğum tarihi|تاريخ الميلاد|Fecha de nacimiento
+Adressen|Addresses|Adresy|Адреса|Adresler|العناوين|Direcciones
+Straße|Street|Ulica|Улица|Sokak|الشارع|Calle
+Hausnummer|House number|Numer domu|Номер дома|Bina numarası|رقم المبنى|Número
+Postleitzahl (PLZ)|Postal code|Kod pocztowy|Почтовый индекс|Posta kodu|الرمز البريدي|Código postal
+Ort|City|Miejscowość|Город|Şehir|المدينة|Localidad
+Kostenstelle|Cost centre|Centrum kosztów|Центр затрат|Masraf merkezi|مركز التكلفة|Centro de costes
+Personalnummer|Employee number|Numer pracownika|Табельный номер|Personel numarası|رقم الموظف|Número de empleado
+Personalnr.|Employee no.|Nr pracownika|Табельный №|Personel no.|رقم الموظف|N.º de empleado
+Personalnummer / Kostenstelle|Employee number / cost centre|Numer pracownika / centrum kosztów|Табельный номер / центр затрат|Personel numarası / masraf merkezi|رقم الموظف / مركز التكلفة|Número de empleado / centro de costes
+Mitarbeiter|Employee|Pracownik|Сотрудник|Çalışan|الموظف|Empleado
+Mitarbeitertyp|Employee type|Typ pracownika|Тип сотрудника|Çalışan türü|نوع الموظف|Tipo de empleado
+Mitarbeiterübersicht|Employee overview|Lista pracowników|Обзор сотрудников|Çalışan listesi|نظرة عامة على الموظفين|Resumen de empleados
+Stammdaten und Rechte|Employee details and permissions|Dane pracownika i uprawnienia|Данные сотрудника и права|Personel bilgileri ve yetkiler|بيانات الموظف والصلاحيات|Datos y permisos
+VM-Stammdaten und Rechte|Administrative employee details and permissions|Dane i uprawnienia administracji|Данные и права административных сотрудников|İdari personel bilgileri ve yetkiler|بيانات الموظفين الإداريين وصلاحياتهم|Datos y permisos del personal administrativo
+Tf-Stammdaten|Train driver details|Dane maszynisty|Данные машиниста|Makinist bilgileri|بيانات السائق|Datos del maquinista
+Tf-Übersicht|Train driver overview|Lista maszynistów|Обзор машинистов|Makinist listesi|نظرة عامة على السائقين|Resumen de maquinistas
+Tf anlegen|Create train driver|Dodaj maszynistę|Добавить машиниста|Makinist ekle|إضافة سائق قطار|Crear maquinista
+Tf bearbeiten|Edit train driver|Edytuj maszynistę|Редактировать машиниста|Makinisti düzenle|تعديل بيانات السائق|Editar maquinista
+Verwaltungsmitarbeiter anlegen|Create administrative employee|Dodaj pracownika administracyjnego|Добавить административного сотрудника|İdari çalışan ekle|إضافة موظف إداري|Crear empleado administrativo
+Verwaltungsmitarbeiter und Rechte|Administrative employees and permissions|Pracownicy administracji i uprawnienia|Административные сотрудники и права|İdari çalışanlar ve yetkiler|الموظفون الإداريون والصلاحيات|Personal administrativo y permisos
+Konten und Freigaben|Accounts and permissions|Konta i uprawnienia|Учётные записи и права|Hesaplar ve yetkiler|الحسابات والصلاحيات|Cuentas y permisos
+Neues Konto|New account|Nowe konto|Новая учётная запись|Yeni hesap|حساب جديد|Nueva cuenta
+Weitere Adresse|Add address|Dodaj adres|Добавить адрес|Adres ekle|إضافة عنوان|Añadir dirección
+Adresse entfernen|Remove address|Usuń adres|Удалить адрес|Adresi kaldır|حذف العنوان|Eliminar dirección
+Modul|Module|Moduł|Модуль|Modül|الوحدة|Módulo
+Module|Modules|Moduły|Модули|Modüller|الوحدات|Módulos
+Modulberechtigungen|Module permissions|Uprawnienia modułów|Права модулей|Modül yetkileri|صلاحيات الوحدات|Permisos de módulos
+Lesen|Read|Odczyt|Чтение|Okuma|قراءة|Lectura
+Lesen und Schreiben|Read and write|Odczyt i zapis|Чтение и запись|Okuma ve yazma|قراءة وكتابة|Lectura y escritura
+Foto|Photo|Zdjęcie|Фото|Fotoğraf|الصورة|Foto
+Foto hochladen|Upload photo|Prześlij zdjęcie|Загрузить фото|Fotoğraf yükle|رفع صورة|Subir foto
+Aktiv|Active|Aktywny|Активен|Aktif|نشط|Activo
+Inaktiv|Inactive|Nieaktywny|Неактивен|Pasif|غير نشط|Inactivo
+Erforderlich|Required|Wymagane|Обязательно|Gerekli|مطلوب|Obligatorio
+Abgeschlossen|Completed|Zakończone|Завершено|Tamamlandı|مكتمل|Completado
+Datum|Date|Data|Дата|Tarih|التاريخ|Fecha
+Datum Arbeitsbeginn|Work start date|Data rozpoczęcia pracy|Дата начала работы|İş başlangıç tarihi|تاريخ بدء العمل|Fecha de inicio
+Datum Arbeitsende|Work end date|Data zakończenia pracy|Дата окончания работы|İş bitiş tarihi|تاريخ انتهاء العمل|Fecha de finalización
+Enddatum|End date|Data końcowa|Дата окончания|Bitiş tarihi|تاريخ الانتهاء|Fecha final
+Beginn|Start|Początek|Начало|Başlangıç|البداية|Inicio
+Ende|End|Koniec|Окончание|Bitiş|النهاية|Fin
+Von|From|Od|С|Başlangıç|من|Desde
+Bis|Until|Do|До|Bitiş|إلى|Hasta
+Bis einschließlich|Until, inclusive|Do dnia włącznie|По дату включительно|Bitiş günü dahil|حتى شاملًا|Hasta, inclusive
+Tag|Day|Dzień|День|Gün|اليوم|Día
+Tage|Days|Dni|Дни|Gün|أيام|Días
+Monat|Month|Miesiąc|Месяц|Ay|الشهر|Mes
+Monate|Months|Miesiące|Месяцы|Aylar|أشهر|Meses
+Jahr|Year|Rok|Год|Yıl|السنة|Año
+Januar|January|Styczeń|Январь|Ocak|يناير|Enero
+Februar|February|Luty|Февраль|Şubat|فبراير|Febrero
+März|March|Marzec|Март|Mart|مارس|Marzo
+April|April|Kwiecień|Апрель|Nisan|أبريل|Abril
+Mai|May|Maj|Май|Mayıs|مايو|Mayo
+Juni|June|Czerwiec|Июнь|Haziran|يونيو|Junio
+Juli|July|Lipiec|Июль|Temmuz|يوليو|Julio
+August|August|Sierpień|Август|Ağustos|أغسطس|Agosto
+September|September|Wrzesień|Сентябрь|Eylül|سبتمبر|Septiembre
+Oktober|October|Październik|Октябрь|Ekim|أكتوبر|Octubre
+November|November|Listopad|Ноябрь|Kasım|نوفمبر|Noviembre
+Dezember|December|Grudzień|Декабрь|Aralık|ديسمبر|Diciembre
+Montag|Monday|Poniedziałek|Понедельник|Pazartesi|الاثنين|Lunes
+Dienstag|Tuesday|Wtorek|Вторник|Salı|الثلاثاء|Martes
+Mittwoch|Wednesday|Środa|Среда|Çarşamba|الأربعاء|Miércoles
+Donnerstag|Thursday|Czwartek|Четверг|Perşembe|الخميس|Jueves
+Freitag|Friday|Piątek|Пятница|Cuma|الجمعة|Viernes
+Samstag|Saturday|Sobota|Суббота|Cumartesi|السبت|Sábado
+Sonntag|Sunday|Niedziela|Воскресенье|Pazar|الأحد|Domingo
+Mo|Mon|Pn|Пн|Pzt|اثن|Lun
+Di|Tue|Wt|Вт|Sal|ثلا|Mar
+Mi|Wed|Śr|Ср|Çar|أرب|Mié
+Do|Thu|Cz|Чт|Per|خمي|Jue
+Fr|Fri|Pt|Пт|Cum|جمع|Vie
+Sa|Sat|So|Сб|Cmt|سبت|Sáb
+So|Sun|Nd|Вс|Paz|أحد|Dom
+Wochentag|Weekday|Dzień tygodnia|День недели|Haftanın günü|يوم الأسبوع|Día de la semana
+Kalenderwoche|Calendar week|Tydzień kalendarzowy|Календарная неделя|Takvim haftası|الأسبوع|Semana del calendario
+KW|Week|Tydz.|Нед.|Hafta|أسبوع|Sem.
+Arbeitszeitplanung|Work schedule planning|Planowanie czasu pracy|Планирование рабочего времени|Çalışma zamanı planlaması|تخطيط وقت العمل|Planificación del tiempo de trabajo
+Arbeitszeiterfassung und Korrekturen|Time entry and corrections|Ewidencja czasu i korekty|Учёт времени и исправления|Zaman kaydı ve düzeltmeler|تسجيل الوقت والتصحيحات|Registro horario y correcciones
+Arbeitszeit erfassen und korrigieren|Record and correct working hours|Rejestruj i koryguj czas pracy|Учитывать и исправлять рабочее время|Çalışma saatlerini kaydet ve düzelt|تسجيل ساعات العمل وتصحيحها|Registrar y corregir horas
+Meine Arbeitszeiten|My working hours|Mój czas pracy|Моё рабочее время|Çalışma saatlerim|ساعات عملي|Mis horas de trabajo
+Meine Einträge|My entries|Moje wpisy|Мои записи|Kayıtlarım|سجلاتي|Mis registros
+Arbeitszeit|Working time|Czas pracy|Рабочее время|Çalışma süresi|وقت العمل|Tiempo de trabajo
+Arbeit|Work|Praca|Работа|Çalışma|العمل|Trabajo
+Geleistet|Worked|Przepracowano|Отработано|Çalışılan|العمل الفعلي|Realizadas
+Plansoll|Planned target|Planowana norma|Плановая норма|Planlanan hedef|الساعات المطلوبة|Objetivo planificado
+Soll|Target|Norma|Норма|Hedef|المطلوب|Objetivo
+Ist|Actual|Wykonano|Факт|Gerçekleşen|الفعلي|Real
+Gutschrift|Credited hours|Godziny zaliczone|Зачтённые часы|Hesaba eklenen süre|الساعات المحتسبة|Horas acreditadas
+Differenz|Difference|Różnica|Разница|Fark|الفرق|Diferencia
+Saldo|Balance|Saldo|Баланс|Bakiye|الرصيد|Saldo
+Differenz Geleistet − Soll|Difference: worked − target|Różnica: przepracowano − norma|Разница: отработано − норма|Fark: çalışılan − hedef|الفرق: الفعلي − المطلوب|Diferencia: realizadas − objetivo
+Arbeitstag|Workday|Dzień pracy|Рабочий день|Çalışma günü|يوم عمل|Día de trabajo
+Arbeitstage|Workdays|Dni pracy|Рабочие дни|Çalışma günleri|أيام العمل|Días de trabajo
+Ruhetag|Rest day|Dzień wolny|День отдыха|Dinlenme günü|يوم راحة|Día de descanso
+Ruhetage|Rest days|Dni wolne|Дни отдыха|Dinlenme günleri|أيام الراحة|Días de descanso
+Urlaub|Annual leave|Urlop|Отпуск|İzin|إجازة|Vacaciones
+Urlaubstage|Leave days|Dni urlopu|Дни отпуска|İzin günleri|أيام الإجازة|Días de vacaciones
+Krank|Sick leave|Choroba|Больничный|Hastalık izni|إجازة مرضية|Baja por enfermedad
+Krankheit|Sickness|Choroba|Болезнь|Hastalık|المرض|Enfermedad
+Ungeplant|Unplanned|Nie zaplanowano|Не запланировано|Planlanmamış|غير مخطط|Sin planificar
+Feiertag|Public holiday|Święto|Праздник|Resmî tatil|عطلة رسمية|Festivo
+Feiertag Berlin|Berlin public holiday|Święto w Berlinie|Праздник в Берлине|Berlin resmî tatili|عطلة رسمية في برلين|Festivo de Berlín
+Feiertag + Tagesart|Holiday + day type|Święto + rodzaj dnia|Праздник + тип дня|Tatil + gün türü|عطلة + نوع اليوم|Festivo + tipo de día
+Tagesart|Day type|Rodzaj dnia|Тип дня|Gün türü|نوع اليوم|Tipo de día
+Tagesliste|Daily list|Lista dni|Список дней|Günlük liste|قائمة الأيام|Lista diaria
+Monatskalender|Monthly calendar|Kalendarz miesięczny|Месячный календарь|Aylık takvim|التقويم الشهري|Calendario mensual
+Monatsplan|Monthly schedule|Plan miesięczny|Месячный план|Aylık plan|الخطة الشهرية|Plan mensual
+Jahresansicht|Year view|Widok roczny|Годовой вид|Yıllık görünüm|العرض السنوي|Vista anual
+Jahresübersicht|Year overview|Przegląd roczny|Годовой обзор|Yıllık özet|نظرة سنوية|Resumen anual
+Stundenübersicht|Hours overview|Przegląd godzin|Обзор часов|Saat özeti|ملخص الساعات|Resumen de horas
+Tf-Stundenübersicht|Train driver hours overview|Przegląd godzin maszynisty|Обзор часов машиниста|Makinist saat özeti|ملخص ساعات السائق|Resumen de horas del maquinista
+Stundenansicht|Hours view|Widok godzin|Просмотр часов|Saat görünümü|عرض الساعات|Vista de horas
+Tagesarbeitszeit|Daily working time|Dzienny czas pracy|Дневное рабочее время|Günlük çalışma süresi|وقت العمل اليومي|Tiempo de trabajo diario
+Wochenarbeitszeit|Weekly working time|Tygodniowy czas pracy|Недельное рабочее время|Haftalık çalışma süresi|وقت العمل الأسبوعي|Tiempo de trabajo semanal
+Monatsdaten|Monthly data|Dane miesięczne|Месячные данные|Aylık veriler|البيانات الشهرية|Datos mensuales
+Monatsabrechnung|Monthly statement|Rozliczenie miesięczne|Месячный отчёт|Aylık hesap özeti|كشف شهري|Informe mensual
+Arbeitssoll|Work target|Norma pracy|Норма работы|Çalışma hedefi|العمل المطلوب|Objetivo de trabajo
+Soll inkl. Urlaub|Target including leave|Norma wraz z urlopem|Норма с учётом отпуска|İzin dahil hedef|المطلوب شامل الإجازة|Objetivo con vacaciones
+Soll / Urlaub|Target / leave|Norma / urlop|Норма / отпуск|Hedef / izin|المطلوب / الإجازة|Objetivo / vacaciones
+Sollstunden (monatlich)|Monthly target hours|Miesięczna norma godzin|Месячная норма часов|Aylık hedef saatler|الساعات الشهرية المطلوبة|Horas objetivo mensuales
+Pause|Break|Przerwa|Перерыв|Mola|استراحة|Pausa
+Gastfahrt|Passenger transfer|Przejazd pasażerski|Пассажирский проезд|Yolcu olarak seyahat|الانتقال كراكب|Viaje como pasajero
+Auffüllung|Top-up|Uzupełnienie|Дополнение до нормы|Süre tamamlama|استكمال الساعات|Complemento
+Nacht|Night|Noc|Ночь|Gece|الليل|Noche
+Rufbereitschaft|On-call standby|Dyżur pod telefonem|Дежурство по вызову|Çağrı nöbeti|الاستعداد عند الطلب|Guardia localizada
+Bereitschaft|Standby|Dyżur|Дежурство|Hazır nöbet|الاستعداد|Guardia presencial
+Zugfahrt|Train journey|Jazda pociągiem|Поездка на поезде|Tren yolculuğu|رحلة القطار|Trayecto en tren
+Ausfallschicht|Cancelled shift|Odwołana zmiana|Отменённая смена|İptal edilen vardiya|وردية ملغاة|Turno cancelado
+Sonstige Erfassung|Other time entry|Inny wpis czasu|Прочий учёт времени|Diğer zaman kaydı|تسجيل وقت آخر|Otro registro horario
+Art|Type|Rodzaj|Тип|Tür|النوع|Tipo
+Typ|Type|Typ|Тип|Tür|النوع|Tipo
+Notiz|Note|Notatka|Заметка|Not|ملاحظة|Nota
+Änderungsgrund|Reason for change|Powód zmiany|Причина изменения|Değişiklik nedeni|سبب التغيير|Motivo del cambio
+Änderungen speichern|Save changes|Zapisz zmiany|Сохранить изменения|Değişiklikleri kaydet|حفظ التغييرات|Guardar cambios
+Zeiten bearbeiten|Edit times|Edytuj godziny|Изменить время|Saatleri düzenle|تعديل الأوقات|Editar horarios
+Arbeitszeit anpassen|Adjust working time|Skoryguj czas pracy|Скорректировать рабочее время|Çalışma süresini ayarla|تعديل وقت العمل|Ajustar tiempo de trabajo
+Arbeitszeit manuell eintragen|Enter working time manually|Wprowadź czas ręcznie|Ввести время вручную|Çalışma süresini elle gir|إدخال وقت العمل يدويًا|Introducir tiempo manualmente
+Erfasste Arbeitszeiten bearbeiten|Edit recorded working times|Edytuj zarejestrowany czas pracy|Редактировать учтённое время|Kaydedilen saatleri düzenle|تعديل ساعات العمل المسجلة|Editar horas registradas
+Speichern und benachrichtigen|Save and notify|Zapisz i powiadom|Сохранить и уведомить|Kaydet ve bildir|حفظ وإشعار|Guardar y notificar
+Änderungsverlauf und E-Mail-Versand|Change history and email delivery|Historia zmian i wysyłka e-mail|История изменений и отправка писем|Değişiklik geçmişi ve e-posta gönderimi|سجل التغييرات وإرسال البريد|Historial y envío de correo
+Änderungen|Changes|Zmiany|Изменения|Değişiklikler|التغييرات|Cambios
+Letzte Änderungen|Recent changes|Ostatnie zmiany|Последние изменения|Son değişiklikler|آخر التغييرات|Últimos cambios
+Schichtmodell|Shift model|Model zmian|Модель смен|Vardiya modeli|نموذج الوردية|Modelo de turnos
+Schichtmodelle|Shift models|Modele zmian|Модели смен|Vardiya modelleri|نماذج الورديات|Modelos de turnos
+Schichtmodell anlegen|Create shift model|Dodaj model zmian|Создать модель смен|Vardiya modeli oluştur|إنشاء نموذج وردية|Crear modelo de turnos
+Modell einem Tf zuweisen|Assign model to a train driver|Przypisz model maszyniście|Назначить модель машинисту|Modeli makiniste ata|تعيين النموذج لسائق|Asignar modelo al maquinista
+Modell speichern|Save model|Zapisz model|Сохранить модель|Modeli kaydet|حفظ النموذج|Guardar modelo
+Modell bearbeiten|Edit model|Edytuj model|Изменить модель|Modeli düzenle|تعديل النموذج|Editar modelo
+Neues Modell|New model|Nowy model|Новая модель|Yeni model|نموذج جديد|Nuevo modelo
+Rhythmus|Cycle|Cykl|Цикл|Döngü|الدورة|Ciclo
+Zyklusblock hinzufügen|Add cycle block|Dodaj blok cyklu|Добавить блок цикла|Döngü bloğu ekle|إضافة مرحلة للدورة|Añadir bloque de ciclo
+Zyklusbeginn (erster Tag des ersten Blocks)|Cycle start (first day of first block)|Początek cyklu (pierwszy dzień pierwszego bloku)|Начало цикла (первый день первого блока)|Döngü başlangıcı (ilk bloğun ilk günü)|بداية الدورة (أول يوم من المرحلة الأولى)|Inicio del ciclo (primer día del primer bloque)
+Bestehende Planung überschreiben (einschließlich Urlaub)|Overwrite existing schedule (including leave)|Nadpisz istniejący plan (w tym urlop)|Перезаписать план (включая отпуск)|Mevcut planı değiştir (izin dahil)|استبدال الخطة الحالية (شامل الإجازة)|Sobrescribir plan existente (incluidas vacaciones)
+Vorschau erstellen|Create preview|Utwórz podgląd|Создать предварительный просмотр|Önizleme oluştur|إنشاء معاينة|Crear vista previa
+Zuweisungsvorschau|Assignment preview|Podgląd przypisania|Предпросмотр назначения|Atama önizlemesi|معاينة التعيين|Vista previa de asignación
+In Arbeitszeitplan übernehmen|Apply to work schedule|Zastosuj do planu pracy|Применить к рабочему плану|Çalışma planına uygula|تطبيق على جدول العمل|Aplicar al plan de trabajo
+Letzte Zuweisungen|Recent assignments|Ostatnie przypisania|Последние назначения|Son atamalar|آخر التعيينات|Últimas asignaciones
+Übernahme|Application|Zastosowanie|Применение|Uygulama|التطبيق|Aplicación
+Übernehmen|Apply|Zastosuj|Применить|Uygula|تطبيق|Aplicar
+Beibehalten|Keep|Zachowaj|Сохранить|Koru|الإبقاء|Conservar
+Entfernen|Remove|Usuń|Удалить|Kaldır|إزالة|Eliminar
+Email|Email|E-mail|Электронная почта|E-posta|البريد الإلكتروني|Correo electrónico
+E-Mail-Adresse|Email address|Adres e-mail|Адрес электронной почты|E-posta adresi|عنوان البريد الإلكتروني|Dirección de correo
+E-Mail / Bundesland|Email / federal state|E-mail / kraj związkowy|Почта / федеральная земля|E-posta / eyalet|البريد / الولاية|Correo / estado federado
+E-Mail des Tf|Train driver email|E-mail maszynisty|Почта машиниста|Makinistin e-postası|بريد السائق|Correo del maquinista
+Bundesland|Federal state|Kraj związkowy|Федеральная земля|Eyalet|الولاية|Estado federado
+Postfach einrichten|Set up mailbox|Skonfiguruj skrzynkę|Настроить почтовый ящик|Posta kutusu kur|إعداد صندوق البريد|Configurar buzón
+Postfach laden|Load mailbox|Wczytaj skrzynkę|Загрузить почтовый ящик|Posta kutusunu yükle|تحميل صندوق البريد|Cargar buzón
+Postfach-Benutzername|Mailbox username|Użytkownik skrzynki|Имя пользователя почты|Posta kutusu kullanıcı adı|اسم مستخدم البريد|Usuario del buzón
+Postfachpasswort (leer = beibehalten)|Mailbox password (blank = keep)|Hasło skrzynki (puste = zachowaj)|Пароль почты (пусто = сохранить)|Posta parolası (boş = koru)|كلمة مرور البريد (فارغ = إبقاء)|Contraseña del buzón (vacío = conservar)
+Postfachzugang dieses Tf|Mailbox access for this train driver|Dostęp do skrzynki tego maszynisty|Доступ к почте этого машиниста|Bu makinistin posta erişimi|الوصول إلى بريد هذا السائق|Acceso al buzón de este maquinista
+Ordner|Folder|Folder|Папка|Klasör|المجلد|Carpeta
+Absender|Sender|Nadawca|Отправитель|Gönderen|المرسل|Remitente
+Betreff|Subject|Temat|Тема|Konu|الموضوع|Asunto
+Nachricht|Message|Wiadomość|Сообщение|Mesaj|الرسالة|Mensaje
+Empfänger (mehrere mit Komma trennen)|Recipients (separate with commas)|Odbiorcy (oddziel przecinkami)|Получатели (через запятую)|Alıcılar (virgülle ayırın)|المستلمون (افصل بفاصلة)|Destinatarios (separados por comas)
+Neue E-Mail|New email|Nowy e-mail|Новое письмо|Yeni e-posta|رسالة جديدة|Nuevo correo
+E-Mail verfassen|Compose email|Napisz e-mail|Написать письмо|E-posta yaz|كتابة رسالة|Redactar correo
+Antworten|Reply|Odpowiedz|Ответить|Yanıtla|رد|Responder
+Weiterleiten|Forward|Przekaż dalej|Переслать|İlet|إعادة توجيه|Reenviar
+Als gelesen markieren|Mark as read|Oznacz jako przeczytane|Отметить прочитанным|Okundu işaretle|تحديد كمقروء|Marcar como leído
+Als ungelesen markieren|Mark as unread|Oznacz jako nieprzeczytane|Отметить непрочитанным|Okunmadı işaretle|تحديد كغير مقروء|Marcar como no leído
+Gelesen|Read|Przeczytane|Прочитано|Okundu|مقروء|Leído
+Ungelesen|Unread|Nieprzeczytane|Не прочитано|Okunmadı|غير مقروء|No leído
+Entwurf speichern|Save draft|Zapisz szkic|Сохранить черновик|Taslağı kaydet|حفظ المسودة|Guardar borrador
+Entwurf laden|Load draft|Wczytaj szkic|Загрузить черновик|Taslağı yükle|تحميل المسودة|Cargar borrador
+Anhänge (höchstens 5; Nachricht insgesamt maximal 10 MiB)|Attachments (up to 5; message maximum 10 MiB)|Załączniki (do 5; wiadomość do 10 MiB)|Вложения (до 5; письмо до 10 МиБ)|Ekler (en fazla 5; mesaj en fazla 10 MiB)|المرفقات (5 كحد أقصى؛ الرسالة حتى 10 ميبيبايت)|Adjuntos (hasta 5; mensaje máximo 10 MiB)
+Anhang|Attachment|Załącznik|Вложение|Ek|مرفق|Adjunto
+Senden|Send|Wyślij|Отправить|Gönder|إرسال|Enviar
+Zugang speichern|Save access details|Zapisz dane dostępu|Сохранить данные доступа|Erişim bilgilerini kaydet|حفظ بيانات الوصول|Guardar acceso
+Suche (Betreff oder Absender)|Search (subject or sender)|Szukaj (temat lub nadawca)|Поиск (тема или отправитель)|Ara (konu veya gönderen)|بحث (الموضوع أو المرسل)|Buscar (asunto o remitente)
+Vorherige Seite|Previous page|Poprzednia strona|Предыдущая страница|Önceki sayfa|الصفحة السابقة|Página anterior
+Nächste Seite|Next page|Następna strona|Следующая страница|Sonraki sayfa|الصفحة التالية|Página siguiente
+Öffnen|Open|Otwórz|Открыть|Aç|فتح|Abrir
+Schließen|Close|Zamknij|Закрыть|Kapat|إغلاق|Cerrar
+Abbrechen|Cancel|Anuluj|Отмена|İptal|إلغاء|Cancelar
+Speichern|Save|Zapisz|Сохранить|Kaydet|حفظ|Guardar
+Löschen|Delete|Usuń|Удалить|Sil|حذف|Eliminar
+Bearbeiten|Edit|Edytuj|Изменить|Düzenle|تعديل|Editar
+Ansehen|View|Zobacz|Просмотреть|Görüntüle|عرض|Ver
+Aktualisieren|Refresh|Odśwież|Обновить|Yenile|تحديث|Actualizar
+Laden|Load|Wczytaj|Загрузить|Yükle|تحميل|Cargar
+Plan laden|Load schedule|Wczytaj plan|Загрузить план|Planı yükle|تحميل الجدول|Cargar plan
+Übersicht laden|Load overview|Wczytaj przegląd|Загрузить обзор|Özeti yükle|تحميل النظرة العامة|Cargar resumen
+Zurücksetzen|Reset|Zresetuj|Сбросить|Sıfırla|إعادة تعيين|Restablecer
+Prüfen|Check|Sprawdź|Проверить|Kontrol et|تحقق|Comprobar
+Status|Status|Status|Статус|Durum|الحالة|Estado
+Aktion|Action|Akcja|Действие|İşlem|الإجراء|Acción
+Aktionen|Actions|Akcje|Действия|İşlemler|الإجراءات|Acciones
+Status / Aktion|Status / action|Status / akcja|Статус / действие|Durum / işlem|الحالة / الإجراء|Estado / acción
+Suche|Search|Szukaj|Поиск|Ara|بحث|Buscar
+Neu|New|Nowe|Новое|Yeni|جديد|Nuevo
+Bisher|Previous|Poprzednio|Ранее|Önceki|السابق|Anterior
+Bitte wählen|Please select|Wybierz|Выберите|Lütfen seçin|يرجى الاختيار|Seleccione
+Mehrfachauswahl|Multiple selection|Wielokrotny wybór|Множественный выбор|Çoklu seçim|تحديد متعدد|Selección múltiple
+Wahl|Select|Wybór|Выбор|Seçim|اختيار|Selección
+Auswahl leeren|Clear selection|Wyczyść wybór|Снять выделение|Seçimi temizle|مسح التحديد|Borrar selección
+Alle Tage der Ansicht wählen|Select all days in this view|Wybierz wszystkie dni widoku|Выбрать все дни вида|Görünümdeki tüm günleri seç|تحديد كل أيام العرض|Seleccionar todos los días
+Auf markierte Tage anwenden|Apply to selected days|Zastosuj do wybranych dni|Применить к выбранным дням|Seçili günlere uygula|تطبيق على الأيام المحددة|Aplicar a días seleccionados
+Tagesart für markierte Tage|Day type for selected days|Rodzaj wybranych dni|Тип выбранных дней|Seçili günlerin türü|نوع الأيام المحددة|Tipo de días seleccionados
+Excel-Import|Excel import|Import z Excela|Импорт Excel|Excel içe aktarma|استيراد إكسل|Importación de Excel
+Excel-Plan|Excel schedule|Plan Excel|План Excel|Excel planı|جدول إكسل|Plan de Excel
+Import prüfen|Check import|Sprawdź import|Проверить импорт|İçe aktarmayı kontrol et|فحص الاستيراد|Comprobar importación
+Import übernehmen|Apply import|Zastosuj import|Применить импорт|İçe aktarmayı uygula|تطبيق الاستيراد|Aplicar importación
+Importvorschau|Import preview|Podgląd importu|Предпросмотр импорта|İçe aktarma önizlemesi|معاينة الاستيراد|Vista previa de importación
+Aktuellen Plan als Excel-Vorlage laden|Download current schedule as Excel template|Pobierz plan jako szablon Excel|Скачать план как шаблон Excel|Mevcut planı Excel şablonu olarak indir|تنزيل الجدول الحالي كقالب إكسل|Descargar plan como plantilla Excel
+Monats-PDF|Monthly PDF|PDF miesięczny|Месячный PDF|Aylık PDF|ملف شهري PDF|PDF mensual
+Jahres-PDF|Annual PDF|PDF roczny|Годовой PDF|Yıllık PDF|ملف سنوي PDF|PDF anual
+Verwerfen|Discard|Odrzuć|Отбросить|Vazgeç|تجاهل|Descartar
+Startseite|Home|Strona główna|Главная|Ana sayfa|الرئيسية|Inicio
+Zur Administration|Go to administration|Do administracji|К администрированию|Yönetime dön|إلى الإدارة|Ir a administración
+Zur Verwaltung|Go to management|Do zarządzania|К управлению|Yönetime dön|إلى إدارة الموظفين|Ir a gestión
+Zur Tf-Übersicht|Go to train driver overview|Do listy maszynistów|К обзору машинистов|Makinist listesine dön|إلى نظرة السائقين|Ir al resumen de maquinistas
+Tf und Monatsdaten|Train drivers and monthly data|Maszyniści i dane miesięczne|Машинисты и месячные данные|Makinistler ve aylık veriler|السائقون والبيانات الشهرية|Maquinistas y datos mensuales
+Versandstatus aktualisieren|Refresh delivery status|Odśwież status wysyłki|Обновить статус отправки|Gönderim durumunu yenile|تحديث حالة الإرسال|Actualizar estado de envío
+vorläufig|provisional|tymczasowo|предварительно|geçici|مؤقت|provisional
+Vollständig|Complete|Kompletny|Полностью|Tamamlandı|مكتمل|Completo
+Offen|Open|Otwarte|Не завершено|Açık|مفتوح|Pendiente
+Erfasst|Recorded|Zarejestrowano|Учтено|Kaydedilen|مسجل|Registrado
+Keine Erfassung|No entry|Brak wpisu|Нет записи|Kayıt yok|لا يوجد تسجيل|Sin registro
+Planstatus|Schedule status|Status planu|Статус плана|Plan durumu|حالة الجدول|Estado del plan
+Ganzer Tag|Full day|Cały dzień|Весь день|Tam gün|يوم كامل|Día completo
+Neue Erfassung|New time entry|Nowy wpis czasu|Новая запись времени|Yeni zaman kaydı|تسجيل وقت جديد|Nuevo registro horario
+Eintrag speichern|Save entry|Zapisz wpis|Сохранить запись|Kaydı kaydet|حفظ السجل|Guardar registro
+Erfassungen|Entries|Wpisy|Записи|Kayıtlar|السجلات|Registros
+Unterkunft wählen|Select accommodation|Wybierz nocleg|Выберите жильё|Konaklama seç|اختيار الإقامة|Seleccionar alojamiento
+Hotel|Hotel|Hotel|Отель|Otel|فندق|Hotel
+Name des Hotels|Hotel name|Nazwa hotelu|Название отеля|Otel adı|اسم الفندق|Nombre del hotel
+Auswärts verbracht|Spent away from home|Spędzono poza domem|Вне дома|Ev dışında geçirildi|قضاء الوقت خارج المنزل|Fuera de casa
+Vor dem Zugriff auf Ihre Module müssen Sie Ihr Initialpasswort durch ein eigenes Passwort ersetzen.|Before accessing your modules, replace your initial password with your own password.|Przed użyciem modułów zmień hasło początkowe na własne.|Перед доступом к модулям замените первоначальный пароль своим.|Modüllere erişmeden önce ilk parolanızı kendi parolanızla değiştirin.|قبل الوصول إلى الوحدات، استبدل كلمة المرور الأولية بكلمة مرور خاصة بك.|Antes de acceder a los módulos, sustituya la contraseña inicial por una propia.
+Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.|You must change your initial password before use.|Przed użyciem musisz zmienić hasło początkowe.|Перед использованием необходимо изменить первоначальный пароль.|Kullanmadan önce ilk parolanızı değiştirmelisiniz.|يجب تغيير كلمة المرور الأولية قبل الاستخدام.|Debe cambiar la contraseña inicial antes de usar la aplicación.
+Administration enthält Lesen und Schreiben. Lesen und Schreiben enthält Lesen. Ohne Auswahl ist das Modul gesperrt.|Administration includes read and write. Read and write includes read. Without a selection, the module is blocked.|Administracja obejmuje odczyt i zapis. Odczyt i zapis obejmuje odczyt. Bez wyboru moduł jest zablokowany.|Администрирование включает чтение и запись. Чтение и запись включает чтение. Без выбора модуль заблокирован.|Yönetim, okuma ve yazmayı kapsar. Okuma ve yazma, okumayı kapsar. Seçim yoksa modül kapalıdır.|الإدارة تشمل القراءة والكتابة، والقراءة والكتابة تشمل القراءة. دون تحديد تُحظر الوحدة.|Administración incluye lectura y escritura. Lectura y escritura incluye lectura. Sin selección, el módulo queda bloqueado.
+Alle Sitzungen werden beendet. Beim nächsten Login muss ein eigenes Passwort gesetzt werden.|All sessions will end. A personal password must be set at the next login.|Wszystkie sesje zostaną zakończone. Przy następnym logowaniu trzeba ustawić własne hasło.|Все сеансы будут завершены. При следующем входе необходимо задать свой пароль.|Tüm oturumlar sonlandırılır. Sonraki girişte kişisel parola belirlenmelidir.|ستنتهي جميع الجلسات. يجب تعيين كلمة مرور خاصة عند الدخول التالي.|Se cerrarán todas las sesiones. En el próximo acceso deberá establecerse una contraseña propia.
+Konten werden durch Admins angelegt. Das Passwort wird nur bei dieser Eingabe verwendet.|Administrators create accounts. The password is used only for this entry.|Konta tworzą administratorzy. Hasło jest używane tylko przy tym wpisie.|Учётные записи создают администраторы. Пароль используется только при этом вводе.|Hesapları yöneticiler oluşturur. Parola yalnızca bu girişte kullanılır.|ينشئ المسؤولون الحسابات. تُستخدم كلمة المرور عند هذا الإدخال فقط.|Los administradores crean las cuentas. La contraseña se utiliza solo en esta entrada.
+Wähle einen Tf für die Monatsdaten.|Select a train driver to view monthly data.|Wybierz maszynistę, aby zobaczyć dane miesięczne.|Выберите машиниста для просмотра месячных данных.|Aylık veriler için bir makinist seçin.|اختر سائقًا لعرض البيانات الشهرية.|Seleccione un maquinista para ver los datos mensuales.
+Name, Benutzername, Nummer oder Kostenstelle|Name, username, number or cost centre|Imię, użytkownik, numer lub centrum kosztów|Имя, логин, номер или центр затрат|Ad, kullanıcı adı, numara veya masraf merkezi|الاسم أو المستخدم أو الرقم أو مركز التكلفة|Nombre, usuario, número o centro de costes
+Berliner gesetzliche Feiertage werden automatisch markiert und zählen mit 0 Sollstunden, auch bei eingetragenem Arbeitstag oder Urlaub. Sonst gilt: Arbeitstag = 8 h, Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen, auch am Wochenende.|Berlin public holidays are marked automatically and have a target of 0 hours, even on a planned workday or leave day. Otherwise: workday = 8 h, leave = 8 h, rest day = 0 h. Unplanned non-holidays remain open, including weekends.|Święta w Berlinie oznaczane są automatycznie i mają normę 0 godzin, także przy pracy lub urlopie. Poza tym: praca = 8 h, urlop = 8 h, dzień wolny = 0 h. Nieplanowane dni poza świętami pozostają otwarte, również w weekendy.|Праздники Берлина отмечаются автоматически и имеют норму 0 часов, даже при запланированной работе или отпуске. Иначе: работа = 8 ч, отпуск = 8 ч, отдых = 0 ч. Незапланированные непраздничные дни остаются открытыми, включая выходные.|Berlin resmî tatilleri otomatik işaretlenir; çalışma veya izin planlansa da hedef 0 saattir. Diğer günlerde: çalışma = 8 saat, izin = 8 saat, dinlenme = 0 saat. Plansız tatil dışı günler hafta sonları dahil açık kalır.|تُحدد عطلات برلين الرسمية تلقائيًا بساعات مطلوبة صفر، حتى عند تسجيل عمل أو إجازة. خلاف ذلك: العمل 8 ساعات، الإجازة 8 ساعات، الراحة صفر. تبقى الأيام غير المخططة وغير الرسمية مفتوحة، بما فيها نهاية الأسبوع.|Los festivos de Berlín se marcan automáticamente con objetivo de 0 horas, incluso si hay trabajo o vacaciones planificados. En otros días: trabajo = 8 h, vacaciones = 8 h, descanso = 0 h. Los días no festivos sin plan quedan pendientes, incluidos los fines de semana.
+„Ungeplant“ hebt eine vorhandene Tagesplanung samt Notiz auf. Änderungen werden erst beim Speichern übernommen. PDFs zeigen den gespeicherten Stand.|“Unplanned” removes the existing daily plan and note. Changes apply only after saving. PDFs show the saved version.|„Nie zaplanowano” usuwa istniejący plan dnia i notatkę. Zmiany są stosowane po zapisaniu. PDF pokazuje zapisaną wersję.|«Не запланировано» удаляет план дня и заметку. Изменения применяются после сохранения. PDF показывает сохранённую версию.|“Planlanmamış” mevcut günlük planı ve notu kaldırır. Değişiklikler kaydedilince uygulanır. PDF kayıtlı sürümü gösterir.|يلغي «غير مخطط» خطة اليوم وملاحظتها. تُطبق التغييرات بعد الحفظ فقط. يعرض PDF النسخة المحفوظة.|«Sin planificar» elimina el plan diario y su nota. Los cambios se aplican al guardar. Los PDF muestran la versión guardada.
+Die Änderung wird in den Monatsplan übernommen. Danach „Änderungen speichern“ wählen.|The change is applied to the monthly draft. Then select “Save changes”.|Zmiana jest wprowadzana do planu miesięcznego. Następnie wybierz „Zapisz zmiany”.|Изменение переносится в месячный план. Затем выберите «Сохранить изменения».|Değişiklik aylık taslağa uygulanır. Ardından “Değişiklikleri kaydet” seçin.|يُضاف التغيير إلى مسودة الشهر. ثم اختر «حفظ التغييرات».|El cambio se aplica al borrador mensual. Después seleccione «Guardar cambios».
+XLSX mit Blatt „Plan“ und Spalten Datum, Art, Notiz, Personalnummer. Import gilt für den ausgewählten Tf und das Jahr. Nur enthaltene Datumszeilen werden geändert.|XLSX with sheet “Plan” and German columns Datum, Art, Notiz, Personalnummer. Import applies to the selected driver and year. Only included date rows change.|XLSX z arkuszem „Plan” i niemieckimi kolumnami Datum, Art, Notiz, Personalnummer. Import dotyczy wybranego maszynisty i roku. Zmieniane są tylko zawarte daty.|XLSX с листом «Plan» и немецкими колонками Datum, Art, Notiz, Personalnummer. Импорт относится к выбранному машинисту и году. Меняются только указанные даты.|“Plan” sayfası ve Almanca Datum, Art, Notiz, Personalnummer sütunları olan XLSX. İçe aktarma seçili makinist ve yıl içindir. Yalnızca içerilen tarihler değişir.|ملف XLSX بورقة «Plan» والأعمدة الألمانية Datum وArt وNotiz وPersonalnummer. يخص الاستيراد السائق والسنة المحددين، ويُغير التواريخ الموجودة فقط.|XLSX con hoja «Plan» y columnas alemanas Datum, Art, Notiz, Personalnummer. Se importa para el maquinista y año seleccionados. Solo cambian las fechas incluidas.
+Blöcke werden in dieser Reihenfolge wiederholt, z. B. 5 Arbeitstage, 2 Ruhetage. Ein Zyklus umfasst maximal 366 Tage. Modelländerungen verändern bereits erzeugte Jahrespläne nicht automatisch.|Blocks repeat in this order, e.g. 5 workdays and 2 rest days. A cycle has up to 366 days. Model changes do not automatically alter existing annual schedules.|Bloki powtarzają się w tej kolejności, np. 5 dni pracy i 2 wolne. Cykl ma do 366 dni. Zmiany modelu nie zmieniają automatycznie istniejących planów rocznych.|Блоки повторяются по порядку, например 5 рабочих дней и 2 дня отдыха. Цикл — до 366 дней. Изменение модели не меняет автоматически созданные годовые планы.|Bloklar bu sırayla tekrarlanır; örneğin 5 çalışma, 2 dinlenme günü. Döngü en fazla 366 gündür. Model değişikliği mevcut yıllık planları otomatik değiştirmez.|تتكرر المراحل بهذا الترتيب، مثل 5 أيام عمل ويومي راحة. الدورة حتى 366 يومًا. لا تُغير تعديلات النموذج الخطط السنوية الموجودة تلقائيًا.|Los bloques se repiten en este orden, por ejemplo 5 días de trabajo y 2 de descanso. Un ciclo tiene hasta 366 días. Los cambios no modifican automáticamente los planes anuales existentes.
+Standard: nur ungeplante Tage füllen. Feiertage bleiben mit 0 Sollstunden gekennzeichnet. Zeitraum und Zyklus können über Jahresgrenzen laufen. Die erzeugten Tage bleiben danach in der Personalplanung editierbar.|Default: fill only unplanned days. Public holidays retain a 0-hour target. Period and cycle may span years. Generated days remain editable in staff scheduling.|Domyślnie: uzupełnij tylko nieplanowane dni. Święta zachowują normę 0 godzin. Okres i cykl mogą obejmować różne lata. Utworzone dni można dalej edytować w planowaniu personelu.|По умолчанию заполняются только незапланированные дни. Праздники сохраняют норму 0 часов. Период и цикл могут пересекать годы. Созданные дни можно редактировать в планировании персонала.|Varsayılan: yalnızca plansız günleri doldur. Tatillerin hedefi 0 saat kalır. Dönem ve döngü yılları aşabilir. Oluşturulan günler personel planlamasında düzenlenebilir.|افتراضيًا تُملأ الأيام غير المخططة فقط. تبقى العطلات بساعات مطلوبة صفر. يمكن للفترة والدورة عبور السنوات، وتبقى الأيام قابلة للتعديل في تخطيط الموظفين.|Por defecto solo se completan días sin plan. Los festivos conservan objetivo de 0 horas. El periodo y ciclo pueden abarcar varios años. Los días generados siguen siendo editables.
+Geleistet = Arbeitszeit einschließlich Gastfahrt, abzüglich Pausen. Gutschrift enthält zusätzlich Auffüllung, Urlaub und Krankheit. Plansoll: Arbeitstag/Urlaub 8 h, Ruhe- und Berliner Feiertage 0 h. Bei offenen Plantagen wird die Differenz nicht als endgültiger Saldo ausgewiesen.|Worked hours include passenger transfers and exclude breaks. Credited hours also include top-ups, leave and sickness. Target: workday/leave 8 h; rest days and Berlin holidays 0 h. With unplanned days, the difference is not a final balance.|Czas przepracowany obejmuje przejazdy pasażerskie bez przerw. Zaliczone godziny obejmują też uzupełnienia, urlop i chorobę. Norma: praca/urlop 8 h, odpoczynek i święta Berlina 0 h. Przy otwartych dniach różnica nie jest ostatecznym saldem.|Отработанное время включает пассажирский проезд без перерывов. Зачёт также включает дополнение, отпуск и болезнь. Норма: работа/отпуск 8 ч, отдых и праздники Берлина 0 ч. При открытых днях разница не является окончательным балансом.|Çalışılan süre yolcu seyahatini içerir, molaları içermez. Eklenen süre tamamlama, izin ve hastalığı da kapsar. Hedef: çalışma/izin 8 saat; dinlenme ve Berlin tatilleri 0 saat. Açık günlerde fark kesin bakiye değildir.|الساعات الفعلية تشمل الانتقال كراكب دون الاستراحات. المحتسبة تشمل أيضًا الاستكمال والإجازة والمرض. المطلوب: العمل والإجازة 8 ساعات، والراحة وعطلات برلين صفر. مع أيام غير مخططة لا يُعد الفرق رصيدًا نهائيًا.|Las horas realizadas incluyen viajes como pasajero y excluyen pausas. Las acreditadas incluyen complementos, vacaciones y enfermedad. Objetivo: trabajo/vacaciones 8 h; descanso y festivos de Berlín 0 h. Con días pendientes, la diferencia no es definitiva.
+Arbeitszeit = geleistete Zeit abzüglich Pause, inklusive Gastfahrt. Gutschrift = Arbeitszeit plus bestehende Acht-Stunden-Auffüllung und Urlaub/Krank. Kalenderwochen umfassen Montag bis Sonntag, auch außerhalb des gewählten Monats.|Working time is time worked minus breaks, including passenger transfers. Credited hours add the existing eight-hour top-up and leave/sickness. Calendar weeks run Monday to Sunday, including days outside the selected month.|Czas pracy to przepracowany czas bez przerw, z przejazdami pasażerskimi. Godziny zaliczone obejmują uzupełnienie do ośmiu godzin i urlop/chorobę. Tydzień trwa od poniedziałku do niedzieli, także poza wybranym miesiącem.|Рабочее время — отработанное время без перерывов, включая пассажирский проезд. Зачёт включает дополнение до восьми часов и отпуск/болезнь. Недели идут с понедельника по воскресенье, включая дни вне выбранного месяца.|Çalışma süresi molalar çıkarılmış, yolcu seyahati dahil süredir. Eklenen süre sekiz saate tamamlama ve izin/hastalığı içerir. Haftalar seçili ay dışındaki günler dahil pazartesiden pazara uzanır.|وقت العمل هو الوقت الفعلي دون الاستراحة مع الانتقال كراكب. المحتسب يضيف الاستكمال إلى ثماني ساعات والإجازة والمرض. يمتد الأسبوع من الاثنين إلى الأحد، حتى خارج الشهر المحدد.|El tiempo de trabajo descuenta pausas e incluye viajes como pasajero. Las horas acreditadas añaden el complemento a ocho horas y vacaciones/enfermedad. Las semanas van de lunes a domingo, incluso fuera del mes elegido.
+Beim Speichern werden Tages-, Wochen- und Monatszeiten neu berechnet. Bei administrativen Tf-Korrekturen wird zusätzlich eine E-Mail mit „Vorher → Nachher“ vorgemerkt.|Saving recalculates daily, weekly and monthly hours. Administrative driver corrections also queue an email showing “Before → After”.|Zapis przelicza czas dzienny, tygodniowy i miesięczny. Korekty administracyjne maszynisty tworzą też e-mail „Przed → Po”.|При сохранении пересчитываются дневные, недельные и месячные часы. При административной коррекции машиниста также создаётся письмо «До → После».|Kaydetme günlük, haftalık ve aylık saatleri yeniden hesaplar. İdari makinist düzeltmeleri “Önce → Sonra” e-postası da oluşturur.|يُعيد الحفظ حساب ساعات اليوم والأسبوع والشهر. وتُدرج التصحيحات الإدارية للسائق رسالة «قبل ← بعد» للإرسال.|Al guardar se recalculan horas diarias, semanales y mensuales. Las correcciones administrativas del maquinista generan además un correo «Antes → Después».
+IMAP- und SMTP-Server werden auf dem Server konfiguriert. Das Passwort wird verschlüsselt gespeichert und niemals angezeigt. Die Freigabe „Email“ erlaubt den Zugriff auf die Tf-Postfächer.|IMAP and SMTP servers are configured on the server. The password is encrypted and never displayed. The “Email” permission grants access to driver mailboxes.|Serwery IMAP i SMTP konfiguruje się na serwerze. Hasło jest szyfrowane i nigdy nie wyświetlane. Uprawnienie „E-mail” pozwala na dostęp do skrzynek maszynistów.|Серверы IMAP и SMTP настраиваются на сервере. Пароль хранится зашифрованным и не отображается. Право «Почта» даёт доступ к ящикам машинистов.|IMAP ve SMTP sunucuları sunucuda yapılandırılır. Parola şifreli saklanır, gösterilmez. “E-posta” yetkisi makinist posta kutularına erişim sağlar.|تُضبط خوادم IMAP وSMTP على الخادم. تُحفظ كلمة المرور مشفرة ولا تُعرض. تتيح صلاحية «البريد» الوصول إلى صناديق السائقين.|IMAP y SMTP se configuran en el servidor. La contraseña se cifra y nunca se muestra. El permiso «Correo» permite acceder a los buzones de los maquinistas.
+Entwürfe speichern Empfänger, Betreff und Text. Anhänge werden erst beim Senden hochgeladen und müssen nach dem Laden eines Entwurfs neu gewählt werden. Antworten und Weiterleiten übernehmen den Text; vorhandene Anhänge bei Bedarf herunterladen und neu hinzufügen.|Drafts save recipients, subject and text. Attachments upload only on sending and must be reselected after loading a draft. Replies and forwards include text; download and reattach existing attachments if needed.|Szkice zapisują odbiorców, temat i tekst. Załączniki przesyła się przy wysyłce i trzeba je ponownie wybrać po wczytaniu szkicu. Odpowiedzi i przekazanie zawierają tekst; w razie potrzeby pobierz i dodaj załączniki.|Черновики сохраняют получателей, тему и текст. Вложения загружаются при отправке и выбираются заново после загрузки черновика. Ответ и пересылка включают текст; вложения при необходимости скачайте и добавьте заново.|Taslaklar alıcı, konu ve metni saklar. Ekler gönderirken yüklenir; taslak açılınca yeniden seçilmelidir. Yanıt ve iletme metni içerir; gerekirse ekleri indirip yeniden ekleyin.|تحفظ المسودات المستلمين والموضوع والنص. تُرفع المرفقات عند الإرسال وتُختار مجددًا بعد تحميل المسودة. الرد والتحويل يشملان النص؛ نزّل المرفقات وأضفها عند الحاجة.|Los borradores guardan destinatarios, asunto y texto. Los adjuntos se suben al enviar y deben elegirse de nuevo al cargar un borrador. Las respuestas y reenvíos incluyen texto; descargue y vuelva a adjuntar archivos si hace falta.
+Jeweils einen Eintrag bearbeiten: Beginn und Ende korrigieren, dann „Prüfen“. Vor dem Speichern werden alte und neue Zeiten angezeigt. Das Enddatum muss am oder nach dem Beginn-Datum liegen. Für eine Schicht über Mitternacht den Folgetag wählen. Pause und Gastfahrt bleiben unverändert. Urlaub und Krank werden weiterhin mit acht Stunden berechnet.|Edit one entry at a time: correct start and end, then check. Old and new times appear before saving. The end date must be on or after the start date. For overnight shifts, choose the next day. Break and passenger transfer remain unchanged. Leave and sickness still count as eight hours.|Edytuj jeden wpis: popraw początek i koniec, potem sprawdź. Stare i nowe godziny pojawią się przed zapisem. Koniec nie może poprzedzać początku. Dla zmiany nocnej wybierz następny dzień. Przerwa i przejazd pozostają bez zmian. Urlop i choroba nadal liczą osiem godzin.|Редактируйте одну запись: исправьте начало и конец, затем проверьте. До сохранения показывается старое и новое время. Дата конца не раньше начала; при ночной смене выберите следующий день. Перерыв и проезд не меняются. Отпуск и больничный считаются по восемь часов.|Tek kayıt düzenleyin: başlangıç ve bitişi düzeltip kontrol edin. Kaydetmeden eski ve yeni saatler gösterilir. Bitiş tarihi başlangıçtan önce olamaz; gece vardiyası için ertesi günü seçin. Mola ve yolcu seyahati değişmez. İzin ve hastalık sekiz saat sayılır.|عدّل سجلًا واحدًا: صحح البداية والنهاية ثم تحقق. تظهر الأوقات القديمة والجديدة قبل الحفظ. لا يسبق تاريخ النهاية البداية؛ للوردية الليلية اختر اليوم التالي. تبقى الاستراحة والانتقال دون تغيير. الإجازة والمرض يُحسبان ثماني ساعات.|Edite una entrada: corrija inicio y fin y compruebe. Antes de guardar se muestran ambos horarios. La fecha final no puede ser anterior; para turnos nocturnos elija el día siguiente. Pausa y viaje no cambian. Vacaciones y enfermedad siguen contando ocho horas.
+Einträge werden über die App an den Server gesendet.|Entries are sent to the server through the app.|Wpisy są wysyłane na serwer przez aplikację.|Записи отправляются на сервер через приложение.|Kayıtlar uygulama üzerinden sunucuya gönderilir.|تُرسل السجلات إلى الخادم عبر التطبيق.|Las entradas se envían al servidor desde la aplicación.
+Für diesen Monat wurden noch keine Einträge übermittelt.|No entries have been submitted for this month yet.|Nie przesłano jeszcze wpisów za ten miesiąc.|За этот месяц ещё нет отправленных записей.|Bu ay için henüz kayıt gönderilmedi.|لم تُرسل سجلات لهذا الشهر بعد.|Todavía no se han enviado entradas de este mes.
+Plan vollständig. Differenz bezieht sich auf geleistete Stunden; Gutschrift wird separat angezeigt.|Schedule complete. The difference refers to worked hours; credited hours are shown separately.|Plan kompletny. Różnica dotyczy przepracowanych godzin; zaliczone godziny pokazano osobno.|План заполнен. Разница относится к отработанным часам; зачёт показывается отдельно.|Plan tamamlandı. Fark çalışılan saatlere aittir; eklenen süre ayrı gösterilir.|الخطة مكتملة. الفرق يتعلق بالساعات الفعلية؛ المحتسبة تُعرض منفصلة.|Plan completo. La diferencia se refiere a horas realizadas; las acreditadas se muestran aparte.
+Jahreskalender: oben geleistet, unten Plansoll. Tag anklicken für Details.|Annual calendar: worked hours above, target below. Click a day for details.|Kalendarz roczny: przepracowane u góry, norma na dole. Kliknij dzień po szczegóły.|Годовой календарь: сверху отработано, снизу норма. Нажмите день для деталей.|Yıllık takvim: üstte çalışılan, altta hedef. Ayrıntılar için güne tıklayın.|التقويم السنوي: الفعلي أعلى والمطلوب أسفل. انقر اليوم للتفاصيل.|Calendario anual: realizadas arriba, objetivo abajo. Pulse un día para detalles.
+Tf-Anmeldung mit dem vom Admin angelegten Konto|Train driver login using the account created by the administrator|Logowanie maszynisty na konto utworzone przez administratora|Вход машиниста с учётной записью администратора|Yöneticinin oluşturduğu hesapla makinist girişi|دخول السائق بحساب أنشأه المسؤول|Acceso del maquinista con la cuenta creada por el administrador
+Die Anmeldung bleibt auf diesem Gerät gespeichert.|Your login is saved on this device.|Logowanie pozostaje zapisane na tym urządzeniu.|Вход сохраняется на этом устройстве.|Giriş bu cihazda saklanır.|يُحفظ تسجيل الدخول على هذا الجهاز.|El acceso queda guardado en este dispositivo.
+Anmeldung erforderlich|Login required|Wymagane logowanie|Требуется вход|Giriş gerekli|تسجيل الدخول مطلوب|Debe iniciar sesión
+Anmeldung fehlgeschlagen|Login failed|Logowanie nieudane|Ошибка входа|Giriş başarısız|فشل تسجيل الدخول|Error de acceso
+Ungültiger Ursprung|Invalid request origin|Nieprawidłowe źródło żądania|Недопустимый источник запроса|Geçersiz istek kaynağı|مصدر الطلب غير صالح|Origen de solicitud no válido
+Keine ausreichende Freigabe für dieses Modul.|Insufficient permission for this module.|Brak uprawnień do tego modułu.|Недостаточно прав для этого модуля.|Bu modül için yeterli yetki yok.|الصلاحية غير كافية لهذه الوحدة.|Permisos insuficientes para este módulo.
+Bitte zuerst Ihr Initialpasswort ändern.|Please change your initial password first.|Najpierw zmień hasło początkowe.|Сначала измените первоначальный пароль.|Önce ilk parolanızı değiştirin.|يرجى تغيير كلمة المرور الأولية أولًا.|Cambie primero la contraseña inicial.
+Passwörter stimmen nicht überein|Passwords do not match|Hasła nie są zgodne|Пароли не совпадают|Parolalar eşleşmiyor|كلمتا المرور غير متطابقتين|Las contraseñas no coinciden
+Aktuelles Passwort ist falsch|Current password is incorrect|Aktualne hasło jest nieprawidłowe|Текущий пароль неверен|Mevcut parola yanlış|كلمة المرور الحالية غير صحيحة|La contraseña actual es incorrecta
+Neues Passwort muss sich vom bisherigen Passwort unterscheiden|New password must differ from the previous password|Nowe hasło musi różnić się od poprzedniego|Новый пароль должен отличаться от прежнего|Yeni parola öncekinden farklı olmalıdır|يجب أن تختلف كلمة المرور الجديدة عن السابقة|La contraseña nueva debe ser diferente de la anterior
+Pflichtfeld darf nicht leer sein|Required field cannot be blank|Pole wymagane nie może być puste|Обязательное поле не может быть пустым|Zorunlu alan boş olamaz|لا يمكن ترك الحقل المطلوب فارغًا|El campo obligatorio no puede estar vacío
+Ungültige Modulberechtigung|Invalid module permission|Nieprawidłowe uprawnienie modułu|Недопустимое право модуля|Geçersiz modül yetkisi|صلاحية الوحدة غير صالحة|Permiso de módulo no válido
+Sie dürfen keine höheren Rechte als Ihre eigenen vergeben.|You cannot grant permissions higher than your own.|Nie możesz nadawać uprawnień wyższych niż własne.|Нельзя назначать права выше своих.|Kendi yetkilerinizden fazlasını veremezsiniz.|لا يمكنك منح صلاحيات أعلى من صلاحياتك.|No puede conceder permisos superiores a los propios.
+Tf nicht gefunden|Train driver not found|Nie znaleziono maszynisty|Машинист не найден|Makinist bulunamadı|السائق غير موجود|Maquinista no encontrado
+Tf-Anmeldung erforderlich|Train driver login required|Wymagane logowanie maszynisty|Требуется вход машиниста|Makinist girişi gerekli|دخول السائق مطلوب|Se requiere acceso de maquinista
+Mitarbeiter nicht gefunden|Employee not found|Nie znaleziono pracownika|Сотрудник не найден|Çalışan bulunamadı|الموظف غير موجود|Empleado no encontrado
+Verwaltungsmitarbeiter nicht gefunden|Administrative employee not found|Nie znaleziono pracownika administracji|Административный сотрудник не найден|İdari çalışan bulunamadı|الموظف الإداري غير موجود|Empleado administrativo no encontrado
+Konto nicht gefunden|Account not found|Nie znaleziono konta|Учётная запись не найдена|Hesap bulunamadı|الحساب غير موجود|Cuenta no encontrada
+Ungültiger Monat|Invalid month|Nieprawidłowy miesiąc|Недопустимый месяц|Geçersiz ay|شهر غير صالح|Mes no válido
+Ungültiges Jahr|Invalid year|Nieprawidłowy rok|Недопустимый год|Geçersiz yıl|سنة غير صالحة|Año no válido
+Arbeitsende muss nach dem Arbeitsbeginn liegen|Work end must be after work start|Koniec pracy musi być po początku|Окончание должно быть после начала работы|İş bitişi başlangıçtan sonra olmalıdır|يجب أن تنتهي الفترة بعد بدايتها|El fin debe ser posterior al inicio
+Der Arbeitszeitdatensatz ist gesperrt und kann nicht geändert werden.|This time entry is locked and cannot be changed.|Ten wpis czasu jest zablokowany i nie można go zmienić.|Запись времени заблокирована и не может быть изменена.|Bu zaman kaydı kilitli ve değiştirilemez.|سجل الوقت مقفل ولا يمكن تعديله.|Este registro está bloqueado y no puede modificarse.
+Arbeitszeitdatensatz ist gesperrt. Das gesamte Paket wurde nicht übernommen.|Time entry is locked. The entire upload was rejected.|Wpis czasu jest zablokowany. Cały pakiet odrzucono.|Запись времени заблокирована. Весь пакет отклонён.|Zaman kaydı kilitli. Yüklemenin tamamı reddedildi.|سجل الوقت مقفل. رُفضت الحزمة كاملة.|El registro está bloqueado. Se rechazó toda la carga.
+Eintrag wurde inzwischen geändert. Bitte neu laden.|Entry has changed. Please reload.|Wpis został zmieniony. Wczytaj ponownie.|Запись изменена. Обновите страницу.|Kayıt değişmiş. Yeniden yükleyin.|تغير السجل. يرجى إعادة التحميل.|El registro cambió. Vuelva a cargar.
+Eintrag nicht gefunden|Entry not found|Nie znaleziono wpisu|Запись не найдена|Kayıt bulunamadı|السجل غير موجود|Registro no encontrado
+Eintrag des Mitarbeiters nicht gefunden|Employee entry not found|Nie znaleziono wpisu pracownika|Запись сотрудника не найдена|Çalışanın kaydı bulunamadı|سجل الموظف غير موجود|Registro del empleado no encontrado
+Begründung erforderlich|Reason required|Wymagane uzasadnienie|Требуется причина|Gerekçe gerekli|السبب مطلوب|Se requiere un motivo
+Plan wurde inzwischen geändert. Bitte neu laden.|Schedule has changed. Please reload.|Plan został zmieniony. Wczytaj ponownie.|План изменён. Обновите страницу.|Plan değişmiş. Yeniden yükleyin.|تغير الجدول. يرجى إعادة التحميل.|El plan cambió. Vuelva a cargar.
+Plan wurde geändert. Vorschau erneut laden.|Schedule changed. Reload the preview.|Plan zmieniony. Wczytaj podgląd ponownie.|План изменён. Обновите предпросмотр.|Plan değişti. Önizlemeyi yeniden yükleyin.|تغير الجدول. أعد تحميل المعاينة.|El plan cambió. Recargue la vista previa.
+Modell wurde zwischenzeitlich geändert. Bitte neu laden.|Model has changed. Please reload.|Model został zmieniony. Wczytaj ponownie.|Модель изменена. Обновите страницу.|Model değişmiş. Yeniden yükleyin.|تغير النموذج. يرجى إعادة التحميل.|El modelo cambió. Vuelva a cargar.
+Modellname bereits vorhanden|Model name already exists|Nazwa modelu już istnieje|Название модели уже существует|Model adı zaten var|اسم النموذج موجود بالفعل|El nombre del modelo ya existe
+Schichtmodell nicht gefunden|Shift model not found|Nie znaleziono modelu zmian|Модель смен не найдена|Vardiya modeli bulunamadı|نموذج الوردية غير موجود|Modelo de turnos no encontrado
+Jahre müssen zwischen 2000 und 2100 liegen.|Years must be between 2000 and 2100.|Lata muszą mieścić się między 2000 a 2100.|Годы должны быть от 2000 до 2100.|Yıllar 2000 ile 2100 arasında olmalıdır.|يجب أن تكون السنوات بين 2000 و2100.|Los años deben estar entre 2000 y 2100.
+Zeitraum muss vorwärts liegen und darf höchstens fünf Jahre umfassen.|The period must run forward and span no more than five years.|Okres musi być chronologiczny i obejmować najwyżej pięć lat.|Период должен идти вперёд и не превышать пяти лет.|Dönem ileri yönde ve en fazla beş yıl olmalıdır.|يجب أن تكون الفترة مرتبة ولا تتجاوز خمس سنوات.|El periodo debe avanzar y abarcar como máximo cinco años.
+Bitte eine XLSX-Datei auswählen|Please select an XLSX file|Wybierz plik XLSX|Выберите файл XLSX|Lütfen XLSX dosyası seçin|يرجى اختيار ملف XLSX|Seleccione un archivo XLSX
+Keine lesbare XLSX-Datei|Unreadable XLSX file|Nieczytelny plik XLSX|Нечитаемый файл XLSX|Okunamayan XLSX dosyası|ملف XLSX غير قابل للقراءة|Archivo XLSX ilegible
+Keine Tageszeilen gefunden|No daily rows found|Nie znaleziono wierszy dni|Не найдены строки дней|Günlük satır bulunamadı|لا توجد صفوف أيام|No se encontraron filas diarias
+Excel-Datei darf höchstens 2 MB groß sein|Excel file must not exceed 2 MB|Plik Excel nie może przekraczać 2 MB|Файл Excel не должен превышать 2 МБ|Excel dosyası en fazla 2 MB olmalıdır|يجب ألا يتجاوز ملف إكسل 2 ميغابايت|El archivo Excel no puede superar 2 MB
+Excel-Datei ist entpackt zu groß|Unpacked Excel file is too large|Rozpakowany plik Excel jest za duży|Распакованный Excel слишком большой|Açılmış Excel dosyası çok büyük|ملف إكسل بعد فك الضغط كبير جدًا|El archivo Excel descomprimido es demasiado grande
+Makros werden nicht importiert|Macros are not imported|Makra nie są importowane|Макросы не импортируются|Makrolar içe aktarılmaz|لا تُستورد وحدات الماكرو|No se importan macros
+Für diesen Tf ist noch kein Postfach eingerichtet.|No mailbox is configured for this driver yet.|Nie skonfigurowano jeszcze skrzynki tego maszynisty.|Для этого машиниста ещё не настроена почта.|Bu makinist için posta kutusu kurulmamış.|لم يُعد صندوق بريد لهذا السائق بعد.|Todavía no hay buzón configurado para este maquinista.
+Postfach-Verschlüsselungsschlüssel muss auf dem Server eingerichtet werden.|A mailbox encryption key must be configured on the server.|Na serwerze trzeba skonfigurować klucz szyfrowania skrzynki.|На сервере нужно настроить ключ шифрования почты.|Sunucuda posta şifreleme anahtarı ayarlanmalıdır.|يجب إعداد مفتاح تشفير البريد على الخادم.|Debe configurar una clave de cifrado del buzón en el servidor.
+Postfachschlüssel passt nicht. Zugangsdaten neu hinterlegen.|Mailbox key does not match. Enter credentials again.|Klucz skrzynki nie pasuje. Wprowadź dane dostępu ponownie.|Ключ почты не подходит. Задайте данные заново.|Posta anahtarı eşleşmiyor. Erişim bilgilerini yeniden girin.|مفتاح البريد غير مطابق. أعد إدخال بيانات الوصول.|La clave no coincide. Introduzca otra vez las credenciales.
+Postfachpasswort erforderlich|Mailbox password required|Wymagane hasło skrzynki|Требуется пароль почты|Posta parolası gerekli|كلمة مرور البريد مطلوبة|Se requiere contraseña del buzón
+Postfachverbindung fehlgeschlagen. Server und Zugangsdaten prüfen.|Mailbox connection failed. Check server and credentials.|Połączenie ze skrzynką nieudane. Sprawdź serwer i dane.|Ошибка соединения с почтой. Проверьте сервер и данные.|Posta bağlantısı başarısız. Sunucu ve erişim bilgilerini kontrol edin.|فشل اتصال البريد. تحقق من الخادم وبيانات الوصول.|Error de conexión al buzón. Revise servidor y credenciales.
+Postfachordner hat sich geändert. Bitte neu laden.|Mailbox folder changed. Please reload.|Folder skrzynki zmienił się. Wczytaj ponownie.|Папка почты изменилась. Обновите страницу.|Posta klasörü değişti. Yeniden yükleyin.|تغير مجلد البريد. يرجى إعادة التحميل.|La carpeta cambió. Vuelva a cargar.
+Postfachordner nicht gefunden|Mailbox folder not found|Nie znaleziono folderu skrzynki|Папка почты не найдена|Posta klasörü bulunamadı|مجلد البريد غير موجود|Carpeta del buzón no encontrada
+Ordnerliste konnte nicht gelesen werden|Could not read folder list|Nie można odczytać folderów|Не удалось прочитать список папок|Klasör listesi okunamadı|تعذرت قراءة قائمة المجلدات|No se pudo leer la lista de carpetas
+Nachrichtensuche fehlgeschlagen|Message search failed|Wyszukiwanie wiadomości nieudane|Ошибка поиска писем|Mesaj araması başarısız|فشل البحث عن الرسائل|Error al buscar mensajes
+Lesestatus konnte nicht geändert werden|Could not change read status|Nie można zmienić statusu odczytu|Не удалось изменить статус чтения|Okuma durumu değiştirilemedi|تعذر تغيير حالة القراءة|No se pudo cambiar el estado de lectura
+E-Mail-Versand fehlgeschlagen. Keine automatische Wiederholung; Postfach und Server prüfen.|Email delivery failed. No automatic retry; check mailbox and server.|Wysyłka e-mail nieudana. Bez automatycznej próby; sprawdź skrzynkę i serwer.|Отправка не удалась. Автоповтора нет; проверьте почту и сервер.|E-posta gönderilemedi. Otomatik tekrar yok; posta ve sunucuyu kontrol edin.|فشل الإرسال. لا إعادة تلقائية؛ تحقق من البريد والخادم.|Error de envío. Sin reintento automático; revise buzón y servidor.
+Ungültige Kopfzeile|Invalid header|Nieprawidłowy nagłówek|Недопустимый заголовок|Geçersiz başlık|ترويسة غير صالحة|Cabecera no válida
+Ungültige Nachrichtenkennung|Invalid message identifier|Nieprawidłowy identyfikator wiadomości|Недопустимый идентификатор письма|Geçersiz mesaj kimliği|معرف رسالة غير صالح|Identificador de mensaje no válido
+Ungültiger Dateiname|Invalid filename|Nieprawidłowa nazwa pliku|Недопустимое имя файла|Geçersiz dosya adı|اسم ملف غير صالح|Nombre de archivo no válido
+Ungültiges Fotoformat|Invalid photo format|Nieprawidłowy format zdjęcia|Недопустимый формат фото|Geçersiz fotoğraf biçimi|صيغة الصورة غير صالحة|Formato de foto no válido
+Planansicht|Schedule view|Widok planu|Просмотр плана|Plan görünümü|عرض الجدول|Vista del plan
+ungeplante Tage|unplanned days|nieplanowane dni|незапланированные дни|plansız günler|أيام غير مخططة|días sin planificar
+Tage gewählt|days selected|dni wybrano|дней выбрано|gün seçildi|أيام محددة|días seleccionados
+Tage offen|days open|dni otwarte|дней не завершено|gün açık|أيام مفتوحة|días pendientes
+Planungsnotiz|Schedule note|Notatka planu|Заметка плана|Plan notu|ملاحظة الجدول|Nota del plan
+Plan vollständig|Schedule complete|Plan kompletny|План заполнен|Plan tamamlandı|الخطة مكتملة|Plan completo
+Plansoll vorläufig|Provisional target|Norma tymczasowa|Предварительная норма|Geçici hedef|المطلوب مؤقت|Objetivo provisional
+Differenz offen|Difference pending|Różnica otwarta|Разница не определена|Fark açık|الفرق غير محدد|Diferencia pendiente
+Bitte einen Tag im ausgewählten Jahr wählen.|Please select a day in the selected year.|Wybierz dzień w wybranym roku.|Выберите день в выбранном году.|Seçili yıldan bir gün seçin.|اختر يومًا في السنة المحددة.|Elija un día del año seleccionado.
+Bitte ein Jahr zwischen 2000 und 2100 wählen.|Please choose a year between 2000 and 2100.|Wybierz rok między 2000 a 2100.|Выберите год от 2000 до 2100.|2000 ile 2100 arasında bir yıl seçin.|اختر سنة بين 2000 و2100.|Elija un año entre 2000 y 2100.
+Noch keine Tf angelegt.|No train drivers created yet.|Nie dodano jeszcze maszynistów.|Машинисты ещё не добавлены.|Henüz makinist eklenmedi.|لم يُضف سائقون بعد.|Todavía no hay maquinistas.
+Noch kein Postfach eingerichtet.|No mailbox configured yet.|Nie skonfigurowano skrzynki.|Почта ещё не настроена.|Posta kutusu henüz kurulmadı.|لم يُعد صندوق البريد بعد.|Todavía no hay buzón configurado.
+Postfach wird geladen …|Loading mailbox …|Wczytywanie skrzynki …|Загрузка почты …|Posta yükleniyor …|جارٍ تحميل البريد …|Cargando buzón …
+Entwurf gespeichert.|Draft saved.|Szkic zapisany.|Черновик сохранён.|Taslak kaydedildi.|حُفظت المسودة.|Borrador guardado.
+E-Mail versendet.|Email sent.|E-mail wysłany.|Письмо отправлено.|E-posta gönderildi.|أُرسلت الرسالة.|Correo enviado.
+Anhang konnte nicht gelesen werden|Could not read attachment|Nie można odczytać załącznika|Не удалось прочитать вложение|Ek okunamadı|تعذرت قراءة المرفق|No se pudo leer el adjunto
+Schichtmodell gespeichert.|Shift model saved.|Model zmian zapisany.|Модель смен сохранена.|Vardiya modeli kaydedildi.|حُفظ نموذج الوردية.|Modelo de turnos guardado.
+Bitte auswählen|Please select|Wybierz|Выберите|Lütfen seçin|يرجى الاختيار|Seleccione
+Zugfahrten|Train journeys|Jazdy pociągiem|Поездки на поезде|Tren yolculukları|رحلات القطار|Trayectos en tren
+Monatsübersicht|Monthly overview|Przegląd miesięczny|Месячный обзор|Aylık özet|نظرة شهرية|Resumen mensual
+Monat senden|Submit month|Wyślij miesiąc|Отправить месяц|Ayı gönder|إرسال الشهر|Enviar mes
+Sende …|Sending …|Wysyłanie …|Отправка …|Gönderiliyor …|جارٍ الإرسال …|Enviando …
+Anmeldung läuft …|Logging in …|Logowanie …|Вход …|Giriş yapılıyor …|جارٍ الدخول …|Iniciando sesión …
+Wird geändert …|Changing …|Zmienianie …|Изменение …|Değiştiriliyor …|جارٍ التغيير …|Cambiando …
+Datum (JJJJ-MM-TT)|Date (YYYY-MM-DD)|Data (RRRR-MM-DD)|Дата (ГГГГ-ММ-ДД)|Tarih (YYYY-AA-GG)|التاريخ (سنة-شهر-يوم)|Fecha (AAAA-MM-DD)
+Beginn (HH:MM)|Start (HH:MM)|Początek (GG:MM)|Начало (ЧЧ:ММ)|Başlangıç (SS:DD)|البداية (ساعة:دقيقة)|Inicio (HH:MM)
+Ende (HH:MM)|End (HH:MM)|Koniec (GG:MM)|Конец (ЧЧ:ММ)|Bitiş (SS:DD)|النهاية (ساعة:دقيقة)|Fin (HH:MM)
+Pause (Minuten)|Break (minutes)|Przerwa (minuty)|Перерыв (минуты)|Mola (dakika)|استراحة (دقائق)|Pausa (minutos)
+Gastfahrt (Minuten)|Passenger transfer (minutes)|Przejazd pasażerski (minuty)|Пассажирский проезд (минуты)|Yolcu seyahati (dakika)|الانتقال كراكب (دقائق)|Viaje como pasajero (minutos)
+Dienst und Zug|Duty and train|Służba i pociąg|Служба и поезд|Görev ve tren|المناوبة والقطار|Servicio y tren
+Dienst starten|Start duty|Rozpocznij służbę|Начать службу|Görevi başlat|بدء المناوبة|Iniciar servicio
+Dienst beenden|End duty|Zakończ służbę|Завершить службу|Görevi bitir|إنهاء المناوبة|Finalizar servicio
+Zugnummer|Train number|Numer pociągu|Номер поезда|Tren numarası|رقم القطار|Número de tren
+OSM laden|Load OSM|Wczytaj OSM|Загрузить OSM|OSM yükle|تحميل OSM|Cargar OSM
+Aktueller Aufenthalt|Current stop|Bieżący postój|Текущая остановка|Mevcut durak|التوقف الحالي|Parada actual
+Betriebsstelle (editierbar)|Operating location (editable)|Punkt eksploatacyjny (edytowalny)|Раздельный пункт (редактируется)|İşletme noktası (düzenlenebilir)|الموقع التشغيلي (قابل للتعديل)|Punto operativo (editable)
+Betriebsstelle|Operating location|Punkt eksploatacyjny|Раздельный пункт|İşletme noktası|الموقع التشغيلي|Punto operativo
+DS100-Kürzel|DS100 code|Kod DS100|Код DS100|DS100 kodu|رمز DS100|Código DS100
+DS100-Kürzel (optional)|DS100 code (optional)|Kod DS100 (opcjonalny)|Код DS100 (необязательно)|DS100 kodu (isteğe bağlı)|رمز DS100 (اختياري)|Código DS100 (opcional)
+DS100 suchen|Search DS100|Szukaj DS100|Искать DS100|DS100 ara|بحث DS100|Buscar DS100
+Ankunft|Arrival|Przyjazd|Прибытие|Varış|الوصول|Llegada
+Abfahrt|Departure|Odjazd|Отправление|Kalkış|المغادرة|Salida
+Standzeit|Stop duration|Czas postoju|Время стоянки|Bekleme süresi|مدة التوقف|Tiempo de parada
+Dauer|Duration|Czas trwania|Длительность|Süre|المدة|Duración
+Standzeit speichern|Save stop|Zapisz postój|Сохранить стоянку|Beklemeyi kaydet|حفظ التوقف|Guardar parada
+Standzeiten|Stops|Postoje|Стоянки|Beklemeler|التوقفات|Paradas
+Standzeit korrigieren|Correct stop|Skoryguj postój|Исправить стоянку|Beklemeyi düzelt|تصحيح التوقف|Corregir parada
+Betriebsstelle / Zeiten bearbeiten|Edit location / times|Edytuj punkt / godziny|Изменить пункт / время|Noktayı / saatleri düzenle|تعديل الموقع والأوقات|Editar punto / horarios
+Falschen Eintrag löschen|Delete incorrect entry|Usuń błędny wpis|Удалить неверную запись|Yanlış kaydı sil|حذف السجل الخاطئ|Eliminar registro incorrecto
+Grund der Standzeit|Reason for stop|Powód postoju|Причина стоянки|Bekleme nedeni|سبب التوقف|Motivo de parada
+Notiz (optional)|Note (optional)|Notatka (opcjonalna)|Заметка (необязательно)|Not (isteğe bağlı)|ملاحظة (اختيارية)|Nota (opcional)
+Erkannte Zeiten können nach dem Speichern bearbeitet werden.|Detected times can be edited after saving.|Wykryte godziny można edytować po zapisaniu.|Определённое время можно исправить после сохранения.|Algılanan saatler kaydettikten sonra düzenlenebilir.|يمكن تعديل الأوقات المكتشفة بعد الحفظ.|Los horarios detectados pueden editarse después de guardar.
+Manuell|Manual|Ręcznie|Вручную|Elle|يدوي|Manual
+Manuell korrigiert|Manually corrected|Skorygowano ręcznie|Исправлено вручную|Elle düzeltildi|صُحح يدويًا|Corregido manualmente
+Neujahr|New Year's Day|Nowy Rok|Новый год|Yılbaşı|رأس السنة|Año Nuevo
+Internationaler Frauentag|International Women's Day|Międzynarodowy Dzień Kobiet|Международный женский день|Dünya Kadınlar Günü|اليوم العالمي للمرأة|Día Internacional de la Mujer
+Karfreitag|Good Friday|Wielki Piątek|Страстная пятница|Kutsal Cuma|الجمعة العظيمة|Viernes Santo
+Ostermontag|Easter Monday|Poniedziałek Wielkanocny|Пасхальный понедельник|Paskalya Pazartesisi|اثنين الفصح|Lunes de Pascua
+Tag der Arbeit|Labour Day|Święto Pracy|День труда|Emek ve Dayanışma Günü|عيد العمال|Día del Trabajo
+Christi Himmelfahrt|Ascension Day|Wniebowstąpienie Pańskie|Вознесение Господне|İsa'nın Göğe Yükselişi|عيد الصعود|Ascensión
+Pfingstmontag|Whit Monday|Poniedziałek Zielonoświątkowy|Духов понедельник|Pentekost Pazartesisi|اثنين العنصرة|Lunes de Pentecostés
+Tag der Deutschen Einheit|German Unity Day|Dzień Jedności Niemiec|День германского единства|Alman Birliği Günü|يوم الوحدة الألمانية|Día de la Unidad Alemana
+Erster Weihnachtstag|Christmas Day|Pierwszy dzień Bożego Narodzenia|Первый день Рождества|Noel'in ilk günü|أول أيام عيد الميلاد|Navidad
+Zweiter Weihnachtstag|Second Christmas Day|Drugi dzień Bożego Narodzenia|Второй день Рождества|Noel'in ikinci günü|ثاني أيام عيد الميلاد|Segundo día de Navidad
+Erforderliche Arbeitstage|Required workdays|Wymagane dni pracy|Необходимые рабочие дни|Gerekli çalışma günleri|أيام العمل المطلوبة|Días de trabajo requeridos
+Urlaubsgutschrift|Leave credit|Zaliczenie urlopu|Зачёт отпуска|İzin kredisi|ساعات الإجازة المحتسبة|Crédito de vacaciones
+Unvollständig|Incomplete|Niekompletny|Неполный|Eksik|غير مكتمل|Incompleto
+Jahresplan|Annual schedule|Plan roczny|Годовой план|Yıllık plan|الخطة السنوية|Plan anual
+Notizen|Notes|Notatki|Заметки|Notlar|الملاحظات|Notas
+Feiertage Berlin|Berlin public holidays|Święta Berlina|Праздники Берлина|Berlin resmî tatilleri|عطلات برلين الرسمية|Festivos de Berlín
+Administrativer Plan · aktueller gespeicherter Stand|Administrative schedule · current saved version|Plan administracyjny · aktualna zapisana wersja|Административный план · сохранённая версия|İdari plan · mevcut kayıtlı sürüm|جدول إداري · النسخة الحالية المحفوظة|Plan administrativo · versión guardada actual
+Seite|Page|Strona|Страница|Sayfa|الصفحة|Página
+LokZeitleiste - Eingangsbestätigung|LokZeitleiste - Submission receipt|LokZeitleiste - Potwierdzenie odbioru|LokZeitleiste - Подтверждение получения|LokZeitleiste - Teslim alındı belgesi|LokZeitleiste - تأكيد الاستلام|LokZeitleiste - Acuse de recibo
+Eingang|Received|Odebrano|Получено|Alındı|الاستلام|Recibido
+Feiertagskalender|Holiday calendar|Kalendarz świąt|Календарь праздников|Tatil takvimi|تقويم العطلات|Calendario de festivos
+Tagessumme|Daily total|Suma dzienna|Дневной итог|Günlük toplam|المجموع اليومي|Total diario
+Keine Einträge empfangen.|No entries received.|Nie odebrano wpisów.|Записи не получены.|Kayıt alınmadı.|لم تُستلم سجلات.|No se recibieron entradas.
+Summe der Übermittlung|Submission total|Suma przesłanych danych|Итог передачи|Gönderim toplamı|مجموع الإرسال|Total del envío
+Bestätigung der empfangenen Daten - keine Entgelt- oder Tarifabrechnung.|Receipt of submitted data - not a payroll or collective agreement statement.|Potwierdzenie danych - nie jest rozliczeniem wynagrodzeń ani układu zbiorowego.|Подтверждение данных — не расчёт зарплаты или тарифа.|Alınan verilerin belgesi; ücret veya toplu sözleşme hesabı değildir.|تأكيد البيانات المستلمة؛ ليس كشف أجور أو حسابًا تعاقديًا.|Acuse de los datos enviados; no es una liquidación salarial ni de convenio.
+Arbeitszeit = Zugfahrt, Bereitschaft und Sonstige Erfassung abzüglich Pause. Gastfahrt ist enthalten und separat ausgewiesen.|Working time = train journeys, standby and other entries minus breaks. Passenger transfers are included and shown separately.|Czas pracy = jazda, dyżur i inne wpisy bez przerw. Przejazdy pasażerskie są uwzględnione i pokazane osobno.|Рабочее время — поездки, дежурство и прочие записи без перерыва. Пассажирский проезд включён и показан отдельно.|Çalışma süresi tren yolculuğu, nöbet ve diğer kayıtlar eksi moladır. Yolcu seyahati dahil ve ayrı gösterilir.|وقت العمل هو الرحلات والاستعداد والسجلات الأخرى دون الاستراحة. الانتقال كراكب مشمول ومعروض منفصلًا.|Tiempo de trabajo = trayectos, guardias y otros registros menos pausas. El viaje como pasajero se incluye y se muestra aparte.
+Mangels genauer Zeitlage liegt die Pause rechnerisch am Ende, Gastfahrt am Beginn des Zeitraums. Sonntag, Feiertag und Nacht (22:00-06:00 Uhr) sind damit vorläufig; Zeitwechsel werden nicht gesondert bewertet.|Without exact timing, breaks are calculated at the end and passenger transfers at the start. Sunday, holiday and night (22:00–06:00) figures are provisional; clock changes are not evaluated separately.|Bez dokładnych godzin przerwę przypisuje się do końca, a przejazd do początku. Niedziele, święta i noc (22:00–06:00) są tymczasowe; zmiany czasu nie są oceniane osobno.|Без точного положения перерыв считается в конце, проезд — в начале. Воскресные, праздничные и ночные часы (22:00–06:00) предварительны; перевод часов отдельно не учитывается.|Kesin zaman bilinmediğinde mola sona, yolcu seyahati başa yerleştirilir. Pazar, tatil ve gece (22:00–06:00) değerleri geçicidir; saat değişimi ayrı hesaplanmaz.|عند غياب التوقيت الدقيق تُحسب الاستراحة في النهاية والانتقال في البداية. قيم الأحد والعطلة والليل (22:00–06:00) مؤقتة؛ لا يُحسب تغيير الساعة منفصلًا.|Sin horarios exactos, la pausa se calcula al final y el viaje al principio. Domingo, festivo y noche (22:00–06:00) son provisionales; los cambios de hora no se calculan aparte.
+LokZeitleiste: Eingang Ihrer Arbeitszeiten|LokZeitleiste: Your time entries received|LokZeitleiste: Odbiór Twoich godzin pracy|LokZeitleiste: Ваше рабочее время получено|LokZeitleiste: Çalışma kayıtlarınız alındı|LokZeitleiste: استلام ساعات عملك|LokZeitleiste: Horas de trabajo recibidas
+Anbei erhalten Sie die tabellarische Bestätigung der übermittelten Tagesdaten. Dies ist keine Entgelt- oder Tarifabrechnung.|Attached is the tabular receipt of your submitted daily data. This is not a payroll or collective agreement statement.|W załączniku potwierdzenie przesłanych danych dziennych. Nie jest to rozliczenie wynagrodzeń ani układu zbiorowego.|Во вложении табличное подтверждение дневных данных. Это не расчёт зарплаты или тарифа.|Ekte günlük verilerinizin tablo biçiminde alındı belgesi bulunur. Bu bir ücret veya toplu sözleşme hesabı değildir.|مرفق تأكيد جدولي للبيانات اليومية المرسلة. ليس كشف أجور أو حسابًا تعاقديًا.|Se adjunta el acuse tabular de los datos diarios enviados. No es una liquidación salarial ni de convenio.
+LokZeitleiste: Ihre Arbeitszeit wurde angepasst|LokZeitleiste: Your working time was adjusted|LokZeitleiste: Twój czas pracy został skorygowany|LokZeitleiste: Ваше рабочее время изменено|LokZeitleiste: Çalışma süreniz düzeltildi|LokZeitleiste: عُدلت ساعات عملك|LokZeitleiste: Se ajustó su tiempo de trabajo
+Guten Tag|Hello|Dzień dobry|Здравствуйте|Merhaba|مرحبًا|Buenos días
+Ihre Arbeitszeit am|Your working time on|Twój czas pracy dnia|Ваше рабочее время за|Şu tarihteki çalışma süreniz|ساعات عملك بتاريخ|Su tiempo de trabajo del
+wurde administrativ angepasst.|was adjusted by an administrator.|został skorygowany przez administrację.|изменено администратором.|yönetici tarafından düzeltildi.|عُدلت بواسطة المسؤول.|fue ajustado por un administrador.
+Arbeitsbeginn|Work start|Początek pracy|Начало работы|İş başlangıcı|بدء العمل|Inicio del trabajo
+Arbeitsende|Work end|Koniec pracy|Окончание работы|İş bitişi|انتهاء العمل|Fin del trabajo
+Pause unverändert|Break unchanged|Przerwa bez zmian|Перерыв без изменений|Mola değişmedi|الاستراحة دون تغيير|Pausa sin cambios
+Minuten|minutes|minuty|минуты|dakika|دقائق|minutos
+Grund|Reason|Powód|Причина|Gerekçe|السبب|Motivo
+Neuberechnung (Vorher → Nachher)|Recalculation (Before → After)|Przeliczenie (Przed → Po)|Перерасчёт (До → После)|Yeniden hesaplama (Önce → Sonra)|إعادة الحساب (قبل ← بعد)|Recálculo (Antes → Después)
+Arbeitszeit enthält Gastfahrt und berücksichtigt Pausen. Die Gutschrift enthält die bestehende|Working time includes passenger transfers and accounts for breaks. Credited hours include the existing|Czas pracy obejmuje przejazdy i uwzględnia przerwy. Zaliczenie obejmuje istniejące|Рабочее время включает проезд и учитывает перерывы. Зачёт включает существующее|Çalışma süresi yolcu seyahati ve molaları kapsar. Eklenen süre mevcut|وقت العمل يشمل الانتقال ويأخذ الاستراحات بالحسبان. المحتسب يشمل|El tiempo incluye viajes y descuenta pausas. Las horas acreditadas incluyen el
+Auffüllung auf acht Stunden sowie Urlaub/Krank. Bei Nachtarbeit wird auf Kalendertage aufgeteilt.|top-up to eight hours and leave/sickness. Night work is split across calendar days.|uzupełnienie do ośmiu godzin i urlop/chorobę. Praca nocna dzielona jest na dni.|дополнение до восьми часов и отпуск/болезнь. Ночная работа делится по календарным дням.|sekiz saate tamamlama ve izin/hastalık süresini içerir. Gece işi takvim günlerine bölünür.|الاستكمال إلى ثماني ساعات والإجازة والمرض. يُقسم العمل الليلي على الأيام.|complemento hasta ocho horas y vacaciones/enfermedad. El trabajo nocturno se divide por días.
+Alle Uhrzeiten sind lokale Zeiten wie in Ihrer Erfassung.|All times are local times as in your entries.|Wszystkie godziny są lokalne, zgodnie z wpisami.|Все часы местные, как в ваших записях.|Tüm saatler kayıtlarınızdaki gibi yerel saattir.|جميع الأوقات محلية كما في سجلاتك.|Todos los horarios son locales, como en sus registros.
+Einträge|Entries|Wpisy|Записи|Kayıtlar|السجلات|Registros
+Tage beibehalten.|days kept.|dni zachowano.|дней сохранено.|gün korundu.|أيام أُبقيت.|días conservados.
+Tage geändert|days changed|dni zmieniono|дней изменено|gün değişti|أيام تغيرت|días modificados
+Tage in Arbeitszeitplan übernommen.|days applied to the work schedule.|dni zastosowano do planu pracy.|дней применено к плану.|gün çalışma planına uygulandı.|أيام طُبقت على الجدول.|días aplicados al plan.
+Tage ungeplant|days unplanned|dni bez planu|дней не запланировано|gün plansız|أيام غير مخططة|días sin plan
+Tage übernehmen|days to apply|dni do zastosowania|дней для применения|gün uygulanacak|أيام للتطبيق|días para aplicar
+bestehende Tage beibehalten|existing days to keep|dni do zachowania|существующих дней сохранить|mevcut gün korunacak|أيام حالية للإبقاء|días existentes para conservar
+Tagesplanungen aus Excel übernommen.|daily schedules imported from Excel.|plany dni zaimportowano z Excela.|дневных планов импортировано из Excel.|günlük plan Excel'den aktarıldı.|خطط يومية استُوردت من إكسل.|planes diarios importados de Excel.
+Tageszeilen geprüft. Nur diese Datumszeilen werden übernommen.|daily rows checked. Only these dates will be applied.|wiersze sprawdzono. Tylko te daty będą zastosowane.|строк проверено. Применятся только эти даты.|günlük satır kontrol edildi. Yalnızca bu tarihler uygulanır.|صفوف يومية فُحصت. تُطبق هذه التواريخ فقط.|filas comprobadas. Solo se aplicarán estas fechas.
+auswählen|select|wybierz|выбрать|seç|اختيار|seleccionar
+Eintrag|Entry|Wpis|Запись|Kayıt|السجل|Registro
+Abmelden fehlgeschlagen|Logout failed|Wylogowanie nieudane|Ошибка выхода|Çıkış başarısız|فشل تسجيل الخروج|Error al cerrar sesión
+Anfrage fehlgeschlagen|Request failed|Żądanie nieudane|Ошибка запроса|İstek başarısız|فشل الطلب|Solicitud fallida
+Anzahl Tage im Zyklusblock|Number of days in cycle block|Liczba dni w bloku cyklu|Число дней в блоке цикла|Döngü bloğundaki gün sayısı|عدد أيام مرحلة الدورة|Número de días del bloque
+Arbeitszeit gespeichert und neu berechnet.|Working time saved and recalculated.|Czas pracy zapisany i przeliczony.|Рабочее время сохранено и пересчитано.|Çalışma süresi kaydedildi ve yeniden hesaplandı.|حُفظ وقت العمل وأُعيد حسابه.|Tiempo guardado y recalculado.
+Arbeitszeit gespeichert und neu berechnet. E-Mail vorgemerkt; Versandstatus siehe Verlauf.|Working time saved and recalculated. Email queued; check history for delivery status.|Czas zapisany i przeliczony. E-mail w kolejce; status wysyłki w historii.|Время сохранено и пересчитано. Письмо в очереди; статус в истории.|Süre kaydedildi ve hesaplandı. E-posta sırada; gönderim durumu geçmişte.|حُفظ الوقت وأُعيد حسابه. الرسالة في الانتظار؛ حالة الإرسال في السجل.|Tiempo guardado y recalculado. Correo en cola; consulte el historial.
+Backend-Menü|Backend menu|Menu zaplecza|Меню управления|Yönetim menüsü|قائمة الإدارة|Menú de gestión
+Benachrichtigung erneut vorgemerkt.|Notification queued again.|Powiadomienie ponownie w kolejce.|Уведомление снова в очереди.|Bildirim yeniden sıraya alındı.|أُدرج الإشعار مجددًا للإرسال.|Notificación puesta de nuevo en cola.
+Bitte Monatsänderungen zuerst speichern oder den Plan neu laden.|Save monthly changes first or reload the schedule.|Najpierw zapisz zmiany miesiąca lub wczytaj plan ponownie.|Сначала сохраните месяц или обновите план.|Önce aylık değişiklikleri kaydedin veya planı yükleyin.|احفظ تغييرات الشهر أولًا أو أعد تحميل الجدول.|Guarde los cambios mensuales o recargue el plan.
+Bitte Tage markieren.|Please select days.|Zaznacz dni.|Выберите дни.|Lütfen günleri seçin.|يرجى تحديد الأيام.|Seleccione días.
+Bitte ein Foto auswählen.|Please select a photo.|Wybierz zdjęcie.|Выберите фото.|Lütfen fotoğraf seçin.|اختر صورة.|Seleccione una foto.
+Bitte eine XLSX-Datei auswählen.|Please select an XLSX file.|Wybierz plik XLSX.|Выберите файл XLSX.|Lütfen XLSX dosyası seçin.|اختر ملف XLSX.|Seleccione un archivo XLSX.
+Die eigene Zeiterfassung ist für Tf und Verwaltungsmitarbeiter vorgesehen.|Personal time entry is available to train drivers and administrative staff.|Własna ewidencja czasu jest dla maszynistów i administracji.|Личный учёт времени доступен машинистам и административным сотрудникам.|Kişisel zaman kaydı makinistler ve idari personel içindir.|تسجيل الوقت الشخصي متاح للسائقين والموظفين الإداريين.|El registro personal está disponible para maquinistas y administrativos.
+Die vorhandene Planung im gewählten Zeitraum einschließlich Urlaub überschreiben?|Overwrite the existing schedule for this period, including leave?|Nadpisać plan w tym okresie, w tym urlop?|Перезаписать план за период, включая отпуск?|Bu dönemdeki mevcut plan izin dahil değiştirilsin mi?|استبدال الخطة الحالية لهذه الفترة بما فيها الإجازة؟|¿Sobrescribir el plan del periodo, incluidas vacaciones?
+E-Mail erneut senden|Retry email delivery|Wyślij e-mail ponownie|Отправить письмо повторно|E-postayı yeniden gönder|إعادة إرسال البريد|Reenviar correo
+Eintrag gespeichert. Tages-, Wochen- und Monatszeiten wurden aktualisiert.|Entry saved. Daily, weekly and monthly hours updated.|Wpis zapisany. Czas dzienny, tygodniowy i miesięczny zaktualizowany.|Запись сохранена. Дневные, недельные и месячные часы обновлены.|Kayıt kaydedildi. Günlük, haftalık ve aylık saatler güncellendi.|حُفظ السجل. حُدثت ساعات اليوم والأسبوع والشهر.|Registro guardado. Horas diarias, semanales y mensuales actualizadas.
+Foto darf höchstens 5 MB groß sein.|Photo must not exceed 5 MB.|Zdjęcie nie może przekraczać 5 MB.|Фото не должно превышать 5 МБ.|Fotoğraf en fazla 5 MB olabilir.|يجب ألا تتجاوز الصورة 5 ميغابايت.|La foto no puede superar 5 MB.
+Foto entfernen|Remove photo|Usuń zdjęcie|Удалить фото|Fotoğrafı kaldır|إزالة الصورة|Eliminar foto
+Foto für das Mitarbeiterprofil wählen|Select employee profile photo|Wybierz zdjęcie profilu pracownika|Выберите фото сотрудника|Çalışan profil fotoğrafını seç|اختيار صورة ملف الموظف|Elegir foto del empleado
+Foto konnte nicht gelesen werden.|Could not read photo.|Nie można odczytać zdjęcia.|Не удалось прочитать фото.|Fotoğraf okunamadı.|تعذرت قراءة الصورة.|No se pudo leer la foto.
+Foto konnte nicht gespeichert werden.|Could not save photo.|Nie można zapisać zdjęcia.|Не удалось сохранить фото.|Fotoğraf kaydedilemedi.|تعذر حفظ الصورة.|No se pudo guardar la foto.
+Höchstens 5 Anhänge mit insgesamt 7 MiB auswählen (10 MiB inklusive Kodierung).|Select up to 5 attachments totalling 7 MiB (10 MiB including encoding).|Wybierz do 5 załączników o sumie 7 MiB (10 MiB z kodowaniem).|Выберите до 5 вложений общим размером 7 МиБ (10 МиБ с кодировкой).|Toplam 7 MiB olan en fazla 5 ek seçin (kodlamayla 10 MiB).|اختر حتى 5 مرفقات بمجموع 7 ميبيبايت (10 مع الترميز).|Seleccione hasta 5 adjuntos con 7 MiB en total (10 con codificación).
+Höchstens 5 MB.|Maximum 5 MB.|Maksymalnie 5 MB.|Максимум 5 МБ.|En fazla 5 MB.|حتى 5 ميغابايت.|Máximo 5 MB.
+Höchstens zehn Adressen.|Maximum ten addresses.|Maksymalnie dziesięć adresów.|Не более десяти адресов.|En fazla on adres.|عشرة عناوين كحد أقصى.|Máximo diez direcciones.
+Import geprüft. Bitte Vorschau kontrollieren.|Import checked. Review the preview.|Import sprawdzony. Skontroluj podgląd.|Импорт проверен. Проверьте предпросмотр.|İçe aktarma kontrol edildi. Önizlemeyi inceleyin.|فُحص الاستيراد. راجع المعاينة.|Importación comprobada. Revise la vista previa.
+Initialpasswort gesetzt. Passwortwechsel beim nächsten Login erforderlich.|Initial password set. Password change required at next login.|Hasło początkowe ustawione. Zmiana przy następnym logowaniu.|Первоначальный пароль задан. При следующем входе требуется смена.|İlk parola ayarlandı. Sonraki girişte değiştirilmelidir.|عُينت كلمة المرور الأولية. يجب تغييرها عند الدخول التالي.|Contraseña inicial establecida. Debe cambiarse en el próximo acceso.
+Jahr zwischen 2000 und 2100 wählen.|Choose a year between 2000 and 2100.|Wybierz rok między 2000 a 2100.|Выберите год от 2000 до 2100.|2000 ile 2100 arasında bir yıl seçin.|اختر سنة بين 2000 و2100.|Elija un año entre 2000 y 2100.
+Kein Foto|No photo|Brak zdjęcia|Нет фото|Fotoğraf yok|لا توجد صورة|Sin foto
+Keine Freigabe für Arbeitszeiten.|No working time permission.|Brak uprawnień do czasu pracy.|Нет прав на рабочее время.|Çalışma saati yetkisi yok.|لا توجد صلاحية لساعات العمل.|Sin permiso para horas de trabajo.
+Keine Freigabe für das Planungsmodul.|No scheduling module permission.|Brak uprawnień do planowania.|Нет прав на модуль планирования.|Planlama modülü yetkisi yok.|لا توجد صلاحية لوحدة التخطيط.|Sin permiso para planificación.
+Keine Freigabe zum Anlegen.|No permission to create.|Brak uprawnień do dodawania.|Нет прав на создание.|Oluşturma yetkisi yok.|لا توجد صلاحية للإنشاء.|Sin permiso para crear.
+Keine Mitarbeiter-Module freigegeben.|No employee modules enabled.|Brak udostępnionych modułów pracowników.|Модули сотрудников недоступны.|Çalışan modülleri açılmamış.|لا توجد وحدات موظفين متاحة.|No hay módulos de empleados habilitados.
+Keine Zeitkorrektur|No time correction|Brak korekty czasu|Нет исправления времени|Saat düzeltmesi yok|لا يوجد تصحيح للوقت|Sin corrección horaria
+Keine lesbaren Ordner gefunden.|No readable folders found.|Nie znaleziono czytelnych folderów.|Нет доступных для чтения папок.|Okunabilir klasör bulunamadı.|لا توجد مجلدات قابلة للقراءة.|No hay carpetas legibles.
+Keine Änderungen vorhanden.|No changes available.|Brak zmian.|Нет изменений.|Değişiklik yok.|لا توجد تغييرات.|No hay cambios.
+Manuell geändert|Manually changed|Zmieniono ręcznie|Изменено вручную|Elle değiştirildi|عُدل يدويًا|Modificado manualmente
+Markierte Tage angepasst. Bitte Änderungen speichern.|Selected days updated. Save changes.|Wybrane dni zmienione. Zapisz zmiany.|Выбранные дни изменены. Сохраните изменения.|Seçili günler güncellendi. Değişiklikleri kaydedin.|عُدلت الأيام المحددة. احفظ التغييرات.|Días seleccionados actualizados. Guarde los cambios.
+Mitarbeiter und gültiges Jahr wählen.|Select an employee and a valid year.|Wybierz pracownika i prawidłowy rok.|Выберите сотрудника и допустимый год.|Çalışan ve geçerli yıl seçin.|اختر موظفًا وسنة صالحة.|Elija empleado y año válido.
+Noch keine Monatsdaten übermittelt.|No monthly data submitted yet.|Nie przesłano danych miesięcznych.|Месячные данные ещё не отправлены.|Aylık veri henüz gönderilmedi.|لم تُرسل بيانات شهرية بعد.|Todavía no se enviaron datos mensuales.
+Noch keine Planänderungen.|No schedule changes yet.|Brak zmian planu.|Изменений плана пока нет.|Henüz plan değişikliği yok.|لا توجد تغييرات للجدول بعد.|Todavía no hay cambios de plan.
+Noch keine Änderungen.|No changes yet.|Brak zmian.|Изменений пока нет.|Henüz değişiklik yok.|لا توجد تغييرات بعد.|Todavía no hay cambios.
+Passwort geändert. Alle bisherigen Sitzungen wurden beendet. Bitte mit dem neuen Passwort anmelden.|Password changed. All previous sessions ended. Log in with the new password.|Hasło zmienione. Zakończono wcześniejsze sesje. Zaloguj się nowym hasłem.|Пароль изменён. Все прежние сеансы закрыты. Войдите с новым паролем.|Parola değişti. Önceki oturumlar kapandı. Yeni parolayla giriş yapın.|تغيرت كلمة المرور. انتهت الجلسات السابقة. ادخل بالكلمة الجديدة.|Contraseña cambiada. Sesiones anteriores cerradas. Acceda con la nueva contraseña.
+Planänderungen gespeichert.|Schedule changes saved.|Zmiany planu zapisane.|Изменения плана сохранены.|Plan değişiklikleri kaydedildi.|حُفظت تغييرات الجدول.|Cambios del plan guardados.
+Postfach über „Postfach einrichten“ mit den Mailserver-Zugangsdaten verbinden.|Connect the mailbox using “Set up mailbox” and your mail server credentials.|Połącz skrzynkę przez „Skonfiguruj skrzynkę” z danymi serwera.|Подключите почту через «Настроить ящик» с данными сервера.|“Posta kutusu kur” üzerinden sunucu bilgileriyle bağlanın.|اربط البريد عبر «إعداد صندوق البريد» ببيانات الخادم.|Conecte el buzón desde «Configurar buzón» con las credenciales del servidor.
+Profilfoto wählen|Select profile photo|Wybierz zdjęcie profilu|Выберите фото профиля|Profil fotoğrafı seç|اختيار صورة الملف|Elegir foto de perfil
+Sperre konnte nicht geändert werden.|Could not change lock.|Nie można zmienić blokady.|Не удалось изменить блокировку.|Kilit değiştirilemedi.|تعذر تغيير القفل.|No se pudo cambiar el bloqueo.
+Stammdaten und Freigaben gespeichert.|Details and permissions saved.|Dane i uprawnienia zapisane.|Данные и права сохранены.|Bilgiler ve yetkiler kaydedildi.|حُفظت البيانات والصلاحيات.|Datos y permisos guardados.
+Tages-, Wochen- und Monatszeiten werden neu berechnet und eine E-Mail mit Vorher → Nachher vorgemerkt.|Daily, weekly and monthly hours will be recalculated and a Before → After email queued.|Czas dzienny, tygodniowy i miesięczny zostanie przeliczony, a e-mail Przed → Po dodany do kolejki.|Дневные, недельные и месячные часы пересчитываются, письмо До → После ставится в очередь.|Günlük, haftalık ve aylık saatler hesaplanır ve Önce → Sonra e-postası sıraya alınır.|تُعاد حسابات اليوم والأسبوع والشهر وتُدرج رسالة قبل وبعد للإرسال.|Se recalcularán horas diarias, semanales y mensuales y se pondrá en cola un correo Antes → Después.
+Tages-, Wochen- und Monatszeiten werden neu berechnet.|Daily, weekly and monthly hours will be recalculated.|Czas dzienny, tygodniowy i miesięczny zostanie przeliczony.|Дневные, недельные и месячные часы пересчитываются.|Günlük, haftalık ve aylık saatler yeniden hesaplanır.|تُعاد حسابات اليوم والأسبوع والشهر.|Se recalcularán horas diarias, semanales y mensuales.
+Tf angelegt. Initialpasswort muss beim ersten Login geändert werden.|Train driver created. Initial password must be changed at first login.|Maszynista dodany. Hasło początkowe trzeba zmienić przy pierwszym logowaniu.|Машинист добавлен. Первоначальный пароль нужно сменить при первом входе.|Makinist eklendi. İlk girişte başlangıç parolası değiştirilmelidir.|أُضيف السائق. يجب تغيير كلمة المرور الأولية عند أول دخول.|Maquinista creado. La contraseña inicial debe cambiarse en el primer acceso.
+Ungespeicherte Monatsänderungen vorhanden.|Unsaved monthly changes exist.|Istnieją niezapisane zmiany miesiąca.|Есть несохранённые изменения месяца.|Kaydedilmemiş aylık değişiklikler var.|توجد تغييرات شهرية غير محفوظة.|Hay cambios mensuales sin guardar.
+Ungespeicherte Änderungen verwerfen?|Discard unsaved changes?|Odrzucić niezapisane zmiany?|Отбросить несохранённые изменения?|Kaydedilmemiş değişikliklerden vazgeçilsin mi?|تجاهل التغييرات غير المحفوظة؟|¿Descartar cambios sin guardar?
+Ungespeicherte Änderungen. PDFs zeigen den gespeicherten Stand.|Unsaved changes. PDFs show the saved version.|Niezapisane zmiany. PDF pokazuje zapisaną wersję.|Изменения не сохранены. PDF показывает сохранённую версию.|Değişiklikler kaydedilmedi. PDF kayıtlı sürümü gösterir.|تغييرات غير محفوظة. يعرض PDF النسخة المحفوظة.|Cambios sin guardar. Los PDF muestran la versión guardada.
+Verwaltungsmitarbeiter angelegt. Initialpasswort bitte persönlich übergeben.|Administrative employee created. Hand over the initial password personally.|Pracownik administracji dodany. Przekaż hasło początkowe osobiście.|Административный сотрудник добавлен. Передайте первоначальный пароль лично.|İdari çalışan eklendi. İlk parolayı kişisel olarak teslim edin.|أُضيف الموظف الإداري. سلّم كلمة المرور الأولية شخصيًا.|Empleado administrativo creado. Entregue la contraseña inicial personalmente.
+Vollständig geplant|Fully planned|Całkowicie zaplanowano|Полностью запланировано|Tamamen planlandı|مخطط بالكامل|Planificado completamente
+Wird gespeichert …|Saving …|Zapisywanie …|Сохранение …|Kaydediliyor …|جارٍ الحفظ …|Guardando …
+Zeiten unverändert.|Times unchanged.|Godziny bez zmian.|Время без изменений.|Saatler değişmedi.|الأوقات دون تغيير.|Horarios sin cambios.
+Zuerst Import prüfen.|Check the import first.|Najpierw sprawdź import.|Сначала проверьте импорт.|Önce içe aktarmayı kontrol edin.|افحص الاستيراد أولًا.|Compruebe primero la importación.
+Zum Lesen sind Planung und Arbeitszeit oder Berichte erforderlich.|Reading requires planning plus working time or reports permissions.|Odczyt wymaga planowania i czasu pracy lub raportów.|Чтение требует прав на планирование и время либо отчёты.|Okuma için planlama ve çalışma saati veya rapor yetkisi gerekir.|تتطلب القراءة صلاحية التخطيط مع الوقت أو التقارير.|La lectura requiere planificación y horas o informes.
+fehlgeschlagen|failed|nieudane|ошибка|başarısız|فشل|fallido
+Änderung speichern|Save change|Zapisz zmianę|Сохранить изменение|Değişikliği kaydet|حفظ التغيير|Guardar cambio
+Erster Mai|Labour Day|Święto Pracy|День труда|Emek ve Dayanışma Günü|عيد العمال|Día del Trabajo
+Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.|Berlin public holidays have a 0-hour target, including planned workdays or leave. Diagonal colours show holiday and day type (F/A, F/U, F/R). Otherwise: leave = 8 h, rest = 0 h. Unplanned non-holidays remain open.|Święta Berlina mają normę 0 godzin, także przy pracy i urlopie. Kolor ukośny pokazuje święto i typ dnia (F/A, F/U, F/R). Poza tym urlop = 8 h, odpoczynek = 0 h. Nieplanowane dni pozostają otwarte.|Праздники Берлина имеют норму 0 часов, включая работу и отпуск. Диагональ показывает праздник и тип дня (F/A, F/U, F/R). Иначе отпуск = 8 ч, отдых = 0 ч. Незапланированные дни остаются открытыми.|Berlin tatillerinin hedefi çalışma veya izin planlansa da 0 saattir. Çapraz renk tatil ve gün türünü gösterir (F/A, F/U, F/R). Diğer günlerde izin = 8, dinlenme = 0 saat. Plansız günler açık kalır.|عطلات برلين بساعات مطلوبة صفر، حتى عند تخطيط عمل أو إجازة. اللون القطري يعرض العطلة ونوع اليوم (F/A، F/U، F/R). الإجازة 8 ساعات والراحة صفر. تبقى الأيام غير المخططة مفتوحة.|Los festivos de Berlín tienen objetivo de 0 horas, incluso con trabajo o vacaciones. La diagonal indica festivo y tipo de día (F/A, F/U, F/R). En otros días vacaciones = 8 h, descanso = 0 h. Los días sin plan quedan pendientes.
+Tage mit 0 h Soll.|days with a 0-hour target.|dni z normą 0 godzin.|дней с нормой 0 часов.|gün 0 saat hedefli.|أيام بساعات مطلوبة صفر.|días con objetivo de 0 horas.
+Anmeldung abgelaufen. Bitte erneut anmelden.|Login expired. Please log in again.|Logowanie wygasło. Zaloguj się ponownie.|Сеанс истёк. Войдите снова.|Oturum süresi doldu. Yeniden giriş yapın.|انتهت جلسة الدخول. ادخل مجددًا.|La sesión caducó. Vuelva a acceder.
+Arbeitsende muss nach dem Arbeitsbeginn liegen. Späteres Enddatum wählen.|Work end must follow work start. Choose a later end date.|Koniec musi być po początku. Wybierz późniejszą datę końca.|Окончание должно быть после начала. Выберите более позднюю дату.|Bitiş başlangıçtan sonra olmalıdır. Daha sonraki bitiş tarihini seçin.|يجب أن تلي النهاية البداية. اختر تاريخ نهاية لاحقًا.|El fin debe seguir al inicio. Elija una fecha final posterior.
+Ausbleibe wird später berechnet: voller Kalendertag oder sonstiger Zeitraum.|Time away will be calculated later: full calendar day or other period.|Czas poza domem będzie obliczony później: pełny dzień lub inny okres.|Время вне дома рассчитывается позже: полный день или иной период.|Ev dışındaki süre sonra hesaplanır: tam takvim günü veya başka dönem.|يُحسب الوقت خارج المنزل لاحقًا: يوم كامل أو فترة أخرى.|La ausencia se calculará después: día completo u otro periodo.
+Bereitschaft darf vorläufig höchstens 8 Stunden dauern.|Standby is provisionally limited to 8 hours.|Dyżur jest tymczasowo ograniczony do 8 godzin.|Дежурство предварительно ограничено 8 часами.|Hazır nöbet şimdilik en fazla 8 saattir.|الاستعداد محدود مؤقتًا بثماني ساعات.|La guardia está limitada provisionalmente a 8 horas.
+Bitte Hotelnamen angeben.|Please enter the hotel name.|Podaj nazwę hotelu.|Укажите название отеля.|Lütfen otel adını girin.|أدخل اسم الفندق.|Introduzca el nombre del hotel.
+Bitte Unterkunft wählen.|Please select accommodation.|Wybierz nocleg.|Выберите жильё.|Lütfen konaklama seçin.|اختر الإقامة.|Seleccione alojamiento.
+Bitte ein anderes Ende der Zugfahrt angeben.|Please enter a different train journey end time.|Podaj inny koniec jazdy.|Укажите другое время окончания поездки.|Tren yolculuğu için farklı bitiş saati girin.|أدخل وقت نهاية آخر للرحلة.|Indique otro fin del trayecto.
+Datum und Uhrzeiten prüfen.|Check date and times.|Sprawdź datę i godziny.|Проверьте дату и время.|Tarih ve saatleri kontrol edin.|تحقق من التاريخ والأوقات.|Compruebe fecha y horarios.
+Datum, Zeiten und Minuten prüfen.|Check date, times and minutes.|Sprawdź datę, godziny i minuty.|Проверьте дату, время и минуты.|Tarih, saat ve dakikaları kontrol edin.|تحقق من التاريخ والأوقات والدقائق.|Compruebe fecha, horarios y minutos.
+Dauer muss positiv sein; Gastfahrt darf Dauer nicht übersteigen.|Duration must be positive; passenger transfer cannot exceed it.|Czas musi być dodatni; przejazd nie może go przekraczać.|Длительность должна быть положительной; проезд не может её превышать.|Süre pozitif olmalı; yolcu seyahati süreyi aşamaz.|يجب أن تكون المدة موجبة، ولا يتجاوزها الانتقال.|La duración debe ser positiva; el viaje no puede superarla.
+Dienst beendet|Duty ended|Służba zakończona|Служба завершена|Görev bitti|انتهت المناوبة|Servicio finalizado
+Eintrag wurde inzwischen geändert.|Entry has changed.|Wpis został zmieniony.|Запись изменена.|Kayıt değişmiş.|تغير السجل.|El registro cambió.
+In Zugfahrt übergehen|Transition to train journey|Przejdź do jazdy|Перейти к поездке|Tren yolculuğuna geç|الانتقال إلى رحلة قطار|Pasar a trayecto
+Mindestens zwölf Zeichen, gleiche Bestätigung und ein anderes Passwort erforderlich.|At least twelve characters, matching confirmation and a different password required.|Wymagane co najmniej 12 znaków, zgodne potwierdzenie i inne hasło.|Нужно не менее 12 символов, совпадение подтверждения и иной пароль.|En az 12 karakter, eşleşen onay ve farklı parola gerekli.|مطلوب 12 حرفًا على الأقل، وتأكيد مطابق، وكلمة مرور مختلفة.|Se requieren 12 caracteres, confirmación coincidente y contraseña diferente.
+OSM-Betriebsstellen werden geladen …|Loading OSM operating locations …|Wczytywanie punktów OSM …|Загрузка пунктов OSM …|OSM işletme noktaları yükleniyor …|جارٍ تحميل مواقع OSM …|Cargando puntos OSM …
+Pause (ab 15:00 min)|Break (from 15:00 min)|Przerwa (od 15:00 min)|Перерыв (от 15:00 мин)|Mola (15:00 dakikadan itibaren)|استراحة (من 15:00 دقيقة)|Pausa (desde 15:00 min)
+Rufbereitschaft: 08:00–20:00 Uhr, höchstens 8 Stunden am selben Tag.|On-call standby: 08:00–20:00, up to 8 hours on the same day.|Dyżur pod telefonem: 08:00–20:00, do 8 godzin tego samego dnia.|Дежурство по вызову: 08:00–20:00, не более 8 часов в один день.|Çağrı nöbeti: 08:00–20:00, aynı gün en fazla 8 saat.|الاستعداد عند الطلب: 08:00–20:00، حتى 8 ساعات في اليوم نفسه.|Guardia localizada: 08:00–20:00, máximo 8 horas el mismo día.
+Tarifgrenze: nur 08:00–20:00 Uhr, höchstens 8 Stunden.|Agreement limit: only 08:00–20:00, up to 8 hours.|Limit układu: tylko 08:00–20:00, do 8 godzin.|Тарифный предел: только 08:00–20:00, до 8 часов.|Sözleşme sınırı: yalnızca 08:00–20:00, en fazla 8 saat.|الحد التعاقدي: 08:00–20:00 فقط، حتى 8 ساعات.|Límite de convenio: solo 08:00–20:00, máximo 8 horas.
+Standortberechtigung fehlt|Location permission missing|Brak uprawnień lokalizacji|Нет разрешения на местоположение|Konum izni eksik|صلاحية الموقع غير متاحة|Falta permiso de ubicación
+Störung auf der Strecke|Line disruption|Awaria na trasie|Нарушение на линии|Hattaki arıza|عطل على الخط|Incidencia en la línea
+Zugfolge|Train sequence|Następstwo pociągów|Следование поездов|Tren sırası|تتابع القطارات|Secuencia de trenes
+Warten auf Fahrplan|Waiting for timetable|Oczekiwanie na rozkład|Ожидание расписания|Tarifeyi bekleme|انتظار الجدول|Espera de horario
+Umleitung|Diversion|Objazd|Объезд|Alternatif güzergâh|تحويل المسار|Desvío
+Fahrt im Blockabstand|Running at block spacing|Jazda w odstępie blokowym|Движение по блок-участкам|Blok aralığında hareket|السير بفاصل المقاطع|Marcha a distancia de bloqueo
+Urlaub ist für diesen Tag bereits erfasst.|Leave is already recorded for this day.|Urlop jest już zapisany na ten dzień.|Отпуск за этот день уже записан.|Bu gün için izin zaten kayıtlı.|الإجازة مسجلة لهذا اليوم بالفعل.|Ya hay vacaciones registradas este día.
+Urlaub/Krank werden je Tag einzeln erfasst.|Leave/sickness is entered separately for each day.|Urlop/chorobę zapisuje się osobno na każdy dzień.|Отпуск/болезнь вводится отдельно по дням.|İzin/hastalık her gün ayrı kaydedilir.|تُسجل الإجازة والمرض لكل يوم منفصلًا.|Vacaciones/enfermedad se registran por día.
+Zeiten laut Personalplanung; vorläufig höchstens 8 Stunden, auch über Mitternacht.|Times according to staff scheduling; provisionally up to 8 hours, including overnight.|Godziny według planu personelu; tymczasowo do 8 godzin, także przez północ.|Время по плану персонала; предварительно до 8 часов, включая ночь.|Personel planına göre saatler; gece dahil şimdilik en fazla 8 saat.|الأوقات بحسب تخطيط الموظفين؛ حتى 8 ساعات مؤقتًا، بما فيها عبور منتصف الليل.|Horarios según planificación; máximo provisional de 8 horas, incluso nocturnas.
+Übergang muss zwischen Beginn (einschließlich) und Ende liegen.|Transition must be between start (inclusive) and end.|Przejście musi być między początkiem (włącznie) a końcem.|Переход должен быть между началом включительно и концом.|Geçiş başlangıç (dahil) ile bitiş arasında olmalıdır.|يجب أن يقع الانتقال بين البداية شاملة والنهاية.|La transición debe estar entre inicio (incluido) y fin.
+Übergang speichern|Save transition|Zapisz przejście|Сохранить переход|Geçişi kaydet|حفظ الانتقال|Guardar transición
+Übergangsdatum (JJJJ-MM-TT)|Transition date (YYYY-MM-DD)|Data przejścia (RRRR-MM-DD)|Дата перехода (ГГГГ-ММ-ДД)|Geçiş tarihi (YYYY-AA-GG)|تاريخ الانتقال (سنة-شهر-يوم)|Fecha de transición (AAAA-MM-DD)
+Beginn Zugfahrt (HH:MM)|Train journey start (HH:MM)|Początek jazdy (GG:MM)|Начало поездки (ЧЧ:ММ)|Tren yolculuğu başlangıcı (SS:DD)|بداية رحلة القطار (ساعة:دقيقة)|Inicio del trayecto (HH:MM)
+Ende Zugfahrt (HH:MM)|Train journey end (HH:MM)|Koniec jazdy (GG:MM)|Окончание поездки (ЧЧ:ММ)|Tren yolculuğu bitişi (SS:DD)|نهاية رحلة القطار (ساعة:دقيقة)|Fin del trayecto (HH:MM)
+Unterkunft|Accommodation|Nocleg|Жильё|Konaklama|الإقامة|Alojamiento
+Dienstwohnung|Company accommodation|Mieszkanie służbowe|Служебное жильё|Şirket konutu|سكن العمل|Alojamiento de empresa
+gefunden|found|znaleziono|найдено|bulundu|عُثر عليه|encontrado
+Betriebsstellen geladen; lokal gespeichert|operating locations loaded; saved locally|punktów wczytano i zapisano lokalnie|пунктов загружено и сохранено локально|işletme noktası yüklendi ve yerel kaydedildi|مواقع تشغيلية حُمّلت وحُفظت محليًا|puntos cargados y guardados localmente
+erkannt – Zeiten bitte prüfen|detected – please check times|wykryto – sprawdź godziny|определено — проверьте время|algılandı – saatleri kontrol edin|اكتُشف؛ تحقق من الأوقات|detectado – compruebe horarios
+Die Bereitschaft endet am Übergangszeitpunkt.|Standby ends at the transition time.|Dyżur kończy się w momencie przejścia.|Дежурство заканчивается в момент перехода.|Nöbet geçiş anında biter.|ينتهي الاستعداد عند وقت الانتقال.|La guardia termina en la transición.
+Einträge für|entries for|wpisy za|записей за|kayıt, dönem|سجلات للفترة|entradas de
+übertragen.|submitted.|przesłano.|отправлено.|gönderildi.|أُرسلت.|enviadas.
+Betriebsstellen gespeichert. GPS nur bei geöffnetem Bildschirm und laufendem Dienst. OSM laden jeweils für die aktuelle Umgebung (10 km).|operating locations saved. GPS works only with the screen open and duty active. OSM loads the current area (10 km).|punktów zapisano. GPS działa przy otwartym ekranie i aktywnej służbie. OSM ładuje okolicę (10 km).|пунктов сохранено. GPS работает при открытом экране и активной службе. OSM загружает район (10 км).|işletme noktası kaydedildi. GPS yalnızca ekran açık ve görev aktifken çalışır. OSM mevcut çevreyi yükler (10 km).|مواقع حُفظت. يعمل GPS مع الشاشة المفتوحة والمناوبة النشطة فقط. تُحمل منطقة OSM الحالية (10 كم).|puntos guardados. GPS solo con pantalla abierta y servicio activo. OSM carga la zona actual (10 km).
+Abfahrt erkannt – bitte kontrollieren und speichern|Departure detected – please check and save|Wykryto odjazd – sprawdź i zapisz|Отправление определено — проверьте и сохраните|Kalkış algılandı – kontrol edip kaydedin|اكتُشفت المغادرة؛ تحقق واحفظ|Salida detectada – compruebe y guarde
+wird gesucht …|is being searched …|jest wyszukiwany …|выполняется поиск …|aranıyor …|جارٍ البحث …|se está buscando …
+in OSM nicht gefunden – Betriebsstelle manuell eintragen|not found in OSM – enter location manually|nie znaleziono w OSM – wpisz punkt ręcznie|не найден в OSM — введите пункт вручную|OSM'de bulunamadı – noktayı elle girin|غير موجود في OSM؛ أدخل الموقع يدويًا|no encontrado en OSM – introduzca el punto manualmente
+DS100-Abfrage fehlgeschlagen|DS100 query failed|Zapytanie DS100 nieudane|Ошибка запроса DS100|DS100 sorgusu başarısız|فشل استعلام DS100|Consulta DS100 fallida
+GPS nicht verfügbar|GPS unavailable|GPS niedostępny|GPS недоступен|GPS kullanılamıyor|GPS غير متاح|GPS no disponible
+DS100/OSM – prüfen|DS100/OSM – check|DS100/OSM – sprawdź|DS100/OSM — проверить|DS100/OSM – kontrol et|DS100/OSM؛ تحقق|DS100/OSM – comprobar
+GPS/OSM – prüfen|GPS/OSM – check|GPS/OSM – sprawdź|GPS/OSM — проверить|GPS/OSM – kontrol et|GPS/OSM؛ تحقق|GPS/OSM – comprobar
+Ankunft: TT.MM.JJJJ HH:mm:ss|Arrival: DD.MM.YYYY HH:mm:ss|Przyjazd: DD.MM.RRRR GG:mm:ss|Прибытие: ДД.ММ.ГГГГ ЧЧ:mm:ss|Varış: GG.AA.YYYY SS:dd:ss|الوصول: يوم.شهر.سنة ساعة:دقيقة:ثانية|Llegada: DD.MM.AAAA HH:mm:ss
+Abfahrt: TT.MM.JJJJ HH:mm:ss|Departure: DD.MM.YYYY HH:mm:ss|Odjazd: DD.MM.RRRR GG:mm:ss|Отправление: ДД.ММ.ГГГГ ЧЧ:mm:ss|Kalkış: GG.AA.YYYY SS:dd:ss|المغادرة: يوم.شهر.سنة ساعة:دقيقة:ثانية|Salida: DD.MM.AAAA HH:mm:ss
+PDF-Bestätigung per E-Mail beauftragt.|PDF receipt queued for email.|Potwierdzenie PDF w kolejce e-mail.|Подтверждение PDF поставлено в очередь.|PDF belgesi e-posta sırasına alındı.|أُدرج تأكيد PDF للإرسال بالبريد.|Acuse PDF puesto en cola de correo.
+Falls die Änderung gespeichert wurde, melden Sie sich mit dem neuen Passwort an.|If the change was saved, log in with the new password.|Jeśli zmiana została zapisana, zaloguj się nowym hasłem.|Если изменение сохранено, войдите с новым паролем.|Değişiklik kaydedildiyse yeni parolayla giriş yapın.|إذا حُفظ التغيير، ادخل بكلمة المرور الجديدة.|Si el cambio se guardó, acceda con la nueva contraseña.
+Admin-Anmeldung erforderlich|Administrator login required|Wymagane logowanie administratora|Требуется вход администратора|Yönetici girişi gerekli|دخول المسؤول مطلوب|Se requiere acceso de administrador
+Administrativ korrigierte Zeiten können nur durch die Verwaltung geändert werden|Administratively corrected times can only be changed by management|Czas skorygowany administracyjnie może zmienić tylko administracja|Административно исправленное время изменяет только администрация|İdari düzeltilen saatleri yalnızca yönetim değiştirebilir|لا يعدل الأوقات المصححة إداريًا إلا المسؤولون|Solo administración puede modificar horarios corregidos administrativamente
+Alle Daten müssen zum gewählten Jahr gehören|All dates must belong to the selected year|Wszystkie daty muszą należeć do wybranego roku|Все даты должны относиться к выбранному году|Tüm tarihler seçili yıla ait olmalıdır|يجب أن تتبع جميع التواريخ السنة المحددة|Todas las fechas deben ser del año elegido
+Alle Tage müssen zum ausgewählten Monat gehören|All days must belong to the selected month|Wszystkie dni muszą należeć do wybranego miesiąca|Все дни должны относиться к выбранному месяцу|Tüm günler seçili aya ait olmalıdır|يجب أن تتبع جميع الأيام الشهر المحدد|Todos los días deben ser del mes elegido
+Anhang nicht gefunden|Attachment not found|Nie znaleziono załącznika|Вложение не найдено|Ek bulunamadı|المرفق غير موجود|Adjunto no encontrado
+Arbeitszeit wurde administrativ korrigiert. Aktuelle Monatsdaten vom Server laden.|Working time was administratively corrected. Download current monthly data from the server.|Czas poprawiono administracyjnie. Pobierz aktualne dane miesiąca z serwera.|Время исправлено администратором. Загрузите актуальные данные месяца.|Saatler yönetim tarafından düzeltildi. Güncel aylık verileri sunucudan yükleyin.|صُحح الوقت إداريًا. حمّل بيانات الشهر الحالية من الخادم.|Se corrigió el horario administrativamente. Descargue los datos mensuales actuales.
+Auswärtige Bereitschaft benötigt Unterkunft und ggf. Hotelnamen|Standby away from home requires accommodation and hotel name where applicable|Dyżur poza domem wymaga noclegu i ewentualnie nazwy hotelu|Дежурство вне дома требует жилья и при необходимости названия отеля|Ev dışı nöbet konaklama ve gerekirse otel adı gerektirir|يتطلب الاستعداد خارج المنزل إقامة واسم فندق عند الحاجة|La guardia fuera de casa requiere alojamiento y, en su caso, nombre del hotel
+Benutzername bereits vergeben|Username already taken|Nazwa użytkownika zajęta|Имя пользователя занято|Kullanıcı adı kullanılıyor|اسم المستخدم مستخدم بالفعل|Nombre de usuario ocupado
+Benutzername oder Personalnummer bereits vorhanden|Username or employee number already exists|Użytkownik lub numer pracownika już istnieje|Имя пользователя или табельный номер уже есть|Kullanıcı adı veya personel numarası zaten var|اسم المستخدم أو رقم الموظف موجود|Ya existe el usuario o número de empleado
+Bereitschaft enthält nur Zeitraum und Unterkunft|Standby includes only period and accommodation|Dyżur obejmuje tylko okres i nocleg|Дежурство содержит только период и жильё|Nöbet yalnızca dönem ve konaklamayı içerir|يشمل الاستعداد الفترة والإقامة فقط|La guardia solo incluye periodo y alojamiento
+Bereitschaft: vorläufig höchstens acht Stunden|Standby: provisionally up to eight hours|Dyżur: tymczasowo do ośmiu godzin|Дежурство: предварительно до восьми часов|Nöbet: şimdilik en fazla sekiz saat|الاستعداد: ثماني ساعات كحد مؤقت|Guardia: máximo provisional de ocho horas
+Bitte ein einzelnes JPEG-, PNG- oder WebP-Foto wählen|Select one JPEG, PNG or WebP photo|Wybierz jedno zdjęcie JPEG, PNG lub WebP|Выберите одно фото JPEG, PNG или WebP|Tek JPEG, PNG veya WebP fotoğrafı seçin|اختر صورة واحدة JPEG أو PNG أو WebP|Seleccione una foto JPEG, PNG o WebP
+Blatt Plan benötigt höchstens vier Spalten|Sheet Plan requires at most four columns|Arkusz Plan wymaga najwyżej czterech kolumn|Лист Plan требует не более четырёх столбцов|Plan sayfası en fazla dört sütun içermelidir|تتطلب ورقة Plan أربعة أعمدة كحد أقصى|La hoja Plan admite como máximo cuatro columnas
+Blatt Plan: höchstens 366 Tageszeilen und vier Spalten|Sheet Plan: up to 366 daily rows and four columns|Arkusz Plan: do 366 wierszy dni i czterech kolumn|Лист Plan: до 366 дневных строк и четырёх столбцов|Plan sayfası: en fazla 366 günlük satır ve dört sütun|ورقة Plan: حتى 366 صفًا وأربعة أعمدة|Hoja Plan: hasta 366 filas diarias y cuatro columnas
+Bundesland des Mitarbeiters fehlt|Employee federal state missing|Brak kraju związkowego pracownika|Не указана земля сотрудника|Çalışanın eyaleti eksik|ولاية الموظف غير محددة|Falta el estado federado del empleado
+Bundesland des Tf fehlt|Train driver federal state missing|Brak kraju związkowego maszynisty|Не указана земля машиниста|Makinistin eyaleti eksik|ولاية السائق غير محددة|Falta el estado federado del maquinista
+Bundesland des Tf fehlt im Admin-Profil|Train driver federal state missing in administrator profile|Brak kraju maszynisty w profilu administracyjnym|В профиле администратора не указана земля машиниста|Yönetici profilinde makinistin eyaleti eksik|ولاية السائق غير محددة في ملف الإدارة|Falta el estado del maquinista en el perfil administrativo
+Das Konto hat Rechte außerhalb Ihrer Verwaltungsfreigabe.|This account has permissions beyond your management scope.|Konto ma uprawnienia poza Twoim zakresem.|Права этой записи выходят за пределы ваших полномочий.|Bu hesap yönetim yetkinizi aşan haklara sahip.|للحساب صلاحيات خارج نطاق إدارتك.|La cuenta tiene permisos fuera de su ámbito.
+Datum muss zwischen 2000 und 2100 liegen|Date must be between 2000 and 2100|Data musi być między 2000 a 2100|Дата должна быть от 2000 до 2100|Tarih 2000 ile 2100 arasında olmalıdır|يجب أن يكون التاريخ بين 2000 و2100|La fecha debe estar entre 2000 y 2100
+Der korrigierte Zeitraum überschneidet sich mit einer anderen Arbeitszeit.|The corrected period overlaps another time entry.|Poprawiony okres nakłada się na inny czas pracy.|Исправленный период пересекается с другим рабочим временем.|Düzeltilen dönem başka çalışma süresiyle çakışıyor.|تتداخل الفترة المصححة مع وقت عمل آخر.|El periodo corregido se solapa con otro registro.
+Diese Erfassung existiert bereits mit anderen Daten. Bitte neu laden.|This entry already exists with different data. Reload.|Ten wpis istnieje z innymi danymi. Wczytaj ponownie.|Эта запись уже есть с другими данными. Обновите.|Bu kayıt farklı verilerle zaten var. Yeniden yükleyin.|السجل موجود ببيانات مختلفة. أعد التحميل.|El registro existe con otros datos. Recargue.
+Diese Erfassungsart enthält keine editierbare Arbeitszeit|This entry type has no editable working time|Ten typ wpisu nie ma edytowalnego czasu pracy|Этот тип записи не содержит редактируемого времени|Bu kayıt türünde düzenlenebilir çalışma süresi yok|لا يحتوي هذا النوع على وقت عمل قابل للتعديل|Este tipo no contiene horario editable
+Dieses Konto darf nur ein Administrator verwalten.|Only an administrator can manage this account.|Tym kontem może zarządzać tylko administrator.|Эту запись может управлять только администратор.|Bu hesabı yalnızca yönetici yönetebilir.|لا يدير هذا الحساب إلا مسؤول.|Solo un administrador puede gestionar esta cuenta.
+Doppelte Datumsangabe|Duplicate date|Powtórzona data|Повторная дата|Yinelenen tarih|تاريخ مكرر|Fecha duplicada
+E-Mail-Adresse des Mitarbeiters fehlt|Employee email address missing|Brak adresu e-mail pracownika|Не указан адрес почты сотрудника|Çalışanın e-posta adresi eksik|عنوان بريد الموظف غير محدد|Falta el correo del empleado
+E-Mail-Adresse und Bundesland des Tf fehlen im Admin-Profil|Train driver email and federal state missing in administrator profile|Brak e-maila i kraju maszynisty w profilu|В профиле не указаны почта и земля машиниста|Yönetici profilinde makinistin e-postası ve eyaleti eksik|بريد السائق وولايته غير محددين في الملف|Faltan correo y estado del maquinista en el perfil
+E-Mail-Versand ist auf dem Server noch nicht eingerichtet|Email delivery is not configured on the server yet|Wysyłka e-mail nie jest skonfigurowana na serwerze|Отправка почты на сервере ещё не настроена|Sunucuda e-posta gönderimi kurulmadı|لم يُعد إرسال البريد على الخادم بعد|Todavía no se configuró el envío de correo en el servidor
+E-Mail-Versand ist noch nicht eingerichtet|Email delivery is not configured yet|Wysyłka e-mail nie jest skonfigurowana|Отправка почты ещё не настроена|E-posta gönderimi kurulmadı|لم يُعد إرسال البريد بعد|Todavía no se configuró el envío de correo
+Eintrag gehört nicht zum angeforderten Monat|Entry does not belong to the requested month|Wpis nie należy do żądanego miesiąca|Запись не относится к запрошенному месяцу|Kayıt istenen aya ait değil|السجل لا يتبع الشهر المطلوب|El registro no pertenece al mes solicitado
+Enddatum muss am oder nach dem Beginn liegen (2000 bis 2100)|End date must be on or after start (2000 to 2100)|Koniec nie może poprzedzać początku (2000–2100)|Дата конца не раньше начала (2000–2100)|Bitiş başlangıçta veya sonra olmalı (2000–2100)|لا يسبق تاريخ النهاية البداية (2000–2100)|La fecha final no puede ser anterior al inicio (2000–2100)
+Endpunkt hat keine Modulfreigabe.|Endpoint has no module permission.|Punkt końcowy nie ma uprawnienia modułu.|Для этого адреса нет прав модуля.|Uç nokta için modül yetkisi yok.|لا توجد صلاحية وحدة لهذا المسار.|El punto de acceso no tiene permiso de módulo.
+Excel benötigt ein Blatt mit dem Namen Plan|Excel requires a sheet named Plan|Excel wymaga arkusza o nazwie Plan|Excel требует лист с именем Plan|Excel, Plan adlı sayfa gerektirir|يتطلب إكسل ورقة باسم Plan|Excel requiere una hoja llamada Plan
+Excel-Inhalt ist beschädigt oder nicht unterstützt|Excel content is corrupt or unsupported|Zawartość Excel uszkodzona lub nieobsługiwana|Данные Excel повреждены или не поддерживаются|Excel içeriği bozuk veya desteklenmiyor|محتوى إكسل تالف أو غير مدعوم|El contenido Excel está dañado o no es compatible
+Foto darf höchstens 12 Megapixel enthalten|Photo must not exceed 12 megapixels|Zdjęcie do 12 megapikseli|Фото не более 12 мегапикселей|Fotoğraf en fazla 12 megapiksel olmalı|الصورة حتى 12 ميغابكسل|La foto no puede superar 12 megapíxeles
+Foto darf höchstens 5 MB groß sein|Photo must not exceed 5 MB|Zdjęcie do 5 MB|Фото не более 5 МБ|Fotoğraf en fazla 5 MB olmalı|الصورة حتى 5 ميغابايت|La foto no puede superar 5 MB
+Für Ihr eigenes Konto bitte Passwort ändern verwenden|Use Change password for your own account|Dla własnego konta użyj Zmień hasło|Для своего аккаунта используйте смену пароля|Kendi hesabınız için Parolayı değiştir kullanın|لحسابك استخدم تغيير كلمة المرور|Para su cuenta utilice Cambiar contraseña
+Geburtsdatum darf nicht in der Zukunft liegen|Date of birth cannot be in the future|Data urodzenia nie może być przyszła|Дата рождения не может быть в будущем|Doğum tarihi gelecekte olamaz|لا يكون تاريخ الميلاد في المستقبل|La fecha de nacimiento no puede ser futura
+Initialpasswort muss sich vom bisherigen Passwort unterscheiden|Initial password must differ from the previous password|Hasło początkowe musi różnić się od poprzedniego|Первоначальный пароль должен отличаться от прежнего|İlk parola öncekinden farklı olmalı|يجب أن تختلف كلمة المرور الأولية عن السابقة|La contraseña inicial debe diferir de la anterior
+Jedes Datum darf nur einmal vorkommen|Each date may occur only once|Każda data może wystąpić raz|Каждая дата допускается один раз|Her tarih yalnızca bir kez kullanılmalı|يظهر كل تاريخ مرة واحدة فقط|Cada fecha solo puede aparecer una vez
+Kein Foto vorhanden|No photo available|Brak zdjęcia|Фото отсутствует|Fotoğraf mevcut değil|لا توجد صورة|No hay foto
+Keine Freigabe für Monatsdaten.|No permission for monthly data.|Brak uprawnień do danych miesiąca.|Нет прав на месячные данные.|Aylık veri yetkisi yok.|لا توجد صلاحية للبيانات الشهرية.|Sin permiso para datos mensuales.
+Mindestens ein Empfänger wurde abgelehnt. Zustellung kann teilweise erfolgt sein; Empfänger vor erneutem Senden prüfen.|At least one recipient was rejected. Partial delivery may have occurred; check recipients before resending.|Odrzucono odbiorcę. Część mogła dostać wiadomość; sprawdź przed ponowną wysyłką.|Получатель отклонён. Возможна частичная доставка; проверьте перед повтором.|En az bir alıcı reddedildi. Kısmi teslim olabilir; tekrar göndermeden alıcıları kontrol edin.|رُفض مستلم واحد على الأقل. قد حدث تسليم جزئي؛ تحقق قبل إعادة الإرسال.|Se rechazó algún destinatario. Puede haber entrega parcial; revise antes de reenviar.
+Nachricht größer als 10 MiB; bitte im externen Mailprogramm öffnen.|Message exceeds 10 MiB; open in an external mail client.|Wiadomość ponad 10 MiB; otwórz w innym kliencie.|Письмо более 10 МиБ; откройте в почтовом клиенте.|Mesaj 10 MiB'tan büyük; harici posta programında açın.|الرسالة أكبر من 10 ميبيبايت؛ افتحها في برنامج بريد خارجي.|Mensaje superior a 10 MiB; ábralo en otro cliente.
+Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.|Message including attachments must not exceed 10 MiB.|Wiadomość z załącznikami do 10 MiB.|Письмо с вложениями не более 10 МиБ.|Eklerle birlikte mesaj en fazla 10 MiB olmalı.|الرسالة مع المرفقات حتى 10 ميبيبايت.|El mensaje con adjuntos no puede superar 10 MiB.
+Nachricht nicht gefunden|Message not found|Nie znaleziono wiadomości|Письмо не найдено|Mesaj bulunamadı|الرسالة غير موجودة|Mensaje no encontrado
+Name erforderlich; ein Zyklus darf höchstens 366 Tage lang sein.|Name required; a cycle must not exceed 366 days.|Nazwa wymagana; cykl do 366 dni.|Нужно имя; цикл не более 366 дней.|Ad gerekli; döngü en fazla 366 gün olmalı.|الاسم مطلوب؛ الدورة حتى 366 يومًا.|Nombre obligatorio; el ciclo no puede superar 366 días.
+Nur erfasste Arbeitszeiten können korrigiert werden|Only recorded working times can be corrected|Korygować można tylko zapisany czas|Исправлять можно только учтённое время|Yalnızca kayıtlı saatler düzeltilebilir|تُصحح أوقات العمل المسجلة فقط|Solo pueden corregirse horas registradas
+Nur fehlgeschlagene Benachrichtigungen können erneut gestartet werden|Only failed notifications can be retried|Ponowić można tylko nieudane powiadomienia|Повторить можно только неудачные уведомления|Yalnızca başarısız bildirimler tekrar denenebilir|يمكن إعادة الإشعارات الفاشلة فقط|Solo pueden reintentarse notificaciones fallidas
+Passwort muss mindestens 12 Zeichen haben|Password requires at least 12 characters|Hasło wymaga co najmniej 12 znaków|Пароль не менее 12 символов|Parola en az 12 karakter olmalı|كلمة المرور 12 حرفًا على الأقل|La contraseña requiere al menos 12 caracteres
+Pause und Gastfahrt müssen in den Zeitraum passen|Break and passenger transfer must fit within the period|Przerwa i przejazd muszą mieścić się w okresie|Перерыв и проезд должны укладываться в период|Mola ve yolcu seyahati döneme sığmalı|تتناسب الاستراحة والانتقال مع الفترة|Pausa y viaje deben caber en el periodo
+Personalnummer bereits vergeben|Employee number already taken|Numer pracownika zajęty|Табельный номер занят|Personel numarası kullanılıyor|رقم الموظف مستخدم|Número de empleado ocupado
+Planung und Arbeitszeit oder Berichte müssen zum Lesen freigegeben sein.|Reading requires planning and working time or reports permissions.|Odczyt wymaga planowania i czasu pracy lub raportów.|Чтение требует прав на планирование и время либо отчёты.|Okuma için planlama ile çalışma saati veya rapor yetkisi gerekli.|تتطلب القراءة التخطيط مع الوقت أو التقارير.|La lectura requiere planificación y horas o informes.
+Postfach-SMTP benötigt SSL oder STARTTLS.|Mailbox SMTP requires SSL or STARTTLS.|SMTP skrzynki wymaga SSL lub STARTTLS.|SMTP почты требует SSL или STARTTLS.|Posta SMTP'si SSL veya STARTTLS gerektirir.|يتطلب SMTP للبريد SSL أو STARTTLS.|SMTP del buzón requiere SSL o STARTTLS.
+Revisionsstände aller betroffenen Monate erforderlich|Revisions for all affected months required|Wymagane wersje wszystkich dotkniętych miesięcy|Нужны версии всех затронутых месяцев|Etkilenen tüm ayların sürümleri gerekli|مطلوبة إصدارات جميع الأشهر المتأثرة|Se requieren versiones de todos los meses afectados
+Rufbereitschaft: 08:00–20:00 Uhr, höchstens acht Stunden|On-call standby: 08:00–20:00, maximum eight hours|Dyżur pod telefonem: 08:00–20:00, do ośmiu godzin|Дежурство по вызову: 08:00–20:00, до восьми часов|Çağrı nöbeti: 08:00–20:00, en fazla sekiz saat|الاستعداد عند الطلب: 08:00–20:00، حتى ثماني ساعات|Guardia localizada: 08:00–20:00, máximo ocho horas
+Schichtmodell oder Tf nicht gefunden|Shift model or train driver not found|Nie znaleziono modelu lub maszynisty|Модель смен или машинист не найдены|Vardiya modeli veya makinist bulunamadı|النموذج أو السائق غير موجود|Modelo o maquinista no encontrado
+Schichtmodell wurde geändert. Bitte neu laden.|Shift model changed. Please reload.|Model zmian zmieniony. Wczytaj ponownie.|Модель смен изменена. Обновите.|Vardiya modeli değişti. Yeniden yükleyin.|تغير نموذج الوردية. أعد التحميل.|El modelo cambió. Recargue.
+Spalten: Datum, Art, optional Notiz, optional Personalnummer|Columns: Datum, Art, optional Notiz, optional Personalnummer|Kolumny: Datum, Art, opcjonalnie Notiz, Personalnummer|Столбцы: Datum, Art, необязательно Notiz, Personalnummer|Sütunlar: Datum, Art, isteğe bağlı Notiz, Personalnummer|الأعمدة: Datum وArt واختياريًا Notiz وPersonalnummer|Columnas: Datum, Art, opcionales Notiz, Personalnummer
+Tf-Korrekturen bitte über den bestehenden Korrektureinstieg mit E-Mail vornehmen|Use the existing correction page with email notification for train driver corrections|Korekty maszynisty wykonuj przez stronę korekt z e-mail|Коррекции машиниста выполняйте через страницу с уведомлением|Makinist düzeltmeleri için e-postalı düzeltme sayfasını kullanın|لتصحيحات السائق استخدم صفحة التصحيح مع البريد|Use la página de correcciones con correo para el maquinista
+Uhrzeiten müssen lokale Stunden und Minuten ohne Sekunden enthalten|Times must be local hours and minutes without seconds|Godziny lokalne i minuty bez sekund|Местные часы и минуты без секунд|Saatler yerel saat ve dakika olmalı, saniye içermemeli|تتضمن الأوقات ساعات ودقائق محلية دون ثوانٍ|Los horarios deben tener horas y minutos locales sin segundos
+Ungültiger Anhang|Invalid attachment|Nieprawidłowy załącznik|Недопустимое вложение|Geçersiz ek|مرفق غير صالح|Adjunto no válido
+Ungültiger Benutzername|Invalid username|Nieprawidłowy użytkownik|Недопустимое имя пользователя|Geçersiz kullanıcı adı|اسم مستخدم غير صالح|Usuario no válido
+Ungültiger Ordner|Invalid folder|Nieprawidłowy folder|Недопустимая папка|Geçersiz klasör|مجلد غير صالح|Carpeta no válida
+Unterkunft ist derzeit nur bei Bereitschaft erfasst|Accommodation is currently recorded only for standby|Nocleg jest obecnie rejestrowany tylko przy dyżurze|Жильё учитывается пока только при дежурстве|Konaklama şu anda yalnızca nöbette kaydedilir|تُسجل الإقامة حاليًا للاستعداد فقط|El alojamiento solo se registra actualmente en guardias
+Unterkunft nur bei auswärtigem Aufenthalt|Accommodation only for time away from home|Nocleg tylko przy pobycie poza domem|Жильё только при пребывании вне дома|Konaklama yalnızca ev dışı kalışta|الإقامة عند البقاء خارج المنزل فقط|Alojamiento solo para estancias fuera de casa
+Urlaub und Krank werden je Tag einzeln erfasst|Leave and sickness are entered separately for each day|Urlop i choroba zapisywane osobno na dzień|Отпуск и болезнь вводятся отдельно по дням|İzin ve hastalık her gün ayrı kaydedilir|تُسجل الإجازة والمرض لكل يوم منفصلًا|Vacaciones y enfermedad se registran por día
+client_id darf im selben Paket nur einmal vorkommen|client_id may occur only once in a batch|client_id może wystąpić raz w pakiecie|client_id допускается один раз в пакете|client_id pakette yalnızca bir kez kullanılmalı|يظهر client_id مرة واحدة في الحزمة|client_id solo puede aparecer una vez por lote
+Änderung nicht gefunden|Change not found|Nie znaleziono zmiany|Изменение не найдено|Değişiklik bulunamadı|التغيير غير موجود|Cambio no encontrado
+Änderungsgrund erforderlich|Reason for change required|Wymagany powód zmiany|Нужна причина изменения|Değişiklik gerekçesi gerekli|سبب التغيير مطلوب|Se requiere motivo del cambio
+Eingaben sind ungültig. Bitte Pflichtfelder und Werte prüfen.|Invalid input. Check required fields and values.|Nieprawidłowe dane. Sprawdź wymagane pola i wartości.|Недопустимые данные. Проверьте поля и значения.|Geçersiz giriş. Zorunlu alanları ve değerleri kontrol edin.|إدخالات غير صالحة. تحقق من الحقول المطلوبة والقيم.|Datos no válidos. Compruebe campos y valores.

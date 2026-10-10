@@ -98,7 +98,9 @@ def process_change(change_id):
         if not item or item.status == "sent" or item.attempts >= MAX_ATTEMPTS:
             return
         try:
-            send_time_change(recipient=item.recipient_email, body=item.email_body)
+            from ..i18n import translate, user_language
+            lang=user_language(db,item.tf_user_id)
+            send_time_change(recipient=item.recipient_email, body=translate(item.email_body,lang),lang=lang)
         except Exception as exc:
             item.status = "failed"
             item.last_error = str(exc)[:500]

@@ -69,7 +69,7 @@ function renderCalendar() {
     const number = document.createElement('b'); number.textContent = Number(day.date.slice(-2));
     const label = document.createElement('span'); label.textContent = planLabel(day);
     const hours = document.createElement('span'); hours.textContent = day.is_holiday?'0:00 h':day.kind === 'Ungeplant' ? 'Offen' : day.kind === 'Ruhetag' ? '0:00 h' : '8:00 h';
-    const note = document.createElement('small'); note.textContent = day.note;
+    const note = document.createElement('small'); note.dataset.i18nIgnore='true'; note.textContent = day.note;
     button.append(number, label, hours, note); button.setAttribute('aria-label', day.date + ', ' + (day.is_holiday?planLabel(day)+', 0 Sollstunden':day.kind) + ', bearbeiten');
     button.disabled = accessLevel < 2;
     button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
@@ -153,18 +153,18 @@ async function load(force = false) {
   const year = Number(el('year').value), month = Number(el('month').value), tf = el('tf').value;
   if (!tf) throw Error('Zuerst einen Tf in der Verwaltung anlegen.');
   if (year < 2000 || year > 2100 || !Number.isInteger(year)) throw Error('Jahr zwischen 2000 und 2100 wählen.');
-  if(sameYear&&!force){saved.month=month;current=annual.months[month-1];el('title').textContent=names[month-1]+' '+year;el('monthPdf').href=prefix()+'/'+month+'/pdf';updateMetrics();renderDays();renderCalendar();renderYear();switchView(view);return true;}
+  if(sameYear&&!force){saved.month=month;current=annual.months[month-1];el('title').textContent=names[month-1]+' '+year;el('monthPdf').href=prefix()+'/'+month+'/pdf';if(el('viewerMonthPdf'))el('viewerMonthPdf').href=el('monthPdf').href;updateMetrics();renderDays();renderCalendar();renderYear();switchView(view);return true;}
   const ticket = ++loadTicket, base = '/api/v1/admin/tf/' + tf + '/plan/' + year;
   const [data, yearData, history] = await Promise.all([api(base + '/' + month), api(base), api(base + '/history')]);
   if (ticket !== loadTicket) return false;
   saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note])]));clearPreview();
   el('title').textContent = names[month - 1] + ' ' + year;
   updateMetrics(); renderDays(); renderCalendar(); renderYear(); switchView(view);
-  el('monthPdf').href = base + '/' + month + '/pdf'; el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
+  el('monthPdf').href = base + '/' + month + '/pdf';if(el('viewerMonthPdf'))el('viewerMonthPdf').href=el('monthPdf').href; el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
   el('history').replaceChildren();
   for (const item of history) {
     const line = document.createElement('p'); line.textContent = item.date + ': ' + item.previous_kind + ' → ' + item.new_kind +
-      ' · ' + (item.source === 'excel' ? 'Excel-Import' : 'Manuell') + ' · Admin #' + item.admin_id + ' · ' + item.changed_at + ' UTC'; el('history').append(line);
+      ' · ' + (item.source === 'excel' ? 'Excel-Import' : item.source === 'shift'?'Schichtmodell':'Manuell') + ' · Admin #' + item.admin_id + ' · ' + item.changed_at + ' UTC'; el('history').append(line);
   }
   if (!history.length) el('history').textContent = 'Noch keine Planänderungen.';
   message('Plan geladen.'); return true;
@@ -213,12 +213,13 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
   try {
     const account = await api('/api/v1/account/me');
     if (account.password_change_required) { location.href = '/account'; return; }
-    accessLevel = account.permissions.planning;
+    accessLevel = new URLSearchParams(location.search).get('readonly')==='1'?Math.min(1,account.permissions.planning):account.permissions.planning;
     if (!accessLevel) throw Error('Keine Freigabe für das Planungsmodul.');
     if (accessLevel < 2) {
       for (const id of ['save','bulk','inspect','confirm','excel','selectAll','selectionTools']) el(id).hidden = true;
       document.querySelector('[data-view=excel]').hidden = true;
     }
+    if(new URLSearchParams(location.search).get('readonly')==='1'){document.querySelector('h1').textContent='Triebfahrzeugführer · Dienstplan';document.querySelector('nav.tabs').hidden=true;el('editor').querySelector('p.muted').hidden=true;const pdf=document.createElement('a');pdf.id='viewerMonthPdf';pdf.className='download';pdf.textContent='Monats-PDF';el('editor').querySelector('.headerline').append(pdf);}
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }

@@ -9,22 +9,25 @@ def smtp_configured() -> bool:
                 and os.getenv("SMTP_SECURITY", "ssl") in ("ssl", "starttls"))
 
 
-def send_receipt(*, recipient: str, filename: str, pdf_data: bytes):
+def send_receipt(*, recipient: str, filename: str, pdf_data: bytes, lang="de"):
+    from ..i18n import translate
+    t=lambda text:translate(text,lang)
     message = EmailMessage()
     message["To"] = recipient
-    message["Subject"] = "LokZeitleiste: Eingang Ihrer Arbeitszeiten"
+    message["Subject"] = t("LokZeitleiste: Eingang Ihrer Arbeitszeiten")
     message.set_content(
-        "Anbei erhalten Sie die tabellarische Bestätigung der übermittelten Tagesdaten. "
-        "Dies ist keine Entgelt- oder Tarifabrechnung."
+        t("Anbei erhalten Sie die tabellarische Bestätigung der übermittelten Tagesdaten. "
+        "Dies ist keine Entgelt- oder Tarifabrechnung.")
     )
     message.add_attachment(pdf_data, maintype="application", subtype="pdf", filename=filename)
     _send_message(message)
 
 
-def send_time_change(*, recipient: str, body: str):
+def send_time_change(*, recipient: str, body: str, lang="de"):
+    from ..i18n import translate
     message = EmailMessage()
     message["To"] = recipient
-    message["Subject"] = "LokZeitleiste: Ihre Arbeitszeit wurde angepasst"
+    message["Subject"] = translate("LokZeitleiste: Ihre Arbeitszeit wurde angepasst",lang)
     message.set_content(body)
     _send_message(message)
 

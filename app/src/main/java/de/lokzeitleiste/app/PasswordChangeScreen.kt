@@ -21,16 +21,16 @@ fun PasswordChangeScreen(username: String, token: String, mandatory: Boolean = f
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.Center) {
-        Text("Passwort ändern", style = MaterialTheme.typography.headlineMedium)
-        Text("Konto: $username")
-        if (mandatory) Text("Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.")
-        OutlinedTextField(current, { current = it }, enabled = !busy, label = { Text("Aktuelles Passwort") },
+        LocalizedText("Passwort ändern", style = MaterialTheme.typography.headlineMedium)
+        LocalizedText("Konto: $username")
+        if (mandatory) LocalizedText("Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.")
+        OutlinedTextField(current, { current = it }, enabled = !busy, label = { LocalizedText("Aktuelles Passwort") },
             visualTransformation = PasswordVisualTransformation())
-        OutlinedTextField(new, { new = it }, enabled = !busy, label = { Text("Neues Passwort (mindestens 12 Zeichen)") },
+        OutlinedTextField(new, { new = it }, enabled = !busy, label = { LocalizedText("Neues Passwort (mindestens 12 Zeichen)") },
             visualTransformation = PasswordVisualTransformation())
-        OutlinedTextField(confirm, { confirm = it }, enabled = !busy, label = { Text("Passwort wiederholen") },
+        OutlinedTextField(confirm, { confirm = it }, enabled = !busy, label = { LocalizedText("Passwort wiederholen") },
             visualTransformation = PasswordVisualTransformation())
-        if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error)
+        if (error.isNotBlank()) LocalizedText(error, color = MaterialTheme.colorScheme.error)
         Button(enabled = !busy, onClick = {
             if (new.length < 12 || new != confirm || new == current) {
                 error = "Mindestens zwölf Zeichen, gleiche Bestätigung und ein anderes Passwort erforderlich."
@@ -47,7 +47,7 @@ fun PasswordChangeScreen(username: String, token: String, mandatory: Boolean = f
                     } finally { busy = false }
                 }
             }
-        }) { Text(if (busy) "Wird geändert …" else "Passwort speichern") }
-        TextButton(enabled = !busy, onClick = onCancel) { Text(if (mandatory) "Zur Anmeldung" else "Abbrechen") }
+        }) { LocalizedText(if (busy) "Wird geändert …" else "Passwort speichern") }
+        TextButton(enabled = !busy, onClick = onCancel) { LocalizedText(if (mandatory) "Zur Anmeldung" else "Abbrechen") }
     }
 }

@@ -16,10 +16,9 @@ MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "Aug
 CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F"}
 DARK = colors.HexColor("#173E55")
 
-FONT_DIR = Path(reportlab.__file__).parent / "fonts"
-for name, filename in [("PlanSans", "Vera.ttf"), ("PlanSans-Bold", "VeraBd.ttf"), ("PlanSans-Italic", "VeraIt.ttf"), ("PlanSans-BoldItalic", "VeraBI.ttf")]:
-    pdfmetrics.registerFont(TTFont(name, str(FONT_DIR / filename)))
-pdfmetrics.registerFontFamily("PlanSans", normal="PlanSans", bold="PlanSans-Bold", italic="PlanSans-Italic", boldItalic="PlanSans-BoldItalic")
+from ..pdf_locale import register_fonts, LocalizedParagraph as Paragraph
+from ..i18n import display
+register_fonts('PlanSans')
 
 
 class DiagonalTable(Table):
@@ -57,6 +56,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     for style in styles.byName.values():
         if hasattr(style, "fontName"):
             style.fontName = "PlanSans-Bold" if style.fontName == "Helvetica-Bold" else "PlanSans"
+    styles.add(ParagraphStyle("PlanHeader", fontName="PlanSans-Bold", fontSize=8, leading=11, textColor=colors.white))
     styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=9, leading=13, textColor=DARK))
     title = f"Jahresplan {plan['year']}" if yearly else f"Monatsplan {MONTHS[plan['month']]} {plan['year']}"
     story = [Paragraph("LokZeitleiste · " + title, styles["Title"]),
@@ -67,15 +67,16 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                ["Arbeitssoll", "Urlaubsgutschrift", "Soll inkl. Urlaub", "Planstatus"],
                [clock(sums["work_target_minutes"]) + " h", clock(sums["vacation_minutes"]) + " h",
                 clock(sums["target_minutes"]) + " h", "Vollständig" if plan["complete"] else "Unvollständig"]]
-    summary_table = Table(summary, colWidths=[doc.width / 4] * 4, rowHeights=[22, 28, 22, 28])
+    summary=[[Paragraph(str(value),styles['Normal']) for value in row] for row in summary]
+    summary_table = Table(summary, colWidths=[doc.width / 4] * 4, rowHeights=[34, 28, 34, 28])
     summary_table.setStyle(TableStyle([("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EEF4F8")),
                                       ("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                                       ("FONTNAME", (0, 1), (-1, 1), "PlanSans-Bold"),
                                       ("FONTNAME", (0, 3), (-1, 3), "PlanSans-Bold"),
                                       ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 8)]))
     story += [summary_table, Spacer(1, 12)]
-    legend = [[f"{CODES[k]} - {k}" for k in CODES]]
-    table = Table(legend, colWidths=[doc.width / len(CODES)] * len(CODES), rowHeights=25)
+    legend = [[Paragraph(f"{CODES[k]} - {k}",styles["PlanCell"]) for k in CODES]]
+    table = Table(legend, colWidths=[doc.width / len(CODES)] * len(CODES), rowHeights=34)
     table.setStyle(TableStyle([("BACKGROUND", (i, 0), (i, 0), colors.HexColor("#" + COLORS[k])) for i, k in enumerate(CODES)] + [("FONTNAME", (0, 0), (-1, -1), "PlanSans")] +
                              [("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                               ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
@@ -101,6 +102,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
             cells.append(clock(month["target_minutes"]))
             rows.append(cells)
         widths = [78] + [(doc.width - 248) / 31] * 31 + [25] * 4 + [70]
+        rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
         table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=widths, rowHeights=[26] + [30] * 12, repeatRows=1)
         table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK),
                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("TEXTCOLOR", (0, 1), (-1, -1), DARK),
@@ -126,6 +128,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}", styles["PlanCell"]))
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
             rows.append(cells)
+        rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
         table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=[doc.width / 7] * 7, rowHeights=[25] + [66] * (len(rows) - 1))
         table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                    ("FONTSIZE", (0, 0), (-1, 0), 9), ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -147,7 +150,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     def footer(canvas, document):
         canvas.setFont("PlanSans", 8)
         canvas.setFillColor(DARK)
-        canvas.drawString(30, 16, "Administrativer Plan · aktueller gespeicherter Stand")
-        canvas.drawRightString(page[0] - 30, 16, f"Seite {document.page}")
+        canvas.drawString(30, 16, display("Administrativer Plan · aktueller gespeicherter Stand"))
+        canvas.drawRightString(page[0] - 30, 16, display(f"Seite {document.page}"))
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return buffer.getvalue()

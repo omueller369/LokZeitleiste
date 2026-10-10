@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from ..db import engine
 from ..models import ReportDispatch, now_utc
 from .mailer import send_receipt
+from ..i18n import user_language
 
 
 log = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ def process_dispatch(dispatch_id: int):
             if not dispatch.pdf_data:
                 raise RuntimeError("PDF-Daten fehlen")
             send_receipt(recipient=dispatch.recipient_email, filename=dispatch.filename,
-                         pdf_data=dispatch.pdf_data)
+                         pdf_data=dispatch.pdf_data, lang=user_language(session,dispatch.tf_user_id))
         except Exception as exc:
             dispatch.status = "failed"
             dispatch.attempts += 1

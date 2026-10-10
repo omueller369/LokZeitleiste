@@ -6,7 +6,8 @@ from ..models import AccountPolicy, ModulePermission, User
 
 MODULES = {"employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
            "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
-           "staff":"Verwaltungsmitarbeiter und Berechtigungen"}
+           "staff":"Verwaltungsmitarbeiter und Berechtigungen", "directory":"Verwaltung: alle Mitarbeiter",
+           "shifts":"Schichtmodelle und Zuweisungen", "email":"Tf-E-Mail-Postfächer"}
 
 
 def password_required(db, user):
@@ -48,9 +49,18 @@ def authorize_route(db, user, request):
     if path in ('/api/v1/admin/me','/api/v1/admin/modules'):
         return
     if path == '/api/v1/admin/tf' and method == 'GET':
-        if not any(permissions(db,user)[m] for m in ('employees','planning','worktime','reports')):
+        if not any(permissions(db,user)[m] for m in ('employees','planning','worktime','reports','directory','shifts','email')):
             raise HTTPException(403, "Keine Mitarbeiter-Module freigegeben.")
         return
+    if path == '/api/v1/admin/directory' and method == 'GET':
+        return demand(db,user,'directory',1)
+    if path.startswith('/api/v1/admin/shifts/'):
+        demand(db,user,'shifts',1 if method=='GET' else 2)
+        if path.endswith(('/assign','/preview')):
+            demand(db,user,'planning',2 if path.endswith('/assign') else 1)
+        return
+    if path.startswith('/api/v1/admin/email/'):
+        return demand(db,user,'email',3 if path.endswith('/config') and method=='PUT' else 1 if method=='GET' else 2)
     if path == '/api/v1/admin/tf' and method == 'POST':
         return demand(db,user,'employees',3)
     if re.fullmatch(r'/api/v1/admin/tf/\d+/hours/\d+',path) and method == 'GET':

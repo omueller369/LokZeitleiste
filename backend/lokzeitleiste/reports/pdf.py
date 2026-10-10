@@ -10,6 +10,9 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 from .daily import DayRow, grouped_days, totals
+from ..pdf_locale import register_fonts, LocalizedParagraph as Paragraph
+from ..i18n import request_language
+register_fonts("ReceiptSans")
 
 
 INK = colors.HexColor("#183247")
@@ -22,14 +25,22 @@ def _clock(minutes: int) -> str:
 
 def render_receipt_pdf(*, first_name: str, last_name: str, personnel_number: str,
                        federal_state: str, year: int, month: int,
-                       received_at: datetime, rows: list[DayRow]) -> bytes:
+                       received_at: datetime, rows: list[DayRow], lang: str | None = None) -> bytes:
+    token=request_language.set(lang or request_language.get())
+    try:
+        return _render_receipt_pdf(first_name=first_name,last_name=last_name,personnel_number=personnel_number,federal_state=federal_state,year=year,month=month,received_at=received_at,rows=rows)
+    finally:
+        request_language.reset(token)
+
+
+def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_state, year, month, received_at, rows):
     stream = BytesIO()
     doc = SimpleDocTemplate(stream, pagesize=landscape(A4),
                             leftMargin=14 * mm, rightMargin=14 * mm,
                             topMargin=13 * mm, bottomMargin=13 * mm,
                             title="LokZeitleiste - Tabellarische Eingangsbestätigung")
-    heading = ParagraphStyle("heading", fontName="Helvetica-Bold", fontSize=12, leading=15, textColor=INK)
-    body = ParagraphStyle("body", fontName="Helvetica", fontSize=8.2, leading=11, textColor=INK)
+    heading = ParagraphStyle("heading", fontName="ReceiptSans-Bold", fontSize=12, leading=15, textColor=INK)
+    body = ParagraphStyle("body", fontName="ReceiptSans", fontSize=8.2, leading=11, textColor=INK)
     small = ParagraphStyle("small", parent=body, fontSize=7.4, leading=9.5)
     center = ParagraphStyle("center", parent=body, alignment=TA_CENTER)
     def p(value, style=body):
@@ -51,7 +62,7 @@ def render_receipt_pdf(*, first_name: str, last_name: str, personnel_number: str
     headers = ["Datum", "Art", "Beginn", "Ende", "Pause", "Arbeit", "Gastfahrt", "Sonntag", "Feiertag", "Nacht"]
     widths = [23, 53, 20, 20, 20, 23, 27, 26, 26, 26]
     widths = [x * mm for x in widths]
-    table_data = [[p(h, ParagraphStyle("header-" + h, parent=center, fontName="Helvetica-Bold",
+    table_data = [[p(h, ParagraphStyle("header-" + h, parent=center, fontName="ReceiptSans-Bold",
                                       textColor=colors.white, fontSize=7.4)) for h in headers]]
     span_rows = []
     for day, day_items in grouped_days(rows):

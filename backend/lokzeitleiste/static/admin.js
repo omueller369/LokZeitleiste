@@ -7,15 +7,9 @@ async function request(path,options={}){const response=await fetch(path,{credent
 function link(box,label,href){const a=document.createElement('a');a.textContent=label;a.href=href;a.style.margin='8px';a.style.display='inline-block';box.append(a);}
 async function show(){const account=await request('/api/v1/account/me');if(account.password_change_required){location.href='/account';return;}
  me=await request('/api/v1/admin/me');el('login').hidden=true;el('dashboard').hidden=false;el('logout').hidden=false;
- el('navigation').replaceChildren();link(el('navigation'),'Mein Passwort ändern','/account');
- if(me.permissions.staff)link(el('navigation'),'Verwaltungsmitarbeiter und Rechte','/admin/staff');
- if(me.role==='staff')link(el('navigation'),'Meine Arbeitszeiten','/my/worktime');
- if(me.permissions.employees>=3)link(el('navigation'),'Tf anlegen','/admin/tf/new');
- if(['employees','planning','worktime','reports'].some(m=>me.permissions[m]))link(el('navigation'),'Tf-Übersicht','/admin/tf');
- if(me.permissions.worktime)link(el('navigation'),'Arbeitszeiterfassung und Korrekturen','/admin/worktime');
- if(me.permissions.planning)link(el('navigation'),'Arbeitszeitplanung','/admin/planning');
+ document.querySelector('script[data-backend-nav]')?.remove();const menu=document.createElement('script');menu.src='/admin/backend-nav.js';menu.dataset.backendNav='true';document.body.append(menu);
  el('createTfCard').hidden=me.permissions.employees<3||location.pathname!=='/admin/tf/new';document.querySelector('.grid').style.gridTemplateColumns='1fr';
- const hasEmployees=['employees','planning','worktime','reports'].some(m=>me.permissions[m]);el('employeeCard').hidden=!hasEmployees||location.pathname!=='/admin/tf';
+ const hasEmployees=['employees','planning','worktime','reports','directory','shifts','email'].some(m=>me.permissions[m]);el('employeeCard').hidden=!hasEmployees||location.pathname!=='/admin/tf';
  if(hasEmployees)await refresh();else el('months').textContent='Keine Mitarbeiter-Module freigegeben.';}
 async function refresh(){const users=await request('/api/v1/admin/tf');el('users').replaceChildren();for(const user of users){const tr=document.createElement('tr');
  const photo=document.createElement('td');if(me.permissions.employees)profilePhoto(photo,'tf',user.id,me.permissions.employees>=2,user.has_photo,refresh);else photo.textContent='—';tr.append(photo);

@@ -11,7 +11,7 @@ button{cursor:pointer;background:#17445b;color:white;border:0;border-radius:8px;
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e9ee}th{font-size:12px;color:#526879}
 .muted{color:#667b89;font-size:13px}.error{color:#a33129}.ok{color:#28734e}#login{max-width:420px;margin:10vh auto}
 @media(max-width:850px){.grid{grid-template-columns:1fr}table{display:block;overflow-x:auto}}
-</style><link rel="stylesheet" href="/responsive.css"></head><body><header><h1>LokZeitleiste · Administration</h1><button id="logout" class="secondary" hidden>Abmelden</button></header>
+</style><link rel="stylesheet" href="/responsive.css"><script src="/i18n.js" defer></script></head><body><header><h1>LokZeitleiste · Administration</h1><button id="logout" class="secondary" hidden>Abmelden</button></header>
 <main><section id="login" class="card"><h2>Admin-Anmeldung</h2><form id="loginForm"><label>Benutzername<input name="username" required autocomplete="username"></label><label>Passwort<input name="password" type="password" required autocomplete="current-password"></label><p id="loginMessage" class="error"></p><button>Anmelden</button></form></section>
 <section id="dashboard" hidden><nav id="navigation" class="card"></nav><div class="grid"><div id="createTfCard" class="card"><h2>Tf anlegen</h2><p class="muted">Konten werden durch Admins angelegt. Das Passwort wird nur bei dieser Eingabe verwendet.</p>
 <form id="tfForm"><div class="two"><label>Vorname<input name="first_name" required></label><label>Name<input name="last_name" required></label></div>

@@ -87,7 +87,7 @@ private fun fetchQuery(query: String): List<Station> {
     try {
         connection.outputStream.use { it.write("data=${java.net.URLEncoder.encode(query, "UTF-8")}".toByteArray()) }
         if (connection.responseCode !in 200..299) error("OSM-Datenserver: HTTP ${connection.responseCode}")
-        val elements = JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).getJSONArray("elements")
+        val elements = JSONObject(connection.inputStream.bufferedReader().use { it.readLocalizedText() }).getJSONArray("elements")
         return (0 until elements.length()).mapNotNull { i ->
             val e = elements.getJSONObject(i)
             val tags = e.optJSONObject("tags") ?: return@mapNotNull null
@@ -178,21 +178,21 @@ fun LokZeitApp(username: String) {
     fun persist(newEntries: List<StopEntry>) { entries = newEntries; saveEntries(context, username, newEntries) }
     fun reset() { arrival = null; departure = null; station = ""; ds100 = ""; currentStopId = null; reason = ""; note = ""; source = "Manuell" }
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Zugfahrt · LokZeit") }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { LocalizedText("Zugfahrt · LokZeit") }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
-                Text("Dienst und Zug", style = MaterialTheme.typography.titleLarge)
+                LocalizedText("Dienst und Zug", style = MaterialTheme.typography.titleLarge)
                 Button(onClick = {
                     dutyStarted = !dutyStarted; prefs.edit().putBoolean("duty", dutyStarted).apply()
                     if (!dutyStarted) { gpsEnabled = false; message = "Dienst beendet" }
-                }) { Text(if (dutyStarted) "Dienst beenden" else "Dienst starten") }
-                OutlinedTextField(trainNumber, { trainNumber = it; prefs.edit().putString("train", it).apply() }, label = { Text("Zugnummer") }, modifier = Modifier.fillMaxWidth())
+                }) { LocalizedText(if (dutyStarted) "Dienst beenden" else "Dienst starten") }
+                OutlinedTextField(trainNumber, { trainNumber = it; prefs.edit().putString("train", it).apply() }, label = { LocalizedText("Zugnummer") }, modifier = Modifier.fillMaxWidth())
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = dutyStarted, onClick = {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                             permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
                         else gpsEnabled = !gpsEnabled
-                    }) { Text(if (gpsEnabled) "GPS stoppen" else "GPS starten") }
+                    }) { LocalizedText(if (gpsEnabled) "GPS stoppen" else "GPS starten") }
                     Button(enabled = currentLocation != null, onClick = {
                         val fix = currentLocation ?: return@Button
                         scope.launch {
@@ -204,15 +204,15 @@ fun LokZeitApp(username: String) {
                                     message = "${fetched.size} Betriebsstellen geladen; lokal gespeichert"
                                 }.onFailure { message = "Abruf fehlgeschlagen: ${it.message}" }
                         }
-                    }) { Text("OSM laden") }
+                    }) { LocalizedText("OSM laden") }
                 }
-                Text(message, style = MaterialTheme.typography.bodySmall)
-                Text("${stations.size} Betriebsstellen gespeichert. GPS nur bei geöffnetem Bildschirm und laufendem Dienst. OSM laden jeweils für die aktuelle Umgebung (10 km).", style = MaterialTheme.typography.bodySmall)
+                LocalizedText(message, style = MaterialTheme.typography.bodySmall)
+                LocalizedText("${stations.size} Betriebsstellen gespeichert. GPS nur bei geöffnetem Bildschirm und laufendem Dienst. OSM laden jeweils für die aktuelle Umgebung (10 km).", style = MaterialTheme.typography.bodySmall)
             }
             item {
-                Text("Aktueller Aufenthalt", style = MaterialTheme.typography.titleLarge)
-                OutlinedTextField(station, { station = it; source = "Manuell korrigiert" }, label = { Text("Betriebsstelle (editierbar)") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(ds100, { ds100 = it.uppercase().trim() }, label = { Text("DS100-Kürzel") }, modifier = Modifier.fillMaxWidth())
+                LocalizedText("Aktueller Aufenthalt", style = MaterialTheme.typography.titleLarge)
+                OutlinedTextField(station, { station = it; source = "Manuell korrigiert" }, label = { LocalizedText("Betriebsstelle (editierbar)") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(ds100, { ds100 = it.uppercase().trim() }, label = { LocalizedText("DS100-Kürzel") }, modifier = Modifier.fillMaxWidth())
                 Button(enabled = Regex("[A-Z0-9]{2,7}").matches(ds100), onClick = {
                     val code = ds100
                     val cached = stations.firstOrNull { it.ref.equals(code, ignoreCase = true) }
@@ -229,32 +229,32 @@ fun LokZeitApp(username: String) {
                                 }
                             }.onFailure { message = "DS100-Abfrage fehlgeschlagen: ${it.message}" }
                     }
-                }) { Text("DS100 suchen") }
-                Text("Ankunft: ${arrival?.let(::stamp) ?: "–"}   Abfahrt: ${departure?.let(::stamp) ?: "–"}")
-                Text("Standzeit: ${elapsed.clock()} · $source")
+                }) { LocalizedText("DS100 suchen") }
+                LocalizedText("Ankunft: ${arrival?.let(::stamp) ?: "–"}   Abfahrt: ${departure?.let(::stamp) ?: "–"}")
+                LocalizedText("Standzeit: ${elapsed.clock()} · $source")
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(enabled = arrival == null, onClick = { arrival = System.currentTimeMillis(); departure = null; source = "Manuell" }) { Text("Ankunft") }
-                    Button(enabled = arrival != null && departure == null, onClick = { departure = System.currentTimeMillis() }) { Text("Abfahrt") }
-                    if (arrival != null) TextButton(onClick = { reset() }) { Text("Verwerfen") }
+                    Button(enabled = arrival == null, onClick = { arrival = System.currentTimeMillis(); departure = null; source = "Manuell" }) { LocalizedText("Ankunft") }
+                    Button(enabled = arrival != null && departure == null, onClick = { departure = System.currentTimeMillis() }) { LocalizedText("Abfahrt") }
+                    if (arrival != null) TextButton(onClick = { reset() }) { LocalizedText("Verwerfen") }
                 }
-                Text("Erkannte Zeiten können nach dem Speichern bearbeitet werden.")
+                LocalizedText("Erkannte Zeiten können nach dem Speichern bearbeitet werden.")
             }
             item {
                 StopReasonDropdown(reason, elapsed, onSelect = { reason = it })
-                OutlinedTextField(note, { note = it }, label = { Text("Notiz (optional)") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(note, { note = it }, label = { LocalizedText("Notiz (optional)") }, modifier = Modifier.fillMaxWidth())
                 Button(enabled = arrival != null && departure != null && station.isNotBlank() && validReason(reason, elapsed), onClick = {
                     persist(listOf(StopEntry(station.trim(), arrival!!, departure!!, reason, note.trim(), source, ds100)) + entries)
                     reset()
-                }, modifier = Modifier.fillMaxWidth()) { Text("Standzeit speichern") }
+                }, modifier = Modifier.fillMaxWidth()) { LocalizedText("Standzeit speichern") }
             }
-            item { Text("Standzeiten – Zug ${trainNumber.ifBlank { "–" }}", style = MaterialTheme.typography.titleLarge) }
+            item { LocalizedText("Standzeiten – Zug ${trainNumber.ifBlank { "–" }}", style = MaterialTheme.typography.titleLarge) }
             itemsIndexed(entries) { index, entry ->
                 Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) {
-                    Text(entry.station, style = MaterialTheme.typography.titleMedium)
-                    Text("${stamp(entry.arrival)} – ${stamp(entry.departure)}")
-                    Text("${duration(entry.arrival, entry.departure).clock()} · ${entry.reason}${if (entry.note.isBlank()) "" else " – ${entry.note}"}")
-                    Text("${entry.source}${if (entry.ds100.isBlank()) "" else " · DS100 ${entry.ds100}"}", style = MaterialTheme.typography.bodySmall)
-                    TextButton(onClick = { editing = index }) { Text("Betriebsstelle / Zeiten bearbeiten") }
+                    LocalizedText(entry.station, localize = false, style = MaterialTheme.typography.titleMedium)
+                    LocalizedText("${stamp(entry.arrival)} – ${stamp(entry.departure)}")
+                    LocalizedText("${duration(entry.arrival, entry.departure).clock()} · ${entry.reason}${if (entry.note.isBlank()) "" else " – ${entry.note}"}")
+                    LocalizedText("${entry.source}${if (entry.ds100.isBlank()) "" else " · DS100 ${entry.ds100}"}", style = MaterialTheme.typography.bodySmall)
+                    TextButton(onClick = { editing = index }) { LocalizedText("Betriebsstelle / Zeiten bearbeiten") }
                 } }
             }
         }
@@ -277,22 +277,22 @@ private fun EditStopDialog(entry: StopEntry, onDismiss: () -> Unit, onSave: (Sto
     val start = runCatching { java.time.LocalDateTime.parse(arrival, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() }.getOrNull()
     val end = runCatching { java.time.LocalDateTime.parse(departure, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() }.getOrNull()
     val seconds = if (start != null && end != null && end >= start) duration(start, end) else 0L
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("Standzeit korrigieren") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { LocalizedText("Standzeit korrigieren") }, text = {
         Column(Modifier.heightIn(max = 510.dp).verticalScroll(rememberScrollState())) {
-            OutlinedTextField(name, { name = it }, label = { Text("Betriebsstelle") })
-            OutlinedTextField(code, { code = it.uppercase().trim() }, label = { Text("DS100-Kürzel (optional)") })
-            OutlinedTextField(arrival, { arrival = it }, label = { Text("Ankunft: TT.MM.JJJJ HH:mm:ss") })
-            OutlinedTextField(departure, { departure = it }, label = { Text("Abfahrt: TT.MM.JJJJ HH:mm:ss") })
-            Text("Dauer: ${seconds.clock()}")
+            OutlinedTextField(name, { name = it }, label = { LocalizedText("Betriebsstelle") })
+            OutlinedTextField(code, { code = it.uppercase().trim() }, label = { LocalizedText("DS100-Kürzel (optional)") })
+            OutlinedTextField(arrival, { arrival = it }, label = { LocalizedText("Ankunft: TT.MM.JJJJ HH:mm:ss") })
+            OutlinedTextField(departure, { departure = it }, label = { LocalizedText("Abfahrt: TT.MM.JJJJ HH:mm:ss") })
+            LocalizedText("Dauer: ${seconds.clock()}")
             StopReasonDropdown(reason, seconds, onSelect = { reason = it })
-            OutlinedTextField(note, { note = it }, label = { Text("Notiz (optional)") })
-            TextButton(onClick = onDelete) { Text("Falschen Eintrag löschen") }
+            OutlinedTextField(note, { note = it }, label = { LocalizedText("Notiz (optional)") })
+            TextButton(onClick = onDelete) { LocalizedText("Falschen Eintrag löschen") }
         }
     }, confirmButton = {
         TextButton(enabled = name.isNotBlank() && start != null && end != null && end >= start && validReason(reason, seconds), onClick = {
             onSave(StopEntry(name.trim(), start!!, end!!, reason, note.trim(), "Manuell korrigiert", code))
-        }) { Text("Speichern") }
-    }, dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } })
+        }) { LocalizedText("Speichern") }
+    }, dismissButton = { TextButton(onClick = onDismiss) { LocalizedText("Abbrechen") } })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -304,8 +304,8 @@ private fun StopReasonDropdown(value: String, seconds: Long, onSelect: (String) 
             value = value,
             onValueChange = {},
             readOnly = true,
-            label = { Text("Grund der Standzeit") },
-            placeholder = { Text("Bitte auswählen") },
+            label = { LocalizedText("Grund der Standzeit") },
+            placeholder = { LocalizedText("Bitte auswählen") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier.menuAnchor().fillMaxWidth()
         )
@@ -313,7 +313,7 @@ private fun StopReasonDropdown(value: String, seconds: Long, onSelect: (String) 
             STOP_REASONS.forEach { option ->
                 val available = option != "Pause" || seconds >= MIN_PAUSE
                 DropdownMenuItem(
-                    text = { Text(if (option == "Pause" && !available) "Pause (ab 15:00 min)" else option) },
+                    text = { LocalizedText(if (option == "Pause" && !available) "Pause (ab 15:00 min)" else option) },
                     enabled = available,
                     onClick = { onSelect(option); expanded = false }
                 )
