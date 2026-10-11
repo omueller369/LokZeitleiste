@@ -26,7 +26,8 @@ class TfCreate(Credentials):
     target_hours_minutes: int = Field(ge=0, le=744 * 60)
     vacation_days: int = Field(ge=0, le=366)
     birth_date: date
-    bahncard: Literal[50, 100]
+    bahncard: Literal[0, 50, 100]
+    bahncard_valid_until: date | None = None
     email: EmailStr
     federal_state: FederalState
 
@@ -104,7 +105,8 @@ class TfProfileUpdate(BaseModel):
     target_hours_minutes: int = Field(ge=0,le=744*60)
     vacation_days: int = Field(ge=0,le=366)
     birth_date: date
-    bahncard: Literal[50,100]
+    bahncard: Literal[0,50,100]
+    bahncard_valid_until: date | None = None
     email: EmailStr
     federal_state: FederalState
     photo_base64: str | None = Field(default=None,max_length=6990510)

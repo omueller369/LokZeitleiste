@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
 from .db import database_session
-from .models import ReportDispatch, TfProfile, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
+from .models import ReportDispatch, TfProfile, TfBahnCardValidity, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
 from .schemas import TfProfileUpdate, EntryIn, Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
 from .reports.daily import day_rows
@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.20")
+app = FastAPI(title="LokZeitleiste API", version="0.21")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -105,6 +105,8 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
                          email=str(data.email), federal_state=data.federal_state))
         from .models import TfDutyProfile
         db.add(TfDutyProfile(user_id=user.id,driver_type=data.driver_type))
+        if data.bahncard and data.bahncard_valid_until is not None:
+            db.add(TfBahnCardValidity(user_id=user.id, valid_until=data.bahncard_valid_until))
         save_photo(db,user.id,image)
         db.commit()
         return {"id": user.id, "username": user.username}
@@ -119,10 +121,12 @@ def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(databas
     rows = db.execute(select(User, TfProfile).join(TfProfile).where(User.role == "tf").order_by(TfProfile.last_name)).all()
     if permissions(db,viewer)["employees"] == 0:
         return [{"id":u.id,"first_name":p.first_name,"last_name":p.last_name,"personnel_number":p.personnel_number,"driver_type":driver_type(db,u.id)} for u,p in rows]
+    validity = {row.user_id: row.valid_until.isoformat() for row in db.scalars(select(TfBahnCardValidity))}
     return [{"id": user.id, "username": user.username, "active": user.active,
              "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,"driver_type":driver_type(db,user.id),
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
+             "bahncard_valid_until": validity.get(user.id) if p.bahncard else None,
              "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None} for user, p in rows]
 
 
@@ -134,9 +138,19 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
     if not user or user.role!='tf' or not profile:raise HTTPException(404,'Tf nicht gefunden')
     image=decode_photo(data.photo_base64)
     try:
+        previous_bahncard = profile.bahncard
         for field in ('last_name','first_name','personnel_number','target_hours_minutes','vacation_days','birth_date','bahncard','email','federal_state'):
             value=getattr(data,field)
             setattr(profile,field,value.strip() if isinstance(value,str) else value)
+        if not data.bahncard or 'bahncard_valid_until' in data.model_fields_set or previous_bahncard != data.bahncard:
+            validity = db.get(TfBahnCardValidity, tf_id)
+            valid_until = data.bahncard_valid_until if data.bahncard else None
+            if valid_until is None:
+                if validity is not None: db.delete(validity)
+            elif validity is None:
+                db.add(TfBahnCardValidity(user_id=tf_id, valid_until=valid_until))
+            else:
+                validity.valid_until = valid_until
         if data.driver_type is not None:
             from .models import TfDutyProfile
             role=db.get(TfDutyProfile,tf_id)

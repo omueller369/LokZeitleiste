@@ -719,7 +719,9 @@
     "iCloud-E-Mail-Adresse": "iCloud-E-Mail-Adresse",
     "Apple-App-Passwort": "Apple-App-Passwort",
     "App-Passwort bei Apple erstellen": "App-Passwort bei Apple erstellen",
-    "iCloud-Zugang speichern": "iCloud-Zugang speichern"
+    "iCloud-Zugang speichern": "iCloud-Zugang speichern",
+    "Keine BahnCard": "Keine BahnCard",
+    "Gültig bis": "Gültig bis"
   },
   "en": {
     "Administration": "Administration",
@@ -1441,7 +1443,9 @@
     "iCloud-E-Mail-Adresse": "iCloud email address",
     "Apple-App-Passwort": "Apple app-specific password",
     "App-Passwort bei Apple erstellen": "Create an app password at Apple",
-    "iCloud-Zugang speichern": "Save iCloud connection"
+    "iCloud-Zugang speichern": "Save iCloud connection",
+    "Keine BahnCard": "No BahnCard",
+    "Gültig bis": "Valid until"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2163,7 +2167,9 @@
     "iCloud-E-Mail-Adresse": "Adres e-mail iCloud",
     "Apple-App-Passwort": "Hasło aplikacji Apple",
     "App-Passwort bei Apple erstellen": "Utwórz hasło aplikacji w Apple",
-    "iCloud-Zugang speichern": "Zapisz dostęp iCloud"
+    "iCloud-Zugang speichern": "Zapisz dostęp iCloud",
+    "Keine BahnCard": "Brak BahnCard",
+    "Gültig bis": "Ważna do"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -2885,7 +2891,9 @@
     "iCloud-E-Mail-Adresse": "Адрес почты iCloud",
     "Apple-App-Passwort": "Пароль приложения Apple",
     "App-Passwort bei Apple erstellen": "Создать пароль приложения у Apple",
-    "iCloud-Zugang speichern": "Сохранить доступ iCloud"
+    "iCloud-Zugang speichern": "Сохранить доступ iCloud",
+    "Keine BahnCard": "Нет BahnCard",
+    "Gültig bis": "Действует до"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -3607,7 +3615,9 @@
     "iCloud-E-Mail-Adresse": "iCloud e-posta adresi",
     "Apple-App-Passwort": "Apple uygulama parolası",
     "App-Passwort bei Apple erstellen": "Apple'da uygulama parolası oluştur",
-    "iCloud-Zugang speichern": "iCloud bağlantısını kaydet"
+    "iCloud-Zugang speichern": "iCloud bağlantısını kaydet",
+    "Keine BahnCard": "BahnCard yok",
+    "Gültig bis": "Geçerlilik tarihi"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -4329,7 +4339,9 @@
     "iCloud-E-Mail-Adresse": "عنوان بريد iCloud",
     "Apple-App-Passwort": "كلمة مرور تطبيق Apple",
     "App-Passwort bei Apple erstellen": "إنشاء كلمة مرور تطبيق لدى Apple",
-    "iCloud-Zugang speichern": "حفظ اتصال iCloud"
+    "iCloud-Zugang speichern": "حفظ اتصال iCloud",
+    "Keine BahnCard": "بدون BahnCard",
+    "Gültig bis": "صالحة حتى"
   },
   "es": {
     "Administration": "Administración",
@@ -5051,6 +5063,8 @@
     "iCloud-E-Mail-Adresse": "Dirección de correo iCloud",
     "Apple-App-Passwort": "Contraseña de aplicación Apple",
     "App-Passwort bei Apple erstellen": "Crear contraseña de aplicación en Apple",
-    "iCloud-Zugang speichern": "Guardar acceso iCloud"
+    "iCloud-Zugang speichern": "Guardar acceso iCloud",
+    "Keine BahnCard": "Sin BahnCard",
+    "Gültig bis": "Válida hasta"
   }
 }

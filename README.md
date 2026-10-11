@@ -1,11 +1,11 @@
-# LokZeitleiste v0.20
+# LokZeitleiste v0.21
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
 ## Projektteile
 
 - `app/`: Android-Frontend mit Monatsübersicht, lokaler Erfassung, Zugfahrtbereich aus LokZeit und manuellem Versand des ausgewählten Monats. Die App nutzt ein vom Admin angelegtes Tf-Konto. Sie kann selbst keine Benutzer anlegen.
-- `backend/`: FastAPI-Webserver mit MySQL. Admins melden sich unter `/admin` an und legen Tf an. Stammdaten pro Tf: Name, Vorname, Personalnummer, monatliche Sollstunden, Urlaubstage, Geburtsdatum und BahnCard 50 oder 100. Monatsdaten und Einträge gehören zu genau einem Tf.
+- `backend/`: FastAPI-Webserver mit MySQL. Admins melden sich unter `/admin` an und legen Tf an. Stammdaten pro Tf: Name, Vorname, Personalnummer, monatliche Sollstunden, Urlaubstage, Geburtsdatum und keine BahnCard, BahnCard 50 oder 100 mit optionalem Gültigkeitsdatum. Monatsdaten und Einträge gehören zu genau einem Tf.
 - `docs/` und `design/`: Anforderungen und Tablet-Vorschauen aus den bisherigen Arbeitsschritten.
 
 Die [Gesamtvorschau](design/gesamtvorschau.html) zeigt die früheren Masken. Die [Vorschau für Tagesbeleg und Monatsabrechnung](design/monatsabrechnung-preview.html) zeigt die neuen Masken mit Beispieldaten.
@@ -103,3 +103,9 @@ Excel: Die bisherigen vier Spalten bleiben gültig. Eine optionale fünfte Spalt
 Die Grenzdienst-Schichtfolge (Anzahl Tag-, Nacht- und Ruhetage) ist im Schichtmodell frei einzustellen; eine betriebliche Folge ist noch nicht vorgegeben. Pausen werden weiterhin in der tatsächlichen Zeiterfassung eingegeben; 12 h bezeichnet hier das Plansoll für den genannten Dienstzeitraum.
 
 Googlemail: Button „Mit Google verbinden“ mit OAuth2/API-Kontoanbindung, automatischer Adressübernahme und Token-Erneuerung. Auf dem Server müssen Google-Client-ID, Client-Secret und öffentliche HTTPS-Adresse einmalig eingerichtet sein. iCloud: Button mit vereinfachtem Dialog (Adresse + Apple-App-Passwort), automatische Serverwerte; keine öffentliche Apple-Mail-OAuth-API für diese eigene Anwendung integriert. Details und Einrichtung im [Postfach-Handbuch](backend/lokzeitleiste/mailbox/README.md).
+
+## BahnCard im TF-Profil
+
+Beim Anlegen, Bearbeiten und Ansehen stehen „Keine BahnCard“, „BahnCard 50“ und „BahnCard 100“ zur Verfügung. Für BahnCard 50/100 wird „Gültig bis“ als Datumsfeld eingeblendet. Das Datum ist optional, damit bestehende Profile ohne bekanntes Ablaufdatum weiter bearbeitet werden können. Bei „Keine BahnCard“ wird das gespeicherte Datum gelöscht. Ältere API-Clients erhalten beim unveränderten Kartentyp ein bereits hinterlegtes Datum.
+
+Die neue Zusatztabelle `tf_bahncard_validity` wird durch den bestehenden Datenbankinitialisierungsschritt angelegt; vorhandene TF-Tabellen benötigen keine Spaltenänderung.

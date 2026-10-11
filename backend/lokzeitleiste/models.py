@@ -36,6 +36,12 @@ class TfProfile(Base):
     user: Mapped[User] = relationship(back_populates="profile")
 
 
+class TfBahnCardValidity(Base):
+    __tablename__ = "tf_bahncard_validity"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    valid_until: Mapped[date] = mapped_column(Date, nullable=False)
+
+
 class SessionToken(Base):
     __tablename__ = "session_tokens"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
