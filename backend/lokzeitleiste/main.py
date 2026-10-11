@@ -87,7 +87,10 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
                          personnel_number=data.personnel_number.strip(),
                          target_hours_minutes=data.target_hours_minutes,
                          vacation_days=data.vacation_days, birth_date=data.birth_date, bahncard=data.bahncard,
-                         email=str(data.email), federal_state=data.federal_state))
+                         email=str(data.email), federal_state=data.federal_state,
+                         gender=data.gender, qualification=data.qualification,
+                         weekly_hours_minutes=data.weekly_hours_minutes, joined_on=data.joined_on,
+                         bahncard_valid_until=data.bahncard_valid_until))
         db.commit()
         return {"id": user.id, "username": user.username}
     except IntegrityError:
@@ -102,7 +105,12 @@ def list_tf(_: User = Depends(require_admin), db: Session = Depends(database_ses
              "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,
              "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
-             "email": p.email, "federal_state": p.federal_state} for user, p in rows]
+             "email": p.email, "federal_state": p.federal_state,
+             "gender": p.gender, "qualification": p.qualification,
+             "weekly_hours_minutes": p.weekly_hours_minutes,
+             "joined_on": p.joined_on.isoformat() if p.joined_on else None,
+             "bahncard_valid_until": p.bahncard_valid_until.isoformat() if p.bahncard_valid_until else None,
+             "photo_placeholder": p.photo_placeholder} for user, p in rows]
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")

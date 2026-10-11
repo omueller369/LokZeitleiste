@@ -24,7 +24,12 @@ class TfCreate(Credentials):
     target_hours_minutes: int = Field(ge=0, le=744 * 60)
     vacation_days: int = Field(ge=0, le=366)
     birth_date: date
-    bahncard: Literal[50, 100]
+    bahncard: Literal[0, 50, 100]
+    gender: Literal["männlich", "weiblich", "divers", "keine Angabe"] = "keine Angabe"
+    qualification: Literal["Strecken-TF", "Grenz-TF", "Grenz- und Strecken-TF"] = "Strecken-TF"
+    weekly_hours_minutes: int = Field(default=2400, ge=0, le=168 * 60)
+    joined_on: date | None = None
+    bahncard_valid_until: date | None = None
     email: EmailStr
     federal_state: FederalState
 

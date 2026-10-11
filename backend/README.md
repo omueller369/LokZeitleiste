@@ -55,3 +55,41 @@ Pro Kalendertag zählt geleistete Zeit aus Zugfahrt, Bereitschaft und Sonstiger 
 Lokal gelöschte Einträge bleiben derzeit auf dem Server; Serverdaten werden noch nicht in die App geladen. Ein gleichzeitiger Betrieb auf mehreren Geräten ist nicht vorgesehen. Es gibt noch keine Passwortzurücksetzung, Dienstplanungsschnittstelle, Ausbleibe-Berechnung oder Kopplung der LokZeit-Standzeiten mit dem Monatsdatensatz. Für spätere Schemaänderungen wird ein Migrationstool benötigt.
 
 API-Tests: `pip install -r requirements-dev.txt` und `python -m unittest discover -s tests` im Backend-Ordner. Die Tests verwenden SQLite als isolierte Testdatenbank. Der reguläre Betrieb verlangt MySQL.
+
+
+## TF-Stammdaten und fiktiver Datenbestand
+
+TF-Profile enthalten Geschlecht (männlich, weiblich, divers, keine Angabe),
+Qualifikation (Strecken-TF, Grenz-TF, Grenz- und Strecken-TF), Wochenarbeitszeit,
+Beitrittsdatum und BahnCard-Gültigkeit. `bahncard=0` bedeutet keine BahnCard.
+Die Administration zeigt für jedes Profil ein Platzhalterbild „Bild folgt“.
+Die Wochenarbeitszeit ist unabhängig vom bestehenden monatlichen Soll gespeichert.
+Bei den fiktiven Konten beträgt sie 40 Stunden; das monatliche Soll ist als
+Jahresdurchschnitt mit 40 × 52 / 12 = 173 Stunden 20 Minuten hinterlegt.
+
+Bestehende MySQL-Datenbanken benötigen vor dem Start der neuen API einmalig
+`migrations/0002_tf_details.sql`. Frische Datenbanken erhalten die neuen Spalten
+über `python -m lokzeitleiste.init_db` automatisch. Vor Migration und Datenersetzung
+ist eine Sicherung anzulegen.
+
+Im Backend-Verzeichnis mit gesetzter `DATABASE_URL`:
+
+```bash
+python -m lokzeitleiste.seed_tf --replace-all-tf
+```
+
+**Dieser ausdrücklich aufzurufende Befehl löscht alle TF-Konten und deren Profile,
+Sitzungen, Monate, Einträge und PDF-Versandaufträge. Admin-Konten bleiben erhalten.**
+Löschen und Anlegen erfolgen gemeinsam in einer Transaktion. Der Befehl gehört
+nicht in den automatischen Serverstart.
+
+Er legt die fiktiven Konten `787001`–`787020` an. Benutzername und TF-Nummer sind
+identisch. Das gemeinsame Entwicklungspasswort lautet `tomcom123456`; gespeichert
+werden ausschließlich gesalzene Passwortprüfwerte. Verteilung: 14 männlich,
+4 weiblich, 1 divers, 1 keine Angabe; 3 Grenz-TF, 2 kombinierte Grenz- und
+Strecken-TF, 15 Strecken-TF. Die ersten 18 haben BahnCard 100, der nächste
+BahnCard 50 und der letzte keine BahnCard. Die 19 Karten haben unterschiedliche
+Restgültigkeiten von 120 bis 365 Tagen, bezogen auf den Ausführungstag in
+Europe/Berlin. Beitrittsdaten werden reproduzierbar zufällig zwischen 01.01.1995
+und dem Ausführungstag gewählt. E-Mail-Adressen verwenden die Beispieldomain
+`example.com`; es sind keine realen Empfänger.
