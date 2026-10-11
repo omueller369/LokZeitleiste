@@ -31,6 +31,7 @@ class TfProfile(Base):
     vacation_days: Mapped[int] = mapped_column(Integer, nullable=False)
     birth_date: Mapped[date] = mapped_column(Date, nullable=False)
     bahncard: Mapped[int] = mapped_column(Integer, nullable=False)
+    gender: Mapped[str] = mapped_column(String(20), default="keine Angabe", nullable=False)
     email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     federal_state: Mapped[str | None] = mapped_column(String(2), nullable=True)
     user: Mapped[User] = relationship(back_populates="profile")

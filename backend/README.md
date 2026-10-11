@@ -80,3 +80,33 @@ Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/adm
 
 
 Ab v0.22 migriert `init_db` alte TF-Loginnamen einmalig zu eindeutigen 787xxx-Nummern und stellt die alten Monatssollwerte auf mindestens 40 Wochenstunden um. Bestehende TF-Sitzungen werden beendet. Die Zuordnung steht intern in `tf_number_migrations`; die Verwaltungsoberfläche zeigt die neuen Nummern. Details zur Berechnung und zu Sperren stehen im Projekt-README. Die aktuelle offizielle Bahnhofsliste wird bei Bedarf mit `python -m lokzeitleiste.accounts.import_stations` importiert; Spaltenargumente und Lizenzangaben siehe `accounts/STATION_SOURCES.md`.
+
+
+## Fiktive TF für Entwicklung
+
+Geschlecht ist in den TF-Formularen auswählbar: männlich, weiblich, divers,
+keine Angabe. TF-Typ, Wochenarbeitszeit, Beitrittsdatum, Adressen und
+BahnCard-Gültigkeit nutzen die bereits vorhandenen Stammdaten der Version 0.22.
+Ohne Profilfoto erscheint „Bild folgt“.
+
+Für bestehende Datenbanken einmalig `migrations/0002_tf_details.sql` ausführen,
+sofern die Spalte `tf_profiles.gender` noch fehlt; frische Datenbanken erhalten
+sie durch `python -m lokzeitleiste.init_db`. Vor Änderungen eine Sicherung anlegen.
+
+Mit gesetzter `DATABASE_URL` im Backend-Verzeichnis:
+
+```bash
+python -m lokzeitleiste.seed_tf --replace-all-tf
+```
+
+**Löscht alle TF und ihre abhängigen Datensätze einschließlich Planung,
+Arbeitszeiten, Sitzungen, Fotos und Maildaten; Admin-Konten bleiben bestehen.**
+Löschen und Neuanlage erfolgen in einer Transaktion. Nicht im Serverstart aufrufen.
+Der Generator erstellt 20 fiktive TF mit Login/TF-Nummern 787001–787020 und
+Entwicklungspasswort `tomcom123456` (gesalzen gespeichert): 14 männlich,
+4 weiblich, 1 divers, 1 ohne Angabe; 3 Grenz-TF, 2 kombinierte TF, 15 Strecken-TF;
+40 Wochenstunden, zufällige Beitrittsdaten ab 01.01.1995 bis zum Ausführungstag.
+18 BahnCard 100 und 1 BahnCard 50 erhalten unterschiedliche Restgültigkeiten
+zwischen 120 und 365 Tagen ab Ausführungstag (Europe/Berlin); 1 TF hat keine
+BahnCard. Monatssoll folgt der vorhandenen Berechnung anhand der Wochenstunden
+und Berliner Arbeitstage. Adressen und E-Mail-Adressen sind Beispieldaten.

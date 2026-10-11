@@ -33,6 +33,7 @@ class TfAddressIn(BaseModel):
 
 
 class TfDetails(BaseModel):
+    gender: Literal["männlich", "weiblich", "divers", "keine Angabe"] = "keine Angabe"
     weekly_minutes: int | None = Field(default=None, ge=0, le=168*60)
     entry_date: date | None = None
     exit_date: date | None = None

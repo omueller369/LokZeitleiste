@@ -42,6 +42,25 @@ class ApiFlowTest(unittest.TestCase):
         self.engine_patch.stop()
         self.engine.dispose()
 
+    def test_tf_details_and_no_bahncard_roundtrip(self):
+        self.client.post("/api/v1/admin/login", json={"username": "admin", "password": "admin-secret-12345"})
+        data = {
+            "username": "787021", "password": "tomcom123456", "first_name": "Alex",
+            "last_name": "Test", "personnel_number": "787021", "target_hours_minutes": 10400,
+            "vacation_days": 30, "birth_date": "1980-01-01", "bahncard": 0,
+            "email": "alex@example.com", "federal_state": "BE", "gender": "divers",
+            "driver_type": "both", "weekly_minutes": 2400, "nationality": "DE",
+            "addresses": [{"street":"Musterstraße","house_number":"1","postal_code":"10115","city":"Berlin","federal_state":"BE","is_postal":True}],
+            "entry_date": "1995-01-01", "bahncard_valid_until": None,
+        }
+        self.assertEqual(self.client.post("/api/v1/admin/tf", json=data).status_code, 201)
+        profile = self.client.get("/api/v1/admin/tf").json()[0]
+        for field in ["gender", "driver_type", "weekly_minutes", "entry_date", "bahncard", "bahncard_valid_until"]:
+            self.assertEqual(profile[field], data[field])
+        self.assertEqual(profile["photo_placeholder"], "Bild folgt")
+        data["gender"] = "ungültig"
+        self.assertEqual(self.client.post("/api/v1/admin/tf", json=data).status_code, 422)
+
     def create_tf(self, username, personnel):
         result = self.client.post("/api/v1/admin/tf", json={
             "username": username, "password": "tf-secret-12345",

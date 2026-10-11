@@ -104,7 +104,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
                          personnel_number=data.personnel_number.strip(),
                          target_hours_minutes=data.target_hours_minutes,
                          vacation_days=data.vacation_days, birth_date=data.birth_date, bahncard=data.bahncard,
-                         email=str(data.email), federal_state=data.federal_state))
+                         email=str(data.email), federal_state=data.federal_state, gender=data.gender))
         from .models import TfDutyProfile
         db.add(TfDutyProfile(user_id=user.id,driver_type=data.driver_type))
         if data.bahncard and data.bahncard_valid_until is not None:
@@ -131,7 +131,7 @@ def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(databas
              "target_hours_minutes": details_dict(db,user)["monthly_minutes"], "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
              "bahncard_valid_until": validity.get(user.id) if p.bahncard else None,
-             "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None, **details_dict(db,user)} for user, p in rows]
+             "gender": p.gender, "photo_placeholder": "Bild folgt", "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None, **details_dict(db,user)} for user, p in rows]
 
 
 @app.put("/api/v1/admin/tf/{tf_id}")
@@ -145,7 +145,7 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
     image=decode_photo(data.photo_base64)
     try:
         previous_bahncard = profile.bahncard
-        for field in ('last_name','first_name','personnel_number','target_hours_minutes','vacation_days','birth_date','bahncard','email','federal_state'):
+        for field in ('last_name','first_name','personnel_number','target_hours_minutes','vacation_days','birth_date','bahncard','email','federal_state','gender'):
             value=getattr(data,field)
             setattr(profile,field,value.strip() if isinstance(value,str) else value)
         if not data.bahncard or 'bahncard_valid_until' in data.model_fields_set or previous_bahncard != data.bahncard:
