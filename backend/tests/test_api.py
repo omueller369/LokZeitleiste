@@ -44,7 +44,9 @@ class ApiFlowTest(unittest.TestCase):
 
     def create_tf(self, username, personnel):
         result = self.client.post("/api/v1/admin/tf", json={
-            "username": username, "password": "tf-secret-12345", "first_name": "Mira",
+            "username": username, "password": "tf-secret-12345",
+            "weekly_minutes":2400,"entry_date":"2020-01-01","nationality":"DE",
+            "addresses":[{"street":"Teststraße","house_number":"1","postal_code":"10115","city":"Berlin","federal_state":"BE","is_postal":True}], "first_name": "Mira",
             "last_name": "Beispiel", "personnel_number": personnel,
             "target_hours_minutes": 9600, "vacation_days": 30,
             "birth_date": "1990-05-12", "bahncard": 50,
@@ -60,15 +62,15 @@ class ApiFlowTest(unittest.TestCase):
     def test_admin_creation_upload_idempotence_and_owner_isolation(self):
         self.assertEqual(self.client.post("/api/v1/admin/login",
             json={"username": "admin", "password": "admin-secret-12345"}).status_code, 200)
-        first = self.create_tf("tf-one", "P-001")
+        first = self.create_tf("787106", "P-001")
         self.assertEqual(first.status_code, 201, first.text)
-        self.assertEqual(self.create_tf("tf-two", "P-002").status_code, 201)
-        self.assertEqual(self.create_tf("tf-three", "P-001").status_code, 409)
+        self.assertEqual(self.create_tf("787109", "P-002").status_code, 201)
+        self.assertEqual(self.create_tf("787108", "P-001").status_code, 409)
         self.assertEqual(len(self.client.get("/api/v1/admin/tf").json()), 2)
         token_one = self.client.post("/api/v1/tf/login",
-            json={"username": "tf-one", "password": "tf-secret-12345"}).json()["access_token"]
+            json={"username": "787106", "password": "tf-secret-12345"}).json()["access_token"]
         token_two = self.client.post("/api/v1/tf/login",
-            json={"username": "tf-two", "password": "tf-secret-12345"}).json()["access_token"]
+            json={"username": "787109", "password": "tf-secret-12345"}).json()["access_token"]
         headers_one = {"Authorization": "Bearer " + token_one}
         headers_two = {"Authorization": "Bearer " + token_two}
         item = {"client_id": str(uuid4()), "kind": "Bereitschaft", "date": "2026-09-22",
@@ -103,8 +105,8 @@ class ApiFlowTest(unittest.TestCase):
 
     def test_month_topup_uses_guest_once_and_absence_once_per_day(self):
         self.client.post("/api/v1/admin/login", json={"username": "admin", "password": "admin-secret-12345"})
-        tf_id = self.create_tf("tf-example", "P-003").json()["id"]
-        token = self.client.post("/api/v1/tf/login", json={"username": "tf-example", "password": "tf-secret-12345"}).json()["access_token"]
+        tf_id = self.create_tf("787102", "P-003").json()["id"]
+        token = self.client.post("/api/v1/tf/login", json={"username": "787102", "password": "tf-secret-12345"}).json()["access_token"]
         headers = {"Authorization": "Bearer " + token}
         def entry(kind, day, start="08:00", end="12:00", guest=0):
             return {"client_id": str(uuid4()), "kind": kind, "date": day,
@@ -125,8 +127,8 @@ class ApiFlowTest(unittest.TestCase):
 
     def test_upload_needs_mail_settings_and_failure_remains_retryable(self):
         self.client.post("/api/v1/admin/login", json={"username": "admin", "password": "admin-secret-12345"})
-        tf_id = self.create_tf("tf-missing", "P-004").json()["id"]
-        token = self.client.post("/api/v1/tf/login", json={"username": "tf-missing", "password": "tf-secret-12345"}).json()["access_token"]
+        tf_id = self.create_tf("787105", "P-004").json()["id"]
+        token = self.client.post("/api/v1/tf/login", json={"username": "787105", "password": "tf-secret-12345"}).json()["access_token"]
         headers = {"Authorization": "Bearer " + token}
         item = {"client_id": str(uuid4()), "kind": "Zugfahrt", "date": "2026-09-10",
                 "start": "08:00", "end": "11:00", "pause": 0, "guest": 0}

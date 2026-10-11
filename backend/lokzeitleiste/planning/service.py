@@ -19,6 +19,8 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
                        PlanMonth.year == year, PlanMonth.month == month))
     stored = {d.day.day: d for d in period.days} if period else {}
     duties={d.day:d.shift for d in db.scalars(select(PlanDuty).where(PlanDuty.tf_user_id==tf_id,PlanDuty.day>=date(year,month,1),PlanDuty.day<=date(year,month,calendar.monthrange(year,month)[1])))}
+    from ..accounts.tf_profiles import daily_minutes, weekly_minutes, monthly_minutes
+    standard_minutes=daily_minutes(db,tf_id)
     days = []
     for number in range(1, calendar.monthrange(year, month)[1] + 1):
         item = stored.get(number)
@@ -26,9 +28,9 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
         day=date(year,month,number)
         info=holiday_info(day)
         days.append({"date": day.isoformat(), "kind": kind, **info,
-                     "note": item.note if item else "", **duty_info(day,kind,duties.get(day,"standard"),info["is_holiday"])})
+                     "note": item.note if item else "", **duty_info(day,kind,duties.get(day,"standard"),info["is_holiday"],standard_minutes)})
     counts = {kind: sum(d["kind"] == kind and not d["is_holiday"] for d in days) for kind in KINDS}
-    return {"year": year, "month": month,"driver_type":driver_type(db,tf_id), "revision": period.revision if period else 0,
+    return {"year": year, "month": month,"weekly_minutes":weekly_minutes(db,tf_id),"contract_monthly_minutes":monthly_minutes(db,tf_id,year,month),"driver_type":driver_type(db,tf_id), "revision": period.revision if period else 0,
             "days": days, "holiday_days":sum(d["is_holiday"] for d in days), "holiday_state":"BE", "work_days": counts["Arbeitstag"], "vacation_days": counts["Urlaub"],
             "rest_days": counts["Ruhetag"], "unplanned_days": counts["Ungeplant"],
             "work_target_minutes": sum(d["target_minutes"] for d in days if d["kind"]=="Arbeitstag"),

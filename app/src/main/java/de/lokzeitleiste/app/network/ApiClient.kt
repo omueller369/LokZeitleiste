@@ -11,6 +11,8 @@ import java.net.URI
 import java.net.URL
 import java.time.YearMonth
 
+class AuthenticationRequired : IllegalStateException("Anmeldung abgelaufen. Bitte erneut anmelden.")
+
 object ApiClient {
     private fun base(): String = BuildConfig.API_BASE_URL.trimEnd('/').also {
         val uri = runCatching { URI(it) }.getOrNull()
@@ -33,16 +35,15 @@ object ApiClient {
             if (method != "GET") connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
             val stream = if (connection.responseCode in 200..299) connection.inputStream else connection.errorStream
             val content = stream?.bufferedReader()?.use { it.readText() } ?: ""
-            if (connection.responseCode !in 200..299)
-                error(if (connection.responseCode == 401) "Anmeldung abgelaufen. Bitte erneut anmelden."
-                      else "Serverfehler ${connection.responseCode}: $content")
+            if (connection.responseCode == 401) throw AuthenticationRequired()
+            if (connection.responseCode !in 200..299) error("Serverfehler ${connection.responseCode}: $content")
             return JSONObject(content)
         } finally { connection.disconnect() }
     }
-    data class LoginResult(val username: String, val token: String, val passwordChangeRequired: Boolean)
+    data class LoginResult(val username: String, val token: String, val passwordChangeRequired: Boolean, val previousUsername: String? = null)
     suspend fun login(username: String, password: String): LoginResult = withContext(Dispatchers.IO) {
         val reply = post("/api/v1/tf/login", JSONObject().put("username", username).put("password", password))
-        LoginResult(reply.getString("username"), reply.getString("access_token"), reply.optBoolean("password_change_required"))
+        LoginResult(reply.getString("username"), reply.getString("access_token"), reply.optBoolean("password_change_required"), reply.optString("previous_username").takeIf { it.isNotBlank() && it != "null" })
     }
     suspend fun changePassword(username: String, token: String, current: String, new: String, confirm: String): LoginResult {
         withContext(Dispatchers.IO) {
@@ -66,6 +67,9 @@ object ApiClient {
         val reply = post("/api/v1/me/months/${month.year}/${month.monthValue}/entries",
             JSONObject().put("entries", items), token)
         UploadResult(reply.getInt("accepted"), reply.optString("email_status") == "queued")
+    }
+    suspend fun identity(token: String): JSONObject = withContext(Dispatchers.IO) {
+        post("/api/v1/account/me", JSONObject(), token, "GET")
     }
     suspend fun getLanguage(token: String): JSONObject = withContext(Dispatchers.IO) {
         post("/api/v1/account/locale", JSONObject(), token, "GET")

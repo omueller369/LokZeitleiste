@@ -57,13 +57,13 @@ class RecordsTest(unittest.TestCase):
 
     def test_tf_lock_blocks_old_upload_batch_and_admin_correction(self):
         tf=TestClient(app,base_url='https://testserver');self.staff_clients.append(tf)
-        tf.post('/api/v1/account/login',json={'username':'tf-account','password':'tf-secret-12345'})
+        tf.post('/api/v1/account/login',json={'username':'787100','password':'tf-secret-12345'})
         item=self.item();entry=tf.post('/api/v1/account/worktime/entries',json=item)
         self.assertEqual(entry.status_code,201,entry.text)
         locked=self.lock(self.client,entry.json()).json()
         self.assertEqual(self.edit(tf,locked).status_code,409)
         self.assertEqual(self.edit(self.client,locked,f'/api/v1/admin/tf/{self.tf}/worktime/entries/').status_code,409)
-        token=tf.post('/api/v1/tf/login',json={'username':'tf-account','password':'tf-secret-12345'}).json()['access_token']
+        token=tf.post('/api/v1/tf/login',json={'username':'787100','password':'tf-secret-12345'}).json()['access_token']
         headers={'Authorization':'Bearer '+token};path='/api/v1/me/months/2026/9/entries'
         self.assertEqual(tf.post(path,json={'entries':[item]},headers=headers).status_code,200)
         self.assertEqual(tf.post(path,json={'entries':[self.item('2026-09-02'),dict(item,end='17:00')]},headers=headers).status_code,409)

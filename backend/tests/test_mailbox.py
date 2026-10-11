@@ -20,7 +20,7 @@ class MailboxTest(unittest.TestCase):
 
     def configure(self):
         path=f'/api/v1/admin/email/{self.tf}'
-        response=self.client.put(path+'/config',json={'address':'tf@example.com','username':'tf-mail','password':'mock-mail-password'})
+        response=self.client.put(path+'/config',json={'address':'tf@example.com','username':'787104','password':'mock-mail-password'})
         self.assertEqual(response.status_code,200,response.text);return path
 
     def fake(self):

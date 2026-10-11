@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from ..db import database_session
 from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto
 from ..schemas import Credentials
-from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password
+from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password, account_active
 from .access import MODULES, check_delegation, demand, password_required, permissions
 from .photos import decode_photo, save_photo
 from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
@@ -37,7 +37,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         if origin() and request.headers.get('origin') != origin():
             raise HTTPException(403,'Ungültiger Ursprung')
         user = db.scalar(select(User).where(User.username == data.username.strip().lower(),User.active == True))
-        if not user or not verify_password(data.password,user.password_hash):
+        if not user or not account_active(db,user) or not verify_password(data.password,user.password_hash):
             raise HTTPException(401,'Anmeldung fehlgeschlagen')
         token = issue_token(db,user)
         response.set_cookie('admin_session',token,httponly=True,secure=cookie_secure,samesite='strict',path='/',max_age=365*24*3600)

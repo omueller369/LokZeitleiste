@@ -48,7 +48,7 @@ Admins können pro Tf einen bearbeitbaren Arbeits-, Urlaubs- und Ruhetagsplan an
 
 ## Funktionen und Grenzen
 
-Admins melden sich über ein HttpOnly-Cookie an, legen Tf mit Name, Vorname, Personalnummer, monatlichen Sollstunden, Urlaubstagen, Geburtsdatum, BahnCard 50 oder 100, E-Mail und Bundesland an und können deren Monate einsehen. Für bereits angelegte Tf sind E-Mail und Bundesland in der Admin-Tabelle nachzutragen. Die App meldet Tf über die API an und sendet den ausgewählten Monat. Einträge werden mit ihrer `client_id` bei erneutem Senden aktualisiert und sind dem angemeldeten Tf zugeordnet. Passwortprüfwerte verwenden PBKDF2-HMAC-SHA256 und zufälligen Salt. App-Tokens sind mit Android Keystore geschützt und verfallen serverseitig nach 365 Tagen.
+Admins melden sich über ein HttpOnly-Cookie an, legen Tf mit Name, Vorname, Personalnummer, sechsstelliger TF-Nummer als Loginname, Wochenarbeitszeit, Urlaubstagen, Geburtsdatum, optionalem BahnCard-Ablaufdatum, E-Mail, Staatsangehörigkeit, Ein-/Austrittsdatum, Heimatbahnhof und Adressen inklusive Bundesland an und können deren Monate einsehen. Für bereits angelegte Tf sind E-Mail und Bundesland in der Admin-Tabelle nachzutragen. Die App meldet Tf über die API an und sendet den ausgewählten Monat. Einträge werden mit ihrer `client_id` bei erneutem Senden aktualisiert und sind dem angemeldeten Tf zugeordnet. Passwortprüfwerte verwenden PBKDF2-HMAC-SHA256 und zufälligen Salt. App-Tokens sind mit Android Keystore geschützt und verfallen serverseitig nach 365 Tagen.
 
 ### Tagesbeleg und E-Mail
 
@@ -77,3 +77,6 @@ Administratoren können Arbeitsbeginn und Arbeitsende je Mitarbeiter unter `/adm
 ## Manuelle Erfassung und Sperren
 
 [Eigene Erfassung, Verwaltung und Sperren](lokzeitleiste/records/README.md): `/my/worktime` für Tf und Verwaltungsmitarbeiter, `/admin/worktime` für berechtigte Verwaltungskonten. Neue Tf anlegen unter `/admin/tf/new`, Übersicht unter `/admin/tf`.
+
+
+Ab v0.22 migriert `init_db` alte TF-Loginnamen einmalig zu eindeutigen 787xxx-Nummern und stellt die alten Monatssollwerte auf mindestens 40 Wochenstunden um. Bestehende TF-Sitzungen werden beendet. Die Zuordnung steht intern in `tf_number_migrations`; die Verwaltungsoberfläche zeigt die neuen Nummern. Details zur Berechnung und zu Sperren stehen im Projekt-README. Die aktuelle offizielle Bahnhofsliste wird bei Bedarf mit `python -m lokzeitleiste.accounts.import_stations` importiert; Spaltenargumente und Lizenzangaben siehe `accounts/STATION_SOURCES.md`.

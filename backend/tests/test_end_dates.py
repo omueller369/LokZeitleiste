@@ -60,7 +60,7 @@ class EndDateTest(unittest.TestCase):
 
     def test_legacy_upload_retains_explicit_end_date_and_locks(self):
         client=TestClient(app,base_url='https://testserver');self.staff_clients.append(client)
-        token=client.post('/api/v1/tf/login',json={'username':'tf-account','password':'tf-secret-12345'}).json()['access_token']
+        token=client.post('/api/v1/tf/login',json={'username':'787100','password':'tf-secret-12345'}).json()['access_token']
         headers={'Authorization':'Bearer '+token};path='/api/v1/me/months/2026/9/entries';item=self.item()
         response=client.post(path,json={'entries':[item]},headers=headers)
         self.assertEqual(response.status_code,200,response.text)
@@ -88,7 +88,7 @@ class EndDateTest(unittest.TestCase):
         response=self.client.put(f'/api/v1/admin/tf/{self.tf}',json=update)
         self.assertEqual(response.status_code,200,response.text);self.assertTrue(response.json()['has_photo'])
         self.assertEqual(self.client.get(f'/api/v1/admin/tf/{self.tf}/photo').status_code,200)
-        create=dict(update,username='tf-with-photo',password='new-tf-secret-12345',personnel_number='P-PHOTO')
+        create=dict(update,weekly_minutes=2400,entry_date='2020-01-01',nationality='DE',addresses=user['addresses'],username='787110',password='new-tf-secret-12345',personnel_number='P-PHOTO')
         result=self.client.post('/api/v1/admin/tf',json=create)
         self.assertEqual(result.status_code,201,result.text)
         self.assertEqual(self.client.get('/api/v1/admin/tf/'+str(result.json()['id'])+'/photo').status_code,200)

@@ -21,9 +21,10 @@ def resolve_shift(db,tf_id,kind,requested,previous='standard',previous_kind='Ung
     return shift
 
 
-def duty_info(day,kind,shift,is_holiday):
+def duty_info(day,kind,shift,is_holiday,standard_minutes=480):
     shift=shift if kind=='Arbeitstag' else 'standard'
-    cfg=SHIFTS[shift]
+    cfg=dict(SHIFTS[shift])
+    if shift=='standard':cfg['minutes']=standard_minutes
     end_date=day+timedelta(days=1) if shift=='border_night' and kind=='Arbeitstag' else day
     return dict(shift=shift,shift_label=cfg['label'] if kind=='Arbeitstag' else '',
                 planned_start=day.isoformat()+'T'+cfg['start'] if kind=='Arbeitstag' and cfg['start'] else None,

@@ -19,6 +19,8 @@ import de.lokzeitleiste.app.data.*
 import de.lokzeitleiste.app.network.ApiClient
 import de.lokzeitleiste.app.network.TokenVault
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import de.lokzeitleiste.app.network.AuthenticationRequired
 
 private val kinds = listOf("Rufbereitschaft", "Bereitschaft", "Zugfahrt", "Ausfallschicht", "Krank", "Urlaub", "Sonstige Erfassung")
 private val dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -38,6 +40,26 @@ private fun App() {
     var user by remember { mutableStateOf(TokenVault.username(context)) }
     var trainScreen by remember { mutableStateOf(false) }
     var passwordScreen by remember { mutableStateOf(false) }
+    LaunchedEffect(user) {
+        if (user.isNotBlank()) {
+            while (true) {
+                try {
+                    val identity = ApiClient.identity(TokenVault.token(context) ?: "")
+                    val current = identity.getString("username")
+                    if (current != user) {
+                        migrateAccountData(context, user, current)
+                        TokenVault.save(context, current, TokenVault.token(context) ?: "")
+                        user = current
+                        break
+                    }
+                } catch (_: AuthenticationRequired) {
+                    TokenVault.clear(context); user = ""; trainScreen = false; passwordScreen = false
+                    break
+                } catch (_: Exception) { /* Offline records remain accessible; server operations require a valid account. */ }
+                delay(30000)
+            }
+        }
+    }
     if (user.isBlank()) LoginScreen { name, token -> TokenVault.save(context, name, token); user = name }
     else if (passwordScreen) PasswordChangeScreen(user, TokenVault.token(context) ?: "",
         onSuccess = { name, token -> TokenVault.save(context, name, token); user = name; passwordScreen = false },

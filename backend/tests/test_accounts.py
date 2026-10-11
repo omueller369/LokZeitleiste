@@ -17,7 +17,7 @@ class AccountsTest(unittest.TestCase):
         self.client.post('/api/v1/admin/login',json={'username':'admin','password':'admin-secret-12345'})
         self.staff_clients=[]
         self.create_tf=test_api.ApiFlowTest.create_tf.__get__(self)
-        self.tf=self.create_tf('tf-account','P-ACCOUNT').json()['id']
+        self.tf=self.create_tf('787100','P-ACCOUNT').json()['id']
 
     def tearDown(self):
         for client in self.staff_clients: client.close()
@@ -151,11 +151,13 @@ class AccountsTest(unittest.TestCase):
         self.assertEqual(self.client.post('/api/v1/admin/login',json={'username':'admin','password':'new-admin-secret-67890'}).status_code,200)
 
     def test_tf_initial_password_and_bearer_change(self):
-        result=self.client.post('/api/v1/admin/tf',json={'username':'tf-initial','password':'tf-initial-12345',
+        result=self.client.post('/api/v1/admin/tf',json={'username':'787103','password':'tf-initial-12345',
             'first_name':'Test','last_name':'Tf','personnel_number':'P-INITIAL','target_hours_minutes':9600,'vacation_days':30,
-            'birth_date':'1990-05-12','bahncard':50,'email':'tf@example.com','federal_state':'BE'})
+            'birth_date':'1990-05-12','bahncard':50,'email':'tf@example.com','federal_state':'BE',
+            'weekly_minutes':2400,'entry_date':'2020-01-01','nationality':'DE',
+            'addresses':[{'street':'Teststraße','house_number':'1','postal_code':'10115','city':'Berlin','federal_state':'BE','is_postal':True}]})
         self.assertEqual(result.status_code,201,result.text)
-        login=self.client.post('/api/v1/tf/login',json={'username':'tf-initial','password':'tf-initial-12345'}).json()
+        login=self.client.post('/api/v1/tf/login',json={'username':'787103','password':'tf-initial-12345'}).json()
         self.assertTrue(login['password_change_required'])
         headers={'Authorization':'Bearer '+login['access_token']}
         self.assertEqual(self.client.get('/api/v1/me/months/2026/9/entries',headers=headers).status_code,403)

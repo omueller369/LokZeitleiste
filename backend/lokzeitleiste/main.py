@@ -14,7 +14,7 @@ from pydantic import ValidationError
 from .db import database_session
 from .models import ReportDispatch, TfProfile, TfBahnCardValidity, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
 from .schemas import TfProfileUpdate, EntryIn, Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
-from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password
+from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password, account_active
 from .reports.daily import day_rows
 from .reports.mailer import smtp_configured
 from .reports.pdf import render_receipt_pdf
@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.21")
+app = FastAPI(title="LokZeitleiste API", version="0.22")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -69,7 +69,7 @@ def admin_login(credentials: Credentials, request: Request, response: Response, 
     if PUBLIC_ORIGIN and request.headers.get('origin') != PUBLIC_ORIGIN:
         raise HTTPException(403, "Ungültiger Ursprung")
     user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role.in_(("admin", "staff"))))
-    if not user or not user.active or not verify_password(credentials.password, user.password_hash):
+    if not user or not account_active(db,user) or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(401, "Anmeldung fehlgeschlagen")
     token = issue_token(db, user)
     response.set_cookie("admin_session", token, httponly=True, secure=COOKIE_SECURE,
@@ -89,6 +89,8 @@ def admin_logout(response: Response, admin_session: str | None = Cookie(default=
 @app.post("/api/v1/admin/tf", status_code=201)
 def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = Depends(database_session)):
     from .accounts.photos import decode_photo,save_photo
+    from .accounts.tf_profiles import validate_details, save_details
+    validate_details(db, data)
     image=decode_photo(data.photo_base64)
     username = data.username.strip().lower()
     if not username or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in username):
@@ -107,27 +109,29 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
         db.add(TfDutyProfile(user_id=user.id,driver_type=data.driver_type))
         if data.bahncard and data.bahncard_valid_until is not None:
             db.add(TfBahnCardValidity(user_id=user.id, valid_until=data.bahncard_valid_until))
+        save_details(db,user,data)
         save_photo(db,user.id,image)
         db.commit()
         return {"id": user.id, "username": user.username}
     except IntegrityError:
         db.rollback()
-        raise HTTPException(409, "Benutzername oder Personalnummer bereits vorhanden")
+        raise HTTPException(409, "TF-Nummer oder Personalnummer bereits vorhanden")
 
 
 @app.get("/api/v1/admin/tf")
 def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(database_session)):
     from .planning.duties import driver_type
+    from .accounts.tf_profiles import details_dict
     rows = db.execute(select(User, TfProfile).join(TfProfile).where(User.role == "tf").order_by(TfProfile.last_name)).all()
     if permissions(db,viewer)["employees"] == 0:
         return [{"id":u.id,"first_name":p.first_name,"last_name":p.last_name,"personnel_number":p.personnel_number,"driver_type":driver_type(db,u.id)} for u,p in rows]
     validity = {row.user_id: row.valid_until.isoformat() for row in db.scalars(select(TfBahnCardValidity))}
-    return [{"id": user.id, "username": user.username, "active": user.active,
+    return [{"id": user.id, "username": user.username, "active": account_active(db,user),
              "last_name": p.last_name, "first_name": p.first_name, "personnel_number": p.personnel_number,"driver_type":driver_type(db,user.id),
-             "target_hours_minutes": p.target_hours_minutes, "vacation_days": p.vacation_days,
+             "target_hours_minutes": details_dict(db,user)["monthly_minutes"], "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
              "bahncard_valid_until": validity.get(user.id) if p.bahncard else None,
-             "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None} for user, p in rows]
+             "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None, **details_dict(db,user)} for user, p in rows]
 
 
 @app.put("/api/v1/admin/tf/{tf_id}")
@@ -136,6 +140,8 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
     user=db.scalar(select(User).where(User.id==tf_id).with_for_update())
     profile=db.get(TfProfile,tf_id)
     if not user or user.role!='tf' or not profile:raise HTTPException(404,'Tf nicht gefunden')
+    from .accounts.tf_profiles import validate_details, save_details
+    validate_details(db,data,user)
     image=decode_photo(data.photo_base64)
     try:
         previous_bahncard = profile.bahncard
@@ -156,11 +162,12 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
             role=db.get(TfDutyProfile,tf_id)
             if not role:role=TfDutyProfile(user_id=tf_id);db.add(role)
             role.driver_type=data.driver_type
+        save_details(db,user,data)
         save_photo(db,tf_id,image)
         db.commit()
         return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
     except IntegrityError as exc:
-        db.rollback();raise HTTPException(409,'Personalnummer bereits vergeben') from exc
+        db.rollback();raise HTTPException(409,'TF-Nummer oder Personalnummer bereits vergeben') from exc
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")
@@ -245,9 +252,11 @@ def my_month_summary(year: int, month: int, user: User = Depends(require_tf),
 @app.post("/api/v1/tf/login")
 def tf_login(credentials: Credentials, db: Session = Depends(database_session)):
     user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role == "tf"))
-    if not user or not user.active or not verify_password(credentials.password, user.password_hash):
+    if not user or not account_active(db,user) or not verify_password(credentials.password, user.password_hash):
         raise HTTPException(401, "Anmeldung fehlgeschlagen")
-    return {"access_token": issue_token(db, user), "token_type": "bearer", "username": user.username, "password_change_required":password_required(db,user)}
+    from .models import TfNumberMigration
+    migration=db.get(TfNumberMigration,user.id)
+    return {"previous_username":migration.previous_username if migration else None,"access_token": issue_token(db, user), "token_type": "bearer", "username": user.username, "password_change_required":password_required(db,user)}
 
 
 @app.post("/api/v1/tf/logout")
@@ -571,3 +580,30 @@ async def localized_validation_error(request: Request, exc):
     # Never echo passwords, mailbox credentials or complete uploaded files in error responses.
     fields=[{'field':'.'.join(str(part) for part in error['loc']), 'type':error['type']} for error in exc.errors()]
     return JSONResponse({'detail':translate('Eingaben sind ungültig. Bitte Pflichtfelder und Werte prüfen.'),'fields':fields},status_code=422)
+
+
+@app.get('/api/v1/admin/tf-metadata')
+def tf_metadata(_: User=Depends(require_admin)):
+    import json
+    from .planning.holidays import berlin_holidays
+    from datetime import date
+    import calendar
+    today=datetime.now(ZoneInfo('Europe/Berlin')).date()
+    days=sum(date(today.year,today.month,d).weekday()<5 and date(today.year,today.month,d) not in berlin_holidays(today.year) for d in range(1,calendar.monthrange(today.year,today.month)[1]+1))
+    return {'countries':json.loads((Path(__file__).parent/'accounts'/'countries.json').read_text()),
+            'today':today.isoformat(),'monthly_workdays':days,'monthly_period':f'{today.year}-{today.month:02d}'}
+
+@app.get('/api/v1/admin/stations')
+def station_search(q: str='', _:User=Depends(require_admin),db:Session=Depends(database_session)):
+    from .models import RailwayStation
+    query=q.strip()[:100]
+    if not query:return []
+    escaped=query.replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
+    from sqlalchemy import or_,func
+    rows=db.scalars(select(RailwayStation).where(or_(RailwayStation.code.ilike(escaped+'%',escape='\\'),RailwayStation.name.ilike('%'+escaped+'%',escape='\\'))).order_by((func.upper(RailwayStation.code)!=query.upper()),RailwayStation.name).limit(30))
+    return [{'code':s.code,'name':s.name} for s in rows]
+
+
+@app.get('/admin/tf-profile-ui.js')
+def tf_profile_script():
+    return FileResponse(Path(__file__).parent/'static'/'tf-profile-ui.js',media_type='text/javascript')

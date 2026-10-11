@@ -48,6 +48,8 @@ def authorize_route(db, user, request):
     ready(db,user)
     if path in ('/api/v1/admin/me','/api/v1/admin/modules'):
         return
+    if path in ('/api/v1/admin/tf-metadata','/api/v1/admin/stations') and method == 'GET':
+        return demand(db,user,'employees',1)
     if path == '/api/v1/admin/tf' and method == 'GET':
         if not any(permissions(db,user)[m] for m in ('employees','planning','worktime','reports','directory','shifts','email')):
             raise HTTPException(403, "Keine Mitarbeiter-Module freigegeben.")

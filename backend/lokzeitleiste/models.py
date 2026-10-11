@@ -324,3 +324,41 @@ class MailboxOAuthState(Base):
     actor_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     encrypted_payload: Mapped[str] = mapped_column(Text, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+
+class TfEmployment(Base):
+    __tablename__ = "tf_employment"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    tf_number: Mapped[int] = mapped_column(Integer, unique=True, nullable=False)
+    weekly_minutes: Mapped[int] = mapped_column(Integer, default=2400, nullable=False)
+    entry_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    exit_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    immediate_block: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    nationality: Mapped[str | None] = mapped_column(String(2), nullable=True)
+    home_station: Mapped[str | None] = mapped_column(String(10), nullable=True)
+
+
+class TfAddress(Base):
+    __tablename__ = "tf_addresses"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False, index=True)
+    street: Mapped[str] = mapped_column(String(200), nullable=False)
+    house_number: Mapped[str] = mapped_column(String(30), nullable=False)
+    postal_code: Mapped[str] = mapped_column(String(20), nullable=False)
+    city: Mapped[str] = mapped_column(String(120), nullable=False)
+    federal_state: Mapped[str] = mapped_column(String(2), nullable=False)
+    is_postal: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+
+class RailwayStation(Base):
+    __tablename__ = "railway_stations"
+    code: Mapped[str] = mapped_column(String(10), primary_key=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+
+
+class TfNumberMigration(Base):
+    __tablename__ = "tf_number_migrations"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    previous_username: Mapped[str] = mapped_column(String(64), nullable=False)
+    tf_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)

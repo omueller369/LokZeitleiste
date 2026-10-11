@@ -1,4 +1,4 @@
-# LokZeitleiste v0.21
+# LokZeitleiste v0.22
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -109,3 +109,19 @@ Googlemail: Button „Mit Google verbinden“ mit OAuth2/API-Kontoanbindung, aut
 Beim Anlegen, Bearbeiten und Ansehen stehen „Keine BahnCard“, „BahnCard 50“ und „BahnCard 100“ zur Verfügung. Für BahnCard 50/100 wird „Gültig bis“ als Datumsfeld eingeblendet. Das Datum ist optional, damit bestehende Profile ohne bekanntes Ablaufdatum weiter bearbeitet werden können. Bei „Keine BahnCard“ wird das gespeicherte Datum gelöscht. Ältere API-Clients erhalten beim unveränderten Kartentyp ein bereits hinterlegtes Datum.
 
 Die neue Zusatztabelle `tf_bahncard_validity` wird durch den bestehenden Datenbankinitialisierungsschritt angelegt; vorhandene TF-Tabellen benötigen keine Spaltenänderung.
+
+## TF-Stammdaten v0.22
+
+TF-Nummer: eindeutige sechsstellige Ganzzahl (100000–999999), zugleich Loginname für Backend und Android-App. Beim nächsten Containerstart legt `init_db` die neuen Zusatztabellen an und stellt bestehende TF einmalig auf zufällige freie Nummern 787000–787999 um. Verwaltungs- und Administratorkonten bleiben erhalten. Es sind maximal 1000 Nummern mit diesem Präfix verfügbar; bei ausgeschöpftem Bereich bricht die Migration ohne Teiländerung ab. Die Zuordnung alter/neuer Namen wird intern in `tf_number_migrations` dokumentiert. Bestehende TF-Sitzungen werden beendet; Passwörter und serverseitige Stunden-/Plandaten bleiben ihren unveränderten Benutzer-IDs zugeordnet. Die Android-App übernimmt beim ersten verifizierten Login lokale Daten unter dem bisherigen Namen.
+
+Die neuen Formulare erfassen Beitrittsdatum, Staatsangehörigkeit (249 ISO-Länder/Gebiete), Wochenarbeitszeit, eine bis zehn Adressen mit Bundesland sowie optional einen Heimatbahnhof. Bei mehreren Adressen muss genau eine Postanschrift markiert sein. Die einzige Adresse gilt automatisch als Postanschrift. Beim Löschen der Postanschrift bietet der Dialog Abbrechen oder die vollständige Eingabe einer Ersatzadresse an. Das Bundesland der Postanschrift wird für personenbezogene Arbeitszeitberichte übernommen; die Personalplanung verwendet weiterhin Berlin.
+
+Ein Austrittsdatum sperrt ab 00:00 Uhr dieses Tages in Europe/Berlin. „Sofortige Sperre“ wirkt unabhängig von einem zukünftigen Austritt. Jede authentifizierte Serveranfrage prüft beide Sperren, auch bei bereits ausgegebenen Tokens. Die App prüft den Kontozugang bei geöffnetem Bildschirm alle 30 Sekunden; ohne Netz kann sie eine neue Serversperre nicht erkennen, sämtliche Serveroperationen bleiben serverseitig geschützt. Eintritt/Austritt verändern keine historischen Zeitdaten.
+
+Wochenarbeitszeit ersetzt die freie Monatssoll-Eingabe. Vertragliche Monatssollstunden = Wochenminuten / fünf (auf volle Minuten gerundet) × Montag–Freitag ohne Berliner Feiertage im jeweiligen Monat. Die Vorschau zeigt den aktuellen Monat. Der individuelle Plan berechnet Standard-Arbeitstage aus Wochenminuten / fünf, Grenzschichten mit 12 Stunden, Urlaub mit acht Stunden, Ruhetage und Feiertage mit null. Plan-Soll und vertragliches Kalender-Soll werden separat als `target_minutes` und `contract_monthly_minutes` geliefert. Alte Monatswerte werden mit 12/52 in Wochenwerte überführt und auf mindestens 40 Stunden korrigiert (maximal 168 Stunden); neue Eingaben erlauben auch Teilzeit.
+
+Bei BahnCard 50/100 erscheint „Gültig bis“ sofort. Standardwert: heutiger Berliner Kalendertag plus 365 Tage; das Feld kann optional geleert werden. Vorhandene Daten werden übernommen.
+
+Die DS100-Suche verwendet eine lokale Datenbank und sucht nach Kürzel oder Name. Datenstand, Lizenz und Import der aktuellen offiziellen DB-InfraGO-Datei stehen in [STATION_SOURCES.md](backend/lokzeitleiste/accounts/STATION_SOURCES.md). Die enthaltene offene Liste hat Stand 04/2018 und wird im Formular entsprechend gekennzeichnet.
+
+Nach Aktualisierung des Branches müssen die Servercontainer neu gebaut und gestartet werden, damit `init_db` die Migration ausführt. Vorher ein Datenbankbackup erstellen. Die Änderungen wurden in einer isolierten SQLite-Testumgebung geprüft; eine bestehende externe Serverdatenbank wurde hier nicht verändert. Ein Android-Build erfordert weiterhin das Android SDK.

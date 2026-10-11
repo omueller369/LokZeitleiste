@@ -11,6 +11,8 @@ from .db import database_session
 from .models import User, TfProfile, StaffProfile, ShiftModel, ShiftAssignment
 from .planning.service import get_month, apply_days, RevisionConflict
 from .planning.schemas import DayInput
+from .accounts.tf_profiles import daily_minutes
+from .security import account_active
 from .planning.duties import duty_info, resolve_shift, driver_type
 
 
@@ -84,7 +86,7 @@ def assignment_preview(db, data):
         eligible = data.overwrite or previous['kind'] == 'Ungeplant'
         if not eligible:
             skipped += 1
-        days.append(dict(previous, previous_kind=previous['kind'],previous_shift=previous['shift'], new_kind=kind,apply=eligible,**{('new_'+key):value for key,value in duty_info(cursor,kind,shift,previous['is_holiday']).items()}))
+        days.append(dict(previous, previous_kind=previous['kind'],previous_shift=previous['shift'], new_kind=kind,apply=eligible,**{('new_'+key):value for key,value in duty_info(cursor,kind,shift,previous['is_holiday'],daily_minutes(db,data.tf_id)).items()}))
         cursor += timedelta(days=1)
     return dict(model=model_dict(model), days=days, expected_revisions=revisions, skipped_days=skipped,
                 apply_days=sum(d['apply'] for d in days))
@@ -98,7 +100,7 @@ def create_router(require_admin):
         rows = []
         for user, profile in db.execute(select(User, TfProfile).join(TfProfile).where(User.role == 'tf')):
             rows.append(dict(id=user.id, role='tf', first_name=profile.first_name, last_name=profile.last_name,
-                             username=user.username, identifier=profile.personnel_number, active=user.active,driver_type=driver_type(db,user.id)))
+                             username=user.username, identifier=profile.personnel_number, active=account_active(db,user),driver_type=driver_type(db,user.id)))
         for user, profile in db.execute(select(User, StaffProfile).join(StaffProfile, User.id == StaffProfile.user_id).where(User.role == 'staff')):
             rows.append(dict(id=user.id, role='staff', first_name=profile.first_name, last_name=profile.last_name,
                              username=user.username, identifier=profile.cost_center, active=user.active))

@@ -20,8 +20,8 @@ class WorkTimeTest(unittest.TestCase):
         self.change_engine.start()
         self.mail = self.change_send.start()
         self.client.post('/api/v1/admin/login', json={'username':'admin','password':'admin-secret-12345'})
-        self.tf = self.create_tf('tf-edit', 'P-EDIT').json()['id']
-        token = self.client.post('/api/v1/tf/login', json={'username':'tf-edit','password':'tf-secret-12345'}).json()['access_token']
+        self.tf = self.create_tf('787101', 'P-EDIT').json()['id']
+        token = self.client.post('/api/v1/tf/login', json={'username':'787101','password':'tf-secret-12345'}).json()['access_token']
         self.headers = {'Authorization':'Bearer ' + token}
         self.base = f'/api/v1/admin/tf/{self.tf}/worktime'
 
@@ -58,7 +58,7 @@ class WorkTimeTest(unittest.TestCase):
         self.assertEqual(data['month']['totals']['credited'], 570)
         self.assertEqual(self.mail.call_count, 1)
         sent = self.mail.call_args.kwargs
-        self.assertEqual(sent['recipient'], 'tf-edit@example.com')
+        self.assertEqual(sent['recipient'], '787101@example.com')
         self.assertIn('Arbeitsbeginn: 08:00 → 07:00', sent['body'])
         self.assertIn('Arbeitsende: 16:00 → 17:00', sent['body'])
         self.assertIn('Arbeitszeit 7:30 h → 9:30 h', sent['body'])
@@ -115,7 +115,7 @@ class WorkTimeTest(unittest.TestCase):
         self.assertEqual(self.edit(old,'07:00','16:00','   ').status_code,422)
         with patch('lokzeitleiste.main.PUBLIC_ORIGIN','https://testserver'):
             self.assertEqual(self.edit(old,'07:00','16:00').status_code,403)
-        other=self.create_tf('tf-other','P-OTHER').json()['id']
+        other=self.create_tf('787107','P-OTHER').json()['id']
         self.assertEqual(self.client.patch(f'/api/v1/admin/tf/{other}/worktime/entries/{old["id"]}',
             json=dict(start='07:00',end='16:00',expected_updated_at=old['updated_at'],reason='Grund')).status_code,404)
         self.upload(start='17:00',end='19:00')
@@ -171,9 +171,9 @@ class WorkTimeTest(unittest.TestCase):
     def test_email_transport_contains_previous_and_new_values(self):
         from lokzeitleiste.reports.mailer import send_time_change
         with patch.dict('os.environ',{'SMTP_SECURITY':'ssl'}), patch('smtplib.SMTP_SSL') as smtp:
-            send_time_change(recipient='tf-edit@example.com',body='Arbeitsbeginn: 08:00 → 07:00\nArbeitsende: 16:00 → 17:00')
+            send_time_change(recipient='787101@example.com',body='Arbeitsbeginn: 08:00 → 07:00\nArbeitsende: 16:00 → 17:00')
             email=smtp.return_value.__enter__.return_value.send_message.call_args.args[0]
-            self.assertEqual(email['To'],'tf-edit@example.com')
+            self.assertEqual(email['To'],'787101@example.com')
             self.assertIn('08:00 → 07:00',email.get_content())
             self.assertIn('16:00 → 17:00',email.get_content())
 

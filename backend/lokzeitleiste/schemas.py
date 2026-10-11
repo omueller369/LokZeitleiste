@@ -2,7 +2,7 @@ from datetime import date, time, datetime, timedelta
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field, model_validator
+from pydantic import BaseModel, EmailStr, Field, model_validator, field_validator
 
 
 FederalState = Literal["BB", "BE", "BW", "BY", "HB", "HE", "HH", "MV", "NI", "NW", "RP", "SH", "SL", "SN", "ST", "TH"]
@@ -16,20 +16,57 @@ class Credentials(BaseModel):
     password: str
 
 
-class TfCreate(Credentials):
+
+class TfAddressIn(BaseModel):
+    street: str = Field(min_length=1, max_length=200)
+    house_number: str = Field(min_length=1, max_length=30)
+    postal_code: str = Field(min_length=1, max_length=20)
+    city: str = Field(min_length=1, max_length=120)
+    federal_state: FederalState
+    is_postal: bool = False
+
+    @field_validator('street', 'house_number', 'postal_code', 'city')
+    @classmethod
+    def clean(cls, value):
+        if not value.strip(): raise ValueError('Pflichtfeld darf nicht leer sein')
+        return value.strip()
+
+
+class TfDetails(BaseModel):
+    weekly_minutes: int | None = Field(default=None, ge=0, le=168*60)
+    entry_date: date | None = None
+    exit_date: date | None = None
+    immediate_block: bool | None = None
+    nationality: str | None = Field(default=None, pattern=r'^[A-Z]{2}$')
+    home_station: str | None = Field(default=None, max_length=10)
+    addresses: list[TfAddressIn] | None = Field(default=None, min_length=1, max_length=10)
+
+    @model_validator(mode='after')
+    def postal_address(self):
+        if self.addresses is not None:
+            if len(self.addresses) == 1: self.addresses[0].is_postal = True
+            if sum(a.is_postal for a in self.addresses) != 1:
+                raise ValueError('Genau eine Postanschrift erforderlich.')
+        if self.entry_date and self.exit_date and self.exit_date < self.entry_date:
+            raise ValueError('Austrittsdatum darf nicht vor dem Beitrittsdatum liegen.')
+        return self
+
+
+class TfCreate(Credentials, TfDetails):
+    username: str = Field(pattern=r"^[1-9][0-9]{5}$", coerce_numbers_to_str=True)
     driver_type: Literal["route","border","both"] = "route"
     password: str = Field(min_length=12)
     photo_base64: str | None = Field(default=None,max_length=6990510)
     last_name: str = Field(min_length=1, max_length=120)
     first_name: str = Field(min_length=1, max_length=120)
     personnel_number: str = Field(min_length=1, max_length=40)
-    target_hours_minutes: int = Field(ge=0, le=744 * 60)
+    target_hours_minutes: int = Field(default=0, ge=0, le=744 * 60)
     vacation_days: int = Field(ge=0, le=366)
     birth_date: date
     bahncard: Literal[0, 50, 100]
     bahncard_valid_until: date | None = None
     email: EmailStr
-    federal_state: FederalState
+    federal_state: FederalState = "BE"
 
 
 class TfDeliveryUpdate(BaseModel):
@@ -97,16 +134,17 @@ class EntryBatch(BaseModel):
         return self
 
 
-class TfProfileUpdate(BaseModel):
+class TfProfileUpdate(TfDetails):
+    username: str | None = Field(default=None, pattern=r"^[1-9][0-9]{5}$", coerce_numbers_to_str=True)
     driver_type: Literal["route","border","both"] | None = None
     last_name: str = Field(min_length=1,max_length=120)
     first_name: str = Field(min_length=1,max_length=120)
     personnel_number: str = Field(min_length=1,max_length=40)
-    target_hours_minutes: int = Field(ge=0,le=744*60)
+    target_hours_minutes: int = Field(default=0,ge=0,le=744*60)
     vacation_days: int = Field(ge=0,le=366)
     birth_date: date
     bahncard: Literal[0,50,100]
     bahncard_valid_until: date | None = None
     email: EmailStr
-    federal_state: FederalState
+    federal_state: FederalState = "BE"
     photo_base64: str | None = Field(default=None,max_length=6990510)

@@ -48,7 +48,7 @@ def user_from_token(session: Session, raw: str | None) -> User | None:
     if not token or token.expires_at <= now_utc():
         return None
     user = session.get(User, token.user_id)
-    return user if user and user.active else None
+    return user if user and account_active(session, user) else None
 
 
 def revoke_token(session: Session, raw: str):
@@ -57,3 +57,13 @@ def revoke_token(session: Session, raw: str):
     if token:
         session.delete(token)
         session.commit()
+
+
+def account_active(session, user):
+    if not user.active: return False
+    if user.role != 'tf': return True
+    from .accounts.tf_profiles import berlin_today
+    from .models import TfEmployment
+    employment = session.get(TfEmployment, user.id)
+    return not employment or (not employment.immediate_block and
+        (employment.exit_date is None or employment.exit_date > berlin_today()))

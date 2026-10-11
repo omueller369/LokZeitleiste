@@ -1,3 +1,4 @@
+from ..accounts.tf_profiles import daily_minutes
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Path
 from fastapi.responses import Response
@@ -81,7 +82,7 @@ def create_router(admin_dependency):
                 try:shift=resolve_shift(db,tf_id,item.kind,item.shift,old["shift"],old["kind"])
                 except ValueError as exc:raise HTTPException(422,str(exc)) from exc
                 updates.append({**item.model_dump(mode="json"), **holiday_info(item.date),
-                                **duty_info(item.date,item.kind,shift,holiday_info(item.date)["is_holiday"]),"previous_shift":old["shift"], "previous_kind": old["kind"],
+                                **duty_info(item.date,item.kind,shift,holiday_info(item.date)["is_holiday"],daily_minutes(db,tf_id)),"previous_shift":old["shift"], "previous_kind": old["kind"],
                                 "previous_note": old["note"]})
             return {"days": updates, "expected_revisions": revisions,
                     "rule": "Nur enthaltene Datumszeilen werden geändert. Ungeplant entfernt eine Tagesplanung."}

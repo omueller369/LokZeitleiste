@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import de.lokzeitleiste.app.data.migrateAccountData
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import de.lokzeitleiste.app.network.ApiClient
 import kotlinx.coroutines.launch
@@ -19,6 +23,7 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
     var busy by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf<ApiClient.LoginResult?>(null) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     pending?.let { account ->
         PasswordChangeScreen(account.username, account.token, mandatory = true,
             onSuccess = { name, token -> pending = null; onSuccess(name, token) },
@@ -29,15 +34,17 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
         LocalizedText("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
         LocalizedText("Tf-Anmeldung mit dem vom Admin angelegten Konto")
         Spacer(Modifier.height(24.dp))
-        OutlinedTextField(username, { username = it }, label = { LocalizedText("Benutzername") })
+        OutlinedTextField(username, { username = it.filter(Char::isDigit).take(6) }, label = { LocalizedText("TF-Nummer") },
+            singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
         OutlinedTextField(password, { password = it }, label = { LocalizedText("Passwort") },
             visualTransformation = PasswordVisualTransformation())
         if (message.isNotBlank()) LocalizedText(message, color = MaterialTheme.colorScheme.error)
-        Button(enabled = !busy, onClick = {
+        Button(enabled = !busy && username.matches(Regex("[1-9][0-9]{5}")), onClick = {
             busy = true; message = ""
             scope.launch {
                 try {
                     val result = ApiClient.login(username.trim().lowercase(), password)
+                    migrateAccountData(context, result.previousUsername, result.username)
                     password = ""
                     if (result.passwordChangeRequired) pending = result else onSuccess(result.username, result.token)
                 } catch (error: Exception) {

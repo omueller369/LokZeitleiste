@@ -11,6 +11,11 @@ from .security import hash_password
 
 def main():
     Base.metadata.create_all(engine())
+    from .accounts.tf_profiles import migrate_existing, seed_stations
+    with Session(engine()) as db:
+        migrate_existing(db)
+        seed_stations(db)
+        db.commit()
     if len(sys.argv) == 2 and sys.argv[1] == "--create-admin":
         name = input("Admin-Benutzername: ").strip().lower()
         if not 3 <= len(name) <= 64 or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in name):
