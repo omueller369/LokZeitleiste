@@ -1,0 +1,182 @@
+[
+  {
+    "index": 1,
+    "first_name": "Klaus",
+    "last_name": "Beispiel",
+    "age": 62,
+    "gender": "male",
+    "appearance": "Short silver hair, trimmed moustache, dark navy collared shirt",
+    "photo": "portraits/01.jpg"
+  },
+  {
+    "index": 2,
+    "first_name": "Michael",
+    "last_name": "Musterfeld",
+    "age": 56,
+    "gender": "male",
+    "appearance": "Balding head, short brown beard, round spectacles, medium complexion, blue shirt",
+    "photo": "portraits/02.jpg"
+  },
+  {
+    "index": 3,
+    "first_name": "Tobias",
+    "last_name": "Probenbach",
+    "age": 33,
+    "gender": "male",
+    "appearance": "Curly black hair, clean-shaven, warm brown skin, blue casual collared shirt",
+    "photo": "portraits/03.jpg"
+  },
+  {
+    "index": 4,
+    "first_name": "Stefan",
+    "last_name": "Testhoven",
+    "age": 48,
+    "gender": "male",
+    "appearance": "Short dark hair with gray temples, square glasses, light complexion, charcoal shirt",
+    "photo": "portraits/04.jpg"
+  },
+  {
+    "index": 5,
+    "first_name": "Andreas",
+    "last_name": "Fiktental",
+    "age": 64,
+    "gender": "male",
+    "appearance": "Wavy gray hair, clean-shaven, lined face, light complexion, light blue shirt",
+    "photo": "portraits/05.jpg"
+  },
+  {
+    "index": 6,
+    "first_name": "Martin",
+    "last_name": "Demoberg",
+    "age": 41,
+    "gender": "male",
+    "appearance": "Short auburn hair, neat reddish beard, freckles, dark green shirt",
+    "photo": "portraits/06.jpg"
+  },
+  {
+    "index": 7,
+    "first_name": "Thomas",
+    "last_name": "Musterhain",
+    "age": 59,
+    "gender": "male",
+    "appearance": "Close-cropped silver hair, neatly trimmed gray beard, warm medium skin, slate-blue shirt",
+    "photo": "portraits/07.jpg"
+  },
+  {
+    "index": 8,
+    "first_name": "Daniel",
+    "last_name": "Probenried",
+    "age": 28,
+    "gender": "male",
+    "appearance": "Short black hair, clean-shaven, tan skin, navy polo shirt",
+    "photo": "portraits/08.jpg"
+  },
+  {
+    "index": 9,
+    "first_name": "Alexander",
+    "last_name": "Testwald",
+    "age": 37,
+    "gender": "male",
+    "appearance": "Dark brown hair combed sideways, fine stubble, olive complexion, gray shirt",
+    "photo": "portraits/09.jpg"
+  },
+  {
+    "index": 10,
+    "first_name": "Markus",
+    "last_name": "Fiktbrück",
+    "age": 52,
+    "gender": "male",
+    "appearance": "Short salt-and-pepper hair, broad face, clean-shaven, light skin, white shirt",
+    "photo": "portraits/10.jpg"
+  },
+  {
+    "index": 11,
+    "first_name": "Frank",
+    "last_name": "Demofeld",
+    "age": 60,
+    "gender": "male",
+    "appearance": "Bald head, thin silver beard, rectangular glasses, light skin, dark blue shirt",
+    "photo": "portraits/11.jpg"
+  },
+  {
+    "index": 12,
+    "first_name": "Jan",
+    "last_name": "Mustersee",
+    "age": 30,
+    "gender": "male",
+    "appearance": "Blond cropped hair, clean-shaven, light skin, black casual collared shirt",
+    "photo": "portraits/12.jpg"
+  },
+  {
+    "index": 13,
+    "first_name": "Lukas",
+    "last_name": "Probenau",
+    "age": 35,
+    "gender": "male",
+    "appearance": "Coiled black hair, short beard, dark brown skin, pale blue shirt",
+    "photo": "portraits/13.jpg"
+  },
+  {
+    "index": 14,
+    "first_name": "Patrick",
+    "last_name": "Testwinkel",
+    "age": 45,
+    "gender": "male",
+    "appearance": "Medium length dark blond hair, clean-shaven, light skin, muted burgundy shirt",
+    "photo": "portraits/14.jpg"
+  },
+  {
+    "index": 15,
+    "first_name": "Sabine",
+    "last_name": "Fiktbach",
+    "age": 54,
+    "gender": "female",
+    "appearance": "Woman with silver-streaked brown bob haircut, natural expression, warm medium skin, navy blouse",
+    "photo": "portraits/15.jpg"
+  },
+  {
+    "index": 16,
+    "first_name": "Nadja",
+    "last_name": "Demotal",
+    "age": 43,
+    "gender": "female",
+    "appearance": "Woman with short curly dark hair, warm brown skin, glasses, blue blouse",
+    "photo": "portraits/16.jpg"
+  },
+  {
+    "index": 17,
+    "first_name": "Julia",
+    "last_name": "Musterheide",
+    "age": 32,
+    "gender": "female",
+    "appearance": "Woman with shoulder-length blond hair tucked behind ears, light skin, dark green blouse",
+    "photo": "portraits/17.jpg"
+  },
+  {
+    "index": 18,
+    "first_name": "Lena",
+    "last_name": "Probenfels",
+    "age": 28,
+    "gender": "female",
+    "appearance": "Woman with chestnut hair in a ponytail, light skin, subtle freckles, charcoal blouse",
+    "photo": "portraits/18.jpg"
+  },
+  {
+    "index": 19,
+    "first_name": "Alex",
+    "last_name": "Testfurt",
+    "age": 39,
+    "gender": "unspecified",
+    "appearance": "Adult person with short dark hair, a softly angular face, olive skin, glasses, muted blue shirt; no gender labeling",
+    "photo": "portraits/19.jpg"
+  },
+  {
+    "index": 20,
+    "first_name": "Robin",
+    "last_name": "Fiktmoor",
+    "age": 46,
+    "gender": "diverse",
+    "appearance": "Fictional nonbinary adult with short swept-back salt-and-pepper hair, warm brown skin, navy shirt; ordinary neutral styling, no stereotyped costume",
+    "photo": "portraits/20.jpg"
+  }
+]

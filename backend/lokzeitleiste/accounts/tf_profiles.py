@@ -7,13 +7,30 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 from decimal import Decimal, ROUND_HALF_UP
 from fastapi import HTTPException
-from sqlalchemy import select, delete
-from ..models import User, TfProfile, TfEmployment, TfAddress, TfNumberMigration, SessionToken, RailwayStation
+from sqlalchemy import select, delete, inspect, text
+from ..models import User, TfProfile, TfEmployment, TfAddress, TfNumberMigration, SessionToken, RailwayStation, TfIdentity
 from ..planning.holidays import berlin_holidays
 
 
 def berlin_today():
     return datetime.now(ZoneInfo('Europe/Berlin')).date()
+
+
+def ensure_gender_column(db):
+    """create_all does not add columns to an existing v0.22 profile table."""
+    if 'gender' not in {column['name'] for column in inspect(db.connection()).get_columns('tf_profiles')}:
+        db.execute(text("ALTER TABLE tf_profiles ADD COLUMN gender VARCHAR(20) NOT NULL DEFAULT 'unspecified'"))
+
+
+def migrate_legacy_gender(db):
+    """Keep gender entered by the interim tf_profiles.gender implementation."""
+    if 'gender' not in {column['name'] for column in inspect(db.connection()).get_columns('tf_profiles')}:
+        return
+    mapping={'männlich':'male','weiblich':'female','divers':'diverse','keine Angabe':'unspecified'}
+    for user_id, value in db.execute(text('SELECT user_id, gender FROM tf_profiles')):
+        if db.get(TfIdentity,user_id) is None:
+            gender=mapping.get(value,value if value in mapping.values() else 'unspecified')
+            db.add(TfIdentity(user_id=user_id,gender=gender))
 
 
 def weekly_minutes(db, tf_id):
@@ -53,6 +70,12 @@ def save_details(db, user, data):
     if row is None:
         row = TfEmployment(user_id=user.id,tf_number=int(user.username),weekly_minutes=2400,immediate_block=False)
         db.add(row)
+    identity=db.get(TfIdentity,user.id)
+    if identity is None:
+        identity=TfIdentity(user_id=user.id,gender=data.gender or "unspecified");db.add(identity)
+    elif data.gender is not None:
+        identity.gender=data.gender
+    db.get(TfProfile,user.id).gender=identity.gender
     row.tf_number = int(user.username)
     for key in ('weekly_minutes','entry_date','exit_date','immediate_block','nationality','home_station'):
         if key in data.model_fields_set:
@@ -74,12 +97,13 @@ def save_details(db, user, data):
 
 def details_dict(db,user):
     row=db.get(TfEmployment,user.id)
+    identity=db.get(TfIdentity,user.id)
     addresses=[dict(id=a.id,street=a.street,house_number=a.house_number,postal_code=a.postal_code,
                     city=a.city,federal_state=a.federal_state,is_postal=a.is_postal)
                for a in db.scalars(select(TfAddress).where(TfAddress.user_id==user.id).order_by(TfAddress.id))]
     station=db.get(RailwayStation,row.home_station) if row and row.home_station else None
     today=berlin_today()
-    return dict(tf_number=row.tf_number if row else int(user.username) if user.username.isdigit() else None,
+    return dict(gender=identity.gender if identity else "unspecified",tf_number=row.tf_number if row else int(user.username) if user.username.isdigit() else None,
                 weekly_minutes=row.weekly_minutes if row else 2400,
                 monthly_minutes=monthly_minutes(db,user.id,today.year,today.month),
                 monthly_period=f'{today.year}-{today.month:02d}',

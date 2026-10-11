@@ -31,7 +31,8 @@ class TfProfile(Base):
     vacation_days: Mapped[int] = mapped_column(Integer, nullable=False)
     birth_date: Mapped[date] = mapped_column(Date, nullable=False)
     bahncard: Mapped[int] = mapped_column(Integer, nullable=False)
-    gender: Mapped[str] = mapped_column(String(20), default="keine Angabe", nullable=False)
+    # Compatibility with the interim branch implementation; tf_identity is canonical.
+    gender: Mapped[str] = mapped_column(String(20), default='unspecified', server_default='unspecified', nullable=False)
     email: Mapped[str | None] = mapped_column(String(320), nullable=True)
     federal_state: Mapped[str | None] = mapped_column(String(2), nullable=True)
     user: Mapped[User] = relationship(back_populates="profile")
@@ -363,3 +364,9 @@ class TfNumberMigration(Base):
     previous_username: Mapped[str] = mapped_column(String(64), nullable=False)
     tf_number: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+
+
+class TfIdentity(Base):
+    __tablename__ = "tf_identity"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    gender: Mapped[str] = mapped_column(String(16), default="unspecified", nullable=False)

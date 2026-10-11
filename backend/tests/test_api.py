@@ -48,7 +48,7 @@ class ApiFlowTest(unittest.TestCase):
             "username": "787021", "password": "tomcom123456", "first_name": "Alex",
             "last_name": "Test", "personnel_number": "787021", "target_hours_minutes": 10400,
             "vacation_days": 30, "birth_date": "1980-01-01", "bahncard": 0,
-            "email": "alex@example.com", "federal_state": "BE", "gender": "divers",
+            "email": "alex@example.com", "federal_state": "BE", "gender": "diverse",
             "driver_type": "both", "weekly_minutes": 2400, "nationality": "DE",
             "addresses": [{"street":"Musterstraße","house_number":"1","postal_code":"10115","city":"Berlin","federal_state":"BE","is_postal":True}],
             "entry_date": "1995-01-01", "bahncard_valid_until": None,

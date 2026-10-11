@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from lokzeitleiste.db import Base
-from lokzeitleiste.models import User, TfProfile, WorkMonth, WorkEntry, ReportDispatch, SessionToken, TfEmployment, TfDutyProfile, TfBahnCardValidity, PlanMonth, PlanDay, AccountPolicy
+from lokzeitleiste.models import User, TfProfile, WorkMonth, WorkEntry, ReportDispatch, SessionToken, TfEmployment, TfDutyProfile, TfBahnCardValidity, TfIdentity, PlanMonth, PlanDay, AccountPolicy
 from lokzeitleiste.seed_tf import replace_tf
 from lokzeitleiste.security import verify_password
 
@@ -41,10 +41,11 @@ class TfSeedTest(unittest.TestCase):
             self.assertEqual(db.scalar(select(User).where(User.role=='admin')).username, 'admin')
             for model in [WorkMonth, WorkEntry, ReportDispatch, SessionToken, PlanMonth, PlanDay]:
                 self.assertEqual(db.scalars(select(model)).all(), [])
-            self.assertEqual(Counter(p.gender for p in profiles), {'männlich':14, 'weiblich':4, 'divers':1, 'keine Angabe':1})
+            self.assertEqual(Counter(p.gender for p in db.scalars(select(TfIdentity))), {'male':14, 'female':4, 'diverse':1, 'unspecified':1})
             self.assertEqual(Counter(p.driver_type for p in db.scalars(select(TfDutyProfile))), {'border':3, 'both':2, 'route':15})
             self.assertEqual(Counter(p.bahncard for p in profiles), {100:18, 50:1, 0:1})
-            self.assertEqual({u.username for u in users}, {str(n) for n in range(787001,787021)})
+            self.assertEqual(len({u.username for u in users}),20)
+            self.assertTrue(all(len(u.username)==6 and u.username.startswith('787') for u in users))
             self.assertTrue(all(verify_password('tomcom123456', u.password_hash) for u in users))
             self.assertTrue(all(p.weekly_minutes==2400 for p in db.scalars(select(TfEmployment))))
             self.assertTrue(all(date(1995,1,1)<=p.entry_date<=today for p in db.scalars(select(TfEmployment))))

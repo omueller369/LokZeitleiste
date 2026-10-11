@@ -1,4 +1,4 @@
-# LokZeitleiste v0.22
+# LokZeitleiste v0.23
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -125,3 +125,11 @@ Bei BahnCard 50/100 erscheint „Gültig bis“ sofort. Standardwert: heutiger B
 Die DS100-Suche verwendet eine lokale Datenbank und sucht nach Kürzel oder Name. Datenstand, Lizenz und Import der aktuellen offiziellen DB-InfraGO-Datei stehen in [STATION_SOURCES.md](backend/lokzeitleiste/accounts/STATION_SOURCES.md). Die enthaltene offene Liste hat Stand 04/2018 und wird im Formular entsprechend gekennzeichnet.
 
 Nach Aktualisierung des Branches müssen die Servercontainer neu gebaut und gestartet werden, damit `init_db` die Migration ausführt. Vorher ein Datenbankbackup erstellen. Die Änderungen wurden in einer isolierten SQLite-Testumgebung geprüft; eine bestehende externe Serverdatenbank wurde hier nicht verändert. Ein Android-Build erfordert weiterhin das Android SDK.
+
+## TF-Testdaten v0.23
+
+Das Geschlechtsfeld bietet „Männlich“, „Weiblich“, „Divers“ und „Keine Angabe“ beim Anlegen, Bearbeiten und Ansehen. Bestehende Profile ohne Angaben werden als „Keine Angabe“ angezeigt. Die neue Tabelle `tf_identity` wird vom regulären Datenbankinitialisierungsschritt angelegt.
+
+Eine ausdrücklich aufrufbare [Testdatenroutine](backend/lokzeitleiste/accounts/demo_tf/README.md) ersetzt alle TF einschließlich abhängiger Daten durch 20 fiktive Personen mit individuellen KI-Profilbildern. Die Routine erzeugt die gewünschten Geschlechts-/TF-Typen und BahnCard-Verteilungen, 40 Wochenstunden, 30 Urlaubstage, 787xxx-Logins, fünfstellige Personalnummern, fiktive Adressen und die gemeinsame E-Mail-Adresse. Initialpasswort: `tomcom123456`, anschließend verpflichtender Passwortwechsel. Die Ablaufdaten der BahnCards werden relativ zum Ausführungstag gewählt.
+
+Die tatsächliche Serverdatenbank wird erst durch `bash backend/testenv/control.sh demo-tf` zurückgesetzt. Normale Starts/Updates löschen keine TF. Ausführung, Sicherung, Verteilung und Bildprompts sind in der Anleitung dokumentiert.

@@ -9,6 +9,7 @@ case "${1:-status}" in
   status) "${compose[@]}" ps ;;
   logs) "${compose[@]}" logs --tail 100 ;;
   admin) "${compose[@]}" exec api python -m lokzeitleiste.init_db --create-admin ;;
+  demo-tf) "${compose[@]}" exec -T api python -m lokzeitleiste.accounts.seed_demo_tf --replace-all-tf ;;
   backup)
     umask 077
     mkdir -p testenv/backups
@@ -17,5 +18,5 @@ case "${1:-status}" in
     # shellcheck disable=SC2016
     "${compose[@]}" exec -T db sh -c 'MYSQL_PWD="$MYSQL_PASSWORD" exec mysqldump --single-transaction --no-tablespaces -u "$MYSQL_USER" "$MYSQL_DATABASE"' > "$target"
     echo "Sicherung: $target" ;;
-  *) echo 'Verwendung: control.sh start|stop|status|logs|admin|backup' >&2; exit 2 ;;
+  *) echo 'Verwendung: control.sh start|stop|status|logs|admin|backup|demo-tf' >&2; exit 2 ;;
 esac

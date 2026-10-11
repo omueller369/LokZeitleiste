@@ -33,7 +33,12 @@ class TfAddressIn(BaseModel):
 
 
 class TfDetails(BaseModel):
-    gender: Literal["männlich", "weiblich", "divers", "keine Angabe"] = "keine Angabe"
+    @field_validator('gender',mode='before')
+    @classmethod
+    def normalize_gender(cls,value):
+        return {'männlich':'male','weiblich':'female','divers':'diverse','keine Angabe':'unspecified'}.get(value,value) if isinstance(value,str) else value
+
+    gender: Literal["male","female","diverse","unspecified"] | None = None
     weekly_minutes: int | None = Field(default=None, ge=0, le=168*60)
     entry_date: date | None = None
     exit_date: date | None = None

@@ -747,7 +747,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "TF-Nummer oder Personalnummer bereits vorhanden",
     "TF-Nummer oder Personalnummer bereits vergeben": "TF-Nummer oder Personalnummer bereits vergeben",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.",
+    "Geschlecht": "Geschlecht",
+    "Männlich": "Männlich",
+    "Weiblich": "Weiblich",
+    "Divers": "Divers",
+    "Keine Angabe": "Keine Angabe",
+    "Bild folgt": "Bild folgt"
   },
   "en": {
     "Administration": "Administration",
@@ -1497,7 +1503,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "TF number or personnel number already exists",
     "TF-Nummer oder Personalnummer bereits vergeben": "TF number or personnel number already assigned",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "TF number, joining date, weekly hours, nationality and address are required.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Station data: Deutsche Bahn AG, CC BY 4.0, April 2018. Administrators can import the current DB InfraGO list."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Station data: Deutsche Bahn AG, CC BY 4.0, April 2018. Administrators can import the current DB InfraGO list.",
+    "Geschlecht": "Gender",
+    "Männlich": "Male",
+    "Weiblich": "Female",
+    "Divers": "Diverse",
+    "Keine Angabe": "Prefer not to say",
+    "Bild folgt": "Photo pending"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2247,7 +2259,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "Numer maszynisty lub pracownika już istnieje",
     "TF-Nummer oder Personalnummer bereits vergeben": "Numer maszynisty lub pracownika jest już przypisany",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "Wymagane są numer maszynisty, data rozpoczęcia, czas pracy, obywatelstwo i adres.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Dane stacji: Deutsche Bahn AG, CC BY 4.0, kwiecień 2018. Administrator może zaimportować aktualną listę DB InfraGO."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Dane stacji: Deutsche Bahn AG, CC BY 4.0, kwiecień 2018. Administrator może zaimportować aktualną listę DB InfraGO.",
+    "Geschlecht": "Płeć",
+    "Männlich": "Mężczyzna",
+    "Weiblich": "Kobieta",
+    "Divers": "Inna",
+    "Keine Angabe": "Brak informacji",
+    "Bild folgt": "Zdjęcie wkrótce"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -2997,7 +3015,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "Номер машиниста или табельный номер уже существует",
     "TF-Nummer oder Personalnummer bereits vergeben": "Номер машиниста или табельный номер уже назначен",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "Требуются номер машиниста, дата начала, часы в неделю, гражданство и адрес.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Данные станций: Deutsche Bahn AG, CC BY 4.0, апрель 2018. Администратор может импортировать актуальный список DB InfraGO."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Данные станций: Deutsche Bahn AG, CC BY 4.0, апрель 2018. Администратор может импортировать актуальный список DB InfraGO.",
+    "Geschlecht": "Пол",
+    "Männlich": "Мужской",
+    "Weiblich": "Женский",
+    "Divers": "Другой",
+    "Keine Angabe": "Не указано",
+    "Bild folgt": "Фото ожидается"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -3747,7 +3771,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "Makinist veya personel numarası zaten mevcut",
     "TF-Nummer oder Personalnummer bereits vergeben": "Makinist veya personel numarası zaten atanmış",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "Makinist numarası, giriş tarihi, haftalık süre, vatandaşlık ve adres gereklidir.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "İstasyon verileri: Deutsche Bahn AG, CC BY 4.0, Nisan 2018. Güncel DB InfraGO listesi yönetici tarafından içe aktarılabilir."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "İstasyon verileri: Deutsche Bahn AG, CC BY 4.0, Nisan 2018. Güncel DB InfraGO listesi yönetici tarafından içe aktarılabilir.",
+    "Geschlecht": "Cinsiyet",
+    "Männlich": "Erkek",
+    "Weiblich": "Kadın",
+    "Divers": "Diğer",
+    "Keine Angabe": "Belirtilmedi",
+    "Bild folgt": "Fotoğraf bekleniyor"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -4497,7 +4527,13 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "رقم السائق أو رقم الموظف موجود بالفعل",
     "TF-Nummer oder Personalnummer bereits vergeben": "رقم السائق أو رقم الموظف مستخدم بالفعل",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "يلزم رقم السائق وتاريخ الالتحاق والساعات الأسبوعية والجنسية والعنوان.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "بيانات المحطات: Deutsche Bahn AG، CC BY 4.0، أبريل 2018. يمكن للمسؤول استيراد قائمة DB InfraGO الحالية."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "بيانات المحطات: Deutsche Bahn AG، CC BY 4.0، أبريل 2018. يمكن للمسؤول استيراد قائمة DB InfraGO الحالية.",
+    "Geschlecht": "الجنس",
+    "Männlich": "ذكر",
+    "Weiblich": "أنثى",
+    "Divers": "متنوع",
+    "Keine Angabe": "غير محدد",
+    "Bild folgt": "الصورة لاحقًا"
   },
   "es": {
     "Administration": "Administración",
@@ -5247,6 +5283,12 @@
     "TF-Nummer oder Personalnummer bereits vorhanden": "El número de maquinista o empleado ya existe",
     "TF-Nummer oder Personalnummer bereits vergeben": "El número de maquinista o empleado ya está asignado",
     "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.": "Se requieren número, fecha de incorporación, jornada semanal, nacionalidad y dirección.",
-    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Datos de estaciones: Deutsche Bahn AG, CC BY 4.0, abril de 2018. El administrador puede importar la lista actual de DB InfraGO."
+    "Bahnhofsdaten: Deutsche Bahn AG, CC BY 4.0, Stand 04/2018. Aktuelle DB-InfraGO-Liste kann administrativ importiert werden.": "Datos de estaciones: Deutsche Bahn AG, CC BY 4.0, abril de 2018. El administrador puede importar la lista actual de DB InfraGO.",
+    "Geschlecht": "Género",
+    "Männlich": "Masculino",
+    "Weiblich": "Femenino",
+    "Divers": "Diverso",
+    "Keine Angabe": "Sin especificar",
+    "Bild folgt": "Foto pendiente"
   }
 }
