@@ -12,13 +12,18 @@ from .planning.service import get_month
 STATIC=FilePath(__file__).parent/'static'
 
 
-def create_router(require_account):
-    router=APIRouter()
-
+def driver_dependency(require_account):
     def require_driver(user:User=Depends(require_account),db:Session=Depends(database_session)):
         if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
         if password_required(db,user):raise HTTPException(403,'Bitte zuerst Ihr Initialpasswort ändern.')
         return user
+    return require_driver
+
+
+def create_router(require_account):
+    router=APIRouter()
+
+    require_driver=driver_dependency(require_account)
 
     @router.get('/tf')
     @router.get('/tf/arbeitsbericht')
@@ -41,7 +46,7 @@ def create_router(require_account):
     def identity(user:User=Depends(require_driver),db:Session=Depends(database_session)):
         profile=db.get(TfProfile,user.id)
         if not profile:raise HTTPException(404,'Tf nicht gefunden')
-        return {'username':user.username,'first_name':profile.first_name,'last_name':profile.last_name}
+        return {'id':user.id,'username':user.username,'first_name':profile.first_name,'last_name':profile.last_name}
 
     @router.get('/api/v1/tf/portal/plan/{year}/{month}')
     def plan(year:int=Path(ge=2000,le=2100),month:int=Path(ge=1,le=12),

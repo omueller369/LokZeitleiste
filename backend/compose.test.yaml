@@ -18,6 +18,7 @@ x-app: &app
     MAILBOX_GOOGLE_CLIENT_SECRET: ${MAILBOX_GOOGLE_CLIENT_SECRET:-}
     PUBLIC_ORIGIN: http://localhost:8080
     COOKIE_SECURE: "false"
+    WORK_REPORT_RECEIPT_EMAIL: ${WORK_REPORT_RECEIPT_EMAIL:-omueller369@gmail.com}
     SMTP_HOST: mailpit
     SMTP_PORT: "1025"
     SMTP_SECURITY: starttls

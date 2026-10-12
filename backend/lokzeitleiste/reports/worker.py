@@ -5,7 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import engine
-from ..models import ReportDispatch, WorkTimeChange
+from ..models import ReportDispatch, WorkTimeChange, DutyReceipt
+from ..work_reports.receipts import process_receipt
 from .service import MAX_ATTEMPTS, process_dispatch
 from ..worktime.service import process_change
 
@@ -24,6 +25,10 @@ def poll_once():
             .order_by(WorkTimeChange.id).limit(20)).all()
     for change_id in changes:
         process_change(change_id)
+
+    with Session(engine()) as db:
+        receipts=db.scalars(select(DutyReceipt.id).where(DutyReceipt.status.in_(('pending','failed')),DutyReceipt.attempts<MAX_ATTEMPTS).order_by(DutyReceipt.id).limit(20)).all()
+    for receipt_id in receipts:process_receipt(receipt_id)
 
 
 def main():

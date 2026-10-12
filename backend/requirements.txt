@@ -13,3 +13,4 @@ Pillow>=11,<13
 cryptography>=44,<51
 arabic-reshaper>=3,<4
 python-bidi>=0.6,<1
+pypdf>=6,<7

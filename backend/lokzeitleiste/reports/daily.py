@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from itertools import groupby
+import json
+from sqlalchemy import select
+from sqlalchemy.orm import object_session
+from ..models import DutyReport,DutyGuestTrip
 
 import holidays
 
@@ -34,6 +38,43 @@ def _overlap(a: datetime, b: datetime, c: datetime, d: datetime) -> int:
     return _minutes(max(a, c), min(b, d))
 
 
+def _reported_segments(entries):
+    """Use real guest intervals while the submitted work entry remains unchanged.
+
+    Without pause positions, allocate the recorded pause backwards to non-guest
+    parts of the duty. Original submitted trips remain immutable after admin edits.
+    """
+    db=object_session(entries[0]) if entries else None
+    if not db:return {}
+    by_id={e.id:e for e in entries if e.id is not None}
+    reports=db.scalars(select(DutyReport).where(DutyReport.entry_id.in_(by_id))).all()
+    guests={}
+    for trip in db.scalars(select(DutyGuestTrip).where(DutyGuestTrip.report_id.in_([r.id for r in reports]))):
+        guests.setdefault(trip.report_id,[]).append((trip.start_at,trip.end_at))
+    result={}
+    for report in reports:
+        entry=by_id[report.entry_id];payload=json.loads(report.payload_json)
+        begin,end=interval(entry);trips=sorted(guests.get(report.id,[]))
+        if (begin.isoformat()!=payload['start_at'] or end.isoformat()!=payload['end_at'] or entry.pause_minutes!=payload['actual_pause']
+            or entry.guest_minutes!=sum(_minutes(a,b) for a,b in trips)):continue
+        gaps=[];cursor=begin
+        for a,b in trips:
+            if a>cursor:gaps.append((cursor,a))
+            cursor=b
+        if cursor<end:gaps.append((cursor,end))
+        remaining=entry.pause_minutes;pauses=[]
+        for a,b in reversed(gaps):
+            taken=min(remaining,_minutes(a,b))
+            if taken:pauses.append((b-timedelta(minutes=taken),b));remaining-=taken
+        work=[];cursor=begin
+        for a,b in sorted(pauses):
+            if cursor<a:work.append((cursor,a))
+            cursor=b
+        if cursor<end:work.append((cursor,end))
+        result[entry.id]=(work,trips)
+    return result
+
+
 def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
     if not entries:
         return []
@@ -41,6 +82,7 @@ def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
     years.update(y for entry in entries for y in range(entry.entry_date.year,entry_end_date(entry).year+1))
     public_holidays = holidays.country_holidays("DE", subdiv=federal_state, years=years, language="de")
     result = []
+    reported=_reported_segments(entries)
     for entry in sorted(entries, key=lambda e: (e.entry_date, e.start_time, e.client_id)):
         begin, finish = interval(entry)
         is_work = entry.kind in WORK_KINDS
@@ -57,12 +99,21 @@ def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
                 _overlap(begin, active_end, day_start, day_start + timedelta(hours=6))
                 + _overlap(begin, active_end, day_start + timedelta(hours=22), day_end)
             ) if is_work else 0
+            if entry.id in reported and is_work:
+                work_segments,guest_segments=reported[entry.id]
+                work=sum(_overlap(a,b,day_start,day_end) for a,b in work_segments)
+                guest=sum(_overlap(a,b,day_start,day_end) for a,b in guest_segments)
+                allocated_pause=_minutes(raw_begin,raw_end)-work
+                night=sum(_overlap(a,b,day_start,day_start+timedelta(hours=6))+_overlap(a,b,day_start+timedelta(hours=22),day_end) for a,b in work_segments)
+            else:
+                guest=_overlap(begin,guest_end,day_start,day_end) if is_work else 0
+                allocated_pause=_overlap(active_end,finish,day_start,day_end) if is_work else 0
             name = public_holidays.get(day, "")
             result.append(DayRow(
                 day=day, kind=entry.kind, start=raw_begin.time(), end=raw_end.time(),
-                pause=_overlap(active_end, finish, day_start, day_end) if is_work else 0,
+                pause=allocated_pause,
                 work=work,
-                guest=_overlap(begin, guest_end, day_start, day_end) if is_work else 0,
+                guest=guest,
                 sunday=work if day.weekday() == 6 else 0,
                 holiday=work if name else 0,
                 night=night, holiday_name=name,

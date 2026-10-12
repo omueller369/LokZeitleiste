@@ -1,0 +1,93 @@
+import io,json,unittest
+from datetime import datetime,timedelta
+from uuid import uuid4
+from unittest.mock import patch
+from fastapi.testclient import TestClient
+from PIL import Image
+from reportlab.pdfgen.canvas import Canvas
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+import test_accounts
+from lokzeitleiste.main import app
+from lokzeitleiste.models import DutyReport,DutyReceipt,DutyGuestTrip,WorkEntry,WorkEntryLock,RailwayStation,User,UserLocale
+from lokzeitleiste.work_reports.schemas import minimum_pause,ReportIn
+from lokzeitleiste.work_reports.receipts import process_receipt,validate_receipt
+from lokzeitleiste.accounts.seed_demo_tf import replace_all_tf
+
+
+class WorkReportsTest(unittest.TestCase):
+    tearDown=test_accounts.AccountsTest.tearDown
+    def setUp(self):
+        test_accounts.AccountsTest.setUp(self)
+        with self.engine.connect() as connection:connection.exec_driver_sql('PRAGMA foreign_keys=ON')
+        self.driver=TestClient(app,base_url='https://testserver');self.staff_clients.append(self.driver)
+        self.driver.post('/api/v1/account/login',json={'username':'787100','password':'tf-secret-12345'})
+        self.engine_patch2=patch('lokzeitleiste.work_reports.receipts.engine',return_value=self.engine);self.engine_patch2.start();self.addCleanup(self.engine_patch2.stop)
+        self.mail=patch('lokzeitleiste.work_reports.receipts._send_message');self.send=self.mail.start();self.addCleanup(self.mail.stop)
+        self.env=patch.dict('os.environ',{'WORK_REPORT_RECEIPT_EMAIL':'omueller369@gmail.com','SMTP_HOST':'mock','SMTP_FROM':'test@example.com'});self.env.start();self.addCleanup(self.env.stop)
+        with Session(self.engine) as db:db.add_all([RailwayStation(code='BHF',name='Berlin Beispiel'),RailwayStation(code='LL',name='Leipzig Beispiel')]);db.commit()
+    def payload(self,start='2026-10-12T09:00',end='2026-10-12T17:00'):
+        return dict(client_id=str(uuid4()),start_at=start,end_at=end,actual_pause=30,overrun_reason='',trips=[dict(start_station='BHF',end_station='LL',start_at=start,end_at=(datetime.fromisoformat(start)+timedelta(hours=1)).isoformat(timespec='minutes'),transport='train',transport_detail='')])
+    def create(self,data=None):
+        result=self.driver.post('/api/v1/tf/work-reports',json=data or self.payload());self.assertEqual(result.status_code,201,result.text);return result.json()
+    def pdf(self):
+        out=io.BytesIO();canvas=Canvas(out);canvas.drawString(20,700,'Fiktiver Beleg');canvas.showPage();canvas.save();return out.getvalue()
+    def upload(self,report,content=None,name='beleg.pdf'):
+        return self.driver.post(f'/api/v1/tf/work-reports/{report}/receipts',files={'file':(name,content or self.pdf(),'application/pdf')})
+    def test_pause_boundaries_and_reason(self):
+        for duration,expected in [(360,0),(361,30),(540,30),(541,45),(599,45),(600,45),(601,46),(660,105),(720,165),(721,166),(780,225)]:self.assertEqual(minimum_pause(duration),expected)
+        data=self.payload(end='2026-10-12T22:00')
+        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],225)
+        for name in ('start_at','end_at'):
+            invalid=dict(data);invalid[name]=invalid[name]+':10';self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=invalid).status_code,422)
+    def test_atomic_idempotent_guest_creation_and_worktime(self):
+        data=self.payload();data['trips'].append(dict(start_station='LL',end_station='BHF',start_at='2026-10-12T15:00',end_at='2026-10-12T16:00',transport='other',transport_detail='Testbus'))
+        first=self.create(data);second=self.create(data);self.assertEqual(first['id'],second['id'])
+        with Session(self.engine) as db:self.assertEqual(len(db.scalars(select(WorkEntry)).all()),1);self.assertEqual(len(db.scalars(select(DutyGuestTrip)).all()),2)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],450);self.assertEqual(month['guest_minutes'],120)
+        existing=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(existing['days'][0]['work'],450)
+        changed=dict(data,overrun_reason='different');self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=changed).status_code,409)
+        overlap=self.payload(start='2026-10-12T16:00',end='2026-10-12T19:00');self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=overlap).status_code,409)
+        invalid=self.payload(start='2026-10-13T09:00',end='2026-10-13T17:00');invalid['trips'][0]['start_station']='UNKNOWN'
+        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=invalid).status_code,422)
+        with Session(self.engine) as db:self.assertEqual(len(db.scalars(select(DutyReport)).all()),1)
+    def test_invalid_trips_and_other_transport(self):
+        for change in [dict(end_at='2026-10-12T08:00'),dict(start_at='2026-10-12T08:00'),dict(transport='other',transport_detail=''),dict(transport='other',transport_detail='X'*141),dict(transport='boat')]:
+            data=self.payload();data['trips'][0].update(change);self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+        data=self.payload();data['trips'].append(dict(data['trips'][0]));self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+    def test_night_month_boundary_uses_real_guest_dates(self):
+        data=self.payload(start='2026-10-31T21:00',end='2026-11-01T09:00');data['trips']=[dict(start_station='BHF',end_station='LL',start_at='2026-11-01T08:00',end_at='2026-11-01T09:00',transport='taxi',transport_detail='')]
+        self.create(data)
+        oct=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();nov=self.driver.get('/api/v1/tf/work-reports/month/2026/11').json()
+        self.assertEqual((oct['guest_minutes'],nov['guest_minutes']),(0,60));self.assertEqual(oct['work_minutes']+nov['work_minutes'],690)
+        self.assertEqual(nov['days'][0]['end_at'],'2026-11-01T09:00:00')
+    def test_receipt_sends_attachment_once_and_survives_failed_mail(self):
+        report=self.create()['id'];content=self.pdf();uploaded=self.upload(report,content);self.assertEqual(uploaded.status_code,202,uploaded.text);rid=uploaded.json()['id']
+        self.assertEqual(self.send.call_count,1);message=self.send.call_args.args[0];self.assertEqual(message['To'],'omueller369@gmail.com');self.assertEqual(list(message.iter_attachments())[0].get_payload(decode=True),content)
+        self.assertEqual(self.upload(report,content).json()['id'],rid);self.assertEqual(self.send.call_count,1)
+        downloaded=self.driver.get(f'/api/v1/tf/work-reports/{report}/receipts/{rid}');self.assertEqual(downloaded.content,content)
+        image=io.BytesIO();Image.new('RGB',(20,20),'white').save(image,format='PNG')
+        with Session(self.engine) as db:db.add(UserLocale(user_id=self.tf,language='pl'));db.commit()
+        self.send.side_effect=OSError('SMTP down');failed=self.upload(report,image.getvalue(),'beleg.png');self.assertEqual(failed.status_code,202)
+        with Session(self.engine) as db:row=db.get(DutyReceipt,failed.json()['id']);self.assertEqual(row.status,'failed');self.assertTrue(row.content)
+        self.send.side_effect=None;self.driver.post(f'/api/v1/tf/work-reports/{report}/receipts/{failed.json()["id"]}/retry')
+        with Session(self.engine) as db:self.assertEqual(db.get(DutyReceipt,failed.json()['id']).status,'sent')
+        self.assertEqual(self.send.call_args.args[0]['Subject'],'LokZeitleiste: rachunek do raportu pracy')
+    def test_access_locks_invalid_receipts_and_reset_closure(self):
+        report=self.create();self.assertEqual(self.client.get(f'/api/v1/tf/work-reports/{report["id"]}').status_code,403)
+        self.assertEqual(self.upload(report['id'],b'not PDF').status_code,422)
+        with Session(self.engine) as db:db.add(WorkEntryLock(entry_id=report['entry_id'],actor_id=1,locked=True,reason='Test'));db.commit()
+        self.assertEqual(self.upload(report['id']).status_code,409)
+        with Session(self.engine) as db:db.get(WorkEntryLock,report['entry_id']).locked=False;db.commit()
+        self.upload(report['id']);other=self.create_tf('787111','OTHER').json()['id']
+        self.driver.post('/api/v1/account/login',json={'username':'787111','password':'tf-secret-12345'})
+        self.assertEqual(self.driver.get(f'/api/v1/tf/work-reports/{report["id"]}/receipts').status_code,404)
+        with Session(self.engine) as db:
+            replace_all_tf(db,seed=25);db.commit()
+            for model in (DutyReport,DutyGuestTrip,DutyReceipt):self.assertEqual(db.scalars(select(model)).all(),[])
+    def test_missing_mail_config_keeps_durable_pending_receipt(self):
+        report=self.create()['id']
+        with patch.dict('os.environ',{'WORK_REPORT_RECEIPT_EMAIL':'','SMTP_HOST':''}):result=self.upload(report);self.assertEqual(result.status_code,202)
+        with Session(self.engine) as db:row=db.get(DutyReceipt,result.json()['id']);self.assertEqual(row.status,'pending');self.assertEqual(row.attempts,0)
+        process_receipt(result.json()['id']);self.assertEqual(self.send.call_count,1)

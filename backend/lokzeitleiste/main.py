@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.24")
+app = FastAPI(title="LokZeitleiste API", version="0.25")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -610,3 +610,6 @@ def tf_profile_script():
 
 from .tf_portal import create_router as tf_portal_router
 app.include_router(tf_portal_router(require_account))
+
+from .work_reports.api import create_router as work_report_router
+app.include_router(work_report_router(require_account))

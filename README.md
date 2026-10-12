@@ -1,4 +1,4 @@
-# LokZeitleiste v0.24
+# LokZeitleiste v0.25
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -139,3 +139,7 @@ Die tatsächliche Serverdatenbank wird erst durch `bash backend/testenv/control.
 Nach dem TF-Login öffnet sich `/tf`: Arbeitsbericht, Lokübergabebuch und Leuna Übergabeprotokoll sind zunächst eigene Platzhalterseiten. Arbeitsplan (`/tf/arbeitsplan`) zeigt den eigenen aktuellen Monatsplan aus der Personalplanung, mit Monatswechsel, Schichtbeginn/-ende (einschließlich Folgetag), Sollstunden, Notizen und diagonal gefärbten Feiertags-/Statusmarkierungen. TF können diesen Plan nur lesen. Die Anzeige ist mobil nutzbar und in allen sieben Sprachen übersetzt. Eigene Arbeitszeiterfassung und Passwortwechsel bleiben erreichbar.
 
 Passwörter können ab v0.24 sechs Zeichen lang sein: TF-/Verwaltungskontoanlage, Administrator-Bootstrap, Passwortwechsel und administrativer Reset verwenden mindestens sechs Zeichen. Der verpflichtende Erstwechsel und das Beenden alter Sitzungen bei Passwortänderungen bleiben erhalten. Bestehende Passwortprüfwerte bleiben gültig. Die Android-Passwortwechselmaske akzeptiert ebenfalls sechs Zeichen; das neue TF Portal ist die Weboberfläche.
+
+## Arbeitsbericht v0.25
+
+Im [TF Portal](backend/lokzeitleiste/work_reports/README.md) Dienstbeginn/-ende, sofortige Dienstzeit-/Pausenberechnung, Pflichtbegründung bei mehr als zwölf Stunden, mehrere DS100-Gastfahrten, Beleg-Upload und die Monatsübersicht nutzen. Synchronisierte Berichte fließen einmalig in die bestehende Arbeitszeitberechnung ein. Belege werden nach dem Speichern über eine dauerhafte Warteschlange versendet; `WORK_REPORT_RECEIPT_EMAIL` konfiguriert das Ziel in API und Mailer. Der Teststack verwendet `omueller369@gmail.com` und fängt Nachrichten in Mailpit ab. Details zu Pausen, Originaldaten, lokalen Entwürfen, Dateigrenzen und Versand stehen in der Modulbeschreibung.

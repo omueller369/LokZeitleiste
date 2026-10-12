@@ -370,3 +370,43 @@ class TfIdentity(Base):
     __tablename__ = "tf_identity"
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
     gender: Mapped[str] = mapped_column(String(16), default="unspecified", nullable=False)
+
+
+class DutyReport(Base):
+    __tablename__='duty_reports'
+    __table_args__=(UniqueConstraint('tf_user_id','client_id'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    tf_user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    entry_id:Mapped[int]=mapped_column(ForeignKey('work_entries.id'),nullable=False,unique=True)
+    client_id:Mapped[str]=mapped_column(String(36),nullable=False)
+    payload_json:Mapped[str]=mapped_column(Text,nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class DutyGuestTrip(Base):
+    __tablename__='duty_guest_trips'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    report_id:Mapped[int]=mapped_column(ForeignKey('duty_reports.id'),nullable=False,index=True)
+    start_station:Mapped[str]=mapped_column(String(10),nullable=False)
+    end_station:Mapped[str]=mapped_column(String(10),nullable=False)
+    start_at:Mapped[datetime]=mapped_column(DateTime,nullable=False)
+    end_at:Mapped[datetime]=mapped_column(DateTime,nullable=False)
+    transport:Mapped[str]=mapped_column(String(20),nullable=False)
+    transport_detail:Mapped[str]=mapped_column(String(140),default='',nullable=False)
+
+
+class DutyReceipt(Base):
+    __tablename__='duty_receipts'
+    __table_args__=(UniqueConstraint('report_id','content_hash'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    report_id:Mapped[int]=mapped_column(ForeignKey('duty_reports.id'),nullable=False,index=True)
+    filename:Mapped[str]=mapped_column(String(120),nullable=False)
+    mime_type:Mapped[str]=mapped_column(String(40),nullable=False)
+    content_hash:Mapped[str]=mapped_column(String(64),nullable=False)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+    recipient_email:Mapped[str]=mapped_column(String(320),default='',nullable=False)
+    status:Mapped[str]=mapped_column(String(12),default='pending',nullable=False)
+    attempts:Mapped[int]=mapped_column(Integer,default=0,nullable=False)
+    last_error:Mapped[str]=mapped_column(String(500),default='',nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+    sent_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
