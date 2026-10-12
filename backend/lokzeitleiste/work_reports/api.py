@@ -7,7 +7,7 @@ from datetime import date,datetime,time,timedelta
 from collections import defaultdict
 from sqlalchemy.orm import Session
 from ..db import database_session
-from ..models import User,DutyReport,DutyReceipt,RailwayStation,TfProfile
+from ..models import User,DutyReport,DutyGuestTrip,DutyReceipt,RailwayStation,TfProfile
 from ..tf_portal import driver_dependency
 from ..records.service import assert_unlocked
 from .schemas import ReportIn
@@ -59,9 +59,28 @@ def create_router(require_account):
             end=max(datetime.combine(day+timedelta(days=1) if r.end==time.min else day,r.end) for r in rows)
             days.append(dict(date=day.isoformat(),start_at=datetime.combine(day,min(r.start for r in rows)).isoformat(),end_at=end.isoformat(),
                 work_minutes=sum(r.work for r in rows),guest_minutes=sum(r.guest for r in rows),pause_minutes=sum(r.pause for r in rows)))
-        reports=db.scalars(select(DutyReport).where(DutyReport.tf_user_id==user.id,DutyReport.entry_id.in_([e.id for e in entries])).order_by(DutyReport.id.desc())).all()
+        period_start=datetime.combine(first,time.min);period_end=datetime.combine(last+timedelta(days=1),time.min)
+        guest_report_ids=select(DutyGuestTrip.report_id).where(DutyGuestTrip.start_at<period_end,DutyGuestTrip.end_at>period_start)
+        reports=db.scalars(select(DutyReport).where(DutyReport.tf_user_id==user.id,or_(DutyReport.entry_id.in_([e.id for e in entries]),DutyReport.id.in_(guest_report_ids))).order_by(DutyReport.id.desc())).all()
+        external=defaultdict(int)
+        views=[report_view(db,r) for r in reports]
+        for view in views:
+            start=datetime.fromisoformat(view['start_at']);end=datetime.fromisoformat(view['end_at'])
+            for trip in view['trips']:
+                a=datetime.fromisoformat(trip['start_at']);b=datetime.fromisoformat(trip['end_at'])
+                for lo,hi in ((a,min(b,start)),(max(a,end),b)):
+                    lo=max(lo,period_start);hi=min(hi,period_end)
+                    while lo<hi:
+                        boundary=min(hi,datetime.combine(lo.date()+timedelta(days=1),time.min))
+                        external[lo.date().isoformat()]+=int((boundary-lo).total_seconds()//60);lo=boundary
+        by_date={d['date']:d for d in days}
+        for day,total in external.items():
+            if day not in by_date:
+                row=dict(date=day,start_at=None,end_at=None,work_minutes=0,guest_minutes=0,pause_minutes=0);days.append(row);by_date[day]=row
+        for row in days:row['external_guest_minutes']=external[row['date']]
+        days.sort(key=lambda d:d['date'])
         return dict(days=days,work_minutes=sum(d['work_minutes'] for d in days),guest_minutes=sum(d['guest_minutes'] for d in days),pause_minutes=sum(d['pause_minutes'] for d in days),
-                    reports=[report_view(db,r) for r in reports])
+                    external_guest_minutes=sum(external.values()),reports=views)
 
     @router.get('/api/v1/tf/work-reports/{report_id}')
     def read_report(report_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):

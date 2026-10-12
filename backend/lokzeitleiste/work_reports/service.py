@@ -16,10 +16,14 @@ def report_view(db,report):
         for field,name in (('start_station','start_station_name'),('end_station','end_station_name')):
             if name not in trip:
                 station=db.get(RailwayStation,trip[field]);trip[name]=station.name if station else ''
+    start=datetime.fromisoformat(payload['start_at']);end=datetime.fromisoformat(payload['end_at'])
+    guest_total=sum(minutes(datetime.fromisoformat(t['start_at']),datetime.fromisoformat(t['end_at'])) for t in payload['trips'])
+    guest_inside=sum(max(0,minutes(max(start,datetime.fromisoformat(t['start_at'])),min(end,datetime.fromisoformat(t['end_at'])))) for t in payload['trips'])
     entry=db.get(WorkEntry,report.entry_id)
     return dict(id=report.id,entry_id=report.entry_id,**payload,
                 duration_minutes=minutes(datetime.fromisoformat(payload['start_at']),datetime.fromisoformat(payload['end_at'])),
                 minimum_pause_minutes=minimum_pause(minutes(datetime.fromisoformat(payload['start_at']),datetime.fromisoformat(payload['end_at']))),
+                guest_total_minutes=guest_total,guest_minutes=guest_inside,external_guest_minutes=guest_total-guest_inside,
                 locked=is_locked(db,entry.id))
 
 
@@ -48,7 +52,7 @@ def save_report(db,user,data):
     if not period:period=WorkMonth(tf_user_id=user.id,year=data.start_at.year,month=data.start_at.month);db.add(period);db.flush()
     entry=WorkEntry(work_month_id=period.id,client_id=str(data.client_id),kind='Sonstige Erfassung',entry_date=data.start_at.date(),
         start_time=data.start_at.strftime('%H:%M'),end_time=data.end_at.strftime('%H:%M'),pause_minutes=data.actual_pause,
-        guest_minutes=sum(minutes(t.start_at,t.end_at) for t in data.trips),note=data.overrun_reason)
+        guest_minutes=sum(max(0,minutes(max(t.start_at,data.start_at),min(t.end_at,data.end_at))) for t in data.trips),note=data.overrun_reason)
     db.add(entry);set_end_date(entry,data.end_at.date());db.flush()
     try:validate_no_overlap(db,user.id,entry)
     except ValueError as exc:db.rollback();raise HTTPException(409,str(exc)) from exc

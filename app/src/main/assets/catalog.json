@@ -869,7 +869,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.",
     "Arbeitsbericht synchronisiert.": "Arbeitsbericht synchronisiert.",
     "Synchronisiert": "Synchronisiert",
-    "Lokal": "Lokal"
+    "Lokal": "Lokal",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.",
+    "Im Dienst": "Im Dienst",
+    "Außerhalb des Dienstes": "Außerhalb des Dienstes",
+    "Gastfahrt im Dienst": "Gastfahrt im Dienst",
+    "Gastfahrt außerhalb des Dienstes": "Gastfahrt außerhalb des Dienstes",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Arbeitszeit (Gastfahrten im Dienst enthalten)"
   },
   "en": {
     "Administration": "Administration",
@@ -1741,7 +1747,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Offline: locally saved working times are shown.",
     "Arbeitsbericht synchronisiert.": "Work report synchronized.",
     "Synchronisiert": "Synchronized",
-    "Lokal": "Local"
+    "Lokal": "Local",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Passenger journeys may take place before, during or after duty. Time outside duty is accounted for separately.",
+    "Im Dienst": "Within duty",
+    "Außerhalb des Dienstes": "Outside duty",
+    "Gastfahrt im Dienst": "Passenger journey within duty",
+    "Gastfahrt außerhalb des Dienstes": "Passenger journey outside duty",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Working time (includes passenger journeys within duty)"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2613,7 +2625,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Offline: wyświetlane są lokalnie zapisane czasy pracy.",
     "Arbeitsbericht synchronisiert.": "Raport pracy zsynchronizowano.",
     "Synchronisiert": "Zsynchronizowano",
-    "Lokal": "Lokalnie"
+    "Lokal": "Lokalnie",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Przejazdy pasażerskie mogą odbywać się przed służbą, w jej trakcie i po niej. Czas poza służbą jest rozliczany oddzielnie.",
+    "Im Dienst": "W czasie służby",
+    "Außerhalb des Dienstes": "Poza służbą",
+    "Gastfahrt im Dienst": "Przejazd pasażerski w czasie służby",
+    "Gastfahrt außerhalb des Dienstes": "Przejazd pasażerski poza służbą",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Czas pracy (obejmuje przejazdy pasażerskie w czasie służby)"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3485,7 +3503,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Нет сети: отображается локально сохранённое рабочее время.",
     "Arbeitsbericht synchronisiert.": "Рабочий отчёт синхронизирован.",
     "Synchronisiert": "Синхронизировано",
-    "Lokal": "Локально"
+    "Lokal": "Локально",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Служебные поездки возможны до, во время и после смены. Время вне смены учитывается отдельно.",
+    "Im Dienst": "В пределах смены",
+    "Außerhalb des Dienstes": "Вне смены",
+    "Gastfahrt im Dienst": "Служебная поездка в пределах смены",
+    "Gastfahrt außerhalb des Dienstes": "Служебная поездка вне смены",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Рабочее время (включая служебные поездки в пределах смены)"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -4357,7 +4381,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Çevrimdışı: yerel olarak kaydedilen çalışma süreleri gösteriliyor.",
     "Arbeitsbericht synchronisiert.": "Çalışma raporu senkronize edildi.",
     "Synchronisiert": "Senkronize edildi",
-    "Lokal": "Yerel"
+    "Lokal": "Yerel",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Yolcu yolculukları görevden önce, görev sırasında veya sonra yapılabilir. Görev dışındaki süreler ayrıca hesaplanır.",
+    "Im Dienst": "Görev sırasında",
+    "Außerhalb des Dienstes": "Görev dışında",
+    "Gastfahrt im Dienst": "Görev sırasındaki yolcu yolculuğu",
+    "Gastfahrt außerhalb des Dienstes": "Görev dışındaki yolcu yolculuğu",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Çalışma süresi (görev sırasındaki yolcu yolculukları dahil)"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -5229,7 +5259,13 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "غير متصل: يتم عرض أوقات العمل المحفوظة محليًا.",
     "Arbeitsbericht synchronisiert.": "تمت مزامنة تقرير العمل.",
     "Synchronisiert": "تمت المزامنة",
-    "Lokal": "محلي"
+    "Lokal": "محلي",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "يمكن أن تتم رحلات الانتقال قبل المناوبة أو خلالها أو بعدها. تُحاسب الأوقات خارج المناوبة بشكل منفصل.",
+    "Im Dienst": "خلال المناوبة",
+    "Außerhalb des Dienstes": "خارج المناوبة",
+    "Gastfahrt im Dienst": "رحلة انتقال خلال المناوبة",
+    "Gastfahrt außerhalb des Dienstes": "رحلة انتقال خارج المناوبة",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "وقت العمل (يشمل رحلات الانتقال خلال المناوبة)"
   },
   "es": {
     "Administration": "Administración",
@@ -6101,6 +6137,12 @@
     "Offline: lokal gespeicherte Arbeitszeiten werden angezeigt.": "Sin conexión: se muestran los tiempos guardados localmente.",
     "Arbeitsbericht synchronisiert.": "Informe de trabajo sincronizado.",
     "Synchronisiert": "Sincronizado",
-    "Lokal": "Local"
+    "Lokal": "Local",
+    "Gastfahrten sind vor, während und nach dem Dienst möglich. Zeiten außerhalb des Dienstes werden gesondert abgerechnet.": "Los desplazamientos pueden ser antes, durante o después del servicio. El tiempo fuera del servicio se contabiliza por separado.",
+    "Im Dienst": "Durante el servicio",
+    "Außerhalb des Dienstes": "Fuera del servicio",
+    "Gastfahrt im Dienst": "Desplazamiento durante el servicio",
+    "Gastfahrt außerhalb des Dienstes": "Desplazamiento fuera del servicio",
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Tiempo de trabajo (incluye desplazamientos durante el servicio)"
   }
 }

@@ -63,9 +63,8 @@ class ReportIn(BaseModel):
         if self.actual_pause>=duration:raise ValueError('Die tatsächliche Pause muss kürzer als der Dienst sein.')
         ordered=sorted(self.trips,key=lambda t:t.start_at)
         for index,trip in enumerate(ordered):
-            if trip.start_at<self.start_at or trip.end_at>self.end_at:raise ValueError('Gastfahrten müssen innerhalb des Dienstes liegen.')
             if index and trip.start_at<ordered[index-1].end_at:raise ValueError('Gastfahrten dürfen sich nicht überschneiden.')
-        if sum(minutes(t.start_at,t.end_at) for t in self.trips)>duration-self.actual_pause:
+        if sum(max(0,minutes(max(t.start_at,self.start_at),min(t.end_at,self.end_at))) for t in self.trips)>duration-self.actual_pause:
             raise ValueError('Gastfahrtzeit und tatsächliche Pause überschreiten die Dienstzeit.')
         self.trips=ordered
         return self

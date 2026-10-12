@@ -54,7 +54,7 @@ def _reported_segments(entries):
     result={}
     for report in reports:
         entry=by_id[report.entry_id];payload=json.loads(report.payload_json)
-        begin,end=interval(entry);trips=sorted(guests.get(report.id,[]))
+        begin,end=interval(entry);trips=sorted((max(begin,a),min(end,b)) for a,b in guests.get(report.id,[]) if max(begin,a)<min(end,b))
         if (begin.isoformat()!=payload['start_at'] or end.isoformat()!=payload['end_at'] or entry.pause_minutes!=payload['actual_pause']
             or entry.guest_minutes!=sum(_minutes(a,b) for a,b in trips)):continue
         gaps=[];cursor=begin
