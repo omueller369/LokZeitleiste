@@ -875,7 +875,10 @@
     "Außerhalb des Dienstes": "Außerhalb des Dienstes",
     "Gastfahrt im Dienst": "Gastfahrt im Dienst",
     "Gastfahrt außerhalb des Dienstes": "Gastfahrt außerhalb des Dienstes",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Arbeitszeit (Gastfahrten im Dienst enthalten)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Arbeitszeit (Gastfahrten im Dienst enthalten)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Arbeitszeit einschließlich dokumentierter Pausen",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Gastfahrtzeit im Dienst überschreitet die Dienstzeit."
   },
   "en": {
     "Administration": "Administration",
@@ -1753,7 +1756,10 @@
     "Außerhalb des Dienstes": "Outside duty",
     "Gastfahrt im Dienst": "Passenger journey within duty",
     "Gastfahrt außerhalb des Dienstes": "Passenger journey outside duty",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Working time (includes passenger journeys within duty)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Working time (includes passenger journeys within duty)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Working time including documented breaks",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Breaks are documented and are not deducted from working time.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Passenger journey time within duty exceeds the duty duration."
   },
   "pl": {
     "Administration": "Administracja",
@@ -2631,7 +2637,10 @@
     "Außerhalb des Dienstes": "Poza służbą",
     "Gastfahrt im Dienst": "Przejazd pasażerski w czasie służby",
     "Gastfahrt außerhalb des Dienstes": "Przejazd pasażerski poza służbą",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Czas pracy (obejmuje przejazdy pasażerskie w czasie służby)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Czas pracy (obejmuje przejazdy pasażerskie w czasie służby)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Czas pracy z uwzględnieniem udokumentowanych przerw",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Przerwy są dokumentowane i nie są odliczane od czasu pracy.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Czas przejazdów w trakcie służby przekracza czas służby."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3509,7 +3518,10 @@
     "Außerhalb des Dienstes": "Вне смены",
     "Gastfahrt im Dienst": "Служебная поездка в пределах смены",
     "Gastfahrt außerhalb des Dienstes": "Служебная поездка вне смены",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Рабочее время (включая служебные поездки в пределах смены)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Рабочее время (включая служебные поездки в пределах смены)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Рабочее время с учётом документированных перерывов",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Перерывы документируются и не вычитаются из рабочего времени.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Время служебных поездок в пределах смены превышает её длительность."
   },
   "tr": {
     "Administration": "Yönetim",
@@ -4387,7 +4399,10 @@
     "Außerhalb des Dienstes": "Görev dışında",
     "Gastfahrt im Dienst": "Görev sırasındaki yolcu yolculuğu",
     "Gastfahrt außerhalb des Dienstes": "Görev dışındaki yolcu yolculuğu",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Çalışma süresi (görev sırasındaki yolcu yolculukları dahil)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Çalışma süresi (görev sırasındaki yolcu yolculukları dahil)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Belgelenen molalar dahil çalışma süresi",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Molalar belgelenir ve çalışma süresinden düşülmez.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Görev sırasındaki yolcu yolculuğu süresi görev süresini aşıyor."
   },
   "ar": {
     "Administration": "الإدارة",
@@ -5265,7 +5280,10 @@
     "Außerhalb des Dienstes": "خارج المناوبة",
     "Gastfahrt im Dienst": "رحلة انتقال خلال المناوبة",
     "Gastfahrt außerhalb des Dienstes": "رحلة انتقال خارج المناوبة",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "وقت العمل (يشمل رحلات الانتقال خلال المناوبة)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "وقت العمل (يشمل رحلات الانتقال خلال المناوبة)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "وقت العمل شاملًا فترات الراحة الموثقة",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "تُوثق فترات الراحة ولا تُخصم من وقت العمل.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "وقت رحلات الانتقال خلال المناوبة يتجاوز مدتها."
   },
   "es": {
     "Administration": "Administración",
@@ -6143,6 +6161,9 @@
     "Außerhalb des Dienstes": "Fuera del servicio",
     "Gastfahrt im Dienst": "Desplazamiento durante el servicio",
     "Gastfahrt außerhalb des Dienstes": "Desplazamiento fuera del servicio",
-    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Tiempo de trabajo (incluye desplazamientos durante el servicio)"
+    "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Tiempo de trabajo (incluye desplazamientos durante el servicio)",
+    "Arbeitszeit einschließlich dokumentierter Pausen": "Tiempo de trabajo incluidas las pausas documentadas",
+    "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Las pausas se documentan y no se descuentan del tiempo de trabajo.",
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "El tiempo de desplazamiento durante el servicio supera su duración."
   }
 }

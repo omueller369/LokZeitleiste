@@ -221,7 +221,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                             isStandby && away && accommodation !in listOf("Dienstwohnung", "Hotel") -> "Bitte Unterkunft wählen."
                             isStandby && away && accommodation == "Hotel" && hotelName.isBlank() -> "Bitte Hotelnamen angeben."
                             kind == "Urlaub" && entries.any { it.date == candidate.date && it.kind == "Urlaub" } -> "Urlaub ist für diesen Tag bereits erfasst."
-                            kind != "Urlaub" && (length(candidate) <= 0 || g > length(candidate)) -> "Dauer muss positiv sein; Gastfahrt darf Dauer nicht übersteigen."
+                            kind != "Urlaub" && (length(candidate) <= 0 || p >= length(candidate) || g > length(candidate)) -> "Dauer muss positiv sein; Gastfahrt darf Dauer nicht übersteigen."
                             else -> ""
                         }
                         if (error.isEmpty() && candidate != null) {

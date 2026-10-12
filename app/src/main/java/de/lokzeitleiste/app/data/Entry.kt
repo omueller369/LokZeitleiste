@@ -13,7 +13,7 @@ data class Entry(
 fun minutes(time: String): Int = LocalTime.parse(time).let { it.hour * 60 + it.minute }
 
 fun length(e: Entry): Int {
-    return (Duration.between(startAt(e), endAt(e)).toMinutes().toInt() - e.pause).coerceAtLeast(0)
+    return (Duration.between(startAt(e), endAt(e)).toMinutes().toInt()).coerceAtLeast(0)
 }
 
 fun startAt(e: Entry): LocalDateTime = LocalDate.parse(e.date).atTime(LocalTime.parse(e.start))
@@ -31,14 +31,14 @@ fun overlap(e: Entry, condition: (LocalDateTime) -> Boolean): Int {
     var count = 0
     var time = from
     while (time < until) { if (condition(time)) count++; time = time.plusMinutes(1) }
-    return (count - e.pause.coerceAtMost(count)).coerceAtLeast(0)
+    return count
 }
 
 fun displayTime(n: Int) = "%d:%02d h".format(n / 60, n % 60)
 
 private fun monthInterval(e: Entry, month: YearMonth, guestOnly: Boolean = false): Pair<LocalDateTime,LocalDateTime> {
     val from = startAt(e)
-    val activeEnd = endAt(e).minusMinutes(e.pause.toLong())
+    val activeEnd = endAt(e)
     val until = if (guestOnly) minOf(activeEnd, from.plusMinutes(e.guest.toLong())) else activeEnd
     return maxOf(from, month.atDay(1).atStartOfDay()) to minOf(until, month.plusMonths(1).atDay(1).atStartOfDay())
 }

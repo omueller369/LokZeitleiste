@@ -69,8 +69,8 @@ class WorkReportsTest(unittest.TestCase):
         data=self.payload();data['trips'].append(dict(start_station='LL',end_station='BHF',start_at='2026-10-12T15:00',end_at='2026-10-12T16:00',transport='other',transport_detail='Testbus'))
         first=self.create(data);second=self.create(data);self.assertEqual(first['id'],second['id'])
         with Session(self.engine) as db:self.assertEqual(len(db.scalars(select(WorkEntry)).all()),1);self.assertEqual(len(db.scalars(select(DutyGuestTrip)).all()),2)
-        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],450);self.assertEqual(month['guest_minutes'],120)
-        existing=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(existing['days'][0]['work'],450)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],480);self.assertEqual(month['guest_minutes'],120)
+        existing=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(existing['days'][0]['work'],480)
         changed=dict(data,overrun_reason='different');self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=changed).status_code,409)
         overlap=self.payload(start='2026-10-12T16:00',end='2026-10-12T19:00');self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=overlap).status_code,409)
         invalid=self.payload(start='2026-10-13T09:00',end='2026-10-13T17:00');invalid['trips'][0]['start_station']='UNKNOWN'
@@ -80,6 +80,19 @@ class WorkReportsTest(unittest.TestCase):
         for change in [dict(end_at='2026-10-12T08:00'),dict(transport='other',transport_detail=''),dict(transport='other',transport_detail='X'*141),dict(transport='boat')]:
             data=self.payload();data['trips'][0].update(change);self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
         data=self.payload();data['trips'].append(dict(data['trips'][0]));self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+    def test_pause_is_documented_without_work_deduction(self):
+        data=self.payload();data['actual_pause']=120
+        # A guest journey may occupy the entire duty; pauses are independent documentation.
+        data['trips'][0]['end_at']=data['end_at']
+        report=self.create(data)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
+        self.assertEqual((month['work_minutes'],month['pause_minutes'],month['guest_minutes']),(480,120,480))
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
+        self.assertEqual(canonical['days'][0]['work'],480)
+        self.assertEqual(canonical['entries'][0]['pause'],120)
+        self.assertEqual(canonical['weeks'][2]['totals']['work'],480)
+        self.assertEqual(report['actual_pause'],120)
+
     def test_external_and_partial_guest_time_separate_from_work(self):
         data=self.payload();data['trips']=[
             dict(start_station='BHF',end_station='LL',start_at='2026-10-12T07:00',end_at='2026-10-12T08:00',transport='train'),
@@ -90,10 +103,10 @@ class WorkReportsTest(unittest.TestCase):
         self.assertEqual((report['guest_total_minutes'],report['guest_minutes'],report['external_guest_minutes']),(240,60,180))
         with Session(self.engine) as db:self.assertEqual(db.get(WorkEntry,report['entry_id']).guest_minutes,60)
         month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
-        self.assertEqual((month['work_minutes'],month['guest_minutes'],month['external_guest_minutes']),(450,60,180))
+        self.assertEqual((month['work_minutes'],month['guest_minutes'],month['external_guest_minutes']),(480,60,180))
         self.assertEqual(month['days'][0]['external_guest_minutes'],180)
         actual=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
-        self.assertEqual(actual['days'][0]['work'],450)
+        self.assertEqual(actual['days'][0]['work'],480)
         self.assertEqual(self.create(data)['id'],report['id'])
 
     def test_external_guest_in_other_month_without_work(self):
@@ -103,14 +116,14 @@ class WorkReportsTest(unittest.TestCase):
         oct=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
         nov=self.driver.get('/api/v1/tf/work-reports/month/2026/11').json()
         self.assertEqual((oct['work_minutes'],oct['guest_minutes'],oct['external_guest_minutes']),(0,0,60))
-        self.assertEqual((nov['work_minutes'],nov['guest_minutes'],nov['external_guest_minutes']),(450,0,60))
+        self.assertEqual((nov['work_minutes'],nov['guest_minutes'],nov['external_guest_minutes']),(480,0,60))
         self.assertEqual(oct['reports'][0]['id'],report['id']);self.assertIsNone(oct['days'][0]['start_at'])
 
     def test_night_month_boundary_uses_real_guest_dates(self):
         data=self.payload(start='2026-10-31T21:00',end='2026-11-01T09:00');data['trips']=[dict(start_station='BHF',end_station='LL',start_at='2026-11-01T08:00',end_at='2026-11-01T09:00',transport='taxi',transport_detail='')]
         self.create(data)
         oct=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();nov=self.driver.get('/api/v1/tf/work-reports/month/2026/11').json()
-        self.assertEqual((oct['guest_minutes'],nov['guest_minutes']),(0,60));self.assertEqual(oct['work_minutes']+nov['work_minutes'],690)
+        self.assertEqual((oct['guest_minutes'],nov['guest_minutes']),(0,60));self.assertEqual(oct['work_minutes']+nov['work_minutes'],720)
         self.assertEqual(nov['days'][0]['end_at'],'2026-11-01T09:00:00')
     def test_receipt_sends_attachment_once_and_survives_failed_mail(self):
         report=self.create()['id'];content=self.pdf();uploaded=self.upload(report,content);self.assertEqual(uploaded.status_code,202,uploaded.text);rid=uploaded.json()['id']

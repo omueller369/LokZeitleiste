@@ -64,7 +64,7 @@ class ReportIn(BaseModel):
         ordered=sorted(self.trips,key=lambda t:t.start_at)
         for index,trip in enumerate(ordered):
             if index and trip.start_at<ordered[index-1].end_at:raise ValueError('Gastfahrten dürfen sich nicht überschneiden.')
-        if sum(max(0,minutes(max(t.start_at,self.start_at),min(t.end_at,self.end_at))) for t in self.trips)>duration-self.actual_pause:
-            raise ValueError('Gastfahrtzeit und tatsächliche Pause überschreiten die Dienstzeit.')
+        if sum(max(0,minutes(max(t.start_at,self.start_at),min(t.end_at,self.end_at))) for t in self.trips)>duration:
+            raise ValueError('Gastfahrtzeit im Dienst überschreitet die Dienstzeit.')
         self.trips=ordered
         return self

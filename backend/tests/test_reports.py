@@ -16,6 +16,16 @@ class ReportCalculationTest(unittest.TestCase):
         self.assertEqual((may.work, may.night, may.holiday), (360, 360, 360))
         self.assertEqual(summarize_month([crossing], year=2026, month=5, federal_state="BE")["totals"]["credited"], 480)
 
+    def test_documented_pause_does_not_reduce_work_or_premiums(self):
+        crossing=WorkEntry(client_id='paid-pause',kind='Zugfahrt',entry_date=date(2026,4,30),
+                          start_time='22:00',end_time='06:00',pause_minutes=90,guest_minutes=120)
+        april,may=day_rows([crossing],'BE')
+        self.assertEqual((april.work,april.night,april.pause),(120,120,0))
+        self.assertEqual((may.work,may.night,may.holiday,may.pause),(360,360,360,90))
+        summary=summarize_month([crossing],year=2026,month=5,federal_state='BE')
+        self.assertEqual(summary['totals']['credited'],480)
+        self.assertEqual(sum(row.pause for row in day_rows([crossing],'BE')),90)
+
     def test_same_day_absence_once_and_conflict_detection(self):
         vacation = [WorkEntry(client_id=str(i), kind="Urlaub", entry_date=date(2026, 9, 23),
                               start_time="08:00", end_time="16:00", pause_minutes=0,

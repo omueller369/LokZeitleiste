@@ -41,8 +41,8 @@ def _overlap(a: datetime, b: datetime, c: datetime, d: datetime) -> int:
 def _reported_segments(entries):
     """Use real guest intervals while the submitted work entry remains unchanged.
 
-    Without pause positions, allocate the recorded pause backwards to non-guest
-    parts of the duty. Original submitted trips remain immutable after admin edits.
+    Pauses are documentation only and never reduce work or premium minutes.
+    Original submitted trips remain immutable after admin edits.
     """
     db=object_session(entries[0]) if entries else None
     if not db:return {}
@@ -57,21 +57,7 @@ def _reported_segments(entries):
         begin,end=interval(entry);trips=sorted((max(begin,a),min(end,b)) for a,b in guests.get(report.id,[]) if max(begin,a)<min(end,b))
         if (begin.isoformat()!=payload['start_at'] or end.isoformat()!=payload['end_at'] or entry.pause_minutes!=payload['actual_pause']
             or entry.guest_minutes!=sum(_minutes(a,b) for a,b in trips)):continue
-        gaps=[];cursor=begin
-        for a,b in trips:
-            if a>cursor:gaps.append((cursor,a))
-            cursor=b
-        if cursor<end:gaps.append((cursor,end))
-        remaining=entry.pause_minutes;pauses=[]
-        for a,b in reversed(gaps):
-            taken=min(remaining,_minutes(a,b))
-            if taken:pauses.append((b-timedelta(minutes=taken),b));remaining-=taken
-        work=[];cursor=begin
-        for a,b in sorted(pauses):
-            if cursor<a:work.append((cursor,a))
-            cursor=b
-        if cursor<end:work.append((cursor,end))
-        result[entry.id]=(work,trips)
+        result[entry.id]=([(begin,end)],trips)
     return result
 
 
@@ -87,7 +73,8 @@ def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
         begin, finish = interval(entry)
         is_work = entry.kind in WORK_KINDS
         pause = entry.pause_minutes if is_work else 0
-        active_end = max(begin, finish - timedelta(minutes=pause)) if is_work else begin
+        active_end = finish if is_work else begin
+        pause_begin = max(begin, finish-timedelta(minutes=pause))
         guest_end = min(active_end, begin + timedelta(minutes=entry.guest_minutes)) if is_work else begin
         day = begin.date()
         while datetime.combine(day, time.min) < finish:
@@ -99,15 +86,14 @@ def day_rows(entries: list[WorkEntry], federal_state: str) -> list[DayRow]:
                 _overlap(begin, active_end, day_start, day_start + timedelta(hours=6))
                 + _overlap(begin, active_end, day_start + timedelta(hours=22), day_end)
             ) if is_work else 0
+            allocated_pause=_overlap(pause_begin,finish,day_start,day_end) if is_work else 0
             if entry.id in reported and is_work:
                 work_segments,guest_segments=reported[entry.id]
                 work=sum(_overlap(a,b,day_start,day_end) for a,b in work_segments)
                 guest=sum(_overlap(a,b,day_start,day_end) for a,b in guest_segments)
-                allocated_pause=_minutes(raw_begin,raw_end)-work
                 night=sum(_overlap(a,b,day_start,day_start+timedelta(hours=6))+_overlap(a,b,day_start+timedelta(hours=22),day_end) for a,b in work_segments)
             else:
                 guest=_overlap(begin,guest_end,day_start,day_end) if is_work else 0
-                allocated_pause=_overlap(active_end,finish,day_start,day_end) if is_work else 0
             name = public_holidays.get(day, "")
             result.append(DayRow(
                 day=day, kind=entry.kind, start=raw_begin.time(), end=raw_end.time(),

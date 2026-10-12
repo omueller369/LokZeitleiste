@@ -124,7 +124,7 @@ class EntryIn(BaseModel):
                 raise ValueError("Unterkunft nur bei auswärtigem Aufenthalt")
         elif self.away or self.accommodation or self.hotel_name:
             raise ValueError("Unterkunft ist derzeit nur bei Bereitschaft erfasst")
-        elif self.pause >= span or self.guest > span - self.pause:
+        elif self.pause >= span or self.guest > span:
             raise ValueError("Pause und Gastfahrt müssen in den Zeitraum passen")
         return self
 
