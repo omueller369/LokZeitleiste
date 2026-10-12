@@ -1,7 +1,7 @@
 from fastapi import APIRouter,BackgroundTasks,Depends,HTTPException,UploadFile,File,Query
 from fastapi.responses import Response,FileResponse
 from pathlib import Path
-from sqlalchemy import select,func
+from sqlalchemy import select,func,or_,case
 import calendar
 from datetime import date,datetime,time,timedelta
 from collections import defaultdict
@@ -32,10 +32,10 @@ def create_router(require_account):
     def styles():return FileResponse(Path(__file__).parent.parent/'static'/'work-report.css',media_type='text/css')
 
     @router.get('/api/v1/tf/work-reports/stations')
-    def stations(q:str=Query(min_length=1,max_length=80),user:User=Depends(driver),db:Session=Depends(database_session)):
+    def stations(q:str=Query(min_length=1,max_length=255),user:User=Depends(driver),db:Session=Depends(database_session)):
         text=q.strip().upper().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
         rows=db.scalars(select(RailwayStation).where(
-            RailwayStation.code.ilike(text+'%',escape='\\')).order_by(RailwayStation.code).limit(20)).all()
+            or_(RailwayStation.code.ilike(text+'%',escape='\\'),RailwayStation.name.ilike('%'+text+'%',escape='\\'))).order_by(case((RailwayStation.code==q.strip().upper(),0),(RailwayStation.code.ilike(text+'%',escape='\\'),1),else_=2),RailwayStation.code).limit(20)).all()
         return [{'code':r.code,'name':r.name} for r in rows]
 
     @router.post('/api/v1/tf/work-reports',status_code=201)

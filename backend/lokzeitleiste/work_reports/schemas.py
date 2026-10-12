@@ -20,6 +20,8 @@ def check_time(value):
 class GuestIn(BaseModel):
     start_station:str=Field(min_length=1,max_length=10)
     end_station:str=Field(min_length=1,max_length=10)
+    start_station_name:str=Field(default='',max_length=255)
+    end_station_name:str=Field(default='',max_length=255)
     start_at:datetime
     end_at:datetime
     transport:Literal['train','car','taxi','public_transport','other']

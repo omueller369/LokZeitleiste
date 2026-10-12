@@ -34,6 +34,30 @@ class WorkReportsTest(unittest.TestCase):
         out=io.BytesIO();canvas=Canvas(out);canvas.drawString(20,700,'Fiktiver Beleg');canvas.showPage();canvas.save();return out.getvalue()
     def upload(self,report,content=None,name='beleg.pdf'):
         return self.driver.post(f'/api/v1/tf/work-reports/{report}/receipts',files={'file':(name,content or self.pdf(),'application/pdf')})
+    def test_station_fulltext_snapshot_and_optional_receipts(self):
+        with Session(self.engine) as db:
+            db.add_all([RailwayStation(code=f'A{i:02}',name='Halle Test') for i in range(25)]);db.commit()
+        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/stations',params={'q':'LL'}).json()[0]['code'],'LL')
+        rows=self.driver.get('/api/v1/tf/work-reports/stations',params={'q':'beispiel'}).json()
+        self.assertEqual({r['code'] for r in rows},{'BHF','LL'})
+        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/stations',params={'q':'%'}).json(),[])
+        data=self.payload();data['trips'][0]['start_station_name']='Untrusted name'
+        report=self.create(data)
+        self.assertEqual(report['trips'][0]['start_station_name'],'Berlin Beispiel')
+        self.assertEqual(report['trips'][0]['end_station_name'],'Leipzig Beispiel')
+        self.assertEqual(self.driver.get(f"/api/v1/tf/work-reports/{report['id']}/receipts").json(),[])
+        with Session(self.engine) as db:
+            db.get(RailwayStation,'BHF').name='New catalog name';db.commit()
+        self.assertEqual(self.create(data)['trips'][0]['start_station_name'],'Berlin Beispiel')
+        # Old records remain readable and retryable without a data migration.
+        with Session(self.engine) as db:
+            row=db.get(DutyReport,report['id']);payload=json.loads(row.payload_json)
+            for trip in payload['trips']:
+                trip.pop('start_station_name');trip.pop('end_station_name')
+            row.payload_json=json.dumps(payload);db.commit()
+        self.assertEqual(self.create(data)['id'],report['id'])
+        self.assertEqual(self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()['trips'][0]['start_station_name'],'New catalog name')
+
     def test_pause_boundaries_and_reason(self):
         for duration,expected in [(360,0),(361,30),(540,30),(541,45),(599,45),(600,45),(601,46),(660,105),(720,165),(721,166),(780,225)]:self.assertEqual(minimum_pause(duration),expected)
         data=self.payload(end='2026-10-12T22:00')
