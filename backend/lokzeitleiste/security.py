@@ -14,8 +14,8 @@ TOKEN_LIFETIME = timedelta(days=365)
 
 
 def hash_password(password: str) -> str:
-    if len(password) < 12:
-        raise ValueError("Passwort muss mindestens 12 Zeichen haben")
+    if len(password) < 6:
+        raise ValueError("Passwort muss mindestens 6 Zeichen haben")
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, ITERATIONS)
     return f"pbkdf2_sha256${ITERATIONS}${salt.hex()}${digest.hex()}"

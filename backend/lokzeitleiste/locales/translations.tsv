@@ -753,3 +753,23 @@ Weiblich|Female|Kobieta|Женский|Kadın|أنثى|Femenino
 Divers|Diverse|Inna|Другой|Diğer|متنوع|Diverso
 Keine Angabe|Prefer not to say|Brak informacji|Не указано|Belirtilmedi|غير محدد|Sin especificar
 Bild folgt|Photo pending|Zdjęcie wkrótce|Фото ожидается|Fotoğraf bekleniyor|الصورة لاحقًا|Foto pendiente
+Neues Passwort (mindestens 6 Zeichen)|New password (at least 6 characters)|Nowe hasło (co najmniej 6 znaków)|Новый пароль (не менее 6 символов)|Yeni parola (en az 6 karakter)|كلمة مرور جديدة (6 حرفًا على الأقل)|Nueva contraseña (mínimo 6 caracteres)
+Passwort muss mindestens 6 Zeichen haben|Password requires at least 6 characters|Hasło wymaga co najmniej 6 znaków|Пароль не менее 6 символов|Parola en az 6 karakter olmalı|كلمة المرور 6 حرفًا على الأقل|La contraseña requiere al menos 6 caracteres
+TF Portal|TF Portal|Portal maszynisty|Портал машиниста|Makinist Portalı|بوابة سائقي القطارات|Portal de maquinistas
+Wählen Sie ein Modul.|Choose a module.|Wybierz moduł.|Выберите модуль.|Bir modül seçin.|اختر وحدة.|Seleccione un módulo.
+Arbeitsbericht|Work report|Raport pracy|Рабочий отчёт|Çalışma raporu|تقرير العمل|Informe de trabajo
+Lokübergabebuch|Locomotive handover log|Książka przekazania lokomotywy|Журнал передачи локомотива|Lokomotif teslim defteri|سجل تسليم القاطرة|Libro de entrega de locomotora
+Leuna Übergabeprotokoll|Leuna handover report|Protokół przekazania Leuna|Протокол передачи Leuna|Leuna teslim tutanağı|محضر تسليم Leuna|Acta de entrega Leuna
+Arbeitsplan|Work schedule|Plan pracy|Рабочий план|Çalışma planı|جدول العمل|Plan de trabajo
+Details folgen später.|Details will follow later.|Szczegóły zostaną podane później.|Подробности будут добавлены позже.|Ayrıntılar daha sonra eklenecek.|ستُضاف التفاصيل لاحقًا.|Los detalles se añadirán más adelante.
+Ihr Einsatzplan aus der Personalplanung.|Your duty schedule from personnel planning.|Twój plan służby z planowania personelu.|Ваш график из планирования персонала.|Personel planlamasından görev çizelgeniz.|جدول مهامك من تخطيط الموظفين.|Su plan de servicio de la planificación de personal.
+Der Plan wird durch die Personalplanung bearbeitet.|The schedule is edited by personnel planning.|Plan jest edytowany przez planowanie personelu.|График изменяется отделом планирования персонала.|Çizelge personel planlaması tarafından düzenlenir.|يُعدّل الجدول من خلال تخطيط الموظفين.|El plan se modifica en la planificación de personal.
+Vertragliches Monatssoll|Contractual monthly target|Miesięczna norma umowna|Месячная норма по договору|Sözleşmedeki aylık hedef|الساعات الشهرية المتعاقد عليها|Objetivo mensual contractual
+Zurück zum TF Portal|Back to TF Portal|Powrót do portalu maszynisty|Назад в портал машиниста|Makinist Portalına dön|العودة إلى بوابة سائقي القطارات|Volver al portal de maquinistas
+Vorheriger Monat|Previous month|Poprzedni miesiąc|Предыдущий месяц|Önceki ay|الشهر السابق|Mes anterior
+Nächster Monat|Next month|Następny miesiąc|Следующий месяц|Sonraki ay|الشهر التالي|Mes siguiente
+Bitte einen gültigen Monat wählen.|Please choose a valid month.|Wybierz prawidłowy miesiąc.|Выберите допустимый месяц.|Geçerli bir ay seçin.|يرجى اختيار شهر صالح.|Seleccione un mes válido.
+TF Portal ist nur für Triebfahrzeugführer verfügbar.|TF Portal is available only to train drivers.|Portal jest dostępny tylko dla maszynistów.|Портал доступен только машинистам.|Portal yalnızca makinistler içindir.|البوابة متاحة فقط لسائقي القطارات.|El portal solo está disponible para maquinistas.
+Mindestens sechs Zeichen, gleiche Bestätigung und ein anderes Passwort erforderlich.|At least six characters, matching confirmation and a different password required.|Wymagane co najmniej 6 znaków, zgodne potwierdzenie i inne hasło.|Нужно не менее 6 символов, совпадение подтверждения и иной пароль.|En az 6 karakter, eşleşen onay ve farklı parola gerekli.|مطلوب 6 أحرف على الأقل، وتأكيد مطابق، وكلمة مرور مختلفة.|Se requieren 6 caracteres, confirmación coincidente y contraseña diferente.
+Neues Initialpasswort (mindestens 6 Zeichen)|New initial password (at least 6 characters)|Nowe hasło początkowe (co najmniej 6 znaków)|Новый первоначальный пароль (не менее 6 символов)|Yeni ilk parola (en az 6 karakter)|كلمة مرور أولية جديدة (6 أحرف على الأقل)|Nueva contraseña inicial (mínimo 6 caracteres)
+Passwort (mindestens 6 Zeichen)|Password (at least 6 characters)|Hasło (co najmniej 6 znaków)|Пароль (не менее 6 символов)|Parola (en az 6 karakter)|كلمة المرور (6 أحرف على الأقل)|Contraseña (mínimo 6 caracteres)

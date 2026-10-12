@@ -61,7 +61,7 @@ class TfDetails(BaseModel):
 class TfCreate(Credentials, TfDetails):
     username: str = Field(pattern=r"^[1-9][0-9]{5}$", coerce_numbers_to_str=True)
     driver_type: Literal["route","border","both"] = "route"
-    password: str = Field(min_length=12)
+    password: str = Field(min_length=6)
     photo_base64: str | None = Field(default=None,max_length=6990510)
     last_name: str = Field(min_length=1, max_length=120)
     first_name: str = Field(min_length=1, max_length=120)

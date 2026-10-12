@@ -23,7 +23,7 @@ from .reports.service import process_dispatch
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.23")
+app = FastAPI(title="LokZeitleiste API", version="0.24")
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
@@ -607,3 +607,6 @@ def station_search(q: str='', _:User=Depends(require_admin),db:Session=Depends(d
 @app.get('/admin/tf-profile-ui.js')
 def tf_profile_script():
     return FileResponse(Path(__file__).parent/'static'/'tf-profile-ui.js',media_type='text/javascript')
+
+from .tf_portal import create_router as tf_portal_router
+app.include_router(tf_portal_router(require_account))

@@ -15,8 +15,8 @@ def main():
         raise SystemExit("Admin-Benutzername ungültig")
     username = sys.argv[1]
     password = sys.stdin.read(4097).rstrip("\r\n")
-    if not 12 <= len(password) <= 4096 or "\n" in password or "\r" in password:
-        raise SystemExit("Passwortdatei: genau eine Zeile mit 12 bis 4096 Zeichen erforderlich")
+    if not 6 <= len(password) <= 4096 or "\n" in password or "\r" in password:
+        raise SystemExit("Passwortdatei: genau eine Zeile mit 6 bis 4096 Zeichen erforderlich")
     with Session(engine()) as db:
         existing = db.scalar(select(User).where(User.username == username))
         if existing:

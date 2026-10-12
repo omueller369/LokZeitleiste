@@ -46,13 +46,13 @@ class StaffIn(BaseModel):
 
 class StaffCreate(StaffIn):
     username: str = Field(pattern=r'^[a-z0-9._-]{3,64}$')
-    initial_password: str = Field(min_length=12,max_length=4096)
+    initial_password: str = Field(min_length=6,max_length=4096)
 
 
 class PasswordChange(BaseModel):
     current_password: str = Field(max_length=4096)
-    new_password: str = Field(min_length=12,max_length=4096)
-    confirm_password: str = Field(min_length=12,max_length=4096)
+    new_password: str = Field(min_length=6,max_length=4096)
+    confirm_password: str = Field(min_length=6,max_length=4096)
 
     @model_validator(mode='after')
     def confirm(self):
@@ -62,4 +62,4 @@ class PasswordChange(BaseModel):
 
 
 class PasswordReset(BaseModel):
-    initial_password: str = Field(min_length=12,max_length=4096)
+    initial_password: str = Field(min_length=6,max_length=4096)

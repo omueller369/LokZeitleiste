@@ -1,0 +1,14 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TF Portal · LokZeitleiste</title><link rel="stylesheet" href="/tf/portal.css"><link rel="stylesheet" href="/responsive.css"><script src="/i18n.js" defer></script></head><body>
+<header><a class="brand" href="/tf">TF Portal</a><nav aria-label="TF Portal"><a href="/account">Mein Konto / Passwort</a><button id="logout" type="button">Abmelden</button></nav></header>
+<main><p id="identity" data-i18n-ignore></p><p id="message" role="status" aria-live="polite"></p>
+<section id="landing" hidden><h1>TF Portal</h1><p>Wählen Sie ein Modul.</p><div class="modules">
+<a class="module" href="/tf/arbeitsbericht"><span class="module-number">1</span><h2>Arbeitsbericht</h2><p>Details folgen später.</p></a>
+<a class="module" href="/tf/lokuebergabebuch"><span class="module-number">2</span><h2>Lokübergabebuch</h2><p>Details folgen später.</p></a>
+<a class="module" href="/tf/leuna-uebergabeprotokoll"><span class="module-number">3</span><h2>Leuna Übergabeprotokoll</h2><p>Details folgen später.</p></a>
+<a class="module" href="/tf/arbeitsplan"><span class="module-number">4</span><h2>Arbeitsplan</h2><p>Ihr Einsatzplan aus der Personalplanung.</p></a></div></section>
+<section id="placeholder" class="card" hidden><h1 id="moduleTitle"></h1><p>Details folgen später.</p></section>
+<section id="plan" hidden><h1>Arbeitsplan</h1><p>Ihr Einsatzplan aus der Personalplanung.</p><div class="card controls"><label>Monat<input id="period" type="month" min="2000-01" max="2100-12" required></label><button id="previous" type="button" aria-label="Vorheriger Monat">←</button><button id="next" type="button" aria-label="Nächster Monat">→</button><button id="reload" type="button">Aktualisieren</button></div>
+<section id="planContent" class="card" hidden><h2 id="periodTitle"></h2><div id="totals" class="metrics"></div><p>Der Plan wird durch die Personalplanung bearbeitet.</p>
+<div class="legend"><span class="status work">Arbeitstag</span><span class="status vacation">Urlaub</span><span class="status rest">Ruhetag</span><span class="status unplanned">Ungeplant</span><span class="status holiday">Feiertag</span></div>
+<div class="table-wrap"><table><thead><tr><th>Datum</th><th>Status</th><th>Schicht</th><th>Beginn</th><th>Ende</th><th>Sollstunden</th><th>Feiertag</th><th>Notiz</th></tr></thead><tbody id="days"></tbody></table></div></section></section>
+<footer><a id="home" href="/tf" hidden>Zurück zum TF Portal</a><a href="/my/worktime">Meine Arbeitszeiten</a></footer></main><script src="/tf/portal.js"></script></body></html>

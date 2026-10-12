@@ -46,6 +46,11 @@ class BootstrapAdminTest(unittest.TestCase):
         with Session(self.engine) as db:
             self.assertEqual(db.scalar(select(User)).role, "tf")
 
+    def test_six_character_admin_password(self):
+        self.run_bootstrap(password='abc123')
+        with Session(self.engine) as db:
+            self.assertTrue(verify_password('abc123',db.scalar(select(User)).password_hash))
+
     def test_invalid_credentials_do_not_create_users(self):
         for username, password in [("a", "valid-secret-12345"), ("admin", "short"),
                                    ("admin", "valid-secret-12345\nsecond-line")]:

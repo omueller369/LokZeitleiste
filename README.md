@@ -1,4 +1,4 @@
-# LokZeitleiste v0.23
+# LokZeitleiste v0.24
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -133,3 +133,9 @@ Das Geschlechtsfeld bietet „Männlich“, „Weiblich“, „Divers“ und „
 Eine ausdrücklich aufrufbare [Testdatenroutine](backend/lokzeitleiste/accounts/demo_tf/README.md) ersetzt alle TF einschließlich abhängiger Daten durch 20 fiktive Personen mit individuellen KI-Profilbildern. Die Routine erzeugt die gewünschten Geschlechts-/TF-Typen und BahnCard-Verteilungen, 40 Wochenstunden, 30 Urlaubstage, 787xxx-Logins, fünfstellige Personalnummern, fiktive Adressen und die gemeinsame E-Mail-Adresse. Initialpasswort: `tomcom123456`, anschließend verpflichtender Passwortwechsel. Die Ablaufdaten der BahnCards werden relativ zum Ausführungstag gewählt.
 
 Die tatsächliche Serverdatenbank wird erst durch `bash backend/testenv/control.sh demo-tf` zurückgesetzt. Normale Starts/Updates löschen keine TF. Ausführung, Sicherung, Verteilung und Bildprompts sind in der Anleitung dokumentiert.
+
+## TF Portal v0.24
+
+Nach dem TF-Login öffnet sich `/tf`: Arbeitsbericht, Lokübergabebuch und Leuna Übergabeprotokoll sind zunächst eigene Platzhalterseiten. Arbeitsplan (`/tf/arbeitsplan`) zeigt den eigenen aktuellen Monatsplan aus der Personalplanung, mit Monatswechsel, Schichtbeginn/-ende (einschließlich Folgetag), Sollstunden, Notizen und diagonal gefärbten Feiertags-/Statusmarkierungen. TF können diesen Plan nur lesen. Die Anzeige ist mobil nutzbar und in allen sieben Sprachen übersetzt. Eigene Arbeitszeiterfassung und Passwortwechsel bleiben erreichbar.
+
+Passwörter können ab v0.24 sechs Zeichen lang sein: TF-/Verwaltungskontoanlage, Administrator-Bootstrap, Passwortwechsel und administrativer Reset verwenden mindestens sechs Zeichen. Der verpflichtende Erstwechsel und das Beenden alter Sitzungen bei Passwortänderungen bleiben erhalten. Bestehende Passwortprüfwerte bleiben gültig. Die Android-Passwortwechselmaske akzeptiert ebenfalls sechs Zeichen; das neue TF Portal ist die Weboberfläche.

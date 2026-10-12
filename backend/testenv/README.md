@@ -48,7 +48,7 @@ sudo bash testenv/control.sh start
 sudo bash testenv/control.sh admin
 ```
 
-Beim letzten Befehl eigenen Admin-Benutzernamen und ein Passwort mit mindestens zwölf Zeichen vergeben. `prepare.sh` erzeugt `.env.test` mit zufälligen MySQL-Passwörtern und ein ein Jahr gültiges Testzertifikat mit Hostname `mailpit`. API und Worker vertrauen diesem Zertifikat über `SSL_CERT_FILE`; die TLS-Prüfung bleibt aktiv. Die geheimen Dateien werden weder ins Repository noch ins Docker-Build kopiert. Wiederholtes Vorbereiten behält Passwörter und Zertifikat bei. Nach Ablauf das Zertifikat bei gestopptem Stack erneuern und API, Worker und Mailpit neu starten.
+Beim letzten Befehl eigenen Admin-Benutzernamen und ein Passwort mit mindestens sechs Zeichen vergeben. `prepare.sh` erzeugt `.env.test` mit zufälligen MySQL-Passwörtern und ein ein Jahr gültiges Testzertifikat mit Hostname `mailpit`. API und Worker vertrauen diesem Zertifikat über `SSL_CERT_FILE`; die TLS-Prüfung bleibt aktiv. Die geheimen Dateien werden weder ins Repository noch ins Docker-Build kopiert. Wiederholtes Vorbereiten behält Passwörter und Zertifikat bei. Nach Ablauf das Zertifikat bei gestopptem Stack erneuern und API, Worker und Mailpit neu starten.
 
 Der Worker startet erst nach Datenbankinitialisierung und erfolgreicher API-Gesundheitsprüfung. Bei einer neuen Installation legt das Backend alle Tabellen an. Vorhandene Produktionsdaten niemals in diesen Stack einspielen.
 

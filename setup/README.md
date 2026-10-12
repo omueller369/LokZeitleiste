@@ -35,7 +35,7 @@ Die Python-Pakete werden beim Containerbuild anhand von `backend/requirements.tx
 
 Der empfohlene Einstieg ist `sudo bash setup.sh`. Alternativ: `sudo bash setup/install-ubuntu.sh --auto-admin`. Für selbst festgelegte Zugangsdaten:
 
-Für eine unbeaufsichtigte Installation eine Passwortdatei außerhalb des Repositorys mit genau einer Zeile und einem Passwort von mindestens zwölf Zeichen bereitstellen. Dateirechte auf `600` setzen. Keine Zugangsdaten in Git speichern.
+Für eine unbeaufsichtigte Installation eine Passwortdatei außerhalb des Repositorys mit genau einer Zeile und einem Passwort von mindestens sechs Zeichen bereitstellen. Dateirechte auf `600` setzen. Keine Zugangsdaten in Git speichern.
 
 ```bash
 chmod 600 /geschuetzter/pfad/admin-passwort

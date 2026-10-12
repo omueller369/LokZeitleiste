@@ -26,14 +26,14 @@ fun PasswordChangeScreen(username: String, token: String, mandatory: Boolean = f
         if (mandatory) LocalizedText("Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.")
         OutlinedTextField(current, { current = it }, enabled = !busy, label = { LocalizedText("Aktuelles Passwort") },
             visualTransformation = PasswordVisualTransformation())
-        OutlinedTextField(new, { new = it }, enabled = !busy, label = { LocalizedText("Neues Passwort (mindestens 12 Zeichen)") },
+        OutlinedTextField(new, { new = it }, enabled = !busy, label = { LocalizedText("Neues Passwort (mindestens 6 Zeichen)") },
             visualTransformation = PasswordVisualTransformation())
         OutlinedTextField(confirm, { confirm = it }, enabled = !busy, label = { LocalizedText("Passwort wiederholen") },
             visualTransformation = PasswordVisualTransformation())
         if (error.isNotBlank()) LocalizedText(error, color = MaterialTheme.colorScheme.error)
         Button(enabled = !busy, onClick = {
-            if (new.length < 12 || new != confirm || new == current) {
-                error = "Mindestens zwölf Zeichen, gleiche Bestätigung und ein anderes Passwort erforderlich."
+            if (new.length < 6 || new != confirm || new == current) {
+                error = "Mindestens sechs Zeichen, gleiche Bestätigung und ein anderes Passwort erforderlich."
             } else {
                 busy = true; error = ""
                 scope.launch {

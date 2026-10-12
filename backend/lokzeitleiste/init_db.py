@@ -22,7 +22,7 @@ def main():
         name = input("Admin-Benutzername: ").strip().lower()
         if not 3 <= len(name) <= 64 or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in name):
             raise SystemExit("Ungültiger Benutzername")
-        password = getpass.getpass("Admin-Passwort (mindestens 12 Zeichen): ")
+        password = getpass.getpass("Admin-Passwort (mindestens 6 Zeichen): ")
         with Session(engine()) as db:
             if db.scalar(select(User).where(User.username == name)):
                 raise SystemExit("Benutzername bereits vorhanden")
