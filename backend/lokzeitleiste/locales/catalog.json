@@ -850,7 +850,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Ungültiger oder verschlüsselter PDF-Beleg.",
     "Ungültiger Bildbeleg.": "Ungültiger Bildbeleg.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Bitte PDF, JPEG oder PNG als Beleg wählen.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht",
+    "Neuen Arbeitsbericht erstellen": "Neuen Arbeitsbericht erstellen",
+    "Arbeitsberichte des Monats": "Arbeitsberichte des Monats",
+    "Arbeitszeiten des ausgewählten Monats": "Arbeitszeiten des ausgewählten Monats",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Berichtszeile anklicken, um alle Daten und Belege zu laden.",
+    "Keine Arbeitsberichte für diesen Monat.": "Keine Arbeitsberichte für diesen Monat.",
+    "Bericht": "Bericht"
   },
   "en": {
     "Administration": "Administration",
@@ -1703,7 +1709,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Invalid or encrypted PDF receipt.",
     "Ungültiger Bildbeleg.": "Invalid image receipt.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Please choose PDF, JPEG or PNG for the receipt.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: receipt for work report"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: receipt for work report",
+    "Neuen Arbeitsbericht erstellen": "Create new work report",
+    "Arbeitsberichte des Monats": "Monthly work reports",
+    "Arbeitszeiten des ausgewählten Monats": "Working times for the selected month",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Click a report row to load all data and receipts.",
+    "Keine Arbeitsberichte für diesen Monat.": "No work reports for this month.",
+    "Bericht": "Report"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2556,7 +2568,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Nieprawidłowy lub zaszyfrowany rachunek PDF.",
     "Ungültiger Bildbeleg.": "Nieprawidłowy obraz rachunku.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Wybierz rachunek PDF, JPEG lub PNG.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: rachunek do raportu pracy"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: rachunek do raportu pracy",
+    "Neuen Arbeitsbericht erstellen": "Utwórz nowy raport pracy",
+    "Arbeitsberichte des Monats": "Raporty pracy za miesiąc",
+    "Arbeitszeiten des ausgewählten Monats": "Czas pracy w wybranym miesiącu",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Kliknij wiersz raportu, aby wczytać wszystkie dane i rachunki.",
+    "Keine Arbeitsberichte für diesen Monat.": "Brak raportów pracy za ten miesiąc.",
+    "Bericht": "Raport"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3409,7 +3427,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Неверный или зашифрованный чек PDF.",
     "Ungültiger Bildbeleg.": "Некорректное изображение чека.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Выберите чек PDF, JPEG или PNG.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: чек к рабочему отчёту"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: чек к рабочему отчёту",
+    "Neuen Arbeitsbericht erstellen": "Создать новый рабочий отчёт",
+    "Arbeitsberichte des Monats": "Рабочие отчёты за месяц",
+    "Arbeitszeiten des ausgewählten Monats": "Рабочее время за выбранный месяц",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Нажмите строку отчёта, чтобы загрузить все данные и чеки.",
+    "Keine Arbeitsberichte für diesen Monat.": "Нет рабочих отчётов за этот месяц.",
+    "Bericht": "Отчёт"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -4262,7 +4286,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Geçersiz veya şifreli PDF makbuzu.",
     "Ungültiger Bildbeleg.": "Geçersiz resim makbuzu.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Makbuz için PDF, JPEG veya PNG seçin.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: çalışma raporu makbuzu"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: çalışma raporu makbuzu",
+    "Neuen Arbeitsbericht erstellen": "Yeni çalışma raporu oluştur",
+    "Arbeitsberichte des Monats": "Aylık çalışma raporları",
+    "Arbeitszeiten des ausgewählten Monats": "Seçilen ayın çalışma saatleri",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Tüm verileri ve makbuzları yüklemek için rapor satırına tıklayın.",
+    "Keine Arbeitsberichte für diesen Monat.": "Bu ay için çalışma raporu yok.",
+    "Bericht": "Rapor"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -5115,7 +5145,13 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "إيصال PDF غير صالح أو مشفر.",
     "Ungültiger Bildbeleg.": "إيصال صورة غير صالح.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "يرجى اختيار PDF أو JPEG أو PNG للإيصال.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: إيصال تقرير العمل"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: إيصال تقرير العمل",
+    "Neuen Arbeitsbericht erstellen": "إنشاء تقرير عمل جديد",
+    "Arbeitsberichte des Monats": "تقارير العمل الشهرية",
+    "Arbeitszeiten des ausgewählten Monats": "أوقات العمل للشهر المحدد",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "انقر صف التقرير لتحميل جميع البيانات والإيصالات.",
+    "Keine Arbeitsberichte für diesen Monat.": "لا توجد تقارير عمل لهذا الشهر.",
+    "Bericht": "تقرير"
   },
   "es": {
     "Administration": "Administración",
@@ -5968,6 +6004,12 @@
     "Ungültiger oder verschlüsselter PDF-Beleg.": "Recibo PDF no válido o cifrado.",
     "Ungültiger Bildbeleg.": "Recibo de imagen no válido.",
     "Bitte PDF, JPEG oder PNG als Beleg wählen.": "Elija PDF, JPEG o PNG para el recibo.",
-    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: recibo del informe de trabajo"
+    "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht": "LokZeitleiste: recibo del informe de trabajo",
+    "Neuen Arbeitsbericht erstellen": "Crear nuevo informe de trabajo",
+    "Arbeitsberichte des Monats": "Informes de trabajo del mes",
+    "Arbeitszeiten des ausgewählten Monats": "Horas de trabajo del mes seleccionado",
+    "Berichtszeile anklicken, um alle Daten und Belege zu laden.": "Haga clic en una fila para cargar todos los datos y recibos.",
+    "Keine Arbeitsberichte für diesen Monat.": "No hay informes de trabajo para este mes.",
+    "Bericht": "Informe"
   }
 }
