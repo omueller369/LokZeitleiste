@@ -113,10 +113,12 @@ class EntryIn(BaseModel):
         if self.kind == "Rufbereitschaft":
             if begin < 480 or finish > 1200 or finish <= begin or span > 480:
                 raise ValueError("Rufbereitschaft: 08:00–20:00 Uhr, höchstens acht Stunden")
-        elif self.kind == "Bereitschaft" and span > 480:
-            raise ValueError("Bereitschaft: vorläufig höchstens acht Stunden")
+        elif self.kind in ("Bereitschaft","Ausfallschicht") and span > 480:
+            raise ValueError("Bereitschaft/Ausfallschicht: höchstens acht Stunden")
         if self.kind in ("Rufbereitschaft", "Bereitschaft"):
-            if self.pause or self.guest or self.note:
+            if self.pause >= span or self.guest > span:
+                raise ValueError("Pause und Gastfahrt müssen in den Zeitraum passen")
+            if self.note:
                 raise ValueError("Bereitschaft enthält nur Zeitraum und Unterkunft")
             if self.away and (not self.accommodation or (self.accommodation == "Hotel" and not self.hotel_name.strip())):
                 raise ValueError("Auswärtige Bereitschaft benötigt Unterkunft und ggf. Hotelnamen")

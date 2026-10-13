@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,time
 from typing import Literal
 from uuid import UUID
 from pydantic import BaseModel,Field,field_validator,model_validator
@@ -45,6 +45,7 @@ class GuestIn(BaseModel):
 
 
 class ReportIn(BaseModel):
+    kind:Literal['Sonstige Erfassung','Bereitschaft','Rufbereitschaft','Ausfallschicht','Urlaub','Krank']='Sonstige Erfassung'
     client_id:UUID
     start_at:datetime
     end_at:datetime
@@ -58,8 +59,15 @@ class ReportIn(BaseModel):
     def validate_report(self):
         duration=minutes(self.start_at,self.end_at)
         if duration<=0:raise ValueError('Dienstende muss nach Dienstbeginn liegen.')
-        self.overrun_reason=self.overrun_reason.strip()
-        if duration>720 and not self.overrun_reason:raise ValueError('Bei mehr als zwölf Stunden ist eine Begründung erforderlich.')
+        if self.kind in ('Bereitschaft','Rufbereitschaft','Ausfallschicht') and duration>480:
+            raise ValueError('Diese Dienstart darf höchstens acht Stunden dauern.')
+        if self.kind=='Rufbereitschaft' and (self.start_at.date()!=self.end_at.date() or self.start_at.time()<time(8) or self.end_at.time()>time(20)):
+            raise ValueError('Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.')
+        if self.kind in ('Urlaub','Krank'):
+            if self.start_at.date()!=self.end_at.date():raise ValueError('Urlaub und Krank werden je Tag einzeln erfasst.')
+            if self.trips or self.actual_pause:raise ValueError('Urlaub und Krank enthalten keine Gastfahrten oder Pausen.')
+        self.overrun_reason=self.overrun_reason.strip() if self.kind=='Sonstige Erfassung' else ''
+        if self.kind=='Sonstige Erfassung' and duration>720 and not self.overrun_reason:raise ValueError('Bei mehr als zwölf Stunden ist eine Begründung erforderlich.')
         if self.actual_pause>=duration:raise ValueError('Die tatsächliche Pause muss kürzer als der Dienst sein.')
         ordered=sorted(self.trips,key=lambda t:t.start_at)
         for index,trip in enumerate(ordered):

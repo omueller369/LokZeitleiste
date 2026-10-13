@@ -1,11 +1,13 @@
 import json
-from datetime import datetime
+from datetime import datetime,time,timedelta
 from ..records.service import is_locked
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from ..models import User,WorkMonth,WorkEntry,WorkEntryAudit,DutyReport,DutyGuestTrip,RailwayStation
-from ..reports.intervals import set_end_date
+from ..reports.intervals import set_end_date,period_entries,interval
+from ..reports.absence import is_rest_day
+from ..reports.daily import WORK_KINDS
 from ..worktime.service import validate_no_overlap
 from .schemas import minutes,minimum_pause
 
@@ -19,10 +21,14 @@ def report_view(db,report):
     start=datetime.fromisoformat(payload['start_at']);end=datetime.fromisoformat(payload['end_at'])
     guest_total=sum(minutes(datetime.fromisoformat(t['start_at']),datetime.fromisoformat(t['end_at'])) for t in payload['trips'])
     guest_inside=sum(max(0,minutes(max(start,datetime.fromisoformat(t['start_at'])),min(end,datetime.fromisoformat(t['end_at'])))) for t in payload['trips'])
+    payload.setdefault('kind','Sonstige Erfassung')
+    rest=is_rest_day(db,report.tf_user_id,start.date()) if payload['kind'] in ('Urlaub','Krank') else False
+    credit=(0 if rest else 480) if payload['kind'] in ('Urlaub','Krank') else minutes(start,end)
     entry=db.get(WorkEntry,report.entry_id)
     return dict(id=report.id,entry_id=report.entry_id,**payload,
                 duration_minutes=minutes(datetime.fromisoformat(payload['start_at']),datetime.fromisoformat(payload['end_at'])),
-                minimum_pause_minutes=minimum_pause(minutes(datetime.fromisoformat(payload['start_at']),datetime.fromisoformat(payload['end_at']))),
+                minimum_pause_minutes=minimum_pause(minutes(start,end)) if payload['kind']=='Sonstige Erfassung' else 0,
+                credited_minutes=credit,is_rest_day=rest,
                 guest_total_minutes=guest_total,guest_minutes=guest_inside,external_guest_minutes=guest_total-guest_inside,
                 locked=is_locked(db,entry.id))
 
@@ -34,6 +40,7 @@ def save_report(db,user,data):
         # Historical reports have no station names. Compare the actual duty/trip data;
         # keep the original station-name snapshot on retries and catalog changes.
         def identity(payload):
+            payload.setdefault('kind','Sonstige Erfassung')
             for trip in payload['trips']:
                 trip.pop('start_station_name',None);trip.pop('end_station_name',None)
             return payload
@@ -46,11 +53,18 @@ def save_report(db,user,data):
             if not station:raise HTTPException(422,'Unbekanntes DS100-Kürzel: '+code)
             setattr(trip,name_field,station.name)
     normalized=data.model_dump_json()
+    # An absence occupies a calendar day, regardless of the display times.
+    first=data.start_at.date();last=(data.end_at-timedelta(minutes=1)).date()
+    for other in period_entries(db,user.id,first,last,lock=True):
+        begin,end=interval(other)
+        if other.kind in ('Urlaub','Krank') or data.kind in ('Urlaub','Krank'):
+            if begin<datetime.combine(last+timedelta(days=1),time.min) and end>datetime.combine(first,time.min) and other.kind in WORK_KINDS|{'Urlaub','Krank'}:
+                raise HTTPException(409,'Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.')
     duplicate=db.scalar(select(WorkEntry.id).join(WorkMonth).where(WorkMonth.tf_user_id==user.id,WorkEntry.client_id==str(data.client_id)))
     if duplicate:raise HTTPException(409,'Diese Erfassung ist bereits vorhanden.')
     period=db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id==user.id,WorkMonth.year==data.start_at.year,WorkMonth.month==data.start_at.month))
     if not period:period=WorkMonth(tf_user_id=user.id,year=data.start_at.year,month=data.start_at.month);db.add(period);db.flush()
-    entry=WorkEntry(work_month_id=period.id,client_id=str(data.client_id),kind='Sonstige Erfassung',entry_date=data.start_at.date(),
+    entry=WorkEntry(work_month_id=period.id,client_id=str(data.client_id),kind=data.kind,entry_date=data.start_at.date(),
         start_time=data.start_at.strftime('%H:%M'),end_time=data.end_at.strftime('%H:%M'),pause_minutes=data.actual_pause,
         guest_minutes=sum(max(0,minutes(max(t.start_at,data.start_at),min(t.end_at,data.end_at))) for t in data.trips),note=data.overrun_reason)
     db.add(entry);set_end_date(entry,data.end_at.date());db.flush()

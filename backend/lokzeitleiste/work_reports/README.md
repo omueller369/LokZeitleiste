@@ -19,6 +19,17 @@ Beispiele: 10:01 h → 46 Minuten, 11:00 h → 105 Minuten, 12:00 h → 165 Minu
 
 **Tatsächliche Pause** wird separat eingegeben. Der berechnete Mindestwert wird nicht automatisch als tatsächlich genommen verbucht. Pausen werden nur dokumentiert und **niemals von der Arbeitszeit abgezogen**. Tages-, Wochen-, Monats-, Jahres- und PDF-Auswertungen sowie die Offline-Berechnung der Android-App verwenden die volle Dienstspanne. Nacht-, Sonn- und Feiertagsstunden werden ebenfalls ohne Pausenabzug berechnet. Eine Unterschreitung der berechneten Mindestpause wird angezeigt, ohne die Erfassung der tatsächlich geleisteten Zeit zu verhindern.
 
+## Dienstarten
+
+Direkt unter Beginn und Ende stehen fünf Checkboxen. Höchstens eine ist gewählt; ohne Auswahl gilt der normale Dienst (`Sonstige Erfassung`). Die Auswahl bleibt im lokalen Entwurf und in der Synchronisationswarteschlange erhalten und wird beim Zeilenklick wiederhergestellt.
+
+- Bereitschaft: volle Zeit, maximal acht Stunden, keine Mindestpause.
+- Rufbereitschaft: volle Zeit, maximal acht Stunden, ausschließlich 08:00–20:00 Uhr am selben Kalendertag, keine Mindestpause.
+- Ausfallschicht: volle Zeit, maximal acht Stunden, keine Mindestpause.
+- Urlaub und Krank: jeweils acht Stunden pro Kalendertag; bei `Ruhetag` in der aktuellen Personalplanung null Stunden. Die Zeitfelder dienen der Datumsauswahl; Beginn und Ende müssen am selben Tag liegen. Gastfahrten und Pausen sind bei diesen Abwesenheiten nicht vorgesehen.
+
+Die Regeln werden im Browser und unabhängig davon im Backend geprüft. Die kanonischen Arbeitszeiteinträge behalten die Dienstart. Rufbereitschaft und Ausfallschicht werden auch in Tages-, Wochen- und Monatsübersichten vollständig als Zeit berücksichtigt. Urlaub/Krank erscheinen dort als Abwesenheitsgutschrift. Die Ruhetagsprüfung bleibt dynamisch: Änderungen der Personalplanung aktualisieren die Gutschrift. Offline werden zwischengespeicherte Planmonate verwendet; ohne verfügbaren Plan wird keine ungesicherte Urlaub-/Krank-Gutschrift lokal gespeichert. Doppelbuchungen und Arbeitszeit/Abwesenheit am selben Tag werden abgelehnt.
+
 ## Gastfahrten
 
 Bis zu 50 Gastfahrten je Dienst: DS100-Abfahrts-/Ankunftscode oder Volltextsuche im Bahnhofsname mit Suchvorschlägen, Start-/Enddatum und Uhrzeit, Zug, Auto, Taxi, ÖPNV oder anderes Verkehrsmittel mit Pflichtfreitext bis 140 Zeichen. Die Auswahl zeigt `DS100 · Bahnhofsname`. Übertragen werden Code und vollständiger Name in getrennten Feldern (`start_station`, `start_station_name`, `end_station`, `end_station_name`). Der Server prüft die Codes und speichert die Namen aus der Bahnhofsdatenbank als Snapshot im Bericht; bei alten Berichten ohne Snapshot ergänzt die Anzeige den aktuellen Katalognamen. Gastfahrten können vor, während und nach dem Dienst liegen und überschneiden sich untereinander nicht. Der Beginn wird mit dem Dienstbeginn vorbelegt, das Ende mit 60 Minuten danach. Bei Änderung des Gastfahrtbeginns folgt das noch automatisch vorbelegte Ende; ein manuell eingegebenes gültiges Ende bleibt erhalten. Das Dienstende wird ebenfalls zunächst 60 Minuten nach Dienstbeginn vorbelegt und muss stets später liegen. **Gastfahrt speichern** fügt die ausgefüllte Fahrt zum Dienst und zur Gastfahrttabelle hinzu. Bearbeiten und Entfernen sind vor der Synchronisation möglich. Mit **Arbeitszeit speichern** wird anschließend der vollständige Dienst einschließlich Gastfahrten lokal abgelegt. Die Tabelle zeigt Start, Ende, Dauer, Verkehrsmittel und DS100-Codes; darunter steht die Summe.

@@ -113,7 +113,7 @@ class ApiFlowTest(unittest.TestCase):
             self.assertEqual([r.status for r in db.query(ReportDispatch).all()], ["sent", "sent"])
         summary = self.client.get("/api/v1/me/months/2026/9/summary", headers=headers_one)
         self.assertEqual(summary.status_code, 200, summary.text)
-        self.assertEqual(summary.json()["totals"]["credited"], 960)
+        self.assertEqual(summary.json()["totals"]["credited"], 480)
         self.assertEqual(summary.json()["totals"]["night"], 480)
         self.assertEqual(self.client.get("/api/v1/me/months/2026/9/summary", headers=headers_two).json()["days"], [])
 

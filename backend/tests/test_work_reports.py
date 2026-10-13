@@ -1,5 +1,5 @@
 import io,json,unittest
-from datetime import datetime,timedelta
+from datetime import date,datetime,timedelta
 from uuid import uuid4
 from unittest.mock import patch
 from fastapi.testclient import TestClient
@@ -9,7 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 import test_accounts
 from lokzeitleiste.main import app
-from lokzeitleiste.models import DutyReport,DutyReceipt,DutyGuestTrip,WorkEntry,WorkEntryLock,RailwayStation,User,UserLocale
+from lokzeitleiste.models import DutyReport,DutyReceipt,DutyGuestTrip,WorkEntry,WorkEntryLock,RailwayStation,User,UserLocale,PlanDay,PlanMonth
 from lokzeitleiste.work_reports.schemas import minimum_pause,ReportIn
 from lokzeitleiste.work_reports.receipts import process_receipt,validate_receipt
 from lokzeitleiste.accounts.seed_demo_tf import replace_all_tf
@@ -80,6 +80,56 @@ class WorkReportsTest(unittest.TestCase):
         for change in [dict(end_at='2026-10-12T08:00'),dict(transport='other',transport_detail=''),dict(transport='other',transport_detail='X'*141),dict(transport='boat')]:
             data=self.payload();data['trips'][0].update(change);self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
         data=self.payload();data['trips'].append(dict(data['trips'][0]));self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+    def test_special_duty_limits_and_credit(self):
+        for day,kind,start,end in [(14,'Bereitschaft','23:00','07:00'),(16,'Rufbereitschaft','08:00','16:00'),(17,'Ausfallschicht','09:00','17:00')]:
+            finish=day+1 if end<start else day
+            data=self.payload(start=f'2026-10-{day}T{start}',end=f'2026-10-{finish}T{end}')
+            data.update(kind=kind,actual_pause=0,trips=[])
+            report=self.create(data)
+            self.assertEqual((report['kind'],report['credited_minutes'],report['minimum_pause_minutes']),(kind,480,0))
+            self.assertEqual(self.create(data)['id'],report['id'])
+        for kind in ('Bereitschaft','Rufbereitschaft','Ausfallschicht'):
+            data=self.payload(start='2026-10-18T08:00',end='2026-10-18T16:01');data.update(kind=kind,actual_pause=0,trips=[])
+            self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+        for start,end in [('2026-10-18T07:59','2026-10-18T08:59'),('2026-10-18T19:01','2026-10-18T20:01'),('2026-10-18T19:00','2026-10-19T01:00')]:
+            data=self.payload(start=start,end=end);data.update(kind='Rufbereitschaft',trips=[],actual_pause=0)
+            self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
+        self.assertEqual(month['work_minutes'],1440)
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
+        self.assertEqual(sum(d['work'] for d in canonical['days']),1440)
+        short=self.payload(start='2026-10-19T09:00',end='2026-10-19T12:00');short.update(kind='Ausfallschicht',actual_pause=0,trips=[])
+        self.assertEqual(self.create(short)['credited_minutes'],180)
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
+        self.assertEqual(next(d for d in canonical['days'] if d['date']=='2026-10-19')['credited'],180)
+
+    def test_absence_credit_on_rest_days_and_plan_updates(self):
+        with Session(self.engine) as db:
+            period=PlanMonth(tf_user_id=self.tf,year=2026,month=10);db.add(period);db.flush()
+            db.add_all([PlanDay(plan_month_id=period.id,day=date(2026,10,14),kind='Ruhetag',note=''),PlanDay(plan_month_id=period.id,day=date(2026,10,16),kind='Ruhetag',note='')]);db.commit()
+        for day,kind,credit in [(14,'Urlaub',0),(15,'Urlaub',480),(16,'Krank',0),(17,'Krank',480)]:
+            data=self.payload(start=f'2026-10-{day}T09:00',end=f'2026-10-{day}T10:00');data.update(kind=kind,actual_pause=0,trips=[])
+            report=self.create(data);self.assertEqual(report['credited_minutes'],credit)
+            self.assertEqual(self.create(data)['id'],report['id'])
+            another=dict(data,client_id=str(uuid4()))
+            self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=another).status_code,409)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],960)
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(sum(d['credited'] for d in canonical['days']),960)
+        with Session(self.engine) as db:
+            day=db.scalar(select(PlanDay).where(PlanDay.day==date(2026,10,14)));day.kind='Arbeitstag';db.commit()
+        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()['work_minutes'],1440)
+        self.assertEqual(sum(d['credited'] for d in self.driver.get('/api/v1/account/worktime/months/2026/10').json()['days']),1440)
+        long_absence=self.payload(start='2026-10-18T06:00',end='2026-10-18T22:00');long_absence.update(kind='Krank',actual_pause=0,trips=[])
+        self.assertEqual(self.create(long_absence)['credited_minutes'],480)
+        bad=self.payload(start='2026-10-19T23:00',end='2026-10-20T01:00');bad.update(kind='Krank',actual_pause=0,trips=[])
+        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=bad).status_code,422)
+
+    def test_legacy_report_kind_and_retries(self):
+        data=self.payload();report=self.create(data)
+        with Session(self.engine) as db:
+            r=db.get(DutyReport,report['id']);payload=json.loads(r.payload_json);payload.pop('kind');r.payload_json=json.dumps(payload);db.commit()
+        self.assertEqual(self.create(data)['kind'],'Sonstige Erfassung')
+
     def test_pause_is_documented_without_work_deduction(self):
         data=self.payload();data['actual_pause']=120
         # A guest journey may occupy the entire duty; pauses are independent documentation.

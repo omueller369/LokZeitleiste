@@ -12,6 +12,7 @@ from ..tf_portal import driver_dependency
 from ..records.service import assert_unlocked
 from .schemas import ReportIn
 from .service import save_report,report_view
+from ..reports.absence import absence_minutes
 from .receipts import MAX_FILE,validate_receipt,recipient,receipt_view,process_receipt
 
 
@@ -59,6 +60,12 @@ def create_router(require_account):
             end=max(datetime.combine(day+timedelta(days=1) if r.end==time.min else day,r.end) for r in rows)
             days.append(dict(date=day.isoformat(),start_at=datetime.combine(day,min(r.start for r in rows)).isoformat(),end_at=end.isoformat(),
                 work_minutes=sum(r.work for r in rows),guest_minutes=sum(r.guest for r in rows),pause_minutes=sum(r.pause for r in rows)))
+        by_date={d['date']:d for d in days}
+        for entry in entries:
+            if entry.kind in ('Urlaub','Krank') and first<=entry.entry_date<=last:
+                day=entry.entry_date.isoformat()
+                if day not in by_date:
+                    row=dict(date=day,start_at=None,end_at=None,work_minutes=absence_minutes(entry),guest_minutes=0,pause_minutes=0);days.append(row);by_date[day]=row
         period_start=datetime.combine(first,time.min);period_end=datetime.combine(last+timedelta(days=1),time.min)
         guest_report_ids=select(DutyGuestTrip.report_id).where(DutyGuestTrip.start_at<period_end,DutyGuestTrip.end_at>period_start)
         reports=db.scalars(select(DutyReport).where(DutyReport.tf_user_id==user.id,or_(DutyReport.entry_id.in_([e.id for e in entries]),DutyReport.id.in_(guest_report_ids))).order_by(DutyReport.id.desc())).all()

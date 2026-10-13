@@ -878,7 +878,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Arbeitszeit (Gastfahrten im Dienst enthalten)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Arbeitszeit einschließlich dokumentierter Pausen",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Gastfahrtzeit im Dienst überschreitet die Dienstzeit."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.",
+    "Dienstart": "Dienstart",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "Diese Dienstart darf höchstens acht Stunden dauern.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Geplanter Ruhetag: keine Anrechnung.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "Urlaub und Krank werden mit acht Stunden angerechnet.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "Maximal acht Stunden. Keine Pause erforderlich.",
+    "Angerechnete Arbeitszeit": "Angerechnete Arbeitszeit",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Bereitschaft/Ausfallschicht: höchstens acht Stunden"
   },
   "en": {
     "Administration": "Administration",
@@ -1759,7 +1771,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Working time (includes passenger journeys within duty)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Working time including documented breaks",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Breaks are documented and are not deducted from working time.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Passenger journey time within duty exceeds the duty duration."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Passenger journey time within duty exceeds the duty duration.",
+    "Dienstart": "Duty type",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Select one duty type. With no selection, a normal duty is recorded.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "This duty type may last at most eight hours.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "On-call duty is only permitted between 08:00 and 20:00 on the same day.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "Vacation and sick leave contain no passenger journeys or breaks.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "Working time or an absence is already recorded for this day.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "The personnel plan must be loaded before recording vacation or sick leave.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Planned rest day: no credit.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "Vacation and sick leave are credited with eight hours.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "At most eight hours. No break required.",
+    "Angerechnete Arbeitszeit": "Credited working time",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Standby/cancelled shift: at most eight hours"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2640,7 +2664,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Czas pracy (obejmuje przejazdy pasażerskie w czasie służby)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Czas pracy z uwzględnieniem udokumentowanych przerw",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Przerwy są dokumentowane i nie są odliczane od czasu pracy.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Czas przejazdów w trakcie służby przekracza czas służby."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Czas przejazdów w trakcie służby przekracza czas służby.",
+    "Dienstart": "Rodzaj służby",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Wybierz jeden rodzaj służby. Bez wyboru zapisywana jest zwykła służba.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "Ten rodzaj służby może trwać najwyżej osiem godzin.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "Dyżur pod telefonem jest dozwolony tylko od 08:00 do 20:00 tego samego dnia.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "Urlop i choroba nie zawierają przejazdów pasażerskich ani przerw.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "Na ten dzień zapisano już czas pracy lub nieobecność.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "Przed zapisaniem urlopu lub choroby należy wczytać plan personelu.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Zaplanowany dzień odpoczynku: brak zaliczenia godzin.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "Urlop i choroba są zaliczane jako osiem godzin.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "Najwyżej osiem godzin. Przerwa nie jest wymagana.",
+    "Angerechnete Arbeitszeit": "Zaliczony czas pracy",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Gotowość/odwołana zmiana: najwyżej osiem godzin"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3521,7 +3557,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Рабочее время (включая служебные поездки в пределах смены)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Рабочее время с учётом документированных перерывов",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Перерывы документируются и не вычитаются из рабочего времени.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Время служебных поездок в пределах смены превышает её длительность."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Время служебных поездок в пределах смены превышает её длительность.",
+    "Dienstart": "Тип смены",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Выберите один тип смены. Без выбора записывается обычная смена.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "Этот тип смены может длиться не более восьми часов.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "Дежурство по вызову допустимо только с 08:00 до 20:00 в один день.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "Отпуск и болезнь не включают служебных поездок или перерывов.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "На этот день уже записано рабочее время или отсутствие.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "Для записи отпуска или болезни сначала загрузите план персонала.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Плановый выходной: часы не начисляются.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "Отпуск и болезнь учитываются как восемь часов.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "Не более восьми часов. Перерыв не требуется.",
+    "Angerechnete Arbeitszeit": "Учтённое рабочее время",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Дежурство/отменённая смена: не более восьми часов"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -4402,7 +4450,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Çalışma süresi (görev sırasındaki yolcu yolculukları dahil)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Belgelenen molalar dahil çalışma süresi",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Molalar belgelenir ve çalışma süresinden düşülmez.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Görev sırasındaki yolcu yolculuğu süresi görev süresini aşıyor."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "Görev sırasındaki yolcu yolculuğu süresi görev süresini aşıyor.",
+    "Dienstart": "Görev türü",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Bir görev türü seçin. Seçim yapılmazsa normal görev kaydedilir.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "Bu görev türü en fazla sekiz saat sürebilir.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "Çağrı nöbeti yalnızca aynı gün 08:00 ile 20:00 arasında yapılabilir.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "İzin ve hastalık kaydında yolcu yolculuğu veya mola bulunmaz.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "Bu gün için çalışma süresi veya devamsızlık zaten kayıtlı.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "İzin veya hastalık kaydı için önce personel planı yüklenmelidir.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Planlanan dinlenme günü: süre sayılmaz.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "İzin ve hastalık sekiz saat olarak sayılır.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "En fazla sekiz saat. Mola gerekli değildir.",
+    "Angerechnete Arbeitszeit": "Hesaba katılan çalışma süresi",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Nöbet/iptal edilen vardiya: en fazla sekiz saat"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -5283,7 +5343,19 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "وقت العمل (يشمل رحلات الانتقال خلال المناوبة)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "وقت العمل شاملًا فترات الراحة الموثقة",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "تُوثق فترات الراحة ولا تُخصم من وقت العمل.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "وقت رحلات الانتقال خلال المناوبة يتجاوز مدتها."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "وقت رحلات الانتقال خلال المناوبة يتجاوز مدتها.",
+    "Dienstart": "نوع المناوبة",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "اختر نوع مناوبة واحدًا. دون اختيار تُسجل مناوبة عادية.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "يمكن أن يستمر هذا النوع من المناوبات ثماني ساعات كحد أقصى.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "المناوبة تحت الطلب مسموحة فقط بين 08:00 و20:00 في اليوم نفسه.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "لا تتضمن الإجازة والمرض رحلات انتقال أو فترات راحة.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "تم تسجيل وقت عمل أو غياب لهذا اليوم بالفعل.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "يجب تحميل خطة الموظفين أولًا لتسجيل الإجازة أو المرض.",
+    "Geplanter Ruhetag: keine Anrechnung.": "يوم راحة مخطط: لا تُحتسب ساعات.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "تُحتسب الإجازة والمرض بثماني ساعات.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "ثماني ساعات كحد أقصى. لا تُطلب فترة راحة.",
+    "Angerechnete Arbeitszeit": "وقت العمل المحتسب",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "الاستعداد/المناوبة الملغاة: ثماني ساعات كحد أقصى"
   },
   "es": {
     "Administration": "Administración",
@@ -6164,6 +6236,18 @@
     "Arbeitszeit (Gastfahrten im Dienst enthalten)": "Tiempo de trabajo (incluye desplazamientos durante el servicio)",
     "Arbeitszeit einschließlich dokumentierter Pausen": "Tiempo de trabajo incluidas las pausas documentadas",
     "Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen.": "Las pausas se documentan y no se descuentan del tiempo de trabajo.",
-    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "El tiempo de desplazamiento durante el servicio supera su duración."
+    "Gastfahrtzeit im Dienst überschreitet die Dienstzeit.": "El tiempo de desplazamiento durante el servicio supera su duración.",
+    "Dienstart": "Tipo de servicio",
+    "Nur eine Dienstart auswählen. Ohne Auswahl wird ein normaler Dienst erfasst.": "Seleccione un tipo de servicio. Sin selección se registra un servicio normal.",
+    "Diese Dienstart darf höchstens acht Stunden dauern.": "Este tipo de servicio puede durar como máximo ocho horas.",
+    "Rufbereitschaft ist nur zwischen 08:00 und 20:00 Uhr am selben Tag zulässig.": "La disponibilidad telefónica solo se permite entre las 08:00 y las 20:00 del mismo día.",
+    "Urlaub und Krank enthalten keine Gastfahrten oder Pausen.": "Las vacaciones y bajas por enfermedad no incluyen desplazamientos ni pausas.",
+    "Für diesen Tag besteht bereits eine Arbeitszeit oder Abwesenheit.": "Ya existe un tiempo de trabajo o una ausencia para este día.",
+    "Für Urlaub und Krank muss die Personalplanung zunächst geladen werden.": "Debe cargarse la planificación de personal antes de registrar vacaciones o enfermedad.",
+    "Geplanter Ruhetag: keine Anrechnung.": "Día de descanso planificado: sin horas acreditadas.",
+    "Urlaub und Krank werden mit acht Stunden angerechnet.": "Las vacaciones y la enfermedad se acreditan con ocho horas.",
+    "Maximal acht Stunden. Keine Pause erforderlich.": "Máximo ocho horas. No se requiere pausa.",
+    "Angerechnete Arbeitszeit": "Tiempo de trabajo acreditado",
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Disponibilidad/turno cancelado: máximo ocho horas"
   }
 }

@@ -12,7 +12,7 @@ from ..models import WorkEntry
 from .intervals import interval, entry_end_date
 
 
-WORK_KINDS = {"Bereitschaft", "Zugfahrt", "Sonstige Erfassung"}
+WORK_KINDS = {"Bereitschaft", "Rufbereitschaft", "Ausfallschicht", "Zugfahrt", "Sonstige Erfassung"}
 
 
 @dataclass(frozen=True)

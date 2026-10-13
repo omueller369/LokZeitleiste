@@ -5,6 +5,7 @@ from datetime import date, timedelta
 
 from ..models import WorkEntry
 from .daily import day_rows, grouped_days, totals
+from .absence import absence_minutes
 
 
 @dataclass(frozen=True)
@@ -30,9 +31,11 @@ def summarize_month(entries: list[WorkEntry], *, year: int, month: int,
     split = [r for r in day_rows(entries, federal_state) if start <= r.day < end]
     by_day = {day: items for day, items in grouped_days(split)}
     absence = {}
+    absence_credit = {}
     for entry in entries:
         if entry.kind in ("Urlaub", "Krank") and start <= entry.entry_date < end:
             absence.setdefault(entry.entry_date, set()).add(entry.kind)
+            absence_credit[entry.entry_date]=max(absence_credit.get(entry.entry_date,0),absence_minutes(entry))
     result = []
     day = start
     while day < end:
@@ -45,11 +48,11 @@ def summarize_month(entries: list[WorkEntry], *, year: int, month: int,
         guest = sums["guest"]
         without_guest = work - guest
         used = min(guest, max(0, 480 - without_guest))
-        topup = max(0, 480 - work) if work else 0
-        vacation = 480 if "Urlaub" in kinds else 0
-        sick = 480 if "Krank" in kinds else 0
-        if work or vacation or sick:
-            kind = "Urlaub" if vacation else "Krank" if sick else "Arbeit"
+        topup = max(0, 480 - work) if work and any(r.kind in ("Zugfahrt","Sonstige Erfassung") for r in rows) else 0
+        vacation = absence_credit.get(day,480) if "Urlaub" in kinds else 0
+        sick = absence_credit.get(day,480) if "Krank" in kinds else 0
+        if work or kinds:
+            kind = "Urlaub" if "Urlaub" in kinds else "Krank" if "Krank" in kinds else "Arbeit"
             result.append(MonthDay(day.isoformat(), kind, without_guest, guest, used,
                                    topup, vacation, sick, work + topup + vacation + sick,
                                    sums["sunday"], sums["holiday"], sums["night"]))
