@@ -890,7 +890,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "Urlaub und Krank werden mit acht Stunden angerechnet.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "Maximal acht Stunden. Keine Pause erforderlich.",
     "Angerechnete Arbeitszeit": "Angerechnete Arbeitszeit",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Bereitschaft/Ausfallschicht: höchstens acht Stunden"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Bereitschaft/Ausfallschicht: höchstens acht Stunden",
+    "Dienstschicht": "Dienstschicht"
   },
   "en": {
     "Administration": "Administration",
@@ -1783,7 +1784,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "Vacation and sick leave are credited with eight hours.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "At most eight hours. No break required.",
     "Angerechnete Arbeitszeit": "Credited working time",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Standby/cancelled shift: at most eight hours"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Standby/cancelled shift: at most eight hours",
+    "Dienstschicht": "Regular duty shift"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2676,7 +2678,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "Urlop i choroba są zaliczane jako osiem godzin.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "Najwyżej osiem godzin. Przerwa nie jest wymagana.",
     "Angerechnete Arbeitszeit": "Zaliczony czas pracy",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Gotowość/odwołana zmiana: najwyżej osiem godzin"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Gotowość/odwołana zmiana: najwyżej osiem godzin",
+    "Dienstschicht": "Zwykła zmiana służbowa"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3569,7 +3572,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "Отпуск и болезнь учитываются как восемь часов.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "Не более восьми часов. Перерыв не требуется.",
     "Angerechnete Arbeitszeit": "Учтённое рабочее время",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Дежурство/отменённая смена: не более восьми часов"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Дежурство/отменённая смена: не более восьми часов",
+    "Dienstschicht": "Обычная рабочая смена"
   },
   "tr": {
     "Administration": "Yönetim",
@@ -4462,7 +4466,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "İzin ve hastalık sekiz saat olarak sayılır.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "En fazla sekiz saat. Mola gerekli değildir.",
     "Angerechnete Arbeitszeit": "Hesaba katılan çalışma süresi",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Nöbet/iptal edilen vardiya: en fazla sekiz saat"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Nöbet/iptal edilen vardiya: en fazla sekiz saat",
+    "Dienstschicht": "Normal görev vardiyası"
   },
   "ar": {
     "Administration": "الإدارة",
@@ -5355,7 +5360,8 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "تُحتسب الإجازة والمرض بثماني ساعات.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "ثماني ساعات كحد أقصى. لا تُطلب فترة راحة.",
     "Angerechnete Arbeitszeit": "وقت العمل المحتسب",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "الاستعداد/المناوبة الملغاة: ثماني ساعات كحد أقصى"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "الاستعداد/المناوبة الملغاة: ثماني ساعات كحد أقصى",
+    "Dienstschicht": "مناوبة عمل عادية"
   },
   "es": {
     "Administration": "Administración",
@@ -6248,6 +6254,7 @@
     "Urlaub und Krank werden mit acht Stunden angerechnet.": "Las vacaciones y la enfermedad se acreditan con ocho horas.",
     "Maximal acht Stunden. Keine Pause erforderlich.": "Máximo ocho horas. No se requiere pausa.",
     "Angerechnete Arbeitszeit": "Tiempo de trabajo acreditado",
-    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Disponibilidad/turno cancelado: máximo ocho horas"
+    "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Disponibilidad/turno cancelado: máximo ocho horas",
+    "Dienstschicht": "Turno de servicio normal"
   }
 }

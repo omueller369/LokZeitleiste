@@ -21,7 +21,7 @@ Beispiele: 10:01 h → 46 Minuten, 11:00 h → 105 Minuten, 12:00 h → 165 Minu
 
 ## Dienstarten
 
-Direkt unter Beginn und Ende stehen fünf Checkboxen. Höchstens eine ist gewählt; ohne Auswahl gilt der normale Dienst (`Sonstige Erfassung`). Die Auswahl bleibt im lokalen Entwurf und in der Synchronisationswarteschlange erhalten und wird beim Zeilenklick wiederhergestellt.
+Direkt unter Beginn und Ende stehen sechs Radiobuttons mit den Labels darüber. Genau eine Dienstart ist gewählt; **Dienstschicht** ist die Voreinstellung und verwendet die normale Dienstberechnung (intern weiterhin `Sonstige Erfassung`, damit bestehende Berichte kompatibel bleiben). Die Auswahl bleibt im lokalen Entwurf und in der Synchronisationswarteschlange erhalten und wird beim Zeilenklick wiederhergestellt.
 
 - Bereitschaft: volle Zeit, maximal acht Stunden, keine Mindestpause.
 - Rufbereitschaft: volle Zeit, maximal acht Stunden, ausschließlich 08:00–20:00 Uhr am selben Kalendertag, keine Mindestpause.
