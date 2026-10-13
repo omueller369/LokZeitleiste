@@ -21,8 +21,8 @@ import java.util.Locale
 object LanguageRuntime {
     @Volatile var code = "de"
     var accountVersion by mutableStateOf(0)
-    val codes = listOf("de", "en", "pl", "ru", "tr", "ar", "es")
-    val labels = listOf("🇩🇪 Deutsch", "🇬🇧 English", "🇵🇱 Polski", "🇷🇺 Русский", "🇹🇷 Türkçe", "🇸🇦 العربية", "🇪🇸 Español")
+    val codes = listOf("de", "en", "pl", "ru", "es")
+    val labels = listOf("🇩🇪 Deutsch", "🇬🇧 English", "🇵🇱 Polski", "🇷🇺 Русский", "🇪🇸 Español")
     private var catalog: JSONObject? = null
     private var pattern: Regex? = null
     private val canonical = mutableMapOf<String, String>()
@@ -59,7 +59,7 @@ fun LocalizedText(text: String, modifier: Modifier = Modifier, color: Color = Co
 fun LanguageShell(content: @Composable () -> Unit) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("lokzeitleiste_language", Context.MODE_PRIVATE) }
-    var language by remember { mutableStateOf(prefs.getString("language", "de") ?: "de") }
+    var language by remember { mutableStateOf((prefs.getString("language", "de") ?: "de").takeIf { it in LanguageRuntime.codes } ?: "de") }
     var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     LanguageRuntime.initialize(context)
@@ -85,7 +85,7 @@ fun LanguageShell(content: @Composable () -> Unit) {
         context.createConfigurationContext(configuration)
     }
     CompositionLocalProvider(LocalLanguage provides language, LocalContext provides localizedContext,
-        LocalLayoutDirection provides if (language == "ar") LayoutDirection.Rtl else LayoutDirection.Ltr) {
+        LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(Modifier.fillMaxSize()) {
             Row(Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.End) {
                 Box {

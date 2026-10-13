@@ -91,7 +91,7 @@ def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[Day
 def template(year_plan: dict, personnel_number: str) -> bytes:
     book = Workbook()
     view = book.create_sheet(translate('Stundenansicht'))
-    view.sheet_view.rightToLeft = request_language.get() == 'ar'
+    view.sheet_view.rightToLeft = False
     view.append([translate(v) for v in ('Datum','Tagesart','Plansoll','Feiertag','Notiz')])
     for month in year_plan['months']:
         for item in month['days']:

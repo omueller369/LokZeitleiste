@@ -10,13 +10,14 @@ class I18nTest(unittest.TestCase):
     setUp=test_accounts.AccountsTest.setUp
     tearDown=test_accounts.AccountsTest.tearDown
 
-    def test_seven_complete_catalogues_and_arabic_display(self):
-        data=catalog();self.assertEqual(set(data),{'de','en','pl','ru','tr','ar','es'})
+    def test_five_complete_catalogues_and_removed_language_fallback(self):
+        data=catalog();self.assertEqual(set(data),{'de','en','pl','ru','es'})
         for lang in data:self.assertEqual(set(data[lang]),set(data['de']));self.assertTrue(all(data[lang].values()))
         self.assertEqual(translate('Speichern','en'),'Save')
         self.assertEqual(translate('2. Personalplanung','es'),'2. Planificación de personal')
         self.assertEqual(language('pl-PL, en;q=0.8'),'pl');self.assertEqual(language('xx'),'de')
-        self.assertNotEqual(display('Speichern','ar'),translate('Speichern','ar'))
+        self.assertEqual(display('Speichern','ar'),'Speichern')
+        self.assertEqual(language('tr-TR'),'de');self.assertEqual(language('ar'),'de')
         result=markup('<b>Speichern</b> &lt;Mira&gt;','ar')
         self.assertTrue(result.startswith('<b>'));self.assertIn('</b>',result);self.assertNotIn('<Mira>',result)
         root=Path(__file__).resolve().parents[2]
@@ -25,11 +26,17 @@ class I18nTest(unittest.TestCase):
     def test_individual_locale_persistence_validation_and_api_errors(self):
         path='/api/v1/account/locale'
         self.assertEqual(self.client.get(path).json(),{'language':'de','configured':False})
-        for lang in ['en','pl','ru','tr','ar','es','de']:
+        for lang in ['en','pl','ru','es','de']:
             response=self.client.put(path,json={'language':lang})
             self.assertEqual(response.status_code,200,response.text)
             self.assertEqual(self.client.get(path).json(),{'language':lang,'configured':True})
-        self.assertEqual(self.client.put(path,json={'language':'xx'}).status_code,422)
+        for removed in ('xx','tr','ar'):
+            self.assertEqual(self.client.put(path,json={'language':removed}).status_code,422)
+        from sqlalchemy.orm import Session
+        from lokzeitleiste.models import UserLocale
+        with Session(self.engine) as db:
+            db.get(UserLocale,1).language='ar';db.commit()
+        self.assertEqual(self.client.get(path).json()['language'],'de')
         response=self.client.get('/api/v1/admin/tf/99999/hours/2026',headers={'Accept-Language':'en'})
         self.assertEqual(response.status_code,404);self.assertEqual(response.json()['detail'],'Train driver not found')
         self.client.post('/api/v1/admin/logout')

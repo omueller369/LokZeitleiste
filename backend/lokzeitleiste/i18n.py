@@ -1,4 +1,4 @@
-"""Shared seven-language catalogue for UI, API messages and generated outputs."""
+"""Shared five-language catalogue for UI, API messages and generated outputs."""
 import json
 import re
 from functools import lru_cache
@@ -6,7 +6,7 @@ from pathlib import Path
 from contextvars import ContextVar
 from .models import UserLocale
 
-LANGUAGES = ('de','en','pl','ru','tr','ar','es')
+LANGUAGES = ('de','en','pl','ru','es')
 request_language = ContextVar('request_language', default='de')
 
 
@@ -36,13 +36,8 @@ def translate(value, lang=None):
 
 def user_language(db,user_id):
     stored=db.get(UserLocale,user_id)
-    return stored.language if stored else 'de'
+    return language(stored.language) if stored else 'de'
 
 
 def display(value,lang=None):
-    translated=translate(value,lang)
-    if language(lang or request_language.get())=='ar':
-        import arabic_reshaper
-        from bidi.algorithm import get_display
-        return get_display(arabic_reshaper.reshape(translated))
-    return translated
+    return translate(value,lang)

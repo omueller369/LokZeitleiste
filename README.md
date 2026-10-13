@@ -78,7 +78,7 @@ Das Menü erscheint auf allen Backend-Modulseiten und berücksichtigt die Freiga
 
 [Schichtmodelle und Zuweisungen](backend/lokzeitleiste/planning/SHIFTS.md) · [Postfach-Einrichtung](backend/lokzeitleiste/mailbox/README.md) · [Mehrsprachigkeit](backend/lokzeitleiste/locales/README.md)
 
-Alle Webansichten und die Android-App unterstützen die Flaggenauswahl für Deutsch (Standard), Englisch, Polnisch, Russisch, Türkisch, Arabisch und Spanisch. Ausgaben und Meldungen verwenden den gemeinsamen Übersetzungskatalog; Arabisch wird rechts-nach-links angezeigt. Android-Version 0.10 neu bauen/installieren.
+Alle Webansichten und die Android-App unterstützen die Flaggenauswahl für Deutsch (Standard), Englisch, Polnisch, Russisch und Spanisch. Ausgaben und Meldungen verwenden den gemeinsamen Übersetzungskatalog; Android-Version 0.10 neu bauen/installieren.
 
 Update im Branch `setup/debian-testumgebung`: `git pull --ff-only`, anschließend `sudo bash setup.sh`. Die neuen Tabellen für Modelle, Zuweisungen, Postfächer, Entwürfe und Kontosprachen werden automatisch angelegt; bestehende Spalten bleiben erhalten. Für E-Mail-Postfächer die privaten `MAILBOX_*`-Werte ergänzen. Die reale IMAP-/SMTP-Verbindung, MySQL-Integration und der Android-Build müssen auf der Zielumgebung geprüft werden.
 
@@ -136,7 +136,7 @@ Die tatsächliche Serverdatenbank wird erst durch `bash backend/testenv/control.
 
 ## TF Portal v0.24
 
-Nach dem TF-Login öffnet sich `/tf`: Arbeitsbericht, Lokübergabebuch und Leuna Übergabeprotokoll sind zunächst eigene Platzhalterseiten. Arbeitsplan (`/tf/arbeitsplan`) zeigt den eigenen aktuellen Monatsplan aus der Personalplanung, mit Monatswechsel, Schichtbeginn/-ende (einschließlich Folgetag), Sollstunden, Notizen und diagonal gefärbten Feiertags-/Statusmarkierungen. TF können diesen Plan nur lesen. Die Anzeige ist mobil nutzbar und in allen sieben Sprachen übersetzt. Eigene Arbeitszeiterfassung und Passwortwechsel bleiben erreichbar.
+Nach dem TF-Login öffnet sich `/tf`: Arbeitsbericht, Lokübergabebuch und Leuna Übergabeprotokoll sind zunächst eigene Platzhalterseiten. Arbeitsplan (`/tf/arbeitsplan`) zeigt den eigenen aktuellen Monatsplan aus der Personalplanung, mit Monatswechsel, Schichtbeginn/-ende (einschließlich Folgetag), Sollstunden, Notizen und diagonal gefärbten Feiertags-/Statusmarkierungen. TF können diesen Plan nur lesen. Die Anzeige ist mobil nutzbar und in allen fünf Sprachen übersetzt. Eigene Arbeitszeiterfassung und Passwortwechsel bleiben erreichbar.
 
 Passwörter können ab v0.24 sechs Zeichen lang sein: TF-/Verwaltungskontoanlage, Administrator-Bootstrap, Passwortwechsel und administrativer Reset verwenden mindestens sechs Zeichen. Der verpflichtende Erstwechsel und das Beenden alter Sitzungen bei Passwortänderungen bleiben erhalten. Bestehende Passwortprüfwerte bleiben gültig. Die Android-Passwortwechselmaske akzeptiert ebenfalls sechs Zeichen; das neue TF Portal ist die Weboberfläche.
 

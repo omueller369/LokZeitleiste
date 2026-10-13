@@ -1,4 +1,4 @@
-"""Unicode fonts and localized ReportLab text, including Arabic shaping."""
+"""Unicode fonts and localized ReportLab text."""
 import os
 import re
 from html import escape, unescape
@@ -8,7 +8,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph as BaseParagraph
 from .i18n import display, translate, request_language
-from reportlab.lib.enums import TA_RIGHT, TA_CENTER
 
 
 def register_fonts(prefix):
@@ -26,12 +25,10 @@ def register_fonts(prefix):
 
 
 def markup(value,lang=None):
-    # Preserve ReportLab markup; shape only visible text, never markup syntax.
+    # Preserve ReportLab markup; translate only visible text, never markup syntax.
     return ''.join(part if part.startswith('<') else escape(display(unescape(part),lang)) for part in re.split(r'(<[^>]*>)',str(value)))
 
 
 class LocalizedParagraph(BaseParagraph):
     def __init__(self,text,style,*args,**kwargs):
-        if request_language.get()=='ar' and style.alignment!=TA_CENTER:
-            style=style.clone(style.name+'-rtl',alignment=TA_RIGHT)
         super().__init__(markup(text),style,*args,**kwargs)

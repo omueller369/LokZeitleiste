@@ -551,7 +551,7 @@ async def localized_error(request: Request, exc):
     return JSONResponse({'detail':translate(exc.detail)}, status_code=exc.status_code, headers=exc.headers)
 
 class LocaleInput(BaseModel):
-    language: Literal['de','en','pl','ru','tr','ar','es']
+    language: Literal['de','en','pl','ru','es']
 
 @app.get('/api/v1/account/locale')
 def get_locale(user: User=Depends(require_account), db: Session=Depends(database_session)):

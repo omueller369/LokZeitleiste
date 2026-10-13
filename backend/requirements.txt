@@ -11,6 +11,4 @@ defusedxml>=0.7.1,<1
 python-multipart>=0.0.20,<1
 Pillow>=11,<13
 cryptography>=44,<51
-arabic-reshaper>=3,<4
-python-bidi>=0.6,<1
 pypdf>=6,<7
