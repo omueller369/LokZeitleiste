@@ -27,7 +27,7 @@ def create_router(require_account):
         return report
 
     @router.get('/tf/work-report.js')
-    def script():return FileResponse(Path(__file__).parent.parent/'static'/'work-report.js',media_type='text/javascript')
+    def script():return FileResponse(Path(__file__).parent.parent/'static'/'work-report.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
 
     @router.get('/tf/train-journeys.js')
     def train_script():return FileResponse(Path(__file__).parent.parent/'static'/'train-journeys.js',media_type='text/javascript')

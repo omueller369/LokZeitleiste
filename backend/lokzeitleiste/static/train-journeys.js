@@ -12,7 +12,7 @@ window.TrainJourneyEditor=class{
   this.tabs=node('div');this.tabs.className='train-tabs';this.tabs.setAttribute('role','tablist');this.tabs.setAttribute('aria-label','Zugfahrten');
   this.panels=node('div');this.summary=node('p');this.summary.id='trainPauseSummary';
   options.container.append(this.tabs,this.panels,this.summary);
-  options.button.onclick=()=>this.add();
+  options.button.onclick=()=>{try{this.add();}catch(error){this.o.message(error.message);}};
   window.addEventListener('languagechange',()=>{this.refreshTabs();this.items.forEach(item=>this.table(item));this.pauseSummary();});
  }
  add(){
