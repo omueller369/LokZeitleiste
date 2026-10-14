@@ -955,7 +955,8 @@
     "Zug-Nr.": "Zug-Nr.",
     "Startbf.": "Startbf.",
     "Endbf.": "Endbf.",
-    "Verurs.": "Verurs."
+    "Verurs.": "Verurs.",
+    "CTL Pause": "CTL Pause"
   },
   "en": {
     "Administration": "Administration",
@@ -1913,7 +1914,8 @@
     "Zug-Nr.": "Train no.",
     "Startbf.": "Start stn.",
     "Endbf.": "End stn.",
-    "Verurs.": "Cause"
+    "Verurs.": "Cause",
+    "CTL Pause": "CTL break"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2871,7 +2873,8 @@
     "Zug-Nr.": "Nr pociągu",
     "Startbf.": "Stacja pocz.",
     "Endbf.": "Stacja końc.",
-    "Verurs.": "Sprawca"
+    "Verurs.": "Sprawca",
+    "CTL Pause": "Przerwa CTL"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3829,7 +3832,8 @@
     "Zug-Nr.": "№ поезда",
     "Startbf.": "Ст. отправ.",
     "Endbf.": "Ст. приб.",
-    "Verurs.": "Причина"
+    "Verurs.": "Причина",
+    "CTL Pause": "Перерыв CTL"
   },
   "es": {
     "Administration": "Administración",
@@ -4787,6 +4791,7 @@
     "Zug-Nr.": "N.º tren",
     "Startbf.": "Est. origen",
     "Endbf.": "Est. destino",
-    "Verurs.": "Causante"
+    "Verurs.": "Causante",
+    "CTL Pause": "Pausa CTL"
   }
 }

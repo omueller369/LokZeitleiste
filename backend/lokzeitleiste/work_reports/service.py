@@ -92,6 +92,9 @@ def resolve_train_stations(db,journeys):
             if not station:raise HTTPException(422,'Unbekanntes DS100-Kürzel: '+code)
             setattr(train,attribute,station.name)
         for event in train.events:
+            if not event.station:
+                event.station_name=''
+                continue
             station=db.get(RailwayStation,event.station)
             if not station:raise HTTPException(422,'Unbekanntes DS100-Kürzel: '+event.station)
             event.station_name=station.name

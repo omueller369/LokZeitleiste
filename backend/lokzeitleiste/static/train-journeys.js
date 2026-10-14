@@ -49,7 +49,7 @@ window.TrainJourneyEditor=class{
   fields.end_at=this.field(grid,'Ankunftsdatum und Uhrzeit','datetime-local',{required:true,step:'60'});fields.end_at.value=(data.end_at||'').slice(0,16);
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
   for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{this.table(item);this.changed();this.refreshTabs();});}
-  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrtereignisse'));const eventGrid=node('div');eventGrid.className='report-grid';const f=item.eventFields={};
+  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrtereignisse'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL Logistics DE';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid';const f=item.eventFields={};
   f.reason=this.select(eventGrid,'Grund',REASONS);f.reason_detail=this.field(eventGrid,'Sonstiger Grund (max. 256 Zeichen)','text',{maxLength:256});
   f.cause=this.select(eventGrid,'Verursacher',CAUSES);f.cause_detail=this.field(eventGrid,'Sonstiger Verursacher (max. 50 Zeichen)','text',{maxLength:50});
   f.station=this.station(eventGrid,'Ort (DS100 oder Bahnhofsname)','');
@@ -64,7 +64,7 @@ window.TrainJourneyEditor=class{
   item.remove=node('button','Zugfahrt entfernen');item.remove.type='button';item.remove.onclick=()=>{if(this.o.readonly())return;if(!confirm('Zugfahrt und ihre Einträge entfernen?'))return;this.items=this.items.filter(x=>x!==item);item.panel.remove();item.tab.remove();this.activate(this.items[0]?.id);this.changed();};item.panel.append(item.remove);
   this.tabs.append(item.tab);this.panels.append(item.panel);this.clearEvent(item);this.table(item);return item;
  }
- details(item){const f=item.eventFields;for(const [name,detail] of [['reason','reason_detail'],['cause','cause_detail']]){const visible=f[name].value==='sonstiges';f[detail].parentElement.hidden=!visible;f[detail].required=visible;if(!visible)f[detail].value='';}}
+ details(item){const f=item.eventFields;const ctl=f.reason.value==='Pause'&&f.cause.value==='CTL Logistics DE';f.station.required=!ctl;f.station.parentElement.hidden=ctl;if(ctl)f.station.value='';for(const [name,detail] of [['reason','reason_detail'],['cause','cause_detail']]){const visible=f[name].value==='sonstiges';f[detail].parentElement.hidden=!visible;f[detail].required=visible;if(!visible)f[detail].value='';}}
  clearEvent(item){
   item.editing=null;item.form.reset();for(const f of Object.values(item.eventFields))f.value='';item.eventFields.start_at.dataset.previous='';item.eventFields.end_at.removeAttribute('min');item.submit.textContent='Eintragen';item.cancel.hidden=true;item.deleteEvent.hidden=true;this.details(item);this.table(item);
  }
@@ -93,7 +93,7 @@ window.TrainJourneyEditor=class{
  async insert(item){
   if(this.o.readonly()||!item.form.reportValidity())return;
   this.o.block(true);
-  try{await this.header(item);const f=item.eventFields;if(!REASONS.includes(f.reason.value)||!CAUSES.includes(f.cause.value))throw Error('Bitte Grund und Verursacher auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=await this.resolve(f.station);
+  try{await this.header(item);const f=item.eventFields;if(!REASONS.includes(f.reason.value)||!CAUSES.includes(f.cause.value))throw Error('Bitte Grund und Verursacher auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=f.reason.value==='Pause'&&f.cause.value==='CTL Logistics DE'?{code:'',name:''}:await this.resolve(f.station);
    if(f.reason.value==='sonstiges'&&(!f.reason_detail.value.trim()||f.reason_detail.value.length>256))throw Error('Sonstigen Grund bitte beschreiben.');if(f.cause.value==='sonstiges'&&(!f.cause_detail.value.trim()||f.cause_detail.value.length>50))throw Error('Sonstigen Verursacher bitte beschreiben.');
    const event={id:item.editing||this.o.uuid(),reason:f.reason.value,reason_detail:f.reason.value==='sonstiges'?f.reason_detail.value.trim():'',cause:f.cause.value,cause_detail:f.cause.value==='sonstiges'?f.cause_detail.value.trim():'',station:station.code,station_name:station.name,start_at:f.start_at.value,end_at:f.end_at.value};
    const all=this.items.flatMap(train=>train.events.filter(e=>e.id!==event.id));if(event.reason==='Pause'&&all.some(e=>e.reason==='Pause'&&this.o.minute(event.start_at)<this.o.minute(e.end_at)&&this.o.minute(event.end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
@@ -102,4 +102,3 @@ window.TrainJourneyEditor=class{
  }
 };
 })();
-

@@ -955,3 +955,4 @@ Zug-Nr.|Train no.|Nr pociągu|№ поезда|N.º tren
 Startbf.|Start stn.|Stacja pocz.|Ст. отправ.|Est. origen
 Endbf.|End stn.|Stacja końc.|Ст. приб.|Est. destino
 Verurs.|Cause|Sprawca|Причина|Causante
+CTL Pause|CTL break|Przerwa CTL|Перерыв CTL|Pausa CTL
