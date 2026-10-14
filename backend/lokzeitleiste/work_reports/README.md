@@ -32,7 +32,7 @@ Die Regeln werden im Browser und unabhängig davon im Backend geprüft. Die kano
 
 ## Zugfahrten und Ereignisse
 
-**Neuer Zugfahrt** öffnet einen neuen Reiter direkt unter dem Button. Jeder Reiter hat Zugnummer (Pflicht, alphanumerisch, höchstens zwölf Zeichen), Start-/Endbahnhof mit DS100 und vollständigem Namen sowie Abfahrts-/Ankunftsdatum und minutengenauer Uhrzeit. Bahnhofssuche nach Code oder Name nutzt dieselbe autorisierte API wie die Gastfahrten. Eine eigene UUID identifiziert jede Zugfahrt; Zugnummern dürfen mehrfach vorkommen.
+**neue Zugfaht** öffnet einen neuen Reiter direkt unter dem Button. Jeder Reiter hat Zugnummer (Pflicht, alphanumerisch, höchstens zwölf Zeichen), Start-/Endbahnhof mit DS100 und vollständigem Namen sowie Abfahrts-/Ankunftsdatum und minutengenauer Uhrzeit. Bahnhofssuche nach Code oder Name nutzt dieselbe autorisierte API wie die Gastfahrten. Eine eigene UUID identifiziert jede Zugfahrt; Zugnummern dürfen mehrfach vorkommen.
 
 Die Ereignismaske enthält sämtliche vorgegebenen Gründe und Verursacher, Bahnhof/Ort sowie Von/Bis. Bei `sonstiges` werden zusätzliche Pflichtfelder eingeblendet: Grund bis 256 Zeichen, Verursacher bis 50. Bis wird zunächst mit Von plus fünf Minuten vorbelegt, auch über Mitternacht. Eintragen fügt eine Zeile hinzu und leert alle Ereignisfelder; die Zugdaten bleiben erhalten. Zeilenklick oder Enter/Leertaste lädt das Ereignis zur Bearbeitung. Speichern ersetzt es anhand seiner UUID und schaltet zurück auf Eintragen. Eine falsche Zeile und ganze Zugfahrten können entfernt werden. Die Tabelle zeigt Zug- und Ereignisdaten zusammen und ist horizontal scrollbar.
 
