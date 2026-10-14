@@ -945,3 +945,13 @@ Warten auf FPLO|Waiting for FPLO|Oczekiwanie na FPLO|Ожидание FPLO|Esper
 Lok defekt|Locomotive defective|Usterka lokomotywy|Неисправность локомотива|Locomotora averiada
 sonstiges|other|inne|другое|otro
 Dritte Stelle|Third party|Podmiot trzeci|Третья сторона|Tercero
+Verkehrsm.|Transport|Transport|Транспорт|Transporte
+Außer Dienst|Outside duty|Poza służbą|Вне смены|Fuera de servicio
+Gastf. im Dienst|Travel on duty|Przejazd w służbie|Проезд в смене|Viaje en servicio
+Gastf. außerhalb|Travel off duty|Przejazd poza służbą|Проезд вне смены|Viaje fuera de servicio
+Gastf. gesamt|Total travel|Przejazdy razem|Всего проездов|Total viajes
+Soll (h)|Target (h)|Norma (h)|Норма (ч)|Objetivo (h)
+Zug-Nr.|Train no.|Nr pociągu|№ поезда|N.º tren
+Startbf.|Start stn.|Stacja pocz.|Ст. отправ.|Est. origen
+Endbf.|End stn.|Stacja końc.|Ст. приб.|Est. destino
+Verurs.|Cause|Sprawca|Причина|Causante

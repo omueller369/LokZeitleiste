@@ -60,7 +60,7 @@ window.TrainJourneyEditor=class{
   item.submit=node('button','Eintragen');item.submit.type='submit';item.cancel=node('button','Bearbeitung abbrechen');item.cancel.type='button';item.cancel.onclick=()=>this.clearEvent(item);
   item.deleteEvent=node('button','Eintrag entfernen');item.deleteEvent.type='button';item.deleteEvent.onclick=()=>{if(this.o.readonly()||!item.editing)return;if(!confirm('Eintrag entfernen?'))return;item.events=item.events.filter(e=>e.id!==item.editing);this.clearEvent(item);this.changed();};item.eventSet.append(eventGrid,item.submit,item.cancel,item.deleteEvent);item.form.append(item.eventSet);item.form.onsubmit=event=>{event.preventDefault();this.insert(item).catch(error=>this.o.message(error.message));};item.panel.append(item.form);
   const scroll=node('div');scroll.className='excel-scroll';const table=node('table');table.className='excel train-event-table';const head=node('thead'),row=node('tr');
-  for(const caption of ['Zugnummer','Startbahnhof','Abfahrt','Endbahnhof','Ankunft','Grund','Verursacher','Ort','Von','Bis','Dauer','Pausenzeit'])row.append(node('th',caption));head.append(row);item.rows=node('tbody');table.append(head,item.rows);scroll.append(table);item.panel.append(scroll);
+  for(const caption of ['Zugnummer','Startbahnhof','Abfahrt','Endbahnhof','Ankunft','Grund','Verursacher','Ort','Von','Bis','Dauer','Pausenzeit']){const short=({'Zugnummer':'Zug-Nr.','Startbahnhof':'Startbf.','Endbahnhof':'Endbf.','Verursacher':'Verurs.','Pausenzeit':'Pause'})[caption]||caption;const cell=node('th',short);cell.title=caption;cell.setAttribute('aria-label',caption);row.append(cell);}head.append(row);item.rows=node('tbody');table.append(head,item.rows);scroll.append(table);item.panel.append(scroll);
   item.remove=node('button','Zugfahrt entfernen');item.remove.type='button';item.remove.onclick=()=>{if(this.o.readonly())return;if(!confirm('Zugfahrt und ihre Einträge entfernen?'))return;this.items=this.items.filter(x=>x!==item);item.panel.remove();item.tab.remove();this.activate(this.items[0]?.id);this.changed();};item.panel.append(item.remove);
   this.tabs.append(item.tab);this.panels.append(item.panel);this.clearEvent(item);this.table(item);return item;
  }
@@ -102,3 +102,4 @@ window.TrainJourneyEditor=class{
  }
 };
 })();
+

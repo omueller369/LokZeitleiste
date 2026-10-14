@@ -945,7 +945,17 @@
     "Warten auf FPLO": "Warten auf FPLO",
     "Lok defekt": "Lok defekt",
     "sonstiges": "sonstiges",
-    "Dritte Stelle": "Dritte Stelle"
+    "Dritte Stelle": "Dritte Stelle",
+    "Verkehrsm.": "Verkehrsm.",
+    "Außer Dienst": "Außer Dienst",
+    "Gastf. im Dienst": "Gastf. im Dienst",
+    "Gastf. außerhalb": "Gastf. außerhalb",
+    "Gastf. gesamt": "Gastf. gesamt",
+    "Soll (h)": "Soll (h)",
+    "Zug-Nr.": "Zug-Nr.",
+    "Startbf.": "Startbf.",
+    "Endbf.": "Endbf.",
+    "Verurs.": "Verurs."
   },
   "en": {
     "Administration": "Administration",
@@ -1893,7 +1903,17 @@
     "Warten auf FPLO": "Waiting for FPLO",
     "Lok defekt": "Locomotive defective",
     "sonstiges": "other",
-    "Dritte Stelle": "Third party"
+    "Dritte Stelle": "Third party",
+    "Verkehrsm.": "Transport",
+    "Außer Dienst": "Outside duty",
+    "Gastf. im Dienst": "Travel on duty",
+    "Gastf. außerhalb": "Travel off duty",
+    "Gastf. gesamt": "Total travel",
+    "Soll (h)": "Target (h)",
+    "Zug-Nr.": "Train no.",
+    "Startbf.": "Start stn.",
+    "Endbf.": "End stn.",
+    "Verurs.": "Cause"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2841,7 +2861,17 @@
     "Warten auf FPLO": "Oczekiwanie na FPLO",
     "Lok defekt": "Usterka lokomotywy",
     "sonstiges": "inne",
-    "Dritte Stelle": "Podmiot trzeci"
+    "Dritte Stelle": "Podmiot trzeci",
+    "Verkehrsm.": "Transport",
+    "Außer Dienst": "Poza służbą",
+    "Gastf. im Dienst": "Przejazd w służbie",
+    "Gastf. außerhalb": "Przejazd poza służbą",
+    "Gastf. gesamt": "Przejazdy razem",
+    "Soll (h)": "Norma (h)",
+    "Zug-Nr.": "Nr pociągu",
+    "Startbf.": "Stacja pocz.",
+    "Endbf.": "Stacja końc.",
+    "Verurs.": "Sprawca"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3789,7 +3819,17 @@
     "Warten auf FPLO": "Ожидание FPLO",
     "Lok defekt": "Неисправность локомотива",
     "sonstiges": "другое",
-    "Dritte Stelle": "Третья сторона"
+    "Dritte Stelle": "Третья сторона",
+    "Verkehrsm.": "Транспорт",
+    "Außer Dienst": "Вне смены",
+    "Gastf. im Dienst": "Проезд в смене",
+    "Gastf. außerhalb": "Проезд вне смены",
+    "Gastf. gesamt": "Всего проездов",
+    "Soll (h)": "Норма (ч)",
+    "Zug-Nr.": "№ поезда",
+    "Startbf.": "Ст. отправ.",
+    "Endbf.": "Ст. приб.",
+    "Verurs.": "Причина"
   },
   "es": {
     "Administration": "Administración",
@@ -4737,6 +4777,16 @@
     "Warten auf FPLO": "Espera de FPLO",
     "Lok defekt": "Locomotora averiada",
     "sonstiges": "otro",
-    "Dritte Stelle": "Tercero"
+    "Dritte Stelle": "Tercero",
+    "Verkehrsm.": "Transporte",
+    "Außer Dienst": "Fuera de servicio",
+    "Gastf. im Dienst": "Viaje en servicio",
+    "Gastf. außerhalb": "Viaje fuera de servicio",
+    "Gastf. gesamt": "Total viajes",
+    "Soll (h)": "Objetivo (h)",
+    "Zug-Nr.": "N.º tren",
+    "Startbf.": "Est. origen",
+    "Endbf.": "Est. destino",
+    "Verurs.": "Causante"
   }
 }
