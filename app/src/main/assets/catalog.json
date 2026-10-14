@@ -891,7 +891,8 @@
     "Maximal acht Stunden. Keine Pause erforderlich.": "Maximal acht Stunden. Keine Pause erforderlich.",
     "Angerechnete Arbeitszeit": "Angerechnete Arbeitszeit",
     "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Bereitschaft/Ausfallschicht: höchstens acht Stunden",
-    "Dienstschicht": "Dienstschicht"
+    "Dienstschicht": "Dienstschicht",
+    "Neuer Zugfahrt": "Neuer Zugfahrt"
   },
   "en": {
     "Administration": "Administration",
@@ -1785,7 +1786,8 @@
     "Maximal acht Stunden. Keine Pause erforderlich.": "At most eight hours. No break required.",
     "Angerechnete Arbeitszeit": "Credited working time",
     "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Standby/cancelled shift: at most eight hours",
-    "Dienstschicht": "Regular duty shift"
+    "Dienstschicht": "Regular duty shift",
+    "Neuer Zugfahrt": "New train journey"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2679,7 +2681,8 @@
     "Maximal acht Stunden. Keine Pause erforderlich.": "Najwyżej osiem godzin. Przerwa nie jest wymagana.",
     "Angerechnete Arbeitszeit": "Zaliczony czas pracy",
     "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Gotowość/odwołana zmiana: najwyżej osiem godzin",
-    "Dienstschicht": "Zwykła zmiana służbowa"
+    "Dienstschicht": "Zwykła zmiana służbowa",
+    "Neuer Zugfahrt": "Nowa jazda pociągiem"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3573,7 +3576,8 @@
     "Maximal acht Stunden. Keine Pause erforderlich.": "Не более восьми часов. Перерыв не требуется.",
     "Angerechnete Arbeitszeit": "Учтённое рабочее время",
     "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Дежурство/отменённая смена: не более восьми часов",
-    "Dienstschicht": "Обычная рабочая смена"
+    "Dienstschicht": "Обычная рабочая смена",
+    "Neuer Zugfahrt": "Новая поездка на поезде"
   },
   "es": {
     "Administration": "Administración",
@@ -4467,6 +4471,7 @@
     "Maximal acht Stunden. Keine Pause erforderlich.": "Máximo ocho horas. No se requiere pausa.",
     "Angerechnete Arbeitszeit": "Tiempo de trabajo acreditado",
     "Bereitschaft/Ausfallschicht: höchstens acht Stunden": "Disponibilidad/turno cancelado: máximo ocho horas",
-    "Dienstschicht": "Turno de servicio normal"
+    "Dienstschicht": "Turno de servicio normal",
+    "Neuer Zugfahrt": "Nuevo trayecto en tren"
   }
 }
