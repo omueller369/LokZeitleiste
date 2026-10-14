@@ -10,8 +10,8 @@ from ..db import database_session
 from ..models import User,DutyReport,DutyGuestTrip,DutyReceipt,RailwayStation,TfProfile
 from ..tf_portal import driver_dependency
 from ..records.service import assert_unlocked
-from .schemas import ReportIn
-from .service import save_report,report_view
+from .schemas import ReportIn,TrainJourneysUpdate
+from .service import save_report,report_view,update_train_journeys
 from ..reports.absence import absence_minutes
 from .receipts import MAX_FILE,validate_receipt,recipient,receipt_view,process_receipt
 
@@ -28,6 +28,9 @@ def create_router(require_account):
 
     @router.get('/tf/work-report.js')
     def script():return FileResponse(Path(__file__).parent.parent/'static'/'work-report.js',media_type='text/javascript')
+
+    @router.get('/tf/train-journeys.js')
+    def train_script():return FileResponse(Path(__file__).parent.parent/'static'/'train-journeys.js',media_type='text/javascript')
 
     @router.get('/tf/work-report.css')
     def styles():return FileResponse(Path(__file__).parent.parent/'static'/'work-report.css',media_type='text/css')
@@ -92,6 +95,12 @@ def create_router(require_account):
     @router.get('/api/v1/tf/work-reports/{report_id}')
     def read_report(report_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         return report_view(db,owned(db,user,report_id))
+
+    @router.put('/api/v1/tf/work-reports/{report_id}/train-journeys')
+    def change_trains(report_id:int,data:TrainJourneysUpdate,user:User=Depends(driver),db:Session=Depends(database_session)):
+        from pydantic import ValidationError
+        try:return report_view(db,update_train_journeys(db,user,owned(db,user,report_id,lock=True),data))
+        except ValidationError as exc:raise HTTPException(422,str(exc.errors()[0]['msg'])) from exc
 
     @router.get('/api/v1/tf/work-reports/{report_id}/receipts')
     def receipts(report_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):

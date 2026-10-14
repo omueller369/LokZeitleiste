@@ -5,6 +5,7 @@ import json
 from sqlalchemy import select
 from sqlalchemy.orm import object_session
 from ..models import DutyReport,DutyGuestTrip
+from ..work_reports.schemas import train_pause_minutes
 
 import holidays
 
@@ -55,7 +56,7 @@ def _reported_segments(entries):
     for report in reports:
         entry=by_id[report.entry_id];payload=json.loads(report.payload_json)
         begin,end=interval(entry);trips=sorted((max(begin,a),min(end,b)) for a,b in guests.get(report.id,[]) if max(begin,a)<min(end,b))
-        if (begin.isoformat()!=payload['start_at'] or end.isoformat()!=payload['end_at'] or entry.pause_minutes!=payload['actual_pause']
+        if (begin.isoformat()!=payload['start_at'] or end.isoformat()!=payload['end_at'] or entry.pause_minutes!=payload['actual_pause']+train_pause_minutes(payload.get('train_journeys',[]))
             or entry.guest_minutes!=sum(_minutes(a,b) for a,b in trips)):continue
         result[entry.id]=([(begin,end)],trips)
     return result

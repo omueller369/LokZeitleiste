@@ -4,3 +4,5 @@
 .report-list .report-overrun{font-size:inherit}
 
 #workReport .duty-kinds{display:flex;flex-wrap:wrap;gap:12px 24px}#workReport .duty-kinds label{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}#workReport .duty-kinds input{width:auto;margin:0}#kindHint{color:#8c5300}
+
+.train-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.train-tabs button[aria-selected="true"]{background:#17445b;color:#fff}.train-panel{border-top:1px solid #becdd7;padding-top:18px}.train-event-table tbody tr{cursor:pointer}.train-event-table tbody tr:hover,.train-event-table tbody tr:focus-visible{background:#e2effa;outline:2px solid #17445b;outline-offset:-2px}.train-event-table tbody tr.selected td{background:#d8eaf6}.train-event-table{min-width:1500px}.train-panel fieldset{margin:12px 0}.train-panel button{margin:6px 8px 6px 0}

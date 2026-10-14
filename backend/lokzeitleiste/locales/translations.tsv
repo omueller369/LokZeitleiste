@@ -892,3 +892,56 @@ Angerechnete Arbeitszeit|Credited working time|Zaliczony czas pracy|Учтённ
 Bereitschaft/Ausfallschicht: höchstens acht Stunden|Standby/cancelled shift: at most eight hours|Gotowość/odwołana zmiana: najwyżej osiem godzin|Дежурство/отменённая смена: не более восьми часов|Disponibilidad/turno cancelado: máximo ocho horas
 Dienstschicht|Regular duty shift|Zwykła zmiana służbowa|Обычная рабочая смена|Turno de servicio normal
 Neuer Zugfahrt|New train journey|Nowa jazda pociągiem|Новая поездка на поезде|Nuevo trayecto en tren
+Zugdaten|Train details|Dane pociągu|Данные поезда|Datos del tren
+Startbahnhof (DS100 oder Bahnhofsname)|Departure station (DS100 or station name)|Stacja początkowa (DS100 lub nazwa)|Станция отправления (DS100 или название)|Estación de salida (DS100 o nombre)
+Abfahrtsdatum und Uhrzeit|Departure date and time|Data i godzina odjazdu|Дата и время отправления|Fecha y hora de salida
+Endbahnhof (DS100 oder Bahnhofsname)|Arrival station (DS100 or station name)|Stacja końcowa (DS100 lub nazwa)|Станция назначения (DS100 или название)|Estación de llegada (DS100 o nombre)
+Ankunftsdatum und Uhrzeit|Arrival date and time|Data i godzina przyjazdu|Дата и время прибытия|Fecha y hora de llegada
+Zugfahrtereignisse|Train journey events|Zdarzenia podczas jazdy pociągiem|События поездки|Eventos del trayecto
+Sonstiger Grund (max. 256 Zeichen)|Other reason (max. 256 characters)|Inny powód (maks. 256 znaków)|Другая причина (макс. 256 символов)|Otro motivo (máx. 256 caracteres)
+Verursacher|Responsible party|Podmiot odpowiedzialny|Ответственная сторона|Responsable
+Sonstiger Verursacher (max. 50 Zeichen)|Other responsible party (max. 50 characters)|Inny podmiot odpowiedzialny (maks. 50 znaków)|Другая ответственная сторона (макс. 50 символов)|Otro responsable (máx. 50 caracteres)
+Ort (DS100 oder Bahnhofsname)|Location (DS100 or station name)|Miejsce (DS100 lub nazwa stacji)|Место (DS100 или название станции)|Lugar (DS100 o nombre de estación)
+Pause (Pausenzeit dokumentieren)|Break (document break time)|Przerwa (dokumentowanie czasu przerwy)|Перерыв (документировать время)|Pausa (documentar su duración)
+Eintragen|Add entry|Dodaj wpis|Добавить запись|Añadir entrada
+Startbahnhof|Departure station|Stacja początkowa|Станция отправления|Estación de salida
+Endbahnhof|Arrival station|Stacja końcowa|Станция назначения|Estación de llegada
+Pausenzeit|Break time|Czas przerwy|Время перерыва|Tiempo de pausa
+Zugfahrt entfernen|Remove train journey|Usuń jazdę pociągiem|Удалить поездку|Eliminar trayecto
+Zugfahrt und ihre Einträge entfernen?|Remove the train journey and its entries?|Usunąć jazdę pociągiem i jej wpisy?|Удалить поездку и её записи?|¿Eliminar el trayecto y sus entradas?
+Pausen aus Zugfahrten|Breaks from train journeys|Przerwy z jazd pociągiem|Перерывы из поездок|Pausas de los trayectos
+Dokumentierte Pausen gesamt|Total documented breaks|Łączny czas udokumentowanych przerw|Все документированные перерывы|Total de pausas documentadas
+Weitere dokumentierte Pause (Minuten)|Additional documented break (minutes)|Dodatkowa udokumentowana przerwa (minuty)|Дополнительный документированный перерыв (минуты)|Pausa documentada adicional (minutos)
+Zugfahrten und Belege synchronisieren|Synchronize train journeys and receipts|Synchronizuj jazdy pociągiem i rachunki|Синхронизировать поездки и квитанции|Sincronizar trayectos y recibos
+Bitte das Ereignis zuerst eintragen oder die Bearbeitung abbrechen.|Please add the event first or cancel editing.|Najpierw dodaj zdarzenie lub anuluj edycję.|Сначала сохраните событие или отмените редактирование.|Primero añada el evento o cancele la edición.
+Bitte Grund und Verursacher auswählen.|Please select a reason and responsible party.|Wybierz powód i podmiot odpowiedzialny.|Выберите причину и ответственную сторону.|Seleccione un motivo y un responsable.
+Dokumentierte Pausen dürfen sich nicht überschneiden.|Documented breaks must not overlap.|Udokumentowane przerwy nie mogą się nakładać.|Документированные перерывы не должны пересекаться.|Las pausas documentadas no pueden solaparse.
+Höchstens 50 Zugfahrten pro Bericht.|At most 50 train journeys per report.|Maksymalnie 50 jazd pociągiem na raport.|Не более 50 поездок в отчёте.|Máximo 50 trayectos por informe.
+Höchstens 500 Ereignisse pro Zugfahrt.|At most 500 events per train journey.|Maksymalnie 500 zdarzeń na jazdę pociągiem.|Не более 500 событий в поездке.|Máximo 500 eventos por trayecto.
+Bis muss nach Von liegen.|The end must be after the start.|Koniec musi być późniejszy niż początek.|Конец должен быть позже начала.|El final debe ser posterior al inicio.
+Zugfahrten und Ereignisse müssen innerhalb des Dienstes liegen.|Train journeys and events must be within duty.|Jazdy pociągiem i zdarzenia muszą mieścić się w służbie.|Поездки и события должны быть в пределах смены.|Los trayectos y eventos deben estar dentro del servicio.
+Sonstigen Grund bitte beschreiben.|Please describe the other reason.|Opisz inny powód.|Опишите другую причину.|Describa el otro motivo.
+Sonstigen Verursacher bitte beschreiben.|Please describe the other responsible party.|Opisz inny podmiot odpowiedzialny.|Опишите другую ответственную сторону.|Describa el otro responsable.
+Zugnummer: nur Buchstaben und Zahlen, maximal zwölf Zeichen.|Train number: letters and numbers only, at most twelve characters.|Numer pociągu: tylko litery i cyfry, maksymalnie dwanaście znaków.|Номер поезда: только буквы и цифры, не более двенадцати символов.|Número de tren: solo letras y números, máximo doce caracteres.
+Zugfahrt-IDs müssen eindeutig sein.|Train journey IDs must be unique.|Identyfikatory jazd muszą być unikalne.|Идентификаторы поездок должны быть уникальными.|Los identificadores de trayecto deben ser únicos.
+Ereignis-IDs müssen eindeutig sein.|Event IDs must be unique.|Identyfikatory zdarzeń muszą być unikalne.|Идентификаторы событий должны быть уникальными.|Los identificadores de evento deben ser únicos.
+Ankunft muss nach Abfahrt liegen.|Arrival must be after departure.|Przyjazd musi być późniejszy niż odjazd.|Прибытие должно быть позже отправления.|La llegada debe ser posterior a la salida.
+Zugfahrten müssen innerhalb des Dienstes liegen.|Train journeys must be within duty.|Jazdy pociągiem muszą mieścić się w służbie.|Поездки должны быть в пределах смены.|Los trayectos deben estar dentro del servicio.
+Zugfahrtereignisse müssen innerhalb des Dienstes liegen.|Train journey events must be within duty.|Zdarzenia jazd muszą mieścić się w służbie.|События поездок должны быть в пределах смены.|Los eventos del trayecto deben estar dentro del servicio.
+Dokumentierte Pausen überschreiten die Dienstzeit.|Documented breaks exceed the duty duration.|Udokumentowane przerwy przekraczają czas służby.|Документированные перерывы превышают длительность смены.|Las pausas documentadas superan la duración del servicio.
+Arbeitsbericht enthält zu viele Zugfahrtdaten.|The work report contains too much train journey data.|Raport pracy zawiera zbyt wiele danych jazd pociągiem.|Отчёт содержит слишком много данных поездок.|El informe contiene demasiados datos de trayectos.
+Zugfahrten wurden inzwischen geändert. Bitte erneut laden.|Train journeys have changed. Please reload.|Jazdy pociągiem zostały zmienione. Wczytaj ponownie.|Поездки уже изменены. Загрузите заново.|Los trayectos han cambiado. Vuelva a cargar.
+Arbeitszeit wurde administrativ geändert. Zugfahrten können nicht mehr geändert werden.|Working time was changed administratively. Train journeys can no longer be edited.|Czas pracy zmieniono administracyjnie. Nie można już edytować jazd pociągiem.|Рабочее время изменено администратором. Редактирование поездок недоступно.|El tiempo de trabajo fue modificado administrativamente. Ya no se pueden editar los trayectos.
+Zugfahrtänderungen verwerfen|Discard train journey changes|Odrzuć zmiany jazd pociągiem|Отменить изменения поездок|Descartar cambios de trayectos
+Nicht synchronisierte Zugfahrtänderungen verwerfen?|Discard unsynchronized train journey changes?|Odrzucić niezsynchronizowane zmiany jazd pociągiem?|Отменить несинхронизированные изменения поездок?|¿Descartar los cambios de trayectos sin sincronizar?
+Bitte zuerst Zugfahrten synchronisieren oder die Bearbeitung abbrechen.|Please synchronize train journeys first or cancel editing.|Najpierw zsynchronizuj jazdy pociągiem lub anuluj edycję.|Сначала синхронизируйте поездки или отмените редактирование.|Primero sincronice los trayectos o cancele la edición.
+Eintrag entfernen|Remove entry|Usuń wpis|Удалить запись|Eliminar entrada
+Eintrag entfernen?|Remove entry?|Usunąć wpis?|Удалить запись?|¿Eliminar entrada?
+Rangieren|Shunting|Manewry|Маневровая работа|Maniobras
+Zugvorbereitung|Train preparation|Przygotowanie pociągu|Подготовка поезда|Preparación del tren
+Warten auf Zug|Waiting for train|Oczekiwanie na pociąg|Ожидание поезда|Espera de tren
+Warten auf Fpl|Waiting for timetable|Oczekiwanie na rozkład jazdy|Ожидание расписания|Espera del horario
+Warten auf FPLO|Waiting for FPLO|Oczekiwanie na FPLO|Ожидание FPLO|Espera de FPLO
+Lok defekt|Locomotive defective|Usterka lokomotywy|Неисправность локомотива|Locomotora averiada
+sonstiges|other|inne|другое|otro
+Dritte Stelle|Third party|Podmiot trzeci|Третья сторона|Tercero
