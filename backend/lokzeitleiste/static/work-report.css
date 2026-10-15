@@ -16,3 +16,22 @@
 #workReport .train-panel [hidden]{display:none!important}
 
 #workReport label.self-payer{display:flex;align-items:center;gap:12px}#workReport .self-payer input{width:auto;margin:0}#receiptSection[hidden]{display:none!important}
+
+/* Form rows follow the travel sequence; narrow screens stack without overflow. */
+#workReport .train-data-grid{grid-template-columns:minmax(9rem,.55fr) minmax(0,1fr) minmax(14rem,1fr);align-items:end}
+#workReport .train-data-grid label{min-width:0;margin:0}
+.train-number{grid-area:1/1}.train-start-station{grid-area:1/2}.train-departure{grid-area:1/3}.train-end-station{grid-area:2/2}.train-arrival{grid-area:2/3}
+#workReport .train-data-grid input[type="datetime-local"],#workReport .guest-data-grid input[type="datetime-local"]{width:100%;min-width:0;max-width:17rem}
+#workReport .guest-data-grid{grid-template-columns:minmax(8rem,16rem) minmax(14rem,17rem);align-items:end;gap:12px 18px;justify-content:start}
+#workReport .guest-data-grid label{min-width:0;margin:0}
+.guest-from{grid-area:1/1}.guest-start{grid-area:1/2}.guest-to{grid-area:2/1}.guest-end{grid-area:2/2}.guest-transport{grid-area:3/1}#workReport .guest-data-grid .self-payer{grid-area:3/2;align-self:end;min-height:44px}.guest-detail{grid-area:4/1/auto/3}
+.guest-table thead tr>:nth-child(5),.guest-table thead tr>:nth-child(6),.guest-table tbody tr>:nth-child(5),.guest-table tbody tr>:nth-child(6),.guest-table #guestInsideTotal,.guest-table #guestOutsideTotal{display:none!important}.guest-table{min-width:580px}
+.train-tab-bar{display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px;border-bottom:2px solid #899ca8;margin:20px 0 0;padding:0 4px}
+.train-tab-bar .train-tabs{flex:1 1 auto;align-items:flex-end;gap:5px;margin:0;max-width:100%}
+.train-tabs button{position:relative;min-width:115px;padding:11px 16px 10px;background:#e4dfd1;color:#344b59;border:1px solid #9ca9ad;border-bottom:0;border-radius:10px 10px 0 0;box-shadow:inset 0 2px 0 #f8f5ec;white-space:normal;overflow-wrap:anywhere}
+.train-tabs button[aria-selected="true"]{background:#fff;color:#173d52;padding-top:15px;box-shadow:inset 0 3px 0 #17445b;z-index:1;margin-bottom:-2px;border-bottom:2px solid white;font-weight:750}
+.train-tab-bar #newTrainJourney{flex:0 0 auto;align-self:center;margin:6px 0 8px auto;padding:9px 14px}
+.train-panel{border-top:0;padding-top:12px}.report-view-actions{margin:16px 0}
+#toggleGuests[hidden],#guestSection[hidden],#workTimesSection[hidden],.train-tab-bar[hidden]{display:none!important}
+@media(max-width:850px){#workReport .train-data-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.train-number{grid-area:1/1}.train-start-station{grid-area:2/1}.train-departure{grid-area:2/2}.train-end-station{grid-area:3/1}.train-arrival{grid-area:3/2}}
+@media(max-width:560px){#workReport .train-data-grid,#workReport .guest-data-grid{grid-template-columns:minmax(0,1fr)}#workReport .train-data-grid label,#workReport .guest-data-grid label,#workReport .guest-data-grid label.self-payer{grid-area:auto}.train-tab-bar #newTrainJourney{margin-left:0}.train-tabs button{min-width:0;max-width:100%}}

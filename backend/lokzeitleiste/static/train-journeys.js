@@ -11,7 +11,7 @@ window.TrainJourneyEditor=class{
   this.o=options;this.stationCache=new Map();this.items=[];this.active=null;
   this.tabs=node('div');this.tabs.className='train-tabs';this.tabs.setAttribute('role','tablist');this.tabs.setAttribute('aria-label','Zugfahrten');
   this.panels=node('div');this.summary=node('p');this.summary.id='trainPauseSummary';
-  options.container.append(this.tabs,this.panels,this.summary);
+  this.bar=node('div');this.bar.className='train-tab-bar';this.bar.append(this.tabs);options.container.append(this.bar,this.panels,this.summary);
   options.button.onclick=()=>{try{this.add();}catch(error){this.o.message(error.message);}};
   window.addEventListener('languagechange',()=>{this.refreshTabs();this.items.forEach(item=>this.table(item));this.pauseSummary();});
  }
@@ -41,12 +41,13 @@ window.TrainJourneyEditor=class{
   item.tab=node('button');item.tab.type='button';item.tab.id='train-tab-'+data.id;item.tab.setAttribute('role','tab');item.tab.setAttribute('aria-controls',item.panel.id);item.panel.setAttribute('aria-labelledby',item.tab.id);
   item.tab.onclick=()=>this.activate(item.id);
   item.tab.onkeydown=event=>{let i=this.items.indexOf(item);if(event.key==='ArrowRight')i=(i+1)%this.items.length;else if(event.key==='ArrowLeft')i=(i+this.items.length-1)%this.items.length;else if(event.key==='Home')i=0;else if(event.key==='End')i=this.items.length-1;else return;event.preventDefault();this.activate(this.items[i].id);this.items[i].tab.focus();};
-  item.header=node('form');item.header.onsubmit=event=>event.preventDefault();item.headerSet=node('fieldset');item.headerSet.append(node('legend','Zugdaten'));const grid=node('div');grid.className='report-grid';
+  item.header=node('form');item.header.onsubmit=event=>event.preventDefault();item.headerSet=node('fieldset');item.headerSet.append(node('legend','Zugdaten'));const grid=node('div');grid.className='report-grid train-data-grid';
   const fields=item.fields={};fields.train_number=this.field(grid,'Zugnummer','text',{required:true,maxLength:12,size:12});fields.train_number.value=data.train_number||'';
   fields.start_station=this.station(grid,'StartBf',labelStation(data.start_station||'',data.start_station_name));
   fields.start_at=this.field(grid,'Abfahrt','datetime-local',{required:true,step:'300'});fields.start_at.value=(data.start_at||'').slice(0,16);
   fields.end_station=this.station(grid,'ZielBf',labelStation(data.end_station||'',data.end_station_name));
   fields.end_at=this.field(grid,'Ankunft','datetime-local',{required:true,step:'300'});fields.end_at.value=(data.end_at||'').slice(0,16);
+  for(const [name,cls] of Object.entries({train_number:'train-number',start_station:'train-start-station',start_at:'train-departure',end_station:'train-end-station',end_at:'train-arrival'}))fields[name].parentElement.classList.add(cls);
   item.autoStart=fields.start_at.value===this.o.bounds().start;item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
   for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{if(name==='start_at'){item.autoStart=false;if(item.autoEnd)fields.end_at.value=this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;}if(name==='end_at')item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);this.ready(item);this.table(item);this.changed();this.refreshTabs();});}
@@ -72,7 +73,7 @@ window.TrainJourneyEditor=class{
  ready(item){const f=item.fields,number=f.train_number.value.trim(),complete=!!(number&&[...number].length<=12&&/^[\p{L}\p{N}]+$/u.test(number)&&f.start_station.value.trim()&&f.end_station.value.trim()&&Number.isFinite(this.o.minute(f.start_at.value))&&this.o.minute(f.end_at.value)>this.o.minute(f.start_at.value));item.form.hidden=!complete;item.eventTable.hidden=!complete;}
  dutyChanged(){if(this.o.readonly())return;const start=this.o.bounds().start;for(const item of this.items){if(item.autoStart){item.fields.start_at.value=start;item.lastStart=start;if(item.autoEnd)item.fields.end_at.value=this.after(start,60);}this.ready(item);this.table(item);}this.changed();}
  activate(id){this.active=id;this.refreshTabs();}
- refreshTabs(){for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
+ refreshTabs(){this.bar.hidden=!this.items.length;if(this.items.length)this.bar.append(this.o.button);else this.o.container.before(this.o.button);for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
   item.rows.replaceChildren();const f=item.fields;
   for(const event of item.events){const row=node('tr');row.tabIndex=0;row.classList.toggle('selected',item.editing===event.id);const n=this.o.minute(event.end_at)-this.o.minute(event.start_at),reason=t(event.reason)+(event.reason==='sonstiges'?' · '+event.reason_detail:''),cause=t(event.cause)+(event.cause==='sonstiges'?' · '+event.cause_detail:'');

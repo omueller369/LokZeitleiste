@@ -964,7 +964,10 @@
     "Nach": "Nach",
     "Uhrzeiten in 5-Minuten-Schritten": "Uhrzeiten in 5-Minuten-Schritten",
     "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.",
-    "Selbstzahler (Sz)": "Selbstzahler (Sz)"
+    "Selbstzahler (Sz)": "Selbstzahler (Sz)",
+    "Gastfahrten schließen": "Gastfahrten schließen",
+    "Arbeitszeiten anzeigen": "Arbeitszeiten anzeigen",
+    "Arbeitszeiten ausblenden": "Arbeitszeiten ausblenden"
   },
   "en": {
     "Administration": "Administration",
@@ -1931,7 +1934,10 @@
     "Nach": "To",
     "Uhrzeiten in 5-Minuten-Schritten": "Times in 5-minute increments",
     "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Complete the train details using 5-minute increments.",
-    "Selbstzahler (Sz)": "Self-paid (Sz)"
+    "Selbstzahler (Sz)": "Self-paid (Sz)",
+    "Gastfahrten schließen": "Close passenger journeys",
+    "Arbeitszeiten anzeigen": "Show working times",
+    "Arbeitszeiten ausblenden": "Hide working times"
   },
   "pl": {
     "Administration": "Administracja",
@@ -2898,7 +2904,10 @@
     "Nach": "Do",
     "Uhrzeiten in 5-Minuten-Schritten": "Godziny w odstępach 5 minut",
     "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Uzupełnij dane pociągu, podając godziny co 5 minut.",
-    "Selbstzahler (Sz)": "Płatność własna (Sz)"
+    "Selbstzahler (Sz)": "Płatność własna (Sz)",
+    "Gastfahrten schließen": "Zamknij przejazdy",
+    "Arbeitszeiten anzeigen": "Pokaż czasy pracy",
+    "Arbeitszeiten ausblenden": "Ukryj czasy pracy"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3865,7 +3874,10 @@
     "Nach": "До",
     "Uhrzeiten in 5-Minuten-Schritten": "Время с шагом 5 минут",
     "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Заполните данные поезда, указывая время с шагом 5 минут.",
-    "Selbstzahler (Sz)": "За свой счёт (Sz)"
+    "Selbstzahler (Sz)": "За свой счёт (Sz)",
+    "Gastfahrten schließen": "Закрыть служебные поездки",
+    "Arbeitszeiten anzeigen": "Показать рабочее время",
+    "Arbeitszeiten ausblenden": "Скрыть рабочее время"
   },
   "es": {
     "Administration": "Administración",
@@ -4832,6 +4844,9 @@
     "Nach": "Hasta",
     "Uhrzeiten in 5-Minuten-Schritten": "Horas en intervalos de 5 minutos",
     "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Complete los datos del tren en intervalos de 5 minutos.",
-    "Selbstzahler (Sz)": "Pago propio (Sz)"
+    "Selbstzahler (Sz)": "Pago propio (Sz)",
+    "Gastfahrten schließen": "Cerrar desplazamientos",
+    "Arbeitszeiten anzeigen": "Mostrar horas de trabajo",
+    "Arbeitszeiten ausblenden": "Ocultar horas de trabajo"
   }
 }
