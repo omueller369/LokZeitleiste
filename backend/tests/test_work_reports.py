@@ -75,10 +75,10 @@ class WorkReportsTest(unittest.TestCase):
         self.assertEqual(self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()['trips'][0]['start_station_name'],'New catalog name')
 
     def test_pause_boundaries_and_reason(self):
-        for duration,expected in [(360,0),(361,30),(540,30),(541,45),(599,45),(600,45),(601,46),(660,105),(720,165),(721,166),(780,225)]:self.assertEqual(minimum_pause(duration),expected)
+        for duration,expected in [(360,0),(361,30),(540,30),(541,45),(599,45),(600,120),(601,120),(660,120),(720,120),(721,120),(780,120)]:self.assertEqual(minimum_pause(duration),expected)
         data=self.payload(end='2026-10-12T22:00')
         self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
-        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],225)
+        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],120)
         for name in ('start_at','end_at'):
             invalid=dict(data);invalid[name]=invalid[name]+':10';self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=invalid).status_code,422)
     def test_atomic_idempotent_guest_creation_and_worktime(self):

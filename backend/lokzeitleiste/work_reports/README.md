@@ -12,10 +12,10 @@ Die vom Auftrag vorgegebene betriebliche Pausenregel wird auf diese Dienstspanne
 |---|---|
 | Bis einschließlich 6 Stunden | 0 Minuten |
 | Mehr als 6 bis einschließlich 9 Stunden | 30 Minuten |
-| Mehr als 9 bis einschließlich 10 Stunden | 45 Minuten |
-| Mehr als 10 Stunden | 45 Minuten plus jede Minute über 10 Stunden |
+| Mehr als 9 bis unter 10 Stunden | 45 Minuten |
+| Ab 10 Stunden, einschließlich 12 Stunden und darüber | 120 Minuten |
 
-Beispiele: 10:01 h → 46 Minuten, 11:00 h → 105 Minuten, 12:00 h → 165 Minuten. Über zwölf Stunden: rote, fette Dienstspanne und Pflichtbegründung bis 1.000 Zeichen, auch serverseitig geprüft. Die zusätzliche Pause über zehn Stunden ist die gewünschte betriebliche Regel. Die allgemeinen 30-/45-Minuten-Grenzen stehen in [§ 4 ArbZG](https://www.gesetze-im-internet.de/arbzg/__4.html); die Maske bildet keine vollständige arbeitsrechtliche Prüfung ab.
+Beispiele: 9:59 h → 45 Minuten, 10:00 h → 120 Minuten, 11:00 h → 120 Minuten, 12:00 h → 120 Minuten. Über zwölf Stunden: rote, fette Dienstspanne und Pflichtbegründung bis 1.000 Zeichen, auch serverseitig geprüft. Die Mindestpause von 120 Minuten ab zehn Stunden ist die gewünschte betriebliche Regel. Die allgemeinen 30-/45-Minuten-Grenzen stehen in [§ 4 ArbZG](https://www.gesetze-im-internet.de/arbzg/__4.html); die Maske bildet keine vollständige arbeitsrechtliche Prüfung ab.
 
 **Tatsächliche Pause** wird separat eingegeben. Der berechnete Mindestwert wird nicht automatisch als tatsächlich genommen verbucht. Pausen werden nur dokumentiert und **niemals von der Arbeitszeit abgezogen**. Tages-, Wochen-, Monats-, Jahres- und PDF-Auswertungen sowie die Offline-Berechnung der Android-App verwenden die volle Dienstspanne. Nacht-, Sonn- und Feiertagsstunden werden ebenfalls ohne Pausenabzug berechnet. Eine Unterschreitung der berechneten Mindestpause wird angezeigt, ohne die Erfassung der tatsächlich geleisteten Zeit zu verhindern.
 
@@ -79,3 +79,5 @@ Die Webmaske bietet Dienst-, Gastfahrt-, Zugfahrt- und Ereigniszeiten in Fünf-M
 ## Selbstzahler bei Gastfahrten
 
 Die Checkbox **Selbstzahler (Sz)** hinter dem Verkehrsmittel steuert die Sichtbarkeit von **Quittungsbelege (optional)**. Nur bei gesetztem Häkchen ist der Bereich sichtbar. Die Kennzeichnung `self_payer` wird pro Gastfahrt im Berichtspayload gespeichert; historische Gastfahrten liefern `false`. Lokale Entwürfe, Warteschlange, Synchronisation und das erneute Laden erhalten die Auswahl. Beim Ausblenden werden Belege nicht gelöscht. Belege bleiben optional; die bisherigen Synchronisations- und Versandfunktionen gelten weiter. Es ist keine neue Datenbankspalte erforderlich.
+
+Im Bereich **Dienstzeiten** öffnet der Button **Gastfahrten** den zunächst ausgeblendeten Gastfahrtbereich. Sobald gespeicherte Gastfahrten oder eingegebene Stations-/Freitextdaten vorhanden sind, bleibt dieser Bereich sichtbar. Neue leere Berichte starten mit ausgeblendetem Bereich.

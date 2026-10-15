@@ -8,7 +8,7 @@ def minutes(start,end):return int((end-start).total_seconds()//60)
 
 
 def minimum_pause(duration):
-    return 45+duration-600 if duration>600 else 45 if duration>540 else 30 if duration>360 else 0
+    return 120 if duration>=600 else 45 if duration>540 else 30 if duration>360 else 0
 
 
 def check_time(value):
