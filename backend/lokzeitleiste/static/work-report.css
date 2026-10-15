@@ -35,3 +35,5 @@
 #toggleGuests[hidden],#guestSection[hidden],#workTimesSection[hidden],.train-tab-bar[hidden]{display:none!important}
 @media(max-width:850px){#workReport .train-data-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.train-number{grid-area:1/1}.train-start-station{grid-area:2/1}.train-departure{grid-area:2/2}.train-end-station{grid-area:3/1}.train-arrival{grid-area:3/2}}
 @media(max-width:560px){#workReport .train-data-grid,#workReport .guest-data-grid{grid-template-columns:minmax(0,1fr)}#workReport .train-data-grid label,#workReport .guest-data-grid label,#workReport .guest-data-grid label.self-payer{grid-area:auto}.train-tab-bar #newTrainJourney{margin-left:0}.train-tabs button{min-width:0;max-width:100%}}
+
+.train-event-table tr>:nth-child(2),.train-event-table tr>:nth-child(3),.train-event-table tr>:nth-child(4),.train-event-table tr>:nth-child(5){display:none!important}.train-event-table{min-width:1000px}

@@ -56,8 +56,8 @@ window.TrainJourneyEditor=class{
   f.cause=this.select(eventGrid,'Verursacher',CAUSES);f.cause_detail=this.field(eventGrid,'Sonstiger Verursacher (max. 50 Zeichen)','text',{maxLength:50});
   f.station=this.station(eventGrid,'Meldestelle/Ort','');
   f.start_at=this.field(eventGrid,'Von','datetime-local',{required:true,step:'300'});f.end_at=this.field(eventGrid,'Bis','datetime-local',{required:true,step:'300'});
-  f.start_at.oninput=()=>{if(!f.end_at.value||f.end_at.value===this.after(f.start_at.dataset.previous,5)||this.o.minute(f.end_at.value)<=this.o.minute(f.start_at.value))f.end_at.value=this.after(f.start_at.value,5);f.start_at.dataset.previous=f.start_at.value;f.end_at.min=f.start_at.value;};
-  for(const [name,field] of Object.entries(f))field.dataset.field=name;
+  f.start_at.oninput=()=>{if(!f.end_at.value||f.end_at.value===this.after(f.start_at.dataset.previous,15)||this.o.minute(f.end_at.value)<=this.o.minute(f.start_at.value))f.end_at.value=this.after(f.start_at.value,15);f.start_at.dataset.previous=f.start_at.value;f.end_at.min=f.start_at.value;};
+  for(const [name,field] of Object.entries(f)){field.dataset.field=name;for(const type of ['input','change'])field.addEventListener(type,()=>{if(item.cancel)item.cancel.hidden=!this.pendingEvent(item);});}
   f.reason.onchange=()=>this.details(item);f.cause.onchange=()=>this.details(item);
   item.submit=node('button','Eintragen');item.submit.type='submit';item.cancel=node('button','Bearbeitung abbrechen');item.cancel.type='button';item.cancel.onclick=()=>this.clearEvent(item);
   item.deleteEvent=node('button','Eintrag entfernen');item.deleteEvent.type='button';item.deleteEvent.onclick=()=>{if(this.o.readonly()||!item.editing)return;if(!confirm('Eintrag entfernen?'))return;item.events=item.events.filter(e=>e.id!==item.editing);this.clearEvent(item);this.changed();};item.eventSet.append(eventGrid,item.submit,item.cancel,item.deleteEvent);item.form.append(item.eventSet);item.form.onsubmit=event=>{event.preventDefault();this.insert(item).catch(error=>this.o.message(error.message));};item.panel.append(item.form);
@@ -66,12 +66,17 @@ window.TrainJourneyEditor=class{
   item.remove=node('button','Zugfahrt entfernen');item.remove.type='button';item.remove.onclick=()=>{if(this.o.readonly())return;if(!confirm('Zugfahrt und ihre Einträge entfernen?'))return;this.items=this.items.filter(x=>x!==item);item.panel.remove();item.tab.remove();this.activate(this.items[0]?.id);this.changed();};item.panel.append(item.remove);
   this.tabs.append(item.tab);this.panels.append(item.panel);this.clearEvent(item);this.table(item);this.ready(item);return item;
  }
- details(item){const f=item.eventFields;const ctl=f.reason.value==='Pause'&&f.cause.value==='CTL Logistics DE';f.station.required=!ctl;f.station.parentElement.hidden=ctl;if(ctl)f.station.value='';for(const [name,detail] of [['reason','reason_detail'],['cause','cause_detail']]){const visible=f[name].value==='sonstiges';f[detail].parentElement.hidden=!visible;f[detail].required=visible;if(!visible)f[detail].value='';}}
- clearEvent(item){
-  item.editing=null;item.form.reset();for(const f of Object.values(item.eventFields))f.value='';item.eventFields.start_at.dataset.previous='';item.eventFields.end_at.removeAttribute('min');item.submit.textContent='Eintragen';item.cancel.hidden=true;item.deleteEvent.hidden=true;this.details(item);this.table(item);
+ details(item){const f=item.eventFields;const ctl=f.reason.value==='Pause'&&f.cause.value==='CTL Logistics DE';f.station.required=!ctl;f.station.parentElement.hidden=ctl;if(ctl)f.station.value='';for(const [name,detail] of [['reason','reason_detail'],['cause','cause_detail']]){const visible=f[name].value==='sonstiges';f[detail].parentElement.hidden=!visible;f[detail].required=visible;if(!visible)f[detail].value='';}if(item.cancel)item.cancel.hidden=!this.pendingEvent(item);}
+ previousEnd(item){const index=this.items.indexOf(item),previous=index<0?this.items.at(-1):this.items[index-1];return previous?.events.at(-1)?.end_at;}
+ refreshSuggestions(){for(const item of this.items)if(!item.events.length&&!this.pendingEvent(item))this.clearEvent(item);}
+ clearEvent(item,nextStart){
+  item.editing=null;item.form.reset();for(const f of Object.values(item.eventFields))f.value='';
+  const f=item.eventFields,bounds=this.o.bounds(),start=(nextStart||item.events.at(-1)?.end_at||this.previousEnd(item)||bounds.start||'').slice(0,16),end=this.after(start,15);
+  f.start_at.value=start;f.end_at.value=end;item.suggestedTimes={start_at:start,end_at:end};f.start_at.dataset.previous=start;f.end_at.min=start;
+  item.submit.textContent='Eintragen';item.cancel.hidden=true;item.deleteEvent.hidden=true;this.details(item);this.table(item);
  }
  ready(item){const f=item.fields,number=f.train_number.value.trim(),complete=!!(number&&[...number].length<=12&&/^[\p{L}\p{N}]+$/u.test(number)&&f.start_station.value.trim()&&f.end_station.value.trim()&&Number.isFinite(this.o.minute(f.start_at.value))&&this.o.minute(f.end_at.value)>this.o.minute(f.start_at.value));item.form.hidden=!complete;item.eventTable.hidden=!complete;}
- dutyChanged(){if(this.o.readonly())return;const start=this.o.bounds().start;for(const item of this.items){if(item.autoStart){item.fields.start_at.value=start;item.lastStart=start;if(item.autoEnd)item.fields.end_at.value=this.after(start,60);}this.ready(item);this.table(item);}this.changed();}
+ dutyChanged(){if(this.o.readonly())return;const bounds=this.o.bounds(),start=bounds.start;for(const item of this.items){if(item.autoStart){item.fields.start_at.value=start;item.lastStart=start;if(item.autoEnd)item.fields.end_at.value=this.after(start,60);}if(!item.events.length&&!this.pendingEvent(item))this.clearEvent(item);this.ready(item);this.table(item);}this.changed();}
  activate(id){this.active=id;this.refreshTabs();}
  refreshTabs(){this.bar.hidden=!this.items.length;if(this.items.length)this.bar.append(this.o.button);else this.o.container.before(this.o.button);for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
@@ -84,14 +89,14 @@ window.TrainJourneyEditor=class{
  draft(){return this.items.map(item=>{const f=item.fields,a=stationParts(f.start_station.value),b=stationParts(f.end_station.value);return {id:item.id,train_number:f.train_number.value.trim(),start_station:a.code,start_station_name:a.name,start_at:f.start_at.value,end_station:b.code,end_station_name:b.name,end_at:f.end_at.value,events:item.events.map(e=>({...e}))};});}
  pauseMinutes(){return this.items.reduce((n,item)=>n+item.events.reduce((a,e)=>a+(e.reason==='Pause'?this.o.minute(e.end_at)-this.o.minute(e.start_at):0),0),0);}
  pauseSummary(){this.summary.textContent=t('Pausen aus Zugfahrten')+': '+this.o.clock(this.pauseMinutes());this.summary.setAttribute('data-i18n-ignore','');}
- changed(){this.pauseSummary();this.o.changed(this.draft());}
+ changed(){this.refreshSuggestions();this.pauseSummary();this.o.changed(this.draft());}
  restore(data){this.items=[];this.active=null;this.tabs.replaceChildren();this.panels.replaceChildren();for(const train of data||[])this.items.push(this.make(train));this.activate(this.items[0]?.id);this.pauseSummary();}
  freeze(){const disabled=this.o.readonly();this.o.button.disabled=disabled;for(const item of this.items){item.headerSet.disabled=disabled;item.eventSet.disabled=disabled;item.remove.disabled=disabled;}}
  checkRange(start,end){const a=this.o.minute(start),b=this.o.minute(end),bounds=this.o.bounds();if(!Number.isFinite(a)||!Number.isFinite(b)||b<=a)throw Error('Bis muss nach Von liegen.');if(a%5||b%5)throw Error('Uhrzeiten in 5-Minuten-Schritten');if(a<this.o.minute(bounds.start)||b>this.o.minute(bounds.end))throw Error('Zugfahrten und Ereignisse müssen innerhalb des Dienstes liegen.');}
  cacheStation(code,name){if(code&&name)this.stationCache.set(code.toUpperCase(),{code,name});}
  async resolve(field){try{const station=await this.o.resolve(field);this.cacheStation(station.code,station.name);return station;}catch(error){const station=this.stationCache.get(stationParts(field.value).code.toUpperCase());if(!station)throw error;field.value=labelStation(station.code,station.name);return station;}}
  async header(item){const f=item.fields,number=f.train_number.value.trim();if(!number||[...number].length>12||!/^[\p{L}\p{N}]+$/u.test(number))throw Error('Zugnummer: nur Buchstaben und Zahlen, maximal zwölf Zeichen.');if(!item.header.reportValidity())throw Error('Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.');this.checkRange(f.start_at.value,f.end_at.value);await this.resolve(f.start_station);await this.resolve(f.end_station);}
- pendingEvent(item){const f=item.eventFields;return Object.values(f).some(field=>field.value.trim());}
+ pendingEvent(item){if(item.editing)return true;return Object.entries(item.eventFields).some(([name,field])=>field.value.trim()!==(item.suggestedTimes?.[name]||''));}
  hasPending(){return this.items.some(item=>this.pendingEvent(item));}
  async validate(){for(const item of this.items){if(this.pendingEvent(item))throw Error('Bitte das Ereignis zuerst eintragen oder die Bearbeitung abbrechen.');await this.header(item);for(const event of item.events)this.checkRange(event.start_at,event.end_at);}this.changed();return this.draft();}
  async insert(item){
@@ -101,7 +106,7 @@ window.TrainJourneyEditor=class{
    if(f.reason.value==='sonstiges'&&(!f.reason_detail.value.trim()||f.reason_detail.value.length>256))throw Error('Sonstigen Grund bitte beschreiben.');if(f.cause.value==='sonstiges'&&(!f.cause_detail.value.trim()||f.cause_detail.value.length>50))throw Error('Sonstigen Verursacher bitte beschreiben.');
    const event={id:item.editing||this.o.uuid(),reason:f.reason.value,reason_detail:f.reason.value==='sonstiges'?f.reason_detail.value.trim():'',cause:f.cause.value,cause_detail:f.cause.value==='sonstiges'?f.cause_detail.value.trim():'',station:station.code,station_name:station.name,start_at:f.start_at.value,end_at:f.end_at.value};
    const all=this.items.flatMap(train=>train.events.filter(e=>e.id!==event.id));if(event.reason==='Pause'&&all.some(e=>e.reason==='Pause'&&this.o.minute(event.start_at)<this.o.minute(e.end_at)&&this.o.minute(event.end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
-   if(item.editing)item.events=item.events.map(e=>e.id===item.editing?event:e);else{if(item.events.length>=500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');item.events.push(event);}this.clearEvent(item);this.changed();this.o.message('');
+   if(item.editing)item.events=item.events.map(e=>e.id===item.editing?event:e);else{if(item.events.length>=500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');item.events.push(event);}this.clearEvent(item,event.end_at);this.changed();this.o.message('');
   }catch(error){this.o.message(error.message);}finally{this.o.block(false);}
  }
 };
