@@ -26,6 +26,7 @@ class GuestIn(BaseModel):
     end_at:datetime
     transport:Literal['train','car','taxi','public_transport','other']
     transport_detail:str=Field(default='',max_length=140)
+    self_payer:bool=False
 
     _times=field_validator('start_at','end_at')(check_time)
 

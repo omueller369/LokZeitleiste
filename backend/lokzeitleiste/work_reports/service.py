@@ -15,6 +15,7 @@ from .schemas import minutes,minimum_pause,ReportIn,train_pause_minutes
 def report_view(db,report):
     payload=json.loads(report.payload_json)
     for trip in payload['trips']:
+        trip.setdefault('self_payer',False)
         for field,name in (('start_station','start_station_name'),('end_station','end_station_name')):
             if name not in trip:
                 station=db.get(RailwayStation,trip[field]);trip[name]=station.name if station else ''
@@ -49,6 +50,7 @@ def save_report(db,user,data):
             payload.setdefault('kind','Sonstige Erfassung')
             payload.pop('train_journeys',None);payload.pop('_train_revision',None)
             for trip in payload['trips']:
+                trip.setdefault('self_payer',False)
                 trip.pop('start_station_name',None);trip.pop('end_station_name',None)
             return payload
         if identity(json.loads(existing.payload_json))!=identity(json.loads(data.model_dump_json())):
@@ -80,7 +82,7 @@ def save_report(db,user,data):
     try:validate_no_overlap(db,user.id,entry)
     except ValueError as exc:db.rollback();raise HTTPException(409,str(exc)) from exc
     report=DutyReport(tf_user_id=user.id,entry_id=entry.id,client_id=str(data.client_id),payload_json=normalized);db.add(report);db.flush()
-    for trip in data.trips:db.add(DutyGuestTrip(report_id=report.id,**trip.model_dump(exclude={'start_station_name','end_station_name'})))
+    for trip in data.trips:db.add(DutyGuestTrip(report_id=report.id,**trip.model_dump(exclude={'start_station_name','end_station_name','self_payer'})))
     db.add(WorkEntryAudit(entry_id=entry.id,actor_id=user.id,action='work_report_created'))
     try:db.commit()
     except IntegrityError as exc:db.rollback();raise HTTPException(409,'Arbeitsbericht wurde inzwischen gespeichert. Bitte erneut laden.') from exc

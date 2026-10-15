@@ -30,6 +30,22 @@ class WorkReportsTest(unittest.TestCase):
         return dict(client_id=str(uuid4()),start_at=start,end_at=end,actual_pause=30,overrun_reason='',trips=[dict(start_station='BHF',end_station='LL',start_at=start,end_at=(datetime.fromisoformat(start)+timedelta(hours=1)).isoformat(timespec='minutes'),transport='train',transport_detail='')])
     def create(self,data=None):
         result=self.driver.post('/api/v1/tf/work-reports',json=data or self.payload());self.assertEqual(result.status_code,201,result.text);return result.json()
+
+    def test_guest_self_payer_roundtrip_and_legacy_retry(self):
+        data=self.payload();data['trips'][0]['self_payer']=True
+        report=self.create(data)
+        self.assertTrue(report['trips'][0]['self_payer'])
+        self.assertEqual(self.create(data)['id'],report['id'])
+        self.assertTrue(self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()['trips'][0]['self_payer'])
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
+        self.assertTrue(month['reports'][0]['trips'][0]['self_payer'])
+        with Session(self.engine) as db:
+            row=db.get(DutyReport,report['id']);payload=json.loads(row.payload_json)
+            payload['trips'][0].pop('self_payer');row.payload_json=json.dumps(payload);db.commit()
+        data['trips'][0].pop('self_payer')
+        self.assertFalse(self.create(data)['trips'][0]['self_payer'])
+        data['trips'][0]['self_payer']=True
+        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,409)
     def pdf(self):
         out=io.BytesIO();canvas=Canvas(out);canvas.drawString(20,700,'Fiktiver Beleg');canvas.showPage();canvas.save();return out.getvalue()
     def upload(self,report,content=None,name='beleg.pdf'):

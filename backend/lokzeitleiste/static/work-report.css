@@ -14,3 +14,5 @@
 #workReport .absence-allowance label{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 #workReport .absence-allowance input{width:auto;margin:0}
 #workReport .train-panel [hidden]{display:none!important}
+
+#workReport label.self-payer{display:flex;align-items:center;gap:12px}#workReport .self-payer input{width:auto;margin:0}#receiptSection[hidden]{display:none!important}
