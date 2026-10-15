@@ -22,6 +22,7 @@ def report_view(db,report):
     guest_total=sum(minutes(datetime.fromisoformat(t['start_at']),datetime.fromisoformat(t['end_at'])) for t in payload['trips'])
     guest_inside=sum(max(0,minutes(max(start,datetime.fromisoformat(t['start_at'])),min(end,datetime.fromisoformat(t['end_at'])))) for t in payload['trips'])
     payload.setdefault('train_journeys',[])
+    payload.setdefault('ausbleibe',[])
     payload.setdefault('kind','Sonstige Erfassung')
     rest=is_rest_day(db,report.tf_user_id,start.date()) if payload['kind'] in ('Urlaub','Krank') else False
     credit=(0 if rest else 480) if payload['kind'] in ('Urlaub','Krank') else minutes(start,end)
@@ -44,6 +45,7 @@ def save_report(db,user,data):
         # Historical reports have no station names. Compare the actual duty/trip data;
         # keep the original station-name snapshot on retries and catalog changes.
         def identity(payload):
+            payload.setdefault('ausbleibe',[])
             payload.setdefault('kind','Sonstige Erfassung')
             payload.pop('train_journeys',None);payload.pop('_train_revision',None)
             for trip in payload['trips']:

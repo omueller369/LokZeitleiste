@@ -34,6 +34,30 @@ class TrainJourneysTest(unittest.TestCase):
         self.assertEqual((month['work_minutes'],month['pause_minutes']),(480,45))
         with Session(self.engine) as db:self.assertEqual(db.get(WorkEntry,report['entry_id']).pause_minutes,45)
 
+    def test_ausbleibe_roundtrip_retry_and_legacy_default(self):
+        data=self.data();data['ausbleibe']=['8h',"24'h"]
+        report=self.create(data)
+        self.assertEqual(report['ausbleibe'],data['ausbleibe'])
+        self.assertEqual(self.create(data)['id'],report['id'])
+        read=self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()
+        self.assertEqual(read['ausbleibe'],data['ausbleibe'])
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
+        self.assertEqual(month['reports'][0]['ausbleibe'],data['ausbleibe'])
+        self.assertEqual(month['work_minutes'],480)
+        trains=copy.deepcopy(report['train_journeys']);trains[0]['events'][0]['end_at']='2026-10-12T10:25'
+        self.assertEqual(self.update(report['id'],trains).json()['ausbleibe'],data['ausbleibe'])
+        changed=copy.deepcopy(data);changed['ausbleibe']=['24h']
+        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=changed).status_code,409)
+        with Session(self.engine) as db:
+            row=db.get(DutyReport,report['id']);payload=json.loads(row.payload_json);payload.pop('ausbleibe');row.payload_json=json.dumps(payload);db.commit()
+        data.pop('ausbleibe')
+        self.assertEqual(self.create(data)['ausbleibe'],[])
+
+    def test_ausbleibe_rejects_unknown_values(self):
+        for values in (['12h'],['8h','24h',"8'h","24'h",'8h']):
+            data=self.data();data['ausbleibe']=values
+            self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
+
     def test_validation_and_unique_identifiers(self):
         for number in ('','1234567890123','12-AB'):
             data=self.data();data['train_journeys'][0]['train_number']=number

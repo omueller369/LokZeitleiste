@@ -956,7 +956,14 @@
     "Startbf.": "Startbf.",
     "Endbf.": "Endbf.",
     "Verurs.": "Verurs.",
-    "CTL Pause": "CTL Pause"
+    "CTL Pause": "CTL Pause",
+    "Ausbleibe": "Ausbleibe",
+    "StartBf": "StartBf",
+    "ZielBf": "ZielBf",
+    "Meldestelle/Ort": "Meldestelle/Ort",
+    "Nach": "Nach",
+    "Uhrzeiten in 5-Minuten-Schritten": "Uhrzeiten in 5-Minuten-Schritten",
+    "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben."
   },
   "en": {
     "Administration": "Administration",
@@ -1915,7 +1922,14 @@
     "Startbf.": "Start stn.",
     "Endbf.": "End stn.",
     "Verurs.": "Cause",
-    "CTL Pause": "CTL break"
+    "CTL Pause": "CTL break",
+    "Ausbleibe": "Time away",
+    "StartBf": "Start stn.",
+    "ZielBf": "Dest. stn.",
+    "Meldestelle/Ort": "Reporting point/location",
+    "Nach": "To",
+    "Uhrzeiten in 5-Minuten-Schritten": "Times in 5-minute increments",
+    "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Complete the train details using 5-minute increments."
   },
   "pl": {
     "Administration": "Administracja",
@@ -2874,7 +2888,14 @@
     "Startbf.": "Stacja pocz.",
     "Endbf.": "Stacja końc.",
     "Verurs.": "Sprawca",
-    "CTL Pause": "Przerwa CTL"
+    "CTL Pause": "Przerwa CTL",
+    "Ausbleibe": "Pobyt poza domem",
+    "StartBf": "Stacja pocz.",
+    "ZielBf": "Stacja doc.",
+    "Meldestelle/Ort": "Punkt zgłoszenia/miejsce",
+    "Nach": "Do",
+    "Uhrzeiten in 5-Minuten-Schritten": "Godziny w odstępach 5 minut",
+    "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Uzupełnij dane pociągu, podając godziny co 5 minut."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3833,7 +3854,14 @@
     "Startbf.": "Ст. отправ.",
     "Endbf.": "Ст. приб.",
     "Verurs.": "Причина",
-    "CTL Pause": "Перерыв CTL"
+    "CTL Pause": "Перерыв CTL",
+    "Ausbleibe": "Отсутствие",
+    "StartBf": "Ст. отправ.",
+    "ZielBf": "Ст. назнач.",
+    "Meldestelle/Ort": "Пункт явки/место",
+    "Nach": "До",
+    "Uhrzeiten in 5-Minuten-Schritten": "Время с шагом 5 минут",
+    "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Заполните данные поезда, указывая время с шагом 5 минут."
   },
   "es": {
     "Administration": "Administración",
@@ -4792,6 +4820,13 @@
     "Startbf.": "Est. origen",
     "Endbf.": "Est. destino",
     "Verurs.": "Causante",
-    "CTL Pause": "Pausa CTL"
+    "CTL Pause": "Pausa CTL",
+    "Ausbleibe": "Tiempo fuera",
+    "StartBf": "Est. origen",
+    "ZielBf": "Est. destino",
+    "Meldestelle/Ort": "Punto de presentación/lugar",
+    "Nach": "Hasta",
+    "Uhrzeiten in 5-Minuten-Schritten": "Horas en intervalos de 5 minutos",
+    "Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.": "Complete los datos del tren en intervalos de 5 minutos."
   }
 }

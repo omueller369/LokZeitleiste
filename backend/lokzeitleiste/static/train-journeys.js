@@ -18,14 +18,14 @@ window.TrainJourneyEditor=class{
  add(){
   if(this.o.readonly())return;
   if(this.items.length>=50){this.o.message('Höchstens 50 Zugfahrten pro Bericht.');return;}
-  const bounds=this.o.bounds(),previous=this.items.at(-1),start=previous?.fields.end_at.value||bounds.start;
+  const start=this.o.bounds().start;
   const end=this.after(start,60);
   const item=this.make({id:this.o.uuid(),train_number:'',start_at:start,end_at:end,events:[]});
   this.items.push(item);this.activate(item.id);this.changed();item.fields.train_number.focus();
  }
  after(value,n){const minute=this.o.minute(value);return Number.isFinite(minute)?new Date((minute+n)*60000).toISOString().slice(0,16):'';}
  field(parent,title,type='text',extra={}){
-  const label=node('label'),caption=node('span',title),input=node('input');input.type=type;Object.assign(input,extra);label.append(caption,input);parent.append(label);return input;
+  const label=node('label'),caption=node('span',title),input=node('input');input.type=type;Object.assign(input,extra);if(type==='datetime-local')input.title='Uhrzeiten in 5-Minuten-Schritten';const full=({'StartBf':'Startbahnhof (DS100 oder Bahnhofsname)','ZielBf':'Endbahnhof (DS100 oder Bahnhofsname)','Meldestelle/Ort':'Ort (DS100 oder Bahnhofsname)'})[title];if(full){label.title=full;input.setAttribute('aria-label',full);}label.append(caption,input);parent.append(label);return input;
  }
  station(parent,title,value){
   const input=this.field(parent,title,'text',{required:true,maxLength:270,autocomplete:'off'}),list=node('datalist');list.id='train-station-'+this.o.uuid();input.setAttribute('list',list.id);parent.append(list);input.value=value||'';this.o.stations(input,list);return input;
@@ -42,32 +42,35 @@ window.TrainJourneyEditor=class{
   item.tab.onclick=()=>this.activate(item.id);
   item.tab.onkeydown=event=>{let i=this.items.indexOf(item);if(event.key==='ArrowRight')i=(i+1)%this.items.length;else if(event.key==='ArrowLeft')i=(i+this.items.length-1)%this.items.length;else if(event.key==='Home')i=0;else if(event.key==='End')i=this.items.length-1;else return;event.preventDefault();this.activate(this.items[i].id);this.items[i].tab.focus();};
   item.header=node('form');item.header.onsubmit=event=>event.preventDefault();item.headerSet=node('fieldset');item.headerSet.append(node('legend','Zugdaten'));const grid=node('div');grid.className='report-grid';
-  const fields=item.fields={};fields.train_number=this.field(grid,'Zugnummer','text',{required:true,maxLength:12});fields.train_number.value=data.train_number||'';
-  fields.start_station=this.station(grid,'Startbahnhof (DS100 oder Bahnhofsname)',labelStation(data.start_station||'',data.start_station_name));
-  fields.start_at=this.field(grid,'Abfahrtsdatum und Uhrzeit','datetime-local',{required:true,step:'60'});fields.start_at.value=(data.start_at||'').slice(0,16);
-  fields.end_station=this.station(grid,'Endbahnhof (DS100 oder Bahnhofsname)',labelStation(data.end_station||'',data.end_station_name));
-  fields.end_at=this.field(grid,'Ankunftsdatum und Uhrzeit','datetime-local',{required:true,step:'60'});fields.end_at.value=(data.end_at||'').slice(0,16);
+  const fields=item.fields={};fields.train_number=this.field(grid,'Zugnummer','text',{required:true,maxLength:12,size:12});fields.train_number.value=data.train_number||'';
+  fields.start_station=this.station(grid,'StartBf',labelStation(data.start_station||'',data.start_station_name));
+  fields.start_at=this.field(grid,'Abfahrt','datetime-local',{required:true,step:'300'});fields.start_at.value=(data.start_at||'').slice(0,16);
+  fields.end_station=this.station(grid,'ZielBf',labelStation(data.end_station||'',data.end_station_name));
+  fields.end_at=this.field(grid,'Ankunft','datetime-local',{required:true,step:'300'});fields.end_at.value=(data.end_at||'').slice(0,16);
+  item.autoStart=fields.start_at.value===this.o.bounds().start;item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
-  for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{this.table(item);this.changed();this.refreshTabs();});}
-  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrtereignisse'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL Logistics DE';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid';const f=item.eventFields={};
+  for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{if(name==='start_at'){item.autoStart=false;if(item.autoEnd)fields.end_at.value=this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;}if(name==='end_at')item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);this.ready(item);this.table(item);this.changed();this.refreshTabs();});}
+  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrt'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL Logistics DE';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid';const f=item.eventFields={};
   f.reason=this.select(eventGrid,'Grund',REASONS);f.reason_detail=this.field(eventGrid,'Sonstiger Grund (max. 256 Zeichen)','text',{maxLength:256});
   f.cause=this.select(eventGrid,'Verursacher',CAUSES);f.cause_detail=this.field(eventGrid,'Sonstiger Verursacher (max. 50 Zeichen)','text',{maxLength:50});
-  f.station=this.station(eventGrid,'Ort (DS100 oder Bahnhofsname)','');
-  f.start_at=this.field(eventGrid,'Von','datetime-local',{required:true,step:'60'});f.end_at=this.field(eventGrid,'Bis','datetime-local',{required:true,step:'60'});
+  f.station=this.station(eventGrid,'Meldestelle/Ort','');
+  f.start_at=this.field(eventGrid,'Von','datetime-local',{required:true,step:'300'});f.end_at=this.field(eventGrid,'Bis','datetime-local',{required:true,step:'300'});
   f.start_at.oninput=()=>{if(!f.end_at.value||f.end_at.value===this.after(f.start_at.dataset.previous,5)||this.o.minute(f.end_at.value)<=this.o.minute(f.start_at.value))f.end_at.value=this.after(f.start_at.value,5);f.start_at.dataset.previous=f.start_at.value;f.end_at.min=f.start_at.value;};
   for(const [name,field] of Object.entries(f))field.dataset.field=name;
   f.reason.onchange=()=>this.details(item);f.cause.onchange=()=>this.details(item);
   item.submit=node('button','Eintragen');item.submit.type='submit';item.cancel=node('button','Bearbeitung abbrechen');item.cancel.type='button';item.cancel.onclick=()=>this.clearEvent(item);
   item.deleteEvent=node('button','Eintrag entfernen');item.deleteEvent.type='button';item.deleteEvent.onclick=()=>{if(this.o.readonly()||!item.editing)return;if(!confirm('Eintrag entfernen?'))return;item.events=item.events.filter(e=>e.id!==item.editing);this.clearEvent(item);this.changed();};item.eventSet.append(eventGrid,item.submit,item.cancel,item.deleteEvent);item.form.append(item.eventSet);item.form.onsubmit=event=>{event.preventDefault();this.insert(item).catch(error=>this.o.message(error.message));};item.panel.append(item.form);
-  const scroll=node('div');scroll.className='excel-scroll';const table=node('table');table.className='excel train-event-table';const head=node('thead'),row=node('tr');
+  const scroll=node('div');scroll.className='excel-scroll';item.eventTable=scroll;const table=node('table');table.className='excel train-event-table';const head=node('thead'),row=node('tr');
   for(const caption of ['Zugnummer','Startbahnhof','Abfahrt','Endbahnhof','Ankunft','Grund','Verursacher','Ort','Von','Bis','Dauer','Pausenzeit']){const short=({'Zugnummer':'Zug-Nr.','Startbahnhof':'Startbf.','Endbahnhof':'Endbf.','Verursacher':'Verurs.','Pausenzeit':'Pause'})[caption]||caption;const cell=node('th',short);cell.title=caption;cell.setAttribute('aria-label',caption);row.append(cell);}head.append(row);item.rows=node('tbody');table.append(head,item.rows);scroll.append(table);item.panel.append(scroll);
   item.remove=node('button','Zugfahrt entfernen');item.remove.type='button';item.remove.onclick=()=>{if(this.o.readonly())return;if(!confirm('Zugfahrt und ihre Einträge entfernen?'))return;this.items=this.items.filter(x=>x!==item);item.panel.remove();item.tab.remove();this.activate(this.items[0]?.id);this.changed();};item.panel.append(item.remove);
-  this.tabs.append(item.tab);this.panels.append(item.panel);this.clearEvent(item);this.table(item);return item;
+  this.tabs.append(item.tab);this.panels.append(item.panel);this.clearEvent(item);this.table(item);this.ready(item);return item;
  }
  details(item){const f=item.eventFields;const ctl=f.reason.value==='Pause'&&f.cause.value==='CTL Logistics DE';f.station.required=!ctl;f.station.parentElement.hidden=ctl;if(ctl)f.station.value='';for(const [name,detail] of [['reason','reason_detail'],['cause','cause_detail']]){const visible=f[name].value==='sonstiges';f[detail].parentElement.hidden=!visible;f[detail].required=visible;if(!visible)f[detail].value='';}}
  clearEvent(item){
   item.editing=null;item.form.reset();for(const f of Object.values(item.eventFields))f.value='';item.eventFields.start_at.dataset.previous='';item.eventFields.end_at.removeAttribute('min');item.submit.textContent='Eintragen';item.cancel.hidden=true;item.deleteEvent.hidden=true;this.details(item);this.table(item);
  }
+ ready(item){const f=item.fields,number=f.train_number.value.trim(),complete=!!(number&&[...number].length<=12&&/^[\p{L}\p{N}]+$/u.test(number)&&f.start_station.value.trim()&&f.end_station.value.trim()&&Number.isFinite(this.o.minute(f.start_at.value))&&this.o.minute(f.end_at.value)>this.o.minute(f.start_at.value));item.form.hidden=!complete;item.eventTable.hidden=!complete;}
+ dutyChanged(){if(this.o.readonly())return;const start=this.o.bounds().start;for(const item of this.items){if(item.autoStart){item.fields.start_at.value=start;item.lastStart=start;if(item.autoEnd)item.fields.end_at.value=this.after(start,60);}this.ready(item);this.table(item);}this.changed();}
  activate(id){this.active=id;this.refreshTabs();}
  refreshTabs(){for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
@@ -83,10 +86,10 @@ window.TrainJourneyEditor=class{
  changed(){this.pauseSummary();this.o.changed(this.draft());}
  restore(data){this.items=[];this.active=null;this.tabs.replaceChildren();this.panels.replaceChildren();for(const train of data||[])this.items.push(this.make(train));this.activate(this.items[0]?.id);this.pauseSummary();}
  freeze(){const disabled=this.o.readonly();this.o.button.disabled=disabled;for(const item of this.items){item.headerSet.disabled=disabled;item.eventSet.disabled=disabled;item.remove.disabled=disabled;}}
- checkRange(start,end){const a=this.o.minute(start),b=this.o.minute(end),bounds=this.o.bounds();if(!Number.isFinite(a)||!Number.isFinite(b)||b<=a)throw Error('Bis muss nach Von liegen.');if(a<this.o.minute(bounds.start)||b>this.o.minute(bounds.end))throw Error('Zugfahrten und Ereignisse müssen innerhalb des Dienstes liegen.');}
+ checkRange(start,end){const a=this.o.minute(start),b=this.o.minute(end),bounds=this.o.bounds();if(!Number.isFinite(a)||!Number.isFinite(b)||b<=a)throw Error('Bis muss nach Von liegen.');if(a%5||b%5)throw Error('Uhrzeiten in 5-Minuten-Schritten');if(a<this.o.minute(bounds.start)||b>this.o.minute(bounds.end))throw Error('Zugfahrten und Ereignisse müssen innerhalb des Dienstes liegen.');}
  cacheStation(code,name){if(code&&name)this.stationCache.set(code.toUpperCase(),{code,name});}
  async resolve(field){try{const station=await this.o.resolve(field);this.cacheStation(station.code,station.name);return station;}catch(error){const station=this.stationCache.get(stationParts(field.value).code.toUpperCase());if(!station)throw error;field.value=labelStation(station.code,station.name);return station;}}
- async header(item){const f=item.fields,number=f.train_number.value.trim();if(!number||[...number].length>12||!/^[\p{L}\p{N}]+$/u.test(number))throw Error('Zugnummer: nur Buchstaben und Zahlen, maximal zwölf Zeichen.');this.checkRange(f.start_at.value,f.end_at.value);await this.resolve(f.start_station);await this.resolve(f.end_station);}
+ async header(item){const f=item.fields,number=f.train_number.value.trim();if(!number||[...number].length>12||!/^[\p{L}\p{N}]+$/u.test(number))throw Error('Zugnummer: nur Buchstaben und Zahlen, maximal zwölf Zeichen.');if(!item.header.reportValidity())throw Error('Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.');this.checkRange(f.start_at.value,f.end_at.value);await this.resolve(f.start_station);await this.resolve(f.end_station);}
  pendingEvent(item){const f=item.eventFields;return Object.values(f).some(field=>field.value.trim());}
  hasPending(){return this.items.some(item=>this.pendingEvent(item));}
  async validate(){for(const item of this.items){if(this.pendingEvent(item))throw Error('Bitte das Ereignis zuerst eintragen oder die Bearbeitung abbrechen.');await this.header(item);for(const event of item.events)this.checkRange(event.start_at,event.end_at);}this.changed();return this.draft();}

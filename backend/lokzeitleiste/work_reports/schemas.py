@@ -124,6 +124,7 @@ class ReportIn(BaseModel):
     client_id:UUID
     start_at:datetime
     end_at:datetime
+    ausbleibe:list[Literal["8h","24h","8'h","24'h"]]=Field(default_factory=list,max_length=4)
     actual_pause:int=Field(default=0,ge=0,le=1440)
     overrun_reason:str=Field(default='',max_length=1000)
     trips:list[GuestIn]=Field(default_factory=list,max_length=50)
@@ -133,6 +134,7 @@ class ReportIn(BaseModel):
 
     @model_validator(mode='after')
     def validate_report(self):
+        self.ausbleibe=list(dict.fromkeys(self.ausbleibe))
         duration=minutes(self.start_at,self.end_at)
         if duration<=0:raise ValueError('Dienstende muss nach Dienstbeginn liegen.')
         if self.kind in ('Bereitschaft','Rufbereitschaft','Ausfallschicht') and duration>480:

@@ -956,3 +956,10 @@ Startbf.|Start stn.|Stacja pocz.|Ст. отправ.|Est. origen
 Endbf.|End stn.|Stacja końc.|Ст. приб.|Est. destino
 Verurs.|Cause|Sprawca|Причина|Causante
 CTL Pause|CTL break|Przerwa CTL|Перерыв CTL|Pausa CTL
+Ausbleibe|Time away|Pobyt poza domem|Отсутствие|Tiempo fuera
+StartBf|Start stn.|Stacja pocz.|Ст. отправ.|Est. origen
+ZielBf|Dest. stn.|Stacja doc.|Ст. назнач.|Est. destino
+Meldestelle/Ort|Reporting point/location|Punkt zgłoszenia/miejsce|Пункт явки/место|Punto de presentación/lugar
+Nach|To|Do|До|Hasta
+Uhrzeiten in 5-Minuten-Schritten|Times in 5-minute increments|Godziny w odstępach 5 minut|Время с шагом 5 минут|Horas en intervalos de 5 minutos
+Bitte die Zugdaten vollständig in 5-Minuten-Schritten eingeben.|Complete the train details using 5-minute increments.|Uzupełnij dane pociągu, podając godziny co 5 minut.|Заполните данные поезда, указывая время с шагом 5 минут.|Complete los datos del tren en intervalos de 5 minutos.
