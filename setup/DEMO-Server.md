@@ -1,24 +1,20 @@
-# Öffentliche Demo: ctl-software.io-goerlitz.eu
+# HTTP-Demo: ctl-software.io-goerlitz.eu
 
-Ziel: **212.227.86.251**, **https://ctl-software.io-goerlitz.eu**. Die neue Routine `setup-demo.sh` baut auf der vollständigen Testinstallation auf und stellt sie per Apache/HTTPS bereit. Sie ist für einen dedizierten Ubuntu-Server **26.04 LTS / 26.04.1**, amd64 oder arm64, vorgesehen. Sie installiert kein neues Betriebssystem. Ein lokaler Teststack und diese Demo sollten in getrennten Servern/VMs laufen, da die Demo den Teststack dieses Projektverzeichnisses verwendet.
+Ziel: **212.227.86.251**, **http://ctl-software.io-goerlitz.eu**. Die Routine verwendet zunächst **HTTP ohne Zertifikat und ohne HTTPS-Weiterleitung**. Vorhandene Apache-Websites und BIND-Dienste werden weiterverwendet; die Hauptdomain bleibt unverändert. Ubuntu Server 26.04 LTS / 26.04.1, amd64 oder arm64, wird vorausgesetzt.
 
-## Voraussetzungen beim Provider
+## DNS und Ports
 
-- DNS-A-Record: `ctl-software.io-goerlitz.eu` → `212.227.86.251`. Weitere A-Records müssen entfernt/angepasst werden. Ein bestehender AAAA-Record muss zunächst entfernt werden, solange IPv6 nicht gesondert eingerichtet ist. DNS-Änderungen können verzögert sichtbar werden.
-- Eingehend TCP **22** (bzw. eigener SSH-Port), **80** und **443** in der Provider-Firewall erlauben. Eine bereits aktive Host-Firewall muss die verwendeten Ports ebenfalls erlauben. Die Routine ändert keine Firewallregeln und schaltet die Firewall nicht ein oder aus.
-- TCP 80 muss auch nach der Installation für die Zertifikatserneuerung erreichbar bleiben.
-- Kein anderer Webserver darf Port 80/443 belegen. Bestehende andere Apache-Domains werden nicht deaktiviert; eine bereits vorhandene Konfiguration für diese Domain wird nicht ungefragt ersetzt.
-- Eine eigene E-Mail-Adresse für das Let's-Encrypt-Zertifikatskonto bereithalten. Der Aufruf stimmt den Let's-Encrypt-Nutzungsbedingungen zu.
+Den A-Record `ctl-software.io-goerlitz.eu` auf `212.227.86.251` setzen. Für diesen Host keine abweichenden A-/CNAME-Einträge verwenden. AAAA-Einträge sind erlaubt, wenn die IPv6-Adressen lokal auf dem Server eingerichtet sind und TCP 80 auch über IPv6 erreichbar ist. TCP 80 und der verwendete SSH-Port müssen durch Provider- und Host-Firewall erreichbar sein. Die Routine ändert keine Firewallregeln. Port 443 und ein Zertifikatskonto sind für HTTP nicht erforderlich.
 
-## Erstinstallation
+## Installation
 
-Im Mac-/PC-Terminal mit dem vorhandenen Ubuntu-Administratorkonto verbinden. `BENUTZER` ersetzen; bei eingerichtetem Root-SSH ist auch `root` möglich:
+Vom Mac/PC verbinden (`BENUTZER` ersetzen):
 
 ```bash
 ssh BENUTZER@212.227.86.251
 ```
 
-Dann **auf dem Server**:
+Auf dem Server:
 
 ```bash
 sudo apt update
@@ -27,74 +23,63 @@ sudo install -d -o "$USER" -g "$(id -gn)" /opt/LokZeitleiste
 git clone --branch setup/debian-testumgebung --single-branch https://github.com/omueller369/LokZeitleiste.git /opt/LokZeitleiste
 cd /opt/LokZeitleiste
 sudo bash setup-demo.sh --check
-sudo bash setup-demo.sh --email DEINE-EMAIL@BEISPIEL.DE
+sudo bash setup-demo.sh
 ```
 
-Die E-Mail-Adresse ersetzen. Ein privates GitHub-Repository erfordert GitHub-Zugang beim Klonen. Zugangsdaten nicht in die URL schreiben. `--check` prüft lesend DNS und die Voraussetzungen; noch fehlende Pakete werden erst beim eigentlichen Setup installiert.
-
-Die Routine installiert Abhängigkeiten, baut/startet Docker-Dienste, richtet Datenbank, Benutzerverzeichnisse, Linux-Konten und Admin-Zugang ein, erstellt das Zertifikat und aktiviert HTTPS. Datenbank und API werden nicht direkt öffentlich veröffentlicht: Die API bindet an `127.0.0.1:8000`; der Zugriff erfolgt über Apache. Das Testpostfach bleibt unter `127.0.0.1:8025`. Origin wird auf `https://ctl-software.io-goerlitz.eu` gesetzt, Sitzungscookies werden nur über HTTPS gesendet.
-
-HTTP leitet auf HTTPS um; vor Ausstellung des Zertifikats werden darüber ausschließlich die ACME-Challenges ausgeliefert. Zertifikatserneuerungen übernimmt `certbot.timer`, anschließend wird Apache neu geladen. Es wird nur `ctl-software.io-goerlitz.eu` eingerichtet, **kein** zusätzliches `www.ctl-software.io-goerlitz.eu`.
-
-## Aufrufen und anmelden
-
-- Administration: https://ctl-software.io-goerlitz.eu/admin
-- TF-Portal: https://ctl-software.io-goerlitz.eu/tf
-- Dokumente: https://ctl-software.io-goerlitz.eu/documents
-
-Initialer Administrator: **administrator**, falls noch kein aktiver Admin existiert. Zufälliges Initialpasswort auf dem Server anzeigen:
-
-```bash
-sudo cat /var/lib/lokzeitleiste/admin-initial-password
-```
-
-Bei vorhandenen Admins werden die bisherigen Zugangsdaten beibehalten. Keine automatische Erstellung oder Zurücksetzung von Beispiel-TFs; Vorführkonten über die Administration mit eigenen Passwörtern anlegen.
-
-## Test-E-Mails ansehen
-
-Alle automatischen Test-E-Mails werden in Mailpit aufgefangen und nicht über einen realen SMTP-Provider versendet. Das Postfach wird nicht öffentlich freigegeben. Im Mac-/PC-Terminal:
-
-```bash
-ssh -N -L 8025:127.0.0.1:8025 BENUTZER@212.227.86.251
-```
-
-Dann http://localhost:8025 öffnen. Individuell eingerichtete externe E-Mail-Konten sind davon getrennt; deren Funktionen verbinden sich mit dem jeweiligen Anbieter.
-
-## Aktualisieren
-
-Auf dem Server im bisherigen Projektverzeichnis:
+Bei privatem Repository die GitHub-Anmeldung beim Klonen verwenden. Eine vorhandene Installation nicht erneut klonen, sondern aktualisieren:
 
 ```bash
 cd /opt/LokZeitleiste
 git status --short
 git pull --ff-only origin setup/debian-testumgebung
-sudo bash setup-demo.sh --email DEINE-EMAIL@BEISPIEL.DE
+sudo bash setup-demo.sh
 ```
 
-Lokale Änderungen vorher sichern/committen. Bei vorhandener `.env.test` wird automatisch `setup-update.sh` ausgeführt: Sicherung von Datenbank, Dokumenten inklusive ACLs, Testkonfiguration und Zertifikaten unter `backend/testenv/backups/update-…/`, anschließend Migrationen/Archivumsortierung und Neubau. Die Admin-Passwörter bleiben erhalten. Kein Datenreset und kein automatischer Datenbank-Rollback. Let's-Encrypt-Dateien unter `/etc/letsencrypt` und die Apache-Konfiguration zusätzlich in die Server-Sicherung aufnehmen; diese liegen außerhalb des Projekt-Backups.
+Lokale Änderungen vorher sichern/committen. Bei vorhandener `.env.test` wird automatisch die Update-Routine mit vorheriger Sicherung von Datenbank, Dokumenten/ACLs und Projektkonfiguration ausgeführt. Zugangsdaten bleiben erhalten. Die Sicherungen liegen unter `backend/testenv/backups/update-…/`. Apache-/BIND-Konfigurationen zusätzlich in die vorhandene Server-Sicherung aufnehmen.
 
-## Prüfen und Fehler finden
+Die Routine setzt `PUBLIC_ORIGIN=http://ctl-software.io-goerlitz.eu` und `COOKIE_SECURE=false`, damit die Anmeldung über HTTP funktioniert. Ein zuvor von dieser Routine aktivierter Demo-HTTPS-VirtualHost wird deaktiviert; andere HTTPS-Sites und vorhandene Zertifikate bleiben erhalten. Cookies, Passwörter und Dokumente sind bei HTTP unverschlüsselt: für diese vorläufige Demo ausschließlich fiktive Daten und eigene Demo-Passwörter verwenden. Externe OAuth-Anbieter können HTTPS für Redirect-URLs verlangen.
+
+## Aufrufen und prüfen
+
+- Administration: http://ctl-software.io-goerlitz.eu/admin
+- TF-Portal: http://ctl-software.io-goerlitz.eu/tf
+- Dokumente: http://ctl-software.io-goerlitz.eu/documents
+
+Bei erstmaliger Anlage lautet der Admin-Benutzer `administrator`; sein zufälliges Initialpasswort anzeigen:
 
 ```bash
-curl --fail https://ctl-software.io-goerlitz.eu/health
+sudo cat /var/lib/lokzeitleiste/admin-initial-password
+curl --fail http://ctl-software.io-goerlitz.eu/health
 sudo bash backend/testenv/control.sh status
 sudo bash backend/testenv/control.sh logs
 sudo apache2ctl configtest
-sudo systemctl status certbot.timer --no-pager
-sudo systemctl status lokzeitleiste-users.timer --no-pager
-sudo certbot renew --dry-run
+sudo apache2ctl -S
 sudo tail -n 100 /var/log/apache2/lokzeitleiste-ctl-demo-error.log
 ```
 
-Ein Zertifikatsfehler deutet häufig auf DNS-/AAAA-Zuordnung, CAA-Regeln oder nicht erreichbaren Port 80 hin. Erst diese Ursache beheben und dann die Demo-Routine erneut starten. Für Google/Microsoft-OAuth im Anbieterportal Redirect-URLs passend zur öffentlichen Domain registrieren; `localhost`-Freigaben gelten dafür nicht automatisch.
+Vorhandene Admin-Zugangsdaten werden beibehalten. Die Routine erzeugt keine TFs mit bekannten Beispielpasswörtern. API und Testpostfach binden ausschließlich lokal; die Datenbank veröffentlicht keinen Hostport. Automatische Demo-E-Mails landen in Mailpit. Im Mac-/PC-Terminal dafür einen Tunnel öffnen:
 
-Die Erstellung der Routine ist lokal geprüft. SSH-Zugriff, Provider-DNS, Firewall und der tatsächliche Installationslauf auf **212.227.86.251** wurden nicht durchgeführt.
+```bash
+ssh -N -L 8025:127.0.0.1:8025 BENUTZER@212.227.86.251
+```
 
-Offizielle Dokumentation: [Certbot Webroot und Erneuerung](https://eff-certbot.readthedocs.io/en/stable/using.html), [Docker Port-Bindings](https://docs.docker.com/engine/network/port-publishing/).
+Danach http://localhost:8025 öffnen. Einzeln eingerichtete externe E-Mail-Konten verbinden sich unabhängig davon mit dem jeweiligen Anbieter.
+
+## Später optional HTTPS einschalten
+
+```bash
+sudo bash setup-demo.sh --https --email DEINE-EMAIL@BEISPIEL.DE
+```
+
+Dafür zusätzlich TCP 443 öffnen und eine eigene E-Mail-Adresse einsetzen. Erst mit `--https` werden Certbot, Zertifikat, HTTP-Weiterleitung auf HTTPS und sichere Cookies eingerichtet. Der Aufruf stimmt den Let's-Encrypt-Nutzungsbedingungen zu. Certbot übernimmt die Erneuerung über seinen Timer. Ein erneuter Aufruf **ohne** `--https` schaltet diese Demo wieder auf HTTP.
+
+Ein Browser kann eine frühere permanente HTTPS-Weiterleitung zwischengespeichert haben; gegebenenfalls Website-Daten für die Demo-Subdomain löschen und die HTTP-Adresse ausdrücklich neu öffnen. Eine von anderen Serverkonfigurationen gesetzte HSTS-Richtlinie einschließlich Subdomains kann HTTP im Browser verhindern.
+
+Die Routine ist lokal geprüft; auf dem externen Server wurden keine Änderungen ausgeführt.
 
 ## Vorhandene Apache- und BIND-Installation
 
-Die Demo verwendet eigene VirtualHosts `lokzeitleiste-ctl-demo-http.conf` und `lokzeitleiste-ctl-demo-https.conf`. Vorhandene Websites, die Hauptdomain `io-goerlitz.eu` und andere BIND-Zoneneinträge werden nicht verändert. Apache wird nach erfolgreicher Konfigurationsprüfung neu geladen; ein Neustart von Apache oder BIND ist nicht vorgesehen. Mit `sudo apache2ctl -S` prüfen, ob ein bestehender Wildcard-VirtualHost die Subdomain bereits abfängt. Ein solches Alias gezielt in der bisherigen Konfiguration anpassen.
+Die Demo verwendet eigene VirtualHosts `lokzeitleiste-ctl-demo-http.conf` auf Port 80. Vorhandene Websites, die Hauptdomain `io-goerlitz.eu` und andere BIND-Zoneneinträge werden nicht verändert. Apache wird nach erfolgreicher Konfigurationsprüfung neu geladen; ein Neustart von Apache oder BIND ist nicht vorgesehen. Mit `sudo apache2ctl -S` prüfen, ob ein bestehender Wildcard-VirtualHost die Subdomain bereits abfängt. Ein solches Alias gezielt in der bisherigen Konfiguration anpassen.
 
 Für öffentlichen autoritativen DNS-Betrieb muss der vorhandene BIND über TCP und UDP 53 erreichbar und bei den zuständigen Nameservern der Domain eingebunden sein.
 
@@ -129,18 +114,29 @@ Wenn die vorhandene Zone lokale Updates über BINDs Session-Key erlaubt (beispie
 
 ```bash
 sudo apt install -y bind9-dnsutils
-sudo bash setup-demo.sh --bind-update --email DEINE-EMAIL@BEISPIEL.DE
+sudo bash setup-demo.sh --bind-update
 ```
 
-Die Option verwendet `nsupdate -l`, aktualisiert ausschließlich den A-Record von `ctl-software.io-goerlitz.eu` und bricht bei vorhandenem CNAME oder AAAA ab. BIND führt bei dynamischen Updates die Seriennummer selbst nach. Die Routine überschreibt weder `named.conf` noch Update-Policies oder andere Records. Ohne bestehende Update-Erlaubnis wird abgebrochen; dann den statischen Weg oder die vorhandene DNS-Verwaltung verwenden. `--check --bind-update` bleibt lesend und führt kein DNS-Update aus.
+Die Option verwendet `nsupdate -l`, aktualisiert ausschließlich den A-Record von `ctl-software.io-goerlitz.eu` und bricht bei vorhandenem CNAME ab. AAAA-Records bleiben erhalten und werden anschließend gegen die lokalen IPv6-Adressen geprüft. BIND führt bei dynamischen Updates die Seriennummer selbst nach. Die Routine überschreibt weder `named.conf` noch Update-Policies oder andere Records. Ohne bestehende Update-Erlaubnis wird abgebrochen; dann den statischen Weg oder die vorhandene DNS-Verwaltung verwenden. `--check --bind-update` bleibt lesend und führt kein DNS-Update aus.
 
-DNS und anschließend HTTPS prüfen:
+DNS und anschließend HTTP prüfen:
 
 ```bash
 dig @127.0.0.1 ctl-software.io-goerlitz.eu A
 dig @1.1.1.1 ctl-software.io-goerlitz.eu A
 sudo bash setup-demo.sh --check
-curl --fail https://ctl-software.io-goerlitz.eu/health
+curl --fail http://ctl-software.io-goerlitz.eu/health
 ```
 
-Nach DNS-Änderungen zunächst deren Veröffentlichung abwarten und dann die Setup-Routine ausführen. Zertifikat, Weiterleitung und `PUBLIC_ORIGIN` werden ausschließlich für `ctl-software.io-goerlitz.eu` eingerichtet.
+Nach DNS-Änderungen zunächst deren Veröffentlichung abwarten und dann die Setup-Routine ausführen. `PUBLIC_ORIGIN` und der HTTP-VirtualHost werden ausschließlich für `ctl-software.io-goerlitz.eu` eingerichtet.
+
+## Meldung zum bestehenden AAAA-Eintrag
+
+`2a02:2479:58:ac00::1` wird akzeptiert, wenn diese globale IPv6-Adresse lokal auf dem Server eingerichtet ist. Auf dem Server prüfen:
+
+```bash
+ip -6 addr show scope global
+dig +short AAAA ctl-software.io-goerlitz.eu
+```
+
+Falls die Adresse nicht lokal vorhanden ist, nur den AAAA-Record **dieser Subdomain** korrigieren oder entfernen. IPv6 für andere Dienste nicht abschalten. Bei vorhandenem IPv6 auch die Firewall für TCP 80 berücksichtigen.

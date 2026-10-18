@@ -7,12 +7,14 @@ server_ip=212.227.86.251
 email=''
 bind_update=false
 check=false
+scheme=http
 while (($#)); do
  case "$1" in
   --email) (($#>=2)) || { echo 'E-Mail fehlt' >&2; exit 2; };email=$2;shift 2 ;;
   --check) check=true;shift ;;
+  --https) scheme=https;shift ;;
   --bind-update) bind_update=true;shift ;;
-  --help|-h) echo 'sudo bash setup-demo.sh --email DEINE-EMAIL [--check] [--bind-update]';exit 0 ;;
+  --help|-h) echo 'sudo bash setup-demo.sh [--check] [--bind-update] [--https --email DEINE-EMAIL]';exit 0 ;;
   *) echo "Unbekannte Option: $1" >&2;exit 2 ;;
  esac
 done
@@ -26,13 +28,12 @@ if [[ $bind_update == true && $check == false ]]; then
  nsupdate -l <<'DNS'
 zone io-goerlitz.eu.
 prereq nxrrset ctl-software.io-goerlitz.eu. CNAME
-prereq nxrrset ctl-software.io-goerlitz.eu. AAAA
 update delete ctl-software.io-goerlitz.eu. A
 update add ctl-software.io-goerlitz.eu. 300 A 212.227.86.251
 send
 DNS
 fi
-# DNS muss ausschließlich auf diesen IPv4-Server zeigen. IPv6 nicht stillschweigend ignorieren.
+# IPv4 muss passen; AAAA-Adressen müssen auf diesem Server eingerichtet sein.
 python3 "$root/setup/demo-config.py" dns "$domain" "$server_ip"
 for site in http https; do
  file="/etc/apache2/sites-available/lokzeitleiste-ctl-demo-$site.conf"
@@ -44,22 +45,25 @@ if [[ -d /etc/apache2/sites-enabled ]]; then
 fi
 if [[ $check == true ]]; then
  bash "$root/setup.sh" --check
- echo "Demo-Vorprüfung beendet: https://$domain. TCP 80/443 müssen beim Provider freigegeben sein."
+ echo "Demo-Vorprüfung beendet: $scheme://$domain. TCP 80 muss freigegeben sein; bei --https zusätzlich 443."
  exit 0
 fi
 [[ $EUID == 0 ]] || die 'Mit sudo ausführen.'
-[[ "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]] || die '--email für das Zertifikatskonto angeben.'
+if [[ $scheme == https ]]; then
+ [[ "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]] || die '--email für das Zertifikatskonto angeben.'
+fi
 # Der bestehende Stack bleibt erhalten und wird vor Änderungen gesichert.
 if [[ -e "$root/backend/.env.test" ]]; then bash "$root/setup-update.sh";else bash "$root/setup-new.sh";fi
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get install -y certbot
-for port in 80 443; do
+if [[ $scheme == https ]]; then apt-get update;apt-get install -y certbot;fi
+ports=(80)
+[[ $scheme != https ]] || ports+=(443)
+for port in "${ports[@]}"; do
  listening=$(ss -H -ltnp "sport = :$port")
  [[ -z "$listening" || "$listening" == *'"apache2"'* ]] || die "Port $port durch anderen Dienst belegt."
 done
-a2enmod proxy proxy_http headers ssl rewrite
-install -d -m 0755 /var/www/lokzeitleiste-acme
+a2enmod proxy proxy_http headers
+if [[ $scheme == https ]];then a2enmod ssl rewrite;install -d -m 0755 /var/www/lokzeitleiste-acme;fi
 activate_site(){
  local source=$1 name=$2 target="/etc/apache2/sites-available/$2" old enabled=false existed=false
  old=$(mktemp)
@@ -77,26 +81,38 @@ activate_site(){
 }
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
-python3 "$root/setup/demo-config.py" apache http "$domain" > "$work/http.conf"
-activate_site "$work/http.conf" lokzeitleiste-ctl-demo-http.conf
-# HTTP veröffentlicht nur ACME-Challenges; die Anwendung wird ausschließlich über TLS proxiert.
-certbot certonly --webroot -w /var/www/lokzeitleiste-acme --cert-name "$domain" -d "$domain" \
- --non-interactive --agree-tos --email "$email" --keep-until-expiring
-python3 "$root/setup/demo-config.py" apache https "$domain" > "$work/https.conf"
-# Sichere Cookies und Origin vor Freigabe des HTTPS-Proxys aktivieren.
-python3 "$root/setup/demo-config.py" env "$root/backend/.env.test" "$domain"
+if [[ $scheme == https ]]; then
+ python3 "$root/setup/demo-config.py" apache acme "$domain" > "$work/http.conf"
+ activate_site "$work/http.conf" lokzeitleiste-ctl-demo-http.conf
+ certbot certonly --webroot -w /var/www/lokzeitleiste-acme --cert-name "$domain" -d "$domain" \
+  --non-interactive --agree-tos --email "$email" --keep-until-expiring
+fi
+python3 "$root/setup/demo-config.py" env "$root/backend/.env.test" "$domain" "$scheme"
 compose=(docker compose --project-directory "$root/backend" --env-file "$root/backend/.env.test" -f "$root/backend/compose.test.yaml")
 "${compose[@]}" up -d --build --wait --wait-timeout 240 api mailer
-activate_site "$work/https.conf" lokzeitleiste-ctl-demo-https.conf
-install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
-cat > /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache <<'HOOK'
+if [[ $scheme == https ]]; then
+ python3 "$root/setup/demo-config.py" apache https "$domain" > "$work/https.conf"
+ activate_site "$work/https.conf" lokzeitleiste-ctl-demo-https.conf
+ install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
+ cat > /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache <<'HOOK'
 #!/usr/bin/env sh
 apache2ctl configtest && systemctl reload apache2
 HOOK
-chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache
-systemctl enable --now certbot.timer
-curl --fail --silent --show-error --resolve "$domain:443:127.0.0.1" "https://$domain/health"
+ chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache
+ systemctl enable --now certbot.timer
+ port=443
+else
+ # Nur den eigenen Demo-TLS-VirtualHost deaktivieren, andere HTTPS-Sites bleiben aktiv.
+ if [[ -e /etc/apache2/sites-enabled/lokzeitleiste-ctl-demo-https.conf ]];then
+  a2dissite lokzeitleiste-ctl-demo-https.conf
+  if ! apache2ctl configtest;then a2ensite lokzeitleiste-ctl-demo-https.conf;die 'TLS-Site konnte nicht deaktiviert werden.';fi
+ fi
+ python3 "$root/setup/demo-config.py" apache http "$domain" > "$work/http.conf"
+ activate_site "$work/http.conf" lokzeitleiste-ctl-demo-http.conf
+ port=80
+fi
+curl --fail --silent --show-error --resolve "$domain:$port:127.0.0.1" "$scheme://$domain/health"
 echo
-printf 'Demo bereit: https://%s/admin\nTF-Portal: https://%s/tf\n' "$domain" "$domain"
+printf 'Demo bereit: %s://%s/admin\nTF-Portal: %s://%s/tf\n' "$scheme" "$domain" "$scheme" "$domain"
 echo 'Admin-Passwort (nur bei erstmaliger Anlage): sudo cat /var/lib/lokzeitleiste/admin-initial-password'
 echo 'Testpostfach ausschließlich über SSH-Tunnel auf localhost:8025. Keine echten E-Mails versendet.'
