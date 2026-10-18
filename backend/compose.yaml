@@ -1,4 +1,14 @@
 services:
+  user-directories:
+    build: .
+    user: "0:0"
+    restart: "no"
+    command: [python, -m, lokzeitleiste.user_directories, --prepare-container]
+    environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
+    volumes:
+      - ../TF:/user-files/TF
+      - ../VW:/user-files/VW
   db:
     image: mysql:8.4
     restart: unless-stopped
@@ -15,12 +25,18 @@ services:
       timeout: 5s
       retries: 10
   api:
+    volumes:
+      - ../TF:/user-files/TF
+      - ../VW:/user-files/VW
     build: .
     restart: unless-stopped
     depends_on:
+      user-directories:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
     environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
       DATABASE_URL: ${DATABASE_URL}
       MAILBOX_IMAP_HOST: ${MAILBOX_IMAP_HOST:-}
       MAILBOX_IMAP_PORT: ${MAILBOX_IMAP_PORT:-993}
@@ -45,13 +61,19 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
   mailer:
+    volumes:
+      - ../TF:/user-files/TF
+      - ../VW:/user-files/VW
     build: .
     restart: unless-stopped
     command: ["python", "-m", "lokzeitleiste.reports.worker"]
     depends_on:
+      user-directories:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
     environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
       DATABASE_URL: ${DATABASE_URL}
       WORK_REPORT_RECEIPT_EMAIL: ${WORK_REPORT_RECEIPT_EMAIL:-}
       SMTP_HOST: ${SMTP_HOST:-}

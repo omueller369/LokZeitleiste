@@ -1,5 +1,6 @@
 import io
 import unittest
+import tempfile
 from unittest.mock import patch
 
 from sqlalchemy import create_engine, select
@@ -13,6 +14,10 @@ from lokzeitleiste.security import hash_password, verify_password
 
 class BootstrapAdminTest(unittest.TestCase):
     def setUp(self):
+        documents=tempfile.TemporaryDirectory()
+        self.addCleanup(documents.cleanup)
+        storage=patch.dict("os.environ", {"LOKZEITLEISTE_FILES_ROOT":documents.name})
+        storage.start();self.addCleanup(storage.stop)
         self.engine = create_engine("sqlite+pysqlite://")
         Base.metadata.create_all(self.engine)
 

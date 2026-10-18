@@ -967,7 +967,8 @@
     "Selbstzahler (Sz)": "Selbstzahler (Sz)",
     "Gastfahrten schließen": "Gastfahrten schließen",
     "Arbeitszeiten anzeigen": "Arbeitszeiten anzeigen",
-    "Arbeitszeiten ausblenden": "Arbeitszeiten ausblenden"
+    "Arbeitszeiten ausblenden": "Arbeitszeiten ausblenden",
+    "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.": "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen."
   },
   "en": {
     "Administration": "Administration",
@@ -1937,7 +1938,8 @@
     "Selbstzahler (Sz)": "Self-paid (Sz)",
     "Gastfahrten schließen": "Close passenger journeys",
     "Arbeitszeiten anzeigen": "Show working times",
-    "Arbeitszeiten ausblenden": "Hide working times"
+    "Arbeitszeiten ausblenden": "Hide working times",
+    "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.": "The user directory could not be prepared. Please check the server configuration."
   },
   "pl": {
     "Administration": "Administracja",
@@ -2907,7 +2909,8 @@
     "Selbstzahler (Sz)": "Płatność własna (Sz)",
     "Gastfahrten schließen": "Zamknij przejazdy",
     "Arbeitszeiten anzeigen": "Pokaż czasy pracy",
-    "Arbeitszeiten ausblenden": "Ukryj czasy pracy"
+    "Arbeitszeiten ausblenden": "Ukryj czasy pracy",
+    "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.": "Nie można przygotować katalogu użytkownika. Sprawdź konfigurację serwera."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -3877,7 +3880,8 @@
     "Selbstzahler (Sz)": "За свой счёт (Sz)",
     "Gastfahrten schließen": "Закрыть служебные поездки",
     "Arbeitszeiten anzeigen": "Показать рабочее время",
-    "Arbeitszeiten ausblenden": "Скрыть рабочее время"
+    "Arbeitszeiten ausblenden": "Скрыть рабочее время",
+    "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.": "Не удалось подготовить каталог пользователя. Проверьте настройки сервера."
   },
   "es": {
     "Administration": "Administración",
@@ -4847,6 +4851,7 @@
     "Selbstzahler (Sz)": "Pago propio (Sz)",
     "Gastfahrten schließen": "Cerrar desplazamientos",
     "Arbeitszeiten anzeigen": "Mostrar horas de trabajo",
-    "Arbeitszeiten ausblenden": "Ocultar horas de trabajo"
+    "Arbeitszeiten ausblenden": "Ocultar horas de trabajo",
+    "Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.": "No se pudo preparar el directorio del usuario. Compruebe la configuración del servidor."
   }
 }

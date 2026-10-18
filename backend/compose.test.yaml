@@ -4,6 +4,7 @@ x-app: &app
   build: .
   restart: unless-stopped
   environment: &env
+    LOKZEITLEISTE_FILES_ROOT: /user-files
     DATABASE_URL: mysql+pymysql://lokzeitleiste:${MYSQL_PASSWORD:?prepare.sh ausführen}@db:3306/lokzeitleiste?charset=utf8mb4
     MAILBOX_IMAP_HOST: ${MAILBOX_IMAP_HOST:-}
     MAILBOX_IMAP_PORT: ${MAILBOX_IMAP_PORT:-993}
@@ -25,8 +26,20 @@ x-app: &app
     SMTP_FROM: lokzeitleiste@example.com
     SSL_CERT_FILE: /test-certs/mailpit.crt
   volumes:
+    - ../TF:/user-files/TF
+    - ../VW:/user-files/VW
     - ./testenv/certs/mailpit.crt:/test-certs/mailpit.crt:ro
 services:
+  user-directories:
+    build: .
+    user: "0:0"
+    restart: "no"
+    command: [python, -m, lokzeitleiste.user_directories, --prepare-container]
+    environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
+    volumes:
+      - ../TF:/user-files/TF
+      - ../VW:/user-files/VW
   db:
     image: mysql:8.4
     restart: unless-stopped
@@ -59,6 +72,8 @@ services:
   api:
     <<: *app
     depends_on:
+      user-directories:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       mailpit:

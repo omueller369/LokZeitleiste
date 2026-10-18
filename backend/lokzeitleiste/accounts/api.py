@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..db import database_session
+from ..user_directories import directory_transaction
 from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password, account_active
@@ -128,7 +129,8 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
             save_photo(db,user.id,image)
             db.add(AccountPolicy(user_id=user.id,must_change_password=True))
             db.add(AccountAudit(actor_id=actor.id,target_id=user.id,action='staff_created'))
-            db.commit()
+            with directory_transaction(user):
+                db.commit()
             return {'id':user.id,'username':user.username,'password_change_required':True}
         except IntegrityError as exc:
             db.rollback()

@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import engine
+from .user_directories import directory_transaction
 from .models import User
 from .security import hash_password
 
@@ -22,10 +23,14 @@ def main():
         if existing:
             if existing.role != "admin" or not existing.active:
                 raise SystemExit("Benutzername gehört keinem aktiven Admin; keine Änderung durchgeführt")
+            with directory_transaction(existing):
+                pass
             print("Aktiver Admin bereits vorhanden; Passwort bleibt unverändert.")
             return
-        db.add(User(username=username, password_hash=hash_password(password), role="admin"))
-        db.commit()
+        user=User(username=username, password_hash=hash_password(password), role="admin")
+        db.add(user)
+        with directory_transaction(user):
+            db.commit()
     print("Admin angelegt.")
 
 

@@ -96,3 +96,32 @@ Grundlagen: [Docker auf Ubuntu](https://docs.docker.com/engine/install/ubuntu/),
 Nach Admin-Anmeldung unter `/admin` beim jeweiligen Tf **Arbeitszeitplan** wählen. Unter `/admin/planning` stehen Monatskalender, Tagesliste, Jahresansicht und Excel-Import als eigene Ansichten bereit. Ein Kalendertag öffnet Tagesart und Notiz; danach die Änderungen speichern. Die Kennzahlen reagieren auf die Eingabe. Die Jahresmatrix und PDF-Exporte zeigen gespeicherte Daten.
 
 Die Tagesliste erlaubt Einzel- und Sammeländerungen. Die Jahresmatrix führt per Klick auf einen Tag zum zugehörigen Monat. Excel wird erst nach Prüfung und Bestätigung übernommen. Monats-/Jahres-PDFs und die Excel-Vorlage lassen sich herunterladen. Anmeldung und Schreibrechte werden vom Backend geprüft.
+# Benutzerverzeichnisse für Dokumente
+
+Direkt im Software-/Repository-Verzeichnis werden zwei dauerhafte Ablagebereiche angelegt:
+
+| Benutzer | Verzeichnis auf dem Linux-Host |
+|---|---|
+| Triebfahrzeugführer | `<Projektverzeichnis>/TF/<Loginname>/` |
+| Verwaltungsmitarbeiter und Administratoren | `<Projektverzeichnis>/VW/<Loginname>/` |
+
+Beispiel bei Installation unter `/opt/LokZeitleiste`: `/opt/LokZeitleiste/TF/787123/` und `/opt/LokZeitleiste/VW/buero.muster/`. Weitere Dokument-Unterordner werden erst nach Festlegung der Dokumentarten ergänzt. Die bestehende Speicherung von Fotos und Quittungsbelegen wird dadurch nicht verändert.
+
+Beim regulären Start legt `init_db` fehlende Verzeichnisse auch für vorhandene und gesperrte Benutzer an. Neue TF, Verwaltungsmitarbeiter und Administratoren erhalten ihr Verzeichnis beim Anlegen. Bei Änderung einer TF-Nummer wird das bisherige Verzeichnis einschließlich seines Inhalts umbenannt. Ein belegtes Ziel wird nicht überschrieben oder zusammengeführt. Benutzerverzeichnisse werden beim Sperren oder beim Testdatenreset nicht gelöscht.
+
+Die beiden Compose-Konfigurationen binden ausschließlich `TF` und `VW` vom Host nach `/user-files/TF` und `/user-files/VW` ein. Der einmalige Dienst `user-directories` bereitet die Besitzrechte für den bestehenden API-Benutzer mit UID 10001 vor. API und Mailer arbeiten anschließend weiterhin ohne root. Die Daten bleiben bei Container-Neubau und -Austausch auf dem Host erhalten. Der Verzeichnismodus ist `0700`; die Ordner werden nicht als öffentliche Webdateien ausgeliefert und sind in Git ausgeschlossen.
+
+Nach Aktualisierung der Quellen den Stack wie üblich starten, damit Initialisierung und Bind-Mounts aktiv werden:
+
+```bash
+bash backend/testenv/control.sh start
+```
+
+Fehlende Benutzerverzeichnisse lassen sich bei laufendem Teststack auch nachträglich ergänzen:
+
+```bash
+cd backend
+docker compose --env-file .env.test -f compose.test.yaml exec api python -m lokzeitleiste.user_directories
+```
+
+Bei nativem Betrieb ist der Standard das Repository-Verzeichnis. Mit `LOKZEITLEISTE_FILES_ROOT` kann ein anderer **absoluter** Ablageroot angegeben werden; der Prozess benötigt dort Schreibrechte. Die Compose-Konfiguration setzt diese Variable im Container auf `/user-files`; auf dem Host bleiben die Ordner direkt im Projektverzeichnis. Änderungen an Login-Verzeichnissen dürfen nur über die Software oder durch den Serveradministrator erfolgen. Neben Datenbank und Konfiguration künftig auch beide Hostverzeichnisse `TF` und `VW` in die Datensicherung aufnehmen.

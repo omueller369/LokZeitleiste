@@ -145,6 +145,8 @@ def replace_all_tf(db,today=None,seed=None):
         db.add(ProfilePhoto(user_id=user.id,image_data=photo));db.flush()
         db.get(TfProfile,user.id).target_hours_minutes=monthly_minutes(db,user.id,today.year,today.month)
     db.flush()
+    from ..user_directories import sync_user_directories
+    sync_user_directories(db)
     return dict(deleted=deleted,created=20,people=[{k:v for k,v in row.items() if k!='photo'} for row in records])
 
 

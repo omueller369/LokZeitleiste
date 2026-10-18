@@ -1,4 +1,5 @@
 import unittest
+import tempfile
 from datetime import date
 from uuid import uuid4
 from unittest.mock import patch
@@ -16,6 +17,10 @@ from lokzeitleiste.security import hash_password
 
 class ApiFlowTest(unittest.TestCase):
     def setUp(self):
+        self.documents=tempfile.TemporaryDirectory()
+        self.addCleanup(self.documents.cleanup)
+        storage=patch.dict("os.environ", {"LOKZEITLEISTE_FILES_ROOT":self.documents.name})
+        storage.start();self.addCleanup(storage.stop)
         self.engine = create_engine("sqlite+pysqlite://", connect_args={"check_same_thread": False},
                                     poolclass=StaticPool)
         Base.metadata.create_all(self.engine)

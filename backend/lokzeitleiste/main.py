@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
 from .db import database_session
+from .user_directories import directory_transaction
 from .models import ReportDispatch, TfProfile, TfBahnCardValidity, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
 from .schemas import TfProfileUpdate, EntryIn, Credentials, EntryBatch, TfCreate, TfDeliveryUpdate
 from .security import issue_token, revoke_token, user_from_token, verify_password, hash_password, account_active
@@ -111,7 +112,8 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
             db.add(TfBahnCardValidity(user_id=user.id, valid_until=data.bahncard_valid_until))
         save_details(db,user,data)
         save_photo(db,user.id,image)
-        db.commit()
+        with directory_transaction(user):
+            db.commit()
         return {"id": user.id, "username": user.username}
     except IntegrityError:
         db.rollback()
@@ -140,6 +142,7 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
     user=db.scalar(select(User).where(User.id==tf_id).with_for_update())
     profile=db.get(TfProfile,tf_id)
     if not user or user.role!='tf' or not profile:raise HTTPException(404,'Tf nicht gefunden')
+    previous_username=user.username
     from .accounts.tf_profiles import validate_details, save_details
     validate_details(db,data,user)
     image=decode_photo(data.photo_base64)
@@ -164,7 +167,8 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
             role.driver_type=data.driver_type
         save_details(db,user,data)
         save_photo(db,tf_id,image)
-        db.commit()
+        with directory_transaction(user,previous_username):
+            db.commit()
         return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
     except IntegrityError as exc:
         db.rollback();raise HTTPException(409,'TF-Nummer oder Personalnummer bereits vergeben') from exc
