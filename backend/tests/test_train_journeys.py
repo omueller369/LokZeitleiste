@@ -21,6 +21,18 @@ class TrainJourneysTest(unittest.TestCase):
     def update(self,report,trains,revision=0):
         return self.driver.put(f'/api/v1/tf/work-reports/{report}/train-journeys',json={'expected_revision':revision,'train_journeys':trains})
 
+    def test_ctl_type_pause_without_station_roundtrips(self):
+        data=self.data();event=data['train_journeys'][0]['events'][0]
+        event.update(cause='CTL',station='',station_name='')
+        report=self.create(data)
+        self.assertEqual(report['train_journeys'][0]['events'][0]['cause'],'CTL')
+        self.assertEqual(report['documented_pause_minutes'],45)
+        self.assertEqual(self.create(data)['id'],report['id'])
+        trains=copy.deepcopy(report['train_journeys']);trains[0]['events'][0]['end_at']='2026-10-12T10:25'
+        changed=self.update(report['id'],trains)
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertEqual(changed.json()['documented_pause_minutes'],50)
+
     def test_multiple_trains_and_pause_documentation_without_work_deduction(self):
         data=self.data();data['train_journeys'].append(dict(self.train(),events=[]))
         report=self.create(data);self.assertEqual(len(report['train_journeys']),2)

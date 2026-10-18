@@ -46,14 +46,14 @@ class GuestIn(BaseModel):
 
 
 REASONS=('V1','V3','A1','A1A','A3','Pause','Rangieren','Zugvorbereitung','BrP','vBrP','Zugfolge','Warten auf Zug','Warten auf Fpl','Warten auf FPLO','Lok defekt','sonstiges')
-CAUSES=('CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle','sonstiges')
+CAUSES=('CTL','CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle','sonstiges')
 
 
 class TrainEventIn(BaseModel):
     id:UUID
     reason:Literal['V1','V3','A1','A1A','A3','Pause','Rangieren','Zugvorbereitung','BrP','vBrP','Zugfolge','Warten auf Zug','Warten auf Fpl','Warten auf FPLO','Lok defekt','sonstiges']
     reason_detail:str=Field(default='',max_length=256)
-    cause:Literal['CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle','sonstiges']
+    cause:Literal['CTL','CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle','sonstiges']
     cause_detail:str=Field(default='',max_length=50)
     station:str=Field(default='',max_length=10)
     station_name:str=Field(default='',max_length=255)
@@ -67,7 +67,7 @@ class TrainEventIn(BaseModel):
 
     @model_validator(mode='after')
     def valid_event(self):
-        if not self.station and not (self.reason=='Pause' and self.cause=='CTL Logistics DE'):raise ValueError('DS100-Kürzel erforderlich.')
+        if not self.station and not (self.reason=='Pause' and self.cause in ('CTL','CTL Logistics DE')):raise ValueError('DS100-Kürzel erforderlich.')
         if not self.station:self.station_name=''
         if self.end_at<=self.start_at:raise ValueError('Bis muss nach Von liegen.')
         self.reason_detail=self.reason_detail.strip() if self.reason=='sonstiges' else ''

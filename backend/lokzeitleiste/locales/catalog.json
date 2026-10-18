@@ -1007,7 +1007,10 @@
     "Version": "Version",
     "Arbeitsbericht vom": "Arbeitsbericht vom",
     "Zugnr.": "Zugnr.",
-    "Ort/Bf": "Ort/Bf"
+    "Ort/Bf": "Ort/Bf",
+    "Sonstige Art (max. 50 Zeichen)": "Sonstige Art (max. 50 Zeichen)",
+    "Bitte Grund und Art auswählen.": "Bitte Grund und Art auswählen.",
+    "Sonstige Art bitte beschreiben.": "Sonstige Art bitte beschreiben."
   },
   "en": {
     "Administration": "Administration",
@@ -2017,7 +2020,10 @@
     "Version": "Version",
     "Arbeitsbericht vom": "Work report dated",
     "Zugnr.": "Train no.",
-    "Ort/Bf": "Location"
+    "Ort/Bf": "Location",
+    "Sonstige Art (max. 50 Zeichen)": "Other type (max. 50 characters)",
+    "Bitte Grund und Art auswählen.": "Please select a reason and type.",
+    "Sonstige Art bitte beschreiben.": "Please describe the other type."
   },
   "pl": {
     "Administration": "Administracja",
@@ -3027,7 +3033,10 @@
     "Version": "Wersja",
     "Arbeitsbericht vom": "Raport pracy z dnia",
     "Zugnr.": "Nr pociągu",
-    "Ort/Bf": "Miejsce"
+    "Ort/Bf": "Miejsce",
+    "Sonstige Art (max. 50 Zeichen)": "Inny rodzaj (maks. 50 znaków)",
+    "Bitte Grund und Art auswählen.": "Wybierz powód i rodzaj.",
+    "Sonstige Art bitte beschreiben.": "Opisz inny rodzaj."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4037,7 +4046,10 @@
     "Version": "Версия",
     "Arbeitsbericht vom": "Рабочий отчёт за",
     "Zugnr.": "№ поезда",
-    "Ort/Bf": "Место"
+    "Ort/Bf": "Место",
+    "Sonstige Art (max. 50 Zeichen)": "Другой тип (макс. 50 символов)",
+    "Bitte Grund und Art auswählen.": "Выберите причину и тип.",
+    "Sonstige Art bitte beschreiben.": "Опишите другой тип."
   },
   "es": {
     "Administration": "Administración",
@@ -5047,6 +5059,9 @@
     "Version": "Versión",
     "Arbeitsbericht vom": "Informe de trabajo del",
     "Zugnr.": "N.º tren",
-    "Ort/Bf": "Lugar"
+    "Ort/Bf": "Lugar",
+    "Sonstige Art (max. 50 Zeichen)": "Otro tipo (máx. 50 caracteres)",
+    "Bitte Grund und Art auswählen.": "Seleccione un motivo y un tipo.",
+    "Sonstige Art bitte beschreiben.": "Describa el otro tipo."
   }
 }
