@@ -44,3 +44,5 @@
 #workReport .train-event-grid input,#workReport .train-event-grid select{box-sizing:border-box}
 #workReport .train-event-grid input[type="datetime-local"]{width:100%;min-width:0;max-width:17rem}
 @media(max-width:800px){#workReport .train-event-grid{grid-template-columns:minmax(0,1fr)}#workReport .train-event-grid label{grid-area:auto}.event-cause{order:1}.event-reason{order:2}.event-station{order:3}.event-start_at{order:4}.event-end_at{order:5}.event-cause_detail{order:6}.event-reason_detail{order:7}}
+
+#reportDetails[hidden]{display:none!important}

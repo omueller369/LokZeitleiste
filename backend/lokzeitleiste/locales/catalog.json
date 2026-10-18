@@ -1010,7 +1010,8 @@
     "Ort/Bf": "Ort/Bf",
     "Sonstige Art (max. 50 Zeichen)": "Sonstige Art (max. 50 Zeichen)",
     "Bitte Grund und Art auswählen.": "Bitte Grund und Art auswählen.",
-    "Sonstige Art bitte beschreiben.": "Sonstige Art bitte beschreiben."
+    "Sonstige Art bitte beschreiben.": "Sonstige Art bitte beschreiben.",
+    "Felder ausblenden": "Felder ausblenden"
   },
   "en": {
     "Administration": "Administration",
@@ -2023,7 +2024,8 @@
     "Ort/Bf": "Location",
     "Sonstige Art (max. 50 Zeichen)": "Other type (max. 50 characters)",
     "Bitte Grund und Art auswählen.": "Please select a reason and type.",
-    "Sonstige Art bitte beschreiben.": "Please describe the other type."
+    "Sonstige Art bitte beschreiben.": "Please describe the other type.",
+    "Felder ausblenden": "Hide fields"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3036,7 +3038,8 @@
     "Ort/Bf": "Miejsce",
     "Sonstige Art (max. 50 Zeichen)": "Inny rodzaj (maks. 50 znaków)",
     "Bitte Grund und Art auswählen.": "Wybierz powód i rodzaj.",
-    "Sonstige Art bitte beschreiben.": "Opisz inny rodzaj."
+    "Sonstige Art bitte beschreiben.": "Opisz inny rodzaj.",
+    "Felder ausblenden": "Ukryj pola"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4049,7 +4052,8 @@
     "Ort/Bf": "Место",
     "Sonstige Art (max. 50 Zeichen)": "Другой тип (макс. 50 символов)",
     "Bitte Grund und Art auswählen.": "Выберите причину и тип.",
-    "Sonstige Art bitte beschreiben.": "Опишите другой тип."
+    "Sonstige Art bitte beschreiben.": "Опишите другой тип.",
+    "Felder ausblenden": "Скрыть поля"
   },
   "es": {
     "Administration": "Administración",
@@ -5062,6 +5066,7 @@
     "Ort/Bf": "Lugar",
     "Sonstige Art (max. 50 Zeichen)": "Otro tipo (máx. 50 caracteres)",
     "Bitte Grund und Art auswählen.": "Seleccione un motivo y un tipo.",
-    "Sonstige Art bitte beschreiben.": "Describa el otro tipo."
+    "Sonstige Art bitte beschreiben.": "Describa el otro tipo.",
+    "Felder ausblenden": "Ocultar campos"
   }
 }
