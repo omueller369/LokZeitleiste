@@ -4,7 +4,7 @@ root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd -P)
 case_dir=$(mktemp -d)
 trap 'rm -rf -- "$case_dir"' EXIT
 export DEMO_BIND_TEST_DIR="$case_dir"
-mkdir -p "$case_dir/project" "$case_dir/bin"
+mkdir -p "$case_dir/project/setup" "$case_dir/bin"
 cp "$root/setup-demo.sh" "$case_dir/project/"
 cat > "$case_dir/bin/python3" <<'MOCK'
 #!/usr/bin/env bash
@@ -17,9 +17,9 @@ cat > "$DEMO_BIND_TEST_DIR/dns-update"
 MOCK
 cat > "$case_dir/project/setup.sh" <<'MOCK'
 #!/usr/bin/env bash
-[[ "$*" == --check ]]
+[[ "$*" == "--host-mysql --check" ]]
 MOCK
-cat > "$case_dir/project/setup-new.sh" <<'MOCK'
+cat > "$case_dir/project/setup/install.sh" <<'MOCK'
 #!/usr/bin/env bash
 exit 77
 MOCK

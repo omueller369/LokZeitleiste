@@ -4,6 +4,7 @@ set -Eeuo pipefail
 ROOT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)
 BACKEND_DIR="$ROOT_DIR/backend"
 CHECK_ONLY=false
+HOST_MYSQL=false
 ADMIN_USER=''
 ADMIN_PASSWORD_FILE=''
 SKIP_ADMIN=false
@@ -12,6 +13,7 @@ usage() {
   cat <<'HELP'
 Verwendung:
   bash setup/install.sh --check
+  sudo bash setup/install.sh --host-mysql --auto-admin
   sudo bash setup/install.sh
   sudo bash setup/install.sh --admin-user USER --admin-password-file /pfad/passwort
   sudo bash setup/install.sh --skip-admin
@@ -25,6 +27,7 @@ die() { echo "FEHLER: $*" >&2; exit 1; }
 while (($#)); do
   case "$1" in
     --check) CHECK_ONLY=true; shift ;;
+    --host-mysql) HOST_MYSQL=true; shift ;;
     --skip-admin) SKIP_ADMIN=true; shift ;;
     --auto-admin) AUTO_ADMIN=true; shift ;;
     --admin-user) (($# >= 2)) || die 'Benutzername fehlt'; ADMIN_USER=$2; shift 2 ;;
@@ -48,6 +51,11 @@ arch=$(dpkg --print-architecture)
 for file in setup/install-user-service.sh setup/provision-users.py backend/lokzeitleiste/documents/api.py setup/auto-admin.sh backend/compose.test.yaml backend/Dockerfile backend/requirements.txt backend/testenv/prepare.sh backend/testenv/control.sh backend/apache/lokzeitleiste-local.conf; do
   [[ -r "$ROOT_DIR/$file" ]] || die "Projektdatei fehlt: $file"
 done
+if [[ $HOST_MYSQL == true ]];then
+  for file in backend/compose.host.yaml backend/testenv/control-host.sh setup/host-mysql.py;do
+    [[ -r "$ROOT_DIR/$file" ]] || die "Projektdatei fehlt: $file"
+  done
+fi
 if [[ -n "$ADMIN_USER" || -n "$ADMIN_PASSWORD_FILE" ]]; then
   [[ -n "$ADMIN_USER" && -n "$ADMIN_PASSWORD_FILE" ]] || die 'Admin-Benutzername und Passwortdatei gemeinsam angeben'
   [[ "$SKIP_ADMIN" == false ]] || die '--skip-admin nicht mit Admin-Optionen kombinieren'
@@ -73,15 +81,25 @@ if [[ -d /etc/apache2 ]]; then
   [[ -z "$foreign" ]] || die 'Port 8080 ist bereits durch eine andere Apache-Listen-Direktive konfiguriert'
 fi
 if command -v ss >/dev/null; then
-  for port in 8000 8025 8080; do
-    listening=$(ss -H -ltn "sport = :$port")
+  ports=(8000 8025 8080)
+  [[ $HOST_MYSQL != true ]] || ports+=(1025)
+  for port in "${ports[@]}"; do
+    listening=$(ss -H -ltnp "sport = :$port")
     [[ -n "$listening" ]] || continue
     if [[ "$port" == 8080 && -e "$SITE" ]] && cmp -s "$SITE" "$SOURCE_SITE"; then
       continue
     fi
     owned=''
     if command -v docker >/dev/null && [[ "$port" != 8080 ]]; then
-      owned=$(docker ps --filter label=com.docker.compose.project=lokzeitleiste-test --format '{{.Ports}}' 2>/dev/null | grep -F "127.0.0.1:$port->" || true)
+      if [[ $HOST_MYSQL == true ]];then
+        for container in $(docker ps -q --filter label=com.docker.compose.project=lokzeitleiste-host);do
+          for pid in $(docker top "$container" -eo pid | awk 'NR>1 {print $1}');do
+            [[ $listening != *"pid=$pid,"* ]] || owned=true
+          done
+        done
+      else
+        owned=$(docker ps --filter label=com.docker.compose.project=lokzeitleiste-test --format '{{.Ports}}' 2>/dev/null | grep -F "127.0.0.1:$port->" || true)
+      fi
     fi
     [[ -n "$owned" ]] || die "Port $port ist belegt; anderen Dienst zuerst prüfen"
   done
@@ -95,6 +113,7 @@ for pkg in apache2 openssh-server git python3 openssl ca-certificates curl iprou
     missing+=("$pkg")
   fi
 done
+if [[ $HOST_MYSQL == true ]] && ! command -v mysql >/dev/null;then missing+=(default-mysql-client);fi
 if ((${#missing[@]})); then echo "Fehlende Pakete: ${missing[*]}"; else echo 'Systempakete vorhanden.'; fi
 docker_ready=false
 if command -v docker >/dev/null && docker compose version >/dev/null 2>&1; then
@@ -146,8 +165,27 @@ systemctl enable --now apache2
 systemctl enable --now ssh
 docker info >/dev/null
 docker compose version
-bash "$BACKEND_DIR/testenv/prepare.sh"
-bash "$BACKEND_DIR/testenv/control.sh" start
+if [[ $HOST_MYSQL == true ]]; then
+  command -v mysqldump >/dev/null || { apt-get update;apt-get install -y default-mysql-client; }
+  had_host_config=false
+  if [[ -f "$BACKEND_DIR/.env.host" ]];then had_host_config=true;bash "$BACKEND_DIR/testenv/control-host.sh" backup;fi
+  python3 "$ROOT_DIR/setup/host-mysql.py" prepare "$BACKEND_DIR/.env.host"
+  [[ $had_host_config == true ]] || bash "$BACKEND_DIR/testenv/control-host.sh" backup
+  bash "$BACKEND_DIR/testenv/prepare.sh" --certs-only
+  if [[ ! -e "$BACKEND_DIR/testenv/certs/host-mailpit.crt" && ! -e "$BACKEND_DIR/testenv/certs/host-mailpit.key" ]];then
+    openssl req -x509 -newkey rsa:3072 -nodes -days 365 -keyout "$BACKEND_DIR/testenv/certs/host-mailpit.key" -out "$BACKEND_DIR/testenv/certs/host-mailpit.crt" -subj '/CN=127.0.0.1' -addext 'subjectAltName=IP:127.0.0.1' -addext 'basicConstraints=critical,CA:TRUE' >/dev/null 2>&1
+  fi
+  [[ -s "$BACKEND_DIR/testenv/certs/host-mailpit.key" ]] || die 'Host-Mailpit-Zertifikatspaar unvollständig'
+  openssl x509 -in "$BACKEND_DIR/testenv/certs/host-mailpit.crt" -checkend 86400 -noout >/dev/null || die 'Host-Mailpit-Zertifikat läuft ab; Zertifikatspaar bei gestopptem Stack erneuern'
+  chmod 644 "$BACKEND_DIR/testenv/certs/host-mailpit.crt"
+  chmod 600 "$BACKEND_DIR/testenv/certs/host-mailpit.key"
+  bash "$BACKEND_DIR/testenv/control-host.sh" start
+  compose=(docker compose --project-directory "$BACKEND_DIR" --env-file "$BACKEND_DIR/.env.host" -f "$BACKEND_DIR/compose.host.yaml")
+else
+  bash "$BACKEND_DIR/testenv/prepare.sh"
+  bash "$BACKEND_DIR/testenv/control.sh" start
+  compose=(docker compose --project-directory "$BACKEND_DIR" --env-file "$BACKEND_DIR/.env.test" -f "$BACKEND_DIR/compose.test.yaml")
+fi
 # Kein Stoppen/Löschen vorhandener Datenbanken und kein automatischer Import.
 a2enmod proxy proxy_http
 created_site=false
@@ -164,7 +202,6 @@ systemctl reload apache2
 curl --fail --silent --show-error --retry 5 --retry-connrefused http://localhost:8080/health
 curl --fail --silent --show-error http://localhost:8080/admin >/dev/null
 curl --fail --silent --show-error http://localhost:8025/api/v1/messages >/dev/null
-compose=(docker compose --project-directory "$BACKEND_DIR" --env-file "$BACKEND_DIR/.env.test" -f "$BACKEND_DIR/compose.test.yaml")
 if [[ "$SKIP_ADMIN" == false ]]; then
   if [[ "$AUTO_ADMIN" == true ]]; then
     bash "$ROOT_DIR/setup/auto-admin.sh" /var/lib/lokzeitleiste/admin-initial-password "${compose[@]}"
@@ -173,7 +210,7 @@ if [[ "$SKIP_ADMIN" == false ]]; then
   if [[ -n "$ADMIN_USER" ]]; then
     "${compose[@]}" exec -T api python -m lokzeitleiste.bootstrap_admin "$ADMIN_USER" < "$ADMIN_PASSWORD_FILE"
   elif (( admin_count == 0 )); then
-    bash "$BACKEND_DIR/testenv/control.sh" admin
+    "${compose[@]}" exec api python -m lokzeitleiste.init_db --create-admin
   else
     echo 'Aktives Admin-Konto vorhanden; Zugangsdaten werden beibehalten.'
   fi

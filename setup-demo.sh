@@ -8,13 +8,15 @@ email=''
 bind_update=false
 check=false
 scheme=http
+host_mysql=true
 while (($#)); do
  case "$1" in
   --email) (($#>=2)) || { echo 'E-Mail fehlt' >&2; exit 2; };email=$2;shift 2 ;;
   --check) check=true;shift ;;
   --https) scheme=https;shift ;;
+  --docker-mysql) host_mysql=false;shift ;;
   --bind-update) bind_update=true;shift ;;
-  --help|-h) echo 'sudo bash setup-demo.sh [--check] [--bind-update] [--https --email DEINE-EMAIL]';exit 0 ;;
+  --help|-h) echo 'sudo bash setup-demo.sh [--check] [--bind-update] [--docker-mysql] [--https --email DEINE-EMAIL]';exit 0 ;;
   *) echo "Unbekannte Option: $1" >&2;exit 2 ;;
  esac
 done
@@ -44,7 +46,7 @@ if [[ -d /etc/apache2/sites-enabled ]]; then
  [[ -z "$conflicts" ]] || die "Domain bereits anderweitig in Apache eingerichtet: $conflicts"
 fi
 if [[ $check == true ]]; then
- bash "$root/setup.sh" --check
+ if [[ $host_mysql == true ]];then bash "$root/setup.sh" --host-mysql --check;else bash "$root/setup.sh" --check;fi
  echo "Demo-Vorprüfung beendet: $scheme://$domain. TCP 80 muss freigegeben sein; bei --https zusätzlich 443."
  exit 0
 fi
@@ -53,7 +55,13 @@ if [[ $scheme == https ]]; then
  [[ "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]] || die '--email für das Zertifikatskonto angeben.'
 fi
 # Der bestehende Stack bleibt erhalten und wird vor Änderungen gesichert.
-if [[ -e "$root/backend/.env.test" ]]; then bash "$root/setup-update.sh";else bash "$root/setup-new.sh";fi
+if [[ $host_mysql == true ]];then
+ bash "$root/setup/install.sh" --host-mysql --auto-admin
+ env_file="$root/backend/.env.host";compose_file="$root/backend/compose.host.yaml"
+else
+ if [[ -e "$root/backend/.env.test" ]]; then bash "$root/setup-update.sh";else bash "$root/setup-new.sh";fi
+ env_file="$root/backend/.env.test";compose_file="$root/backend/compose.test.yaml"
+fi
 export DEBIAN_FRONTEND=noninteractive
 if [[ $scheme == https ]]; then apt-get update;apt-get install -y certbot;fi
 ports=(80)
@@ -87,8 +95,8 @@ if [[ $scheme == https ]]; then
  certbot certonly --webroot -w /var/www/lokzeitleiste-acme --cert-name "$domain" -d "$domain" \
   --non-interactive --agree-tos --email "$email" --keep-until-expiring
 fi
-python3 "$root/setup/demo-config.py" env "$root/backend/.env.test" "$domain" "$scheme"
-compose=(docker compose --project-directory "$root/backend" --env-file "$root/backend/.env.test" -f "$root/backend/compose.test.yaml")
+python3 "$root/setup/demo-config.py" env "$env_file" "$domain" "$scheme"
+compose=(docker compose --project-directory "$root/backend" --env-file "$env_file" -f "$compose_file")
 "${compose[@]}" up -d --build --wait --wait-timeout 240 api mailer
 if [[ $scheme == https ]]; then
  python3 "$root/setup/demo-config.py" apache https "$domain" > "$work/https.conf"

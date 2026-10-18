@@ -34,7 +34,8 @@ def ensure_api_account():
 
 def manifest(backend):
     files=['docker','compose','--project-directory',str(backend)]
-    if (backend/'.env.test').is_file():files+=['--env-file',str(backend/'.env.test'),'-f',str(backend/'compose.test.yaml')]
+    if (backend/'.env.host').is_file():files+=['--env-file',str(backend/'.env.host'),'-f',str(backend/'compose.host.yaml')]
+    elif (backend/'.env.test').is_file():files+=['--env-file',str(backend/'.env.test'),'-f',str(backend/'compose.test.yaml')]
     else:files+=['--env-file',str(backend/'.env'),'-f',str(backend/'compose.yaml')]
     result=subprocess.run(files+['exec','-T','api','python','-m','lokzeitleiste.documents.accounts'],check=True,capture_output=True,text=True)
     return json.loads(result.stdout)

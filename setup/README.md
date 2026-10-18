@@ -175,3 +175,5 @@ Die vollständigen Befehle für Ubuntu in **UTM auf dem Mac**, inklusive Clone, 
 `sudo bash setup-demo.sh` richtet die Demo für **ctl-software.io-goerlitz.eu / 212.227.86.251** zunächst mit HTTP und interner Test-E-Mail-Zustellung ein. Bei vorhandener Umgebung wird zuerst die Update-Sicherung ausgeführt. DNS, Firewallvoraussetzungen, SSH-/Clone-Befehle, Zugriff, Updates und Kontrollen: [DEMO-Server.md](DEMO-Server.md).
 
 HTTPS bleibt für später optional: `sudo bash setup-demo.sh --https --email DEINE-EMAIL@BEISPIEL.DE`. Ohne `--https` werden kein Zertifikat und keine HTTPS-Weiterleitung eingerichtet.
+
+Die externe Demo verwendet standardmäßig MySQL auf dem Ubuntu-Host (`ctl-software`, Datenbank `ctl_software`, Passwortabfrage beim ersten Setup). Konfiguration: `backend/.env.host`, Betrieb: `backend/testenv/control-host.sh`. Es wird kein weiterer MySQL-Server installiert. Der bisherige Docker-Datenbankweg ist über `setup-demo.sh --docker-mysql` verfügbar.

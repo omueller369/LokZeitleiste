@@ -18,3 +18,5 @@ backend/testenv/backups/
 # Benutzerunterlagen auf dem Linux-Host, keine Repository-Dateien.
 /TF/
 /VW/
+
+backend/.env.host

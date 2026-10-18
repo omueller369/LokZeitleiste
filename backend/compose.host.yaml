@@ -1,0 +1,123 @@
+# Linux-Demo mit bestehendem MySQL auf dem Host; keine Datenbank-Container.
+name: lokzeitleiste-host
+services:
+  user-directories:
+    build: .
+    user: 0:0
+    restart: 'no'
+    command:
+    - python
+    - -m
+    - lokzeitleiste.user_directories
+    - --prepare-container
+    environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
+    volumes:
+    - ../TF:/user-files/TF
+    - ../VW:/user-files/VW
+  mailpit:
+    image: axllent/mailpit:v1.27.4
+    restart: unless-stopped
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_TLS_CERT: /certs/host-mailpit.crt
+      MP_SMTP_TLS_KEY: /certs/host-mailpit.key
+      MP_SMTP_REQUIRE_STARTTLS: 'true'
+      MP_UI_BIND_ADDR: 127.0.0.1:8025
+      MP_SMTP_BIND_ADDR: 127.0.0.1:1025
+    volumes:
+    - mailpit_test_data:/data
+    - ./testenv/certs:/certs:ro
+    network_mode: host
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
+      DATABASE_URL: ${DATABASE_URL:?Host-MySQL konfigurieren}
+      MAILBOX_IMAP_HOST: ${MAILBOX_IMAP_HOST:-}
+      MAILBOX_IMAP_PORT: ${MAILBOX_IMAP_PORT:-993}
+      MAILBOX_SMTP_HOST: ${MAILBOX_SMTP_HOST:-}
+      MAILBOX_SMTP_PORT: ${MAILBOX_SMTP_PORT:-465}
+      MAILBOX_SMTP_SECURITY: ${MAILBOX_SMTP_SECURITY:-ssl}
+      MAILBOX_SENT_FOLDER: ${MAILBOX_SENT_FOLDER:-Sent}
+      MAILBOX_ENCRYPTION_KEY: ${MAILBOX_ENCRYPTION_KEY:-}
+      MAILBOX_MICROSOFT_CLIENT_ID: ${MAILBOX_MICROSOFT_CLIENT_ID:-}
+      MAILBOX_MICROSOFT_TENANT: ${MAILBOX_MICROSOFT_TENANT:-common}
+      MAILBOX_GOOGLE_CLIENT_ID: ${MAILBOX_GOOGLE_CLIENT_ID:-}
+      MAILBOX_GOOGLE_CLIENT_SECRET: ${MAILBOX_GOOGLE_CLIENT_SECRET:-}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      WORK_REPORT_RECEIPT_EMAIL: ${WORK_REPORT_RECEIPT_EMAIL:-omueller369@gmail.com}
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: '1025'
+      SMTP_SECURITY: starttls
+      SMTP_FROM: lokzeitleiste@example.com
+      SSL_CERT_FILE: /test-certs/host-mailpit.crt
+    volumes:
+    - ../TF:/user-files/TF
+    - ../VW:/user-files/VW
+    - ./testenv/certs/host-mailpit.crt:/test-certs/host-mailpit.crt:ro
+    depends_on:
+      user-directories:
+        condition: service_completed_successfully
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',
+        timeout=3)
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    network_mode: host
+    command:
+    - sh
+    - -c
+    - python -m lokzeitleiste.init_db && uvicorn lokzeitleiste.main:app --host 127.0.0.1
+      --port 8000
+  mailer:
+    build: .
+    restart: unless-stopped
+    environment:
+      LOKZEITLEISTE_FILES_ROOT: /user-files
+      DATABASE_URL: ${DATABASE_URL:?Host-MySQL konfigurieren}
+      MAILBOX_IMAP_HOST: ${MAILBOX_IMAP_HOST:-}
+      MAILBOX_IMAP_PORT: ${MAILBOX_IMAP_PORT:-993}
+      MAILBOX_SMTP_HOST: ${MAILBOX_SMTP_HOST:-}
+      MAILBOX_SMTP_PORT: ${MAILBOX_SMTP_PORT:-465}
+      MAILBOX_SMTP_SECURITY: ${MAILBOX_SMTP_SECURITY:-ssl}
+      MAILBOX_SENT_FOLDER: ${MAILBOX_SENT_FOLDER:-Sent}
+      MAILBOX_ENCRYPTION_KEY: ${MAILBOX_ENCRYPTION_KEY:-}
+      MAILBOX_MICROSOFT_CLIENT_ID: ${MAILBOX_MICROSOFT_CLIENT_ID:-}
+      MAILBOX_MICROSOFT_TENANT: ${MAILBOX_MICROSOFT_TENANT:-common}
+      MAILBOX_GOOGLE_CLIENT_ID: ${MAILBOX_GOOGLE_CLIENT_ID:-}
+      MAILBOX_GOOGLE_CLIENT_SECRET: ${MAILBOX_GOOGLE_CLIENT_SECRET:-}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      WORK_REPORT_RECEIPT_EMAIL: ${WORK_REPORT_RECEIPT_EMAIL:-omueller369@gmail.com}
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: '1025'
+      SMTP_SECURITY: starttls
+      SMTP_FROM: lokzeitleiste@example.com
+      SSL_CERT_FILE: /test-certs/host-mailpit.crt
+    volumes:
+    - ../TF:/user-files/TF
+    - ../VW:/user-files/VW
+    - ./testenv/certs/host-mailpit.crt:/test-certs/host-mailpit.crt:ro
+    command:
+    - python
+    - -m
+    - lokzeitleiste.reports.worker
+    depends_on:
+      api:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    network_mode: host
+volumes:
+  mailpit_test_data: null

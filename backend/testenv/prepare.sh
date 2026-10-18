@@ -4,7 +4,7 @@ set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 command -v openssl >/dev/null
 umask 077
-if [[ ! -e .env.test ]]; then
+if [[ ${1:-} != --certs-only && ! -e .env.test ]]; then
   db_password=$(openssl rand -hex 24)
   root_password=$(openssl rand -hex 24)
   printf 'MYSQL_PASSWORD=%s\nMYSQL_ROOT_PASSWORD=%s\n' "$db_password" "$root_password" > .env.test
@@ -25,5 +25,6 @@ openssl x509 -in testenv/certs/mailpit.crt -checkend 86400 -noout >/dev/null || 
 # Öffentliches Zertifikat muss vom nicht privilegierten API-Benutzer lesbar sein.
 chmod 755 testenv/certs
 chmod 644 testenv/certs/mailpit.crt
-chmod 600 testenv/certs/mailpit.key .env.test
+chmod 600 testenv/certs/mailpit.key
+[[ ! -e .env.test ]] || chmod 600 .env.test
 echo 'Testkonfiguration vorbereitet. Passwörter wurden nicht ausgegeben.'

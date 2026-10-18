@@ -35,7 +35,9 @@ git pull --ff-only origin setup/debian-testumgebung
 sudo bash setup-demo.sh
 ```
 
-Lokale Änderungen vorher sichern/committen. Bei vorhandener `.env.test` wird automatisch die Update-Routine mit vorheriger Sicherung von Datenbank, Dokumenten/ACLs und Projektkonfiguration ausgeführt. Zugangsdaten bleiben erhalten. Die Sicherungen liegen unter `backend/testenv/backups/update-…/`. Apache-/BIND-Konfigurationen zusätzlich in die vorhandene Server-Sicherung aufnehmen.
+Lokale Änderungen vorher sichern/committen. Standardmäßig wird jetzt die vorhandene **MySQL-Installation auf dem Ubuntu-Host** verwendet. Beim ersten Start werden Benutzer (Standard `ctl-software`), Datenbank (Standard `ctl_software`) und Passwort abgefragt. Der Benutzer benötigt die Rechte zum Anlegen dieser Datenbank und zum Anlegen/Ändern/Lesen/Schreiben ihrer Tabellen. Die Routine verändert keine MySQL-Benutzer, Grants oder Serverkonfiguration. Verbindung: `127.0.0.1:3306`; kein zusätzlicher MySQL-Container wird gestartet. Die Datenbank wird nur mit `CREATE DATABASE IF NOT EXISTS` angelegt.
+
+Die Verbindungsdaten liegen in `backend/.env.host` (Modus 600, nicht im Repository). Vor jedem Start mit Schemaänderungen wird ein Datenbank-Dump und eine Sicherung von Dokumenten/ACLs und Projektkonfiguration erstellt; bei Updates wird dafür API/Mailer kurz gestoppt. Bestehende Daten und Passwörter bleiben bestehen. Alte Docker-Testvolumes bleiben unangetastet und werden nicht automatisch in die Host-Datenbank importiert. Ein parallel laufender alter Teststack auf Port 8000/8025 muss vorab regulär gestoppt werden. Mit `--docker-mysql` lässt sich der bisherige Docker-Testdatenbankweg ausdrücklich auswählen. Zugangsdaten bleiben erhalten. Die Sicherungen liegen unter `backend/testenv/backups/update-…/`. Apache-/BIND-Konfigurationen zusätzlich in die vorhandene Server-Sicherung aufnehmen.
 
 Die Routine setzt `PUBLIC_ORIGIN=http://ctl-software.io-goerlitz.eu` und `COOKIE_SECURE=false`, damit die Anmeldung über HTTP funktioniert. Ein zuvor von dieser Routine aktivierter Demo-HTTPS-VirtualHost wird deaktiviert; andere HTTPS-Sites und vorhandene Zertifikate bleiben erhalten. Cookies, Passwörter und Dokumente sind bei HTTP unverschlüsselt: für diese vorläufige Demo ausschließlich fiktive Daten und eigene Demo-Passwörter verwenden. Externe OAuth-Anbieter können HTTPS für Redirect-URLs verlangen.
 
@@ -50,8 +52,8 @@ Bei erstmaliger Anlage lautet der Admin-Benutzer `administrator`; sein zufällig
 ```bash
 sudo cat /var/lib/lokzeitleiste/admin-initial-password
 curl --fail http://ctl-software.io-goerlitz.eu/health
-sudo bash backend/testenv/control.sh status
-sudo bash backend/testenv/control.sh logs
+sudo bash backend/testenv/control-host.sh status
+sudo bash backend/testenv/control-host.sh logs
 sudo apache2ctl configtest
 sudo apache2ctl -S
 sudo tail -n 100 /var/log/apache2/lokzeitleiste-ctl-demo-error.log
@@ -140,3 +142,24 @@ dig +short AAAA ctl-software.io-goerlitz.eu
 ```
 
 Falls die Adresse nicht lokal vorhanden ist, nur den AAAA-Record **dieser Subdomain** korrigieren oder entfernen. IPv6 für andere Dienste nicht abschalten. Bei vorhandenem IPv6 auch die Firewall für TCP 80 berücksichtigen.
+
+## Host-MySQL vorab prüfen
+
+Auf dem Ubuntu-Server kann die Verbindung ohne Passwort in der Befehlszeile geprüft werden:
+
+```bash
+mysql --protocol=TCP -h 127.0.0.1 -u ctl-software -p -e "SELECT VERSION();"
+```
+
+Das Passwort erst bei der Abfrage eingeben. Ein `Access denied` bedeutet, dass Anmeldung oder TCP-Zugriffsrechte dieses Kontos geprüft werden müssen; die Routine verändert diese Rechte nicht automatisch. Nach erfolgreicher Erstinstallation verwendet sie die gespeicherte `.env.host` und fragt das Passwort nicht erneut ab.
+
+Betrieb der Host-Datenbankvariante:
+
+```bash
+sudo bash backend/testenv/control-host.sh status
+sudo bash backend/testenv/control-host.sh logs
+sudo bash backend/testenv/control-host.sh stop
+sudo bash backend/testenv/control-host.sh start
+```
+
+`stop` stoppt ausschließlich Anwendungscontainer und Mailpit, nicht den bestehenden MySQL-Server. `backup` erstellt eine Sicherung und lässt API/Mailer bis zum anschließenden `start` gestoppt. Es gibt keinen automatischen Import und kein `DROP DATABASE`. Auf dem Server wurde diese Variante noch nicht ausgeführt; geprüft sind Konfiguration, Zugangsdatenbehandlung und die vorbereiteten Befehle.
