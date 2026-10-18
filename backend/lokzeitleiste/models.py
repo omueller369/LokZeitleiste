@@ -430,4 +430,4 @@ class DocumentFile(Base):
 class DocumentRenderState(Base):
     __tablename__='document_render_states'
     document_id:Mapped[int]=mapped_column(ForeignKey('document_files.id',ondelete='CASCADE'),primary_key=True)
-    format_version:Mapped[int]=mapped_column(Integer,nullable=False,default=2)
+    format_version:Mapped[int]=mapped_column(Integer,nullable=False,default=3)

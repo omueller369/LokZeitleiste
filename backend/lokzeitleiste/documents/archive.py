@@ -36,7 +36,7 @@ def month_folder(year,month):
 def clock(n):return f'{int(n)//60}:{int(n)%60:02d}'
 
 
-FORMAT_VERSION=2
+FORMAT_VERSION=3
 
 
 def report_filename(report):
@@ -61,18 +61,19 @@ def needs_render(db,row):
 def pdf_document(title,lines,rows=None,sections=None,wide=False):
     register_fonts('DocumentSans')
     width,height=landscape(A4) if wide else A4
-    usable=width-68
+    usable=width-68-12  # SimpleDocTemplate frame has 6 pt padding on each side.
     style=ParagraphStyle('Doc',fontName='DocumentSans',fontSize=8,leading=11,splitLongWords=True)
     heading=ParagraphStyle('DocHeading',parent=style,fontName='DocumentSans-Bold',fontSize=17,leading=22,textColor=colors.HexColor('#17445b'))
     subheading=ParagraphStyle('DocSection',parent=heading,fontSize=11,leading=15,spaceBefore=12,spaceAfter=6,keepWithNext=True)
     paragraph=lambda text:Paragraph(escape(str(text)).replace('\n','<br/>'),style)
-    def table(values,header=False):
-        count=len(values[0]);widths=[usable/count]*count
-        if count==2:widths=[usable*.29,usable*.71]
-        elif count==5:widths=[usable*w for w in (.12,.27,.17,.27,.17)]
-        elif count==6:widths=[usable*w for w in (.32,.18,.16,.14,.14,.06)]
-        elif count==7:widths=[usable*w for w in (.18,.18,.14,.14,.08,.22,.06)]
-        result=Table([[paragraph(v) for v in row] for row in values],colWidths=widths,repeatRows=1 if header else 0,hAlign='LEFT',splitInRow=1)
+    def table(values,header=False,indent=0):
+        space=usable-indent
+        count=len(values[0]);widths=[space/count]*count
+        if count==2:widths=[space*.29,space*.71]
+        elif count==5:widths=[space*w for w in (.12,.27,.17,.27,.17)]
+        elif count==6:widths=[space*w for w in (.32,.18,.16,.14,.14,.06)]
+        elif count==7:widths=[space*w for w in (.18,.18,.14,.14,.08,.22,.06)]
+        result=Table([[paragraph(v) for v in row] for row in values],colWidths=widths,repeatRows=1 if header else 0,hAlign='RIGHT' if indent else 'LEFT',splitInRow=1)
         commands=[('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6),('ROWBACKGROUNDS',(0,0),(-1,-1),[colors.white,colors.HexColor('#f1f6f8')])]
         if header:commands.append(('BACKGROUND',(0,0),(-1,0),colors.HexColor('#dcebf4')))
         result.setStyle(TableStyle(commands));return result
@@ -81,12 +82,21 @@ def pdf_document(title,lines,rows=None,sections=None,wide=False):
     story=[Paragraph(escape(title),heading),Spacer(1,12)]
     if metadata:story.append(table(metadata))
     if rows:story += [Spacer(1,12),table(rows,True)]
-    for label,values in sections or []:
-        story += [Paragraph(escape(label),subheading),table(values,True)]
+    for section in sections or []:
+        label,values=section[:2];indent=usable*section[2] if len(section)>2 else 0
+        section_style=ParagraphStyle('IndentedSection',parent=subheading,leftIndent=indent)
+        story += [Paragraph(escape(label),section_style),table(values,True,indent)]
     def footer(canvas,doc):
         canvas.saveState();canvas.setFont('DocumentSans',8);canvas.setFillColor(colors.HexColor('#546b7b'));canvas.drawRightString(width-34,16,str(doc.page));canvas.restoreState()
     stream=io.BytesIO();SimpleDocTemplate(stream,pagesize=(width,height),leftMargin=34,rightMargin=34,topMargin=30,bottomMargin=32,title=title).build(story,onFirstPage=footer,onLaterPages=footer)
     return stream.getvalue()
+
+
+def report_time(value,start,end,previous=None):
+    value=datetime.fromisoformat(value);start=datetime.fromisoformat(start);end=datetime.fromisoformat(end)
+    reference=datetime.fromisoformat(previous) if previous else start
+    changed=start.date()!=end.date() and value.date()!=reference.date()
+    return value.strftime('%d.%m.%Y %H:%M' if changed else '%H:%M')
 
 
 def work_report_pdf(db,user,report):
@@ -94,30 +104,34 @@ def work_report_pdf(db,user,report):
     from ..work_reports.schemas import train_pause_minutes,minutes
     from ..work_reports.service import report_view
     view=report_view(db,report);credited=view['credited_minutes']
-    stamp=lambda value:datetime.fromisoformat(value).strftime('%d.%m.%Y %H:%M')
+    stamp=lambda value,previous=None:report_time(value,data['start_at'],data['end_at'],previous)
     station=lambda row,key:(' '.join([row.get(key,''),row.get(key+'_name','')])).strip() or '-'
     lines=[(t('TF-Nummer'),user.username),(t('Vorname')+' / '+t('Nachname'),f'{profile.first_name} {profile.last_name}'),
         (t('Arbeitsbericht'),report.id),(t('Version'),int(data.get('_train_revision',0))+1),
         (t('Dienstart'),t('Dienstschicht' if data.get('kind','Sonstige Erfassung')=='Sonstige Erfassung' else data['kind'])),
-        (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'])),(t('Arbeitszeit'),clock(credited)),
+        (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'],data['start_at'])),(t('Arbeitszeit'),clock(credited)),
         (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
         (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-'),(t('Begründung für mehr als zwölf Stunden'),data.get('overrun_reason','') or '-')]
     lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Mindestpause nach Dienstregel'),str(view['minimum_pause_minutes'])+' min'),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
     transport={'train':'Zug','car':'Auto','taxi':'Taxi','public_transport':'ÖPNV','other':'Anderes Transportmittel'}
     guests=[[t(v) for v in ['Von','Nach','Beginn','Ende','Dauer','Verkehrsmittel','Sz']]]
+    previous_guest=None
     for trip in data['trips']:
-        guests.append([station(trip,'start_station'),station(trip,'end_station'),stamp(trip['start_at']),stamp(trip['end_at']),clock(minutes(datetime.fromisoformat(trip['start_at']),datetime.fromisoformat(trip['end_at']))),t(transport[trip['transport']])+(' / '+trip['transport_detail'] if trip.get('transport_detail') else ''),'✓' if trip.get('self_payer') else '-'])
+        guests.append([station(trip,'start_station'),station(trip,'end_station'),stamp(trip['start_at'],previous_guest),stamp(trip['end_at'],trip['start_at']),clock(minutes(datetime.fromisoformat(trip['start_at']),datetime.fromisoformat(trip['end_at']))),t(transport[trip['transport']])+(' / '+trip['transport_detail'] if trip.get('transport_detail') else ''),'✓' if trip.get('self_payer') else '-'])
+        previous_guest=trip['end_at']
     if len(guests)==1:guests.append(['-']*7)
     sections=[(t('Gastfahrten'),guests)]
     for train in data.get('train_journeys',[]):
-        header=[[t(v) for v in ['Zugnummer','StartBf','Abfahrt','ZielBf','Ankunft']],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'])]]
+        header=[[t(v) for v in ['Zugnummer','StartBf','Abfahrt','ZielBf','Ankunft']],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'],train['start_at'])]]
         sections.append((t('Zugfahrt')+' '+train['train_number'],header))
         events=[[t(v) for v in ['Grund','Verursacher','Meldestelle/Ort','Von','Bis','Dauer']]]
+        previous_event=None
         for event in train.get('events',[]):
-            events.append([t(event['reason'])+(' / '+event['reason_detail'] if event.get('reason_detail') else ''),t(event['cause'])+(' / '+event['cause_detail'] if event.get('cause_detail') else ''),station(event,'station'),stamp(event['start_at']),stamp(event['end_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
+            events.append([t(event['reason'])+(' / '+event['reason_detail'] if event.get('reason_detail') else ''),t(event['cause'])+(' / '+event['cause_detail'] if event.get('cause_detail') else ''),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
+            previous_event=event['end_at']
         if len(events)==1:events.append(['-']*6)
-        sections.append((t('Zugfahrt'),events))
-    return pdf_document(t('Arbeitsbericht'),lines,sections=sections,wide=True)
+        sections.append((t('Zugfahrt'),events,.12))
+    return pdf_document(t('Arbeitsbericht vom')+' '+datetime.fromisoformat(data['start_at']).strftime('%d.%m.%Y'),lines,sections=sections,wide=True)
 
 
 def archive_report(db,user,report,queue_email=False,include_months=True):

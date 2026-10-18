@@ -177,7 +177,9 @@ class DocumentsTest(unittest.TestCase):
         with Session(self.engine) as db:
             rows=db.scalars(select(DocumentFile)).all()
             for row in rows:
-                db.delete(db.get(DocumentRenderState,row.id))
+                state=db.get(DocumentRenderState,row.id)
+                if row.source_key.startswith('month-report:'):db.delete(state)
+                else:state.format_version=2
                 if row.source_key.startswith('work-report:'):
                     old=root/row.relative_path;new=old.with_name(f'Arbeitsbericht-{report["id"]}.pdf');old.rename(new)
                     row.relative_path=new.relative_to(root).as_posix();row.display_name=new.name
@@ -190,7 +192,7 @@ class DocumentsTest(unittest.TestCase):
             hashes={}
             for row in db.scalars(select(DocumentFile)):
                 self.assertTrue((root/row.relative_path).read_bytes().startswith(b'%PDF'))
-                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,2)
+                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,3)
                 hashes[row.id]=row.sha256
             daily=db.scalar(select(DocumentFile).where(DocumentFile.source_key==f'work-report:{report["id"]}'))
             self.assertEqual(daily.display_name,f'2026-10-12-1-{report["id"]}-Arbeitsbericht.pdf')
@@ -210,6 +212,16 @@ class DocumentsTest(unittest.TestCase):
         files=self.listing()['files'];daily=next(f for f in files if f['path'].endswith('-Arbeitsbericht.pdf'))
         self.assertEqual(daily['name'],f'2026-10-12-2-{report["id"]}-Arbeitsbericht.pdf')
         self.assertEqual(sum(f['path'].endswith('-Arbeitsbericht.pdf') for f in files),1)
+
+
+    def test_pdf_times_only_label_date_changes_in_overnight_duties(self):
+        from lokzeitleiste.documents.archive import report_time
+        start='2026-10-12T21:00';end='2026-10-13T09:00'
+        self.assertEqual(report_time(start,start,end),'21:00')
+        self.assertEqual(report_time(end,start,end,start),'13.10.2026 09:00')
+        self.assertEqual(report_time('2026-10-13T00:05',start,end,'2026-10-12T23:55'),'13.10.2026 00:05')
+        self.assertEqual(report_time('2026-10-13T00:10',start,end,'2026-10-13T00:05'),'00:10')
+        self.assertEqual(report_time('2026-10-12T09:00','2026-10-12T09:00','2026-10-12T17:00'),'09:00')
 
 
 

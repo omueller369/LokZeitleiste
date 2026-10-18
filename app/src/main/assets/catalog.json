@@ -1004,7 +1004,8 @@
     "Benutzerverzeichnis ist bereits vergeben.": "Benutzerverzeichnis ist bereits vergeben.",
     "Dokumentenverwaltung": "Dokumentenverwaltung",
     "Zurück zu TF-Portal": "Zurück zu TF-Portal",
-    "Version": "Version"
+    "Version": "Version",
+    "Arbeitsbericht vom": "Arbeitsbericht vom"
   },
   "en": {
     "Administration": "Administration",
@@ -2011,7 +2012,8 @@
     "Benutzerverzeichnis ist bereits vergeben.": "User directory is already assigned.",
     "Dokumentenverwaltung": "Document management",
     "Zurück zu TF-Portal": "Back to TF Portal",
-    "Version": "Version"
+    "Version": "Version",
+    "Arbeitsbericht vom": "Work report dated"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3018,7 +3020,8 @@
     "Benutzerverzeichnis ist bereits vergeben.": "Katalog użytkownika jest już przypisany.",
     "Dokumentenverwaltung": "Zarządzanie dokumentami",
     "Zurück zu TF-Portal": "Powrót do portalu maszynisty",
-    "Version": "Wersja"
+    "Version": "Wersja",
+    "Arbeitsbericht vom": "Raport pracy z dnia"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4025,7 +4028,8 @@
     "Benutzerverzeichnis ist bereits vergeben.": "Каталог пользователя уже занят.",
     "Dokumentenverwaltung": "Управление документами",
     "Zurück zu TF-Portal": "Назад в портал машиниста",
-    "Version": "Версия"
+    "Version": "Версия",
+    "Arbeitsbericht vom": "Рабочий отчёт за"
   },
   "es": {
     "Administration": "Administración",
@@ -5032,6 +5036,7 @@
     "Benutzerverzeichnis ist bereits vergeben.": "El directorio de usuario ya está asignado.",
     "Dokumentenverwaltung": "Gestión de documentos",
     "Zurück zu TF-Portal": "Volver al portal de maquinistas",
-    "Version": "Versión"
+    "Version": "Versión",
+    "Arbeitsbericht vom": "Informe de trabajo del"
   }
 }
