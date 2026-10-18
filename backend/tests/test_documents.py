@@ -83,8 +83,8 @@ class DocumentsTest(unittest.TestCase):
     def test_archive_mail_bytes_month_pdfs_and_delete_protection(self):
         report=self.create();data=self.listing();files=data['files']
         self.assertTrue(any('/Arbeitsberichte/' in f['path'] for f in files))
-        self.assertTrue(any(f['path'].endswith('/2026-10/Monatsbericht.pdf') for f in files))
-        self.assertTrue(any(f['path'].endswith('/2026-10/Monatszusammenfassung.pdf') for f in files))
+        self.assertTrue(any(f['path'].endswith('/2026/10/Monatsbericht.pdf') for f in files))
+        self.assertTrue(any(f['path'].endswith('/2026/10/Monatszusammenfassung.pdf') for f in files))
         file=next(f for f in files if f['path'].endswith(f'Arbeitsbericht-{report["id"]}.pdf'))
         self.assertFalse(file['can_delete']);self.assertTrue(file['generated'])
         self.assertEqual(self.driver.delete('/api/v1/documents/file',params={'path':file['path']}).status_code,403)
@@ -96,6 +96,81 @@ class DocumentsTest(unittest.TestCase):
             self.assertEqual(db.get(ReportDispatch,dispatch_id).status,'sent')
             before=len(db.scalars(select(DocumentFile)).all());backfill_documents(db);db.commit()
             self.assertEqual(len(db.scalars(select(DocumentFile)).all()),before)
+
+    def test_legacy_archives_migrate_by_duty_date_without_changing_bytes(self):
+        self.create()
+        root=Path(self.documents.name)/'TF'/'787100'
+        originals={}
+        with Session(self.engine) as db:
+            for row in db.scalars(select(DocumentFile)):
+                new=root/row.relative_path
+                folder='Dokumente/Arbeitsberichte/2026-10-18' if row.source_key.startswith('work-report:') else 'Dokumente/Monatsabrechnung/2026-10'
+                old=root/folder/row.display_name;old.parent.mkdir(parents=True,exist_ok=True)
+                new.rename(old);row.relative_path=old.relative_to(root).as_posix()
+                originals[row.source_key]=(old,old.read_bytes())
+            db.commit()
+            # First run rolls back: old originals must survive.
+            backfill_documents(db);db.rollback()
+            for old,content in originals.values():self.assertEqual(old.read_bytes(),content)
+            backfill_documents(db);db.commit()
+            paths=[]
+            for row in db.scalars(select(DocumentFile)):
+                old,content=originals[row.source_key];new=root/row.relative_path
+                self.assertFalse(old.exists());self.assertEqual(new.read_bytes(),content)
+                if row.source_key.startswith('work-report:'):self.assertIn('/2026/10/12/',row.relative_path)
+                else:self.assertIn('/2026/10/',row.relative_path)
+                paths.append(row.relative_path)
+            backfill_documents(db);db.commit()
+            self.assertEqual(sorted(paths),sorted(row.relative_path for row in db.scalars(select(DocumentFile))))
+
+    def test_migration_preserves_target_collision_and_relocates_after_duty_edit(self):
+        report=self.create();root=Path(self.documents.name)/'TF'/'787100'
+        with Session(self.engine) as db:
+            row=db.scalar(select(DocumentFile).where(DocumentFile.source_key==f'work-report:{report["id"]}'))
+            original=root/row.relative_path;content=original.read_bytes()
+            legacy=root/'Dokumente/Arbeitsberichte/2026-10-18'/original.name
+            legacy.parent.mkdir(parents=True,exist_ok=True);original.rename(legacy)
+            row.relative_path=legacy.relative_to(root).as_posix();db.commit()
+            original.write_bytes(b'manually uploaded document')
+            backfill_documents(db);db.commit()
+            self.assertEqual(original.read_bytes(),b'manually uploaded document')
+            self.assertEqual((root/row.relative_path).read_bytes(),content)
+            self.assertIn('-system-',row.relative_path)
+            before=row.relative_path;backfill_documents(db);db.commit();self.assertEqual(row.relative_path,before)
+        from lokzeitleiste.documents.storage import generated
+        with Session(self.engine) as db:
+            user=db.scalar(select(User).where(User.username=='787100'))
+            row=generated(db,user,f'Dokumente/Arbeitsberichte/2026/09/30/Arbeitsbericht-{report["id"]}.pdf',b'updated report',f'work-report:{report["id"]}')
+            db.commit()
+            self.assertIn('/2026/09/30/',row.relative_path)
+            self.assertTrue((root/row.relative_path).is_file())
+            self.assertFalse((root/before).exists())
+
+
+    def test_overnight_duty_uses_start_day_and_both_billing_months(self):
+        payload=self.payload('2026-10-31T21:00','2026-11-01T09:00');payload['actual_pause']=120
+        report=self.create(payload)
+        paths=[file['path'] for file in self.listing()['files']]
+        self.assertIn(f'Dokumente/Arbeitsberichte/2026/10/31/Arbeitsbericht-{report["id"]}.pdf',paths)
+        for month in ('10','11'):
+            for name in ('Monatsbericht','Monatszusammenfassung'):
+                self.assertIn(f'Dokumente/Monatsabrechnung/2026/{month}/{name}.pdf',paths)
+
+    def test_old_month_receipt_uses_billing_month_not_dispatch_creation(self):
+        from lokzeitleiste.documents.archive import archive_dispatch
+        self.create();root=Path(self.documents.name)/'TF'/'787100'
+        with Session(self.engine) as db:
+            original=db.scalar(select(ReportDispatch))
+            dispatch=ReportDispatch(tf_user_id=original.tf_user_id,work_month_id=original.work_month_id,
+                recipient_email=original.recipient_email,filename='Monat.pdf',pdf_data=b'monthly receipt',status='sent')
+            db.add(dispatch);db.flush()
+            old=root/f'Dokumente/Arbeitsberichte/2026-12-24/Eingang-{dispatch.id}.pdf'
+            old.parent.mkdir(parents=True,exist_ok=True);old.write_bytes(dispatch.pdf_data)
+            row=DocumentFile(owner_id=dispatch.tf_user_id,source_key=f'dispatch:{dispatch.id}',relative_path=old.relative_to(root).as_posix(),display_name=old.name,byte_size=len(dispatch.pdf_data),sha256='')
+            db.add(row);db.commit();backfill_documents(db);db.commit()
+            self.assertFalse(old.exists());self.assertEqual(row.relative_path,f'Dokumente/Monatsabrechnung/2026/10/Eingang-{dispatch.id}.pdf')
+            self.assertEqual((root/row.relative_path).read_bytes(),b'monthly receipt')
+
 
 
 class LinuxProvisioningTest(unittest.TestCase):

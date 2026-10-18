@@ -7,7 +7,8 @@ from pathlib import PurePosixPath,Path
 from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select,event
+from sqlalchemy.orm import Session
 
 from ..models import DocumentFile, now_utc
 from ..user_directories import user_path
@@ -23,8 +24,8 @@ def prepare_tree(user):
     root = user_path(user.username, user.role)
     root.mkdir(mode=0o770, exist_ok=True)
     if user.role == 'tf':
-        folders = ['Arbeitsberichte/'+today().strftime('%Y-%m-%d'),
-                   'Monatsabrechnung/'+today().strftime('%Y-%m'),
+        folders = ['Arbeitsberichte/'+today().strftime('%Y/%m/%d'),
+                   'Monatsabrechnung/'+today().strftime('%Y/%m'),
                    'Fahrpläne/Trassen', 'Fahrpläne/FPLO', 'Fahrpläne/Sonstiges']
     else:
         folders = ['Protokolle', 'Sonstiges']
@@ -70,10 +71,69 @@ def write_atomic(path, content):
         if os.path.exists(name):os.unlink(name)
 
 
+def _remove_empty_parents(path, root):
+    parent=path.parent
+    while parent!=root and parent.is_relative_to(root):
+        try:parent.rmdir()
+        except OSError:break
+        parent=parent.parent
+
+
+@event.listens_for(Session,'after_commit')
+def _commit_relocations(db):
+    for old,new,digest,root in db.info.pop('document_relocations',[]):
+        try:
+            if new.is_file() and not new.is_symlink() and not old.is_symlink() and old.is_file() and hashlib.sha256(old.read_bytes()).hexdigest()==digest:
+                old.unlink();_remove_empty_parents(old,root/'Dokumente')
+        except OSError:
+            import logging
+            logging.getLogger(__name__).exception('Altes Archiv konnte nach Migration nicht entfernt werden: %s',old)
+
+
+@event.listens_for(Session,'after_rollback')
+def _rollback_relocations(db):
+    for old,new,digest,root in db.info.pop('document_relocations',[]):
+        if not new.is_symlink() and new.is_file() and hashlib.sha256(new.read_bytes()).hexdigest()==digest:
+            new.unlink();_remove_empty_parents(new,root/'Dokumente')
+
+
+def relocate(db,user,row,relative):
+    """Copy first; remove the original only after its database path is committed."""
+    root=prepare_tree(user)
+    # Keep a previous collision suffix once the document is in the correct folder.
+    if row.relative_path==relative or (PurePosixPath(row.relative_path).parent==PurePosixPath(relative).parent and
+            PurePosixPath(row.relative_path).name.startswith(PurePosixPath(relative).stem+'-system-')):
+        return row
+    try:old=safe_path(user,row.relative_path)
+    except HTTPException as error:
+        if error.status_code!=404:raise
+        return row
+    parts=PurePosixPath(relative).parts
+    if not parts or parts[0]!='Dokumente' or any(p in ('.','..') for p in parts):raise ValueError('Invalid archive path')
+    current=root
+    for part in parts[:-1]:
+        current=current/part
+        if current.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+        current.mkdir(mode=0o770,exist_ok=True)
+    target=root/relative
+    if target.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+    if target.exists() or db.scalar(select(DocumentFile.id).where(DocumentFile.owner_id==user.id,DocumentFile.relative_path==relative)):
+        from uuid import uuid4
+        target=target.with_name(target.stem+'-system-'+uuid4().hex[:12]+target.suffix)
+    content=old.read_bytes();write_atomic(target,content)
+    row.relative_path=target.relative_to(root).as_posix();row.display_name=target.name
+    db.info.setdefault('document_relocations',[]).append((old,target,hashlib.sha256(content).hexdigest(),root))
+    db.flush()
+    return row
+
+
 def generated(db,user,relative,content,source):
     root=prepare_tree(user)
     existing=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key==source))
-    if existing:relative=existing.relative_path
+    if existing:
+        relocate(db,user,existing,relative)
+        # A missing original is recreated directly in the requested directory.
+        if (root/existing.relative_path).is_file():relative=existing.relative_path
     parts=PurePosixPath(relative).parts
     if not parts or parts[0]!='Dokumente' or any(p in ('.','..') for p in parts):raise ValueError('Invalid archive path')
     current=root
@@ -83,7 +143,7 @@ def generated(db,user,relative,content,source):
         current.mkdir(mode=0o770,exist_ok=True)
     path=root/relative
     if path.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
-    if path.exists() and not existing:
+    if path.exists() and (not existing or existing.relative_path!=relative):
         from uuid import uuid4
         path=path.with_name(path.stem+'-system-'+uuid4().hex[:12]+path.suffix)
         relative=path.relative_to(root).as_posix()

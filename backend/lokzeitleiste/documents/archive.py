@@ -19,12 +19,18 @@ from ..reports.intervals import period_entries,entry_end_date,touched_months
 from ..reports.daily import day_rows
 from ..reports.monthly import summarize_month
 from ..reports.pdf import render_receipt_pdf
-from .storage import generated,today
+from .storage import generated,today,relocate
 
 
-def creation_day(value):
-    if value.tzinfo is None:value=value.replace(tzinfo=timezone.utc)
-    return value.astimezone(ZoneInfo('Europe/Berlin')).strftime('%Y-%m-%d')
+def report_folder(report):
+    # Report timestamps are local duty times; never use upload/creation time.
+    start=datetime.fromisoformat(json.loads(report.payload_json)['start_at'])
+    if start.tzinfo is not None:start=start.astimezone(ZoneInfo('Europe/Berlin'))
+    return 'Dokumente/Arbeitsberichte/'+start.strftime('%Y/%m/%d')
+
+
+def month_folder(year,month):
+    return f'Dokumente/Monatsabrechnung/{year:04d}/{month:02d}'
 
 
 def clock(n):return f'{int(n)//60}:{int(n)%60:02d}'
@@ -67,7 +73,7 @@ def work_report_pdf(db,user,report):
 
 def archive_report(db,user,report,queue_email=False,include_months=True):
     db.flush();content=work_report_pdf(db,user,report)
-    generated(db,user,f'Dokumente/Arbeitsberichte/{creation_day(report.created_at)}/Arbeitsbericht-{report.id}.pdf',content,f'work-report:{report.id}')
+    generated(db,user,f'{report_folder(report)}/Arbeitsbericht-{report.id}.pdf',content,f'work-report:{report.id}')
     entry=db.get(WorkEntry,report.entry_id)
     if queue_email:
         profile=db.get(TfProfile,user.id)
@@ -89,7 +95,7 @@ def archive_month(db,user,year,month):
     labels={'work_without_guest':'Arbeitszeit ohne Gastfahrten','guest':'Gastfahrten gesamt','topup':'Auffüllung','vacation':'Urlaub','sick':'Krank','credited':'Angerechnete Arbeitszeit','sunday':'Sonntag','holiday':'Feiertag','night':'Nacht'}
     lines += [f'{t(label)}: {clock(summary["totals"][key])}' for key,label in labels.items()]
     rows=[[t('Datum'),t('Dienstart'),t('Angerechnete Arbeitszeit')]]+[[r['date'],t(r['type']),clock(r['credited'])] for r in summary['days']]
-    folder=f'Dokumente/Monatsabrechnung/{year}-{month:02d}'
+    folder=month_folder(year,month)
     generated(db,user,folder+'/Monatszusammenfassung.pdf',pdf_document(t('Monatszusammenfassung'),lines,rows),f'month-summary:{year}-{month:02d}')
     report=render_receipt_pdf(first_name=profile.first_name,last_name=profile.last_name,personnel_number=profile.personnel_number,
         federal_state=state,year=year,month=month,received_at=today(),rows=[r for r in day_rows(entries,state) if r.day.year==year and r.day.month==month],lang=lang,monthly=True)
@@ -104,12 +110,13 @@ def archive_dispatch(db,dispatch):
         report=db.get(DutyReport,int(match[1]))
         latest=db.scalar(select(ReportDispatch.id).where(ReportDispatch.tf_user_id==user.id,ReportDispatch.filename==dispatch.filename).order_by(ReportDispatch.id.desc()).limit(1))
         if report and report.tf_user_id==user.id and latest==dispatch.id:
-            generated(db,user,f'Dokumente/Arbeitsberichte/{creation_day(report.created_at)}/{dispatch.filename}',dispatch.pdf_data,f'work-report:{report.id}')
+            generated(db,user,f'{report_folder(report)}/{dispatch.filename}',dispatch.pdf_data,f'work-report:{report.id}')
             entry=db.get(WorkEntry,report.entry_id)
             for year,month in touched_months(entry.entry_date,entry_end_date(entry)):archive_month(db,user,year,month)
     else:
-        generated(db,user,f'Dokumente/Arbeitsberichte/{creation_day(dispatch.created_at)}/Eingang-{dispatch.id}.pdf',dispatch.pdf_data,f'dispatch:{dispatch.id}')
-        period=db.get(WorkMonth,dispatch.work_month_id);archive_month(db,user,period.year,period.month)
+        period=db.get(WorkMonth,dispatch.work_month_id)
+        generated(db,user,f'{month_folder(period.year,period.month)}/Eingang-{dispatch.id}.pdf',dispatch.pdf_data,f'dispatch:{dispatch.id}')
+        archive_month(db,user,period.year,period.month)
 
 
 def backfill_documents(db):
@@ -121,8 +128,17 @@ def backfill_documents(db):
         root=user_path(user.username,user.role)
         for report in db.scalars(select(DutyReport).where(DutyReport.tf_user_id==user.id)):
             stored=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key==f'work-report:{report.id}'))
+            if stored:relocate(db,user,stored,f'{report_folder(report)}/Arbeitsbericht-{report.id}.pdf')
             if not stored or not (root/stored.relative_path).is_file():archive_report(db,user,report,include_months=False)
+        for stored in db.scalars(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key.like('dispatch:%'))):
+            dispatch=db.get(ReportDispatch,int(stored.source_key.split(':')[1]))
+            if dispatch:
+                period=db.get(WorkMonth,dispatch.work_month_id)
+                if period:relocate(db,user,stored,f'{month_folder(period.year,period.month)}/Eingang-{dispatch.id}.pdf')
         periods={(m.year,m.month) for m in db.scalars(select(WorkMonth).where(WorkMonth.tf_user_id==user.id))}
+        for source in db.scalars(select(DocumentFile.source_key).where(DocumentFile.owner_id==user.id)):
+            match=re.fullmatch(r'month-(?:summary|report):(\d{4})-(\d{2})',source or '')
+            if match and 1<=int(match[2])<=12:periods.add((int(match[1]),int(match[2])))
         entries=db.scalars(select(WorkEntry).join(WorkMonth).where(WorkMonth.tf_user_id==user.id)).all()
         for entry in entries:periods.update(touched_months(entry.entry_date,entry_end_date(entry)))
         for year,month in periods:
@@ -130,6 +146,8 @@ def backfill_documents(db):
             relevant=[e for e in entries if (year,month) in touched_months(e.entry_date,entry_end_date(e))]
             updated=max((e.updated_at for e in relevant),default=None)
             report=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key==f'month-report:{year}-{month:02d}'))
+            if row:relocate(db,user,row,month_folder(year,month)+'/Monatszusammenfassung.pdf')
+            if report:relocate(db,user,report,month_folder(year,month)+'/Monatsbericht.pdf')
             if not row or not report or not (root/row.relative_path).is_file() or not (root/report.relative_path).is_file() or (updated and updated>row.updated_at):
                 try:archive_month(db,user,year,month)
                 except ValueError:

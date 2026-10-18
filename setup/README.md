@@ -140,13 +140,13 @@ Der Home-/Ablagepfad folgt weiterhin dem Login. Unter diesem Pfad wird folgende 
 
 | TF | VW einschließlich Administratoren |
 |---|---|
-| `Dokumente/Arbeitsberichte/JJJJ-MM-TT/` | `Dokumente/Protokolle/` |
-| `Dokumente/Monatsabrechnung/JJJJ-MM/` | `Dokumente/Sonstiges/` |
+| `Dokumente/Arbeitsberichte/JJJJ/MM/TT/` | `Dokumente/Protokolle/` |
+| `Dokumente/Monatsabrechnung/JJJJ/MM/` | `Dokumente/Sonstiges/` |
 | `Dokumente/Fahrpläne/Trassen/` | |
 | `Dokumente/Fahrpläne/FPLO/` | |
 | `Dokumente/Fahrpläne/Sonstiges/` | |
 
-Datumsordner verwenden das ursprüngliche serverseitige Erstelldatum des Arbeitsberichts bzw. Eingangsauftrags in Europe/Berlin; Monatsordner verwenden den betreffenden Abrechnungsmonat. Bei neuen TF wird der aktuelle Tages-/Monatsordner vorbereitet. Beim nächsten Update werden fehlende Ordner für sämtliche vorhandenen Konten ergänzt. Vorhandene Arbeitsberichte werden aus den gespeicherten Berichtsdaten als PDFs ergänzt, vorhandene Monatsdaten als Monatszusammenfassung und Monatsbericht. Historische E-Mail-PDFs, deren Versanddaten bereits entfernt sind, werden nicht als unveränderte Original-E-Mails ausgegeben.
+Arbeitsberichte werden nach dem Datum des **Dienstbeginns** unter `Arbeitsberichte/JJJJ/MM/TT/` abgelegt, auch bei nachträglicher Erstellung oder einem Dienst über Mitternacht. Monatsdokumente verwenden den betreffenden **Abrechnungsmonat** unter `Monatsabrechnung/JJJJ/MM/`. Vorhandene automatisch archivierte PDFs werden beim Update in diese Struktur umsortiert; PDF-Inhalte und Quellenzuordnung bleiben erhalten. Namenskollisionen überschreiben keine fremden Dokumente. Die Originaldatei wird erst nach erfolgreichem Datenbank-Commit entfernt; leere alte Datumsordner werden dabei entfernt. Manuelle Uploads bleiben an ihrem bisherigen Ort. Änderungen des Dienstbeginns verschieben auch den zugehörigen Arbeitsbericht. Bei neuen TF wird der aktuelle Tages-/Monatsordner vorbereitet. Beim nächsten Update werden fehlende Ordner für sämtliche vorhandenen Konten ergänzt. Vorhandene Arbeitsberichte werden aus den gespeicherten Berichtsdaten als PDFs ergänzt, vorhandene Monatsdaten als Monatszusammenfassung und Monatsbericht. Historische E-Mail-PDFs, deren Versanddaten bereits entfernt sind, werden nicht als unveränderte Original-E-Mails ausgegeben.
 
 Jeder Anwendungsbenutzer erhält das technische Linux-Konto `lz_u_<Datenbank-ID>` mit stabiler UID `200000 + Datenbank-ID`, gesperrtem Passwort und `/usr/sbin/nologin`. Es entstehen keine interaktiv nutzbaren SSH-/Shell-Anmeldungen; Backend-Passwörter bleiben davon unabhängig. Das zusätzliche technische Konto `lz_api` mit UID 10001 bildet den vorhandenen Containerbenutzer auf dem Host ab. Namens-/UID-Kollisionen mit fremden Konten werden abgewiesen. Bei geänderten TF-Nummern folgt das Home-Verzeichnis der umbenannten Ablage. Bestehende Konten werden nicht gelöscht. Noch belegte Ablagen eines früheren Logins werden keinem neuen Mitarbeiter zugeordnet; auch der Testdatenreset reserviert bereits vorhandene Verzeichnisnamen.
 
