@@ -179,7 +179,7 @@ class DocumentsTest(unittest.TestCase):
             for row in rows:
                 state=db.get(DocumentRenderState,row.id)
                 if row.source_key.startswith('month-report:'):db.delete(state)
-                else:state.format_version=2
+                else:state.format_version=3
                 if row.source_key.startswith('work-report:'):
                     old=root/row.relative_path;new=old.with_name(f'Arbeitsbericht-{report["id"]}.pdf');old.rename(new)
                     row.relative_path=new.relative_to(root).as_posix();row.display_name=new.name
@@ -192,7 +192,7 @@ class DocumentsTest(unittest.TestCase):
             hashes={}
             for row in db.scalars(select(DocumentFile)):
                 self.assertTrue((root/row.relative_path).read_bytes().startswith(b'%PDF'))
-                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,3)
+                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,4)
                 hashes[row.id]=row.sha256
             daily=db.scalar(select(DocumentFile).where(DocumentFile.source_key==f'work-report:{report["id"]}'))
             self.assertEqual(daily.display_name,f'2026-10-12-1-{report["id"]}-Arbeitsbericht.pdf')
@@ -222,6 +222,33 @@ class DocumentsTest(unittest.TestCase):
         self.assertEqual(report_time('2026-10-13T00:05',start,end,'2026-10-12T23:55'),'13.10.2026 00:05')
         self.assertEqual(report_time('2026-10-13T00:10',start,end,'2026-10-13T00:05'),'00:10')
         self.assertEqual(report_time('2026-10-12T09:00','2026-10-12T09:00','2026-10-12T17:00'),'09:00')
+
+
+    def test_portrait_report_conditional_fields_and_one_page_per_train(self):
+        from lokzeitleiste.models import DutyReport
+        from lokzeitleiste.documents.archive import work_report_pdf
+        import re
+        data=self.payload();data['train_journeys']=[dict(id=str(uuid4()),train_number=number,start_station='BHF',end_station='LL',start_at=data['start_at'],end_at=data['end_at'],events=[]) for number in ('TESTA','TESTB')]
+        report=self.create(data)
+        file=next(f for f in self.listing()['files'] if f['name'].endswith('-Arbeitsbericht.pdf'))
+        pdf=self.driver.get('/api/v1/documents/download',params={'path':file['path']}).content
+        self.assertEqual(len(re.findall(rb'/Type\s*/Page\b',pdf)),3)
+        boxes=re.findall(rb'/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]',pdf)
+        self.assertEqual(len(boxes),3)
+        for width,height in boxes:self.assertAlmostEqual(float(width),595.28,places=1);self.assertAlmostEqual(float(height),841.89,places=1)
+        with Session(self.engine) as db:
+            row=db.get(DutyReport,report['id']);user=db.get(User,row.tf_user_id)
+            with patch('lokzeitleiste.documents.archive.pdf_document',return_value=b'pdf') as render:
+                work_report_pdf(db,user,row);args,options=render.call_args
+                labels=[label for label,value in args[1]]
+                self.assertNotIn('Mindestpause nach Dienstregel',labels)
+                self.assertNotIn('Begründung für mehr als zwölf Stunden',labels)
+                self.assertNotIn('Sz',options['sections'][0][1][0]);self.assertTrue(options['paired_head'])
+                self.assertEqual(len(options['train_pages']),2)
+                payload=json.loads(row.payload_json);payload['overrun_reason']='Fiktive Begründung';payload['trips'][0]['self_payer']=True;row.payload_json=json.dumps(payload)
+                work_report_pdf(db,user,row);args,options=render.call_args
+                self.assertIn('Begründung für mehr als zwölf Stunden',[label for label,value in args[1]])
+                self.assertIn('Sz',options['sections'][0][1][0])
 
 
 

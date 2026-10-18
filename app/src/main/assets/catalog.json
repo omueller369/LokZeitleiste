@@ -1005,7 +1005,9 @@
     "Dokumentenverwaltung": "Dokumentenverwaltung",
     "Zurück zu TF-Portal": "Zurück zu TF-Portal",
     "Version": "Version",
-    "Arbeitsbericht vom": "Arbeitsbericht vom"
+    "Arbeitsbericht vom": "Arbeitsbericht vom",
+    "Zugnr.": "Zugnr.",
+    "Ort/Bf": "Ort/Bf"
   },
   "en": {
     "Administration": "Administration",
@@ -2013,7 +2015,9 @@
     "Dokumentenverwaltung": "Document management",
     "Zurück zu TF-Portal": "Back to TF Portal",
     "Version": "Version",
-    "Arbeitsbericht vom": "Work report dated"
+    "Arbeitsbericht vom": "Work report dated",
+    "Zugnr.": "Train no.",
+    "Ort/Bf": "Location"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3021,7 +3025,9 @@
     "Dokumentenverwaltung": "Zarządzanie dokumentami",
     "Zurück zu TF-Portal": "Powrót do portalu maszynisty",
     "Version": "Wersja",
-    "Arbeitsbericht vom": "Raport pracy z dnia"
+    "Arbeitsbericht vom": "Raport pracy z dnia",
+    "Zugnr.": "Nr pociągu",
+    "Ort/Bf": "Miejsce"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4029,7 +4035,9 @@
     "Dokumentenverwaltung": "Управление документами",
     "Zurück zu TF-Portal": "Назад в портал машиниста",
     "Version": "Версия",
-    "Arbeitsbericht vom": "Рабочий отчёт за"
+    "Arbeitsbericht vom": "Рабочий отчёт за",
+    "Zugnr.": "№ поезда",
+    "Ort/Bf": "Место"
   },
   "es": {
     "Administration": "Administración",
@@ -5037,6 +5045,8 @@
     "Dokumentenverwaltung": "Gestión de documentos",
     "Zurück zu TF-Portal": "Volver al portal de maquinistas",
     "Version": "Versión",
-    "Arbeitsbericht vom": "Informe de trabajo del"
+    "Arbeitsbericht vom": "Informe de trabajo del",
+    "Zugnr.": "N.º tren",
+    "Ort/Bf": "Lugar"
   }
 }

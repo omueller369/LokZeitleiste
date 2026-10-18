@@ -9,7 +9,7 @@ from html import escape
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4,landscape
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table,TableStyle
+from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table,TableStyle,PageBreak,KeepInFrame
 from sqlalchemy import select,or_
 
 from ..models import User,TfProfile,WorkMonth,WorkEntry,DutyReport,DocumentFile,ReportDispatch,DocumentRenderState
@@ -36,7 +36,7 @@ def month_folder(year,month):
 def clock(n):return f'{int(n)//60}:{int(n)%60:02d}'
 
 
-FORMAT_VERSION=3
+FORMAT_VERSION=4
 
 
 def report_filename(report):
@@ -58,7 +58,7 @@ def needs_render(db,row):
     return not state or state.format_version<FORMAT_VERSION
 
 
-def pdf_document(title,lines,rows=None,sections=None,wide=False):
+def pdf_document(title,lines,rows=None,sections=None,wide=False,paired_head=False,train_pages=None):
     register_fonts('DocumentSans')
     width,height=landscape(A4) if wide else A4
     usable=width-68-12  # SimpleDocTemplate frame has 6 pt padding on each side.
@@ -66,26 +66,53 @@ def pdf_document(title,lines,rows=None,sections=None,wide=False):
     heading=ParagraphStyle('DocHeading',parent=style,fontName='DocumentSans-Bold',fontSize=17,leading=22,textColor=colors.HexColor('#17445b'))
     subheading=ParagraphStyle('DocSection',parent=heading,fontSize=11,leading=15,spaceBefore=12,spaceAfter=6,keepWithNext=True)
     paragraph=lambda text:Paragraph(escape(str(text)).replace('\n','<br/>'),style)
-    def table(values,header=False,indent=0):
+    def table(values,header=False,indent=0,weights=None,spans=None,font_size=None):
         space=usable-indent
         count=len(values[0]);widths=[space/count]*count
         if count==2:widths=[space*.29,space*.71]
         elif count==5:widths=[space*w for w in (.12,.27,.17,.27,.17)]
-        elif count==6:widths=[space*w for w in (.32,.18,.16,.14,.14,.06)]
+        elif count==6:widths=[space*w for w in (.29,.17,.16,.14,.14,.10)]
         elif count==7:widths=[space*w for w in (.18,.18,.14,.14,.08,.22,.06)]
-        result=Table([[paragraph(v) for v in row] for row in values],colWidths=widths,repeatRows=1 if header else 0,hAlign='RIGHT' if indent else 'LEFT',splitInRow=1)
+        if weights:widths=[space*w for w in weights]
+        cell_style=ParagraphStyle('TrainCell',parent=style,fontSize=font_size,leading=font_size*1.35) if font_size else style
+        cells=[[Paragraph(escape(str(v)).replace('\n','<br/>'),cell_style) for v in row] for row in values]
+        result=Table(cells,colWidths=widths,repeatRows=1 if header else 0,hAlign='RIGHT' if indent else 'LEFT',splitInRow=1)
         commands=[('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6),('ROWBACKGROUNDS',(0,0),(-1,-1),[colors.white,colors.HexColor('#f1f6f8')])]
+        if font_size:commands += [('TOPPADDING',(0,0),(-1,-1),3),('BOTTOMPADDING',(0,0),(-1,-1),3)]
         if header:commands.append(('BACKGROUND',(0,0),(-1,0),colors.HexColor('#dcebf4')))
+        for row in spans or []:commands.append(('SPAN',(0,row),(-1,row)))
         result.setStyle(TableStyle(commands));return result
     # Key/value metadata is always tabular; legacy string callers remain supported.
     metadata=[list(value) if isinstance(value,(tuple,list)) else list(value.split(': ',1)) if ': ' in value else ['',value] for value in lines]
     story=[Paragraph(escape(title),heading),Spacer(1,12)]
-    if metadata:story.append(table(metadata))
+    if metadata:
+        if paired_head:
+            half=(len(metadata)+1)//2
+            pairs=[metadata[i]+(metadata[i+half] if i+half<len(metadata) else ['','']) for i in range(half)]
+            head=Table([[paragraph(v) for v in row] for row in pairs],colWidths=[usable*.22,usable*.28,usable*.22,usable*.28])
+            head.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(0,-1),colors.HexColor('#f1f6f8')),('BACKGROUND',(2,0),(2,-1),colors.HexColor('#f1f6f8')),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
+            story.append(head)
+        else:story.append(table(metadata))
     if rows:story += [Spacer(1,12),table(rows,True)]
     for section in sections or []:
         label,values=section[:2];indent=usable*section[2] if len(section)>2 else 0
         section_style=ParagraphStyle('IndentedSection',parent=subheading,leftIndent=indent)
-        story += [Paragraph(escape(label),section_style),table(values,True,indent)]
+        story += [Paragraph(escape(label),section_style),table(values,True,indent,section[3] if len(section)>3 else None)]
+    for page in train_pages or []:
+        available=height-30-32-12
+        for font_size in (8,7.5,7,6.5,6,5.5,5):
+            content=[]
+            for section in page:
+                label,values=section[:2];indent=usable*section[2] if len(section)>2 else 0
+                section_style=ParagraphStyle('TrainSection',parent=subheading,leftIndent=indent)
+                block=table(values,True,indent,spans=section[4] if len(section)>4 else None,font_size=font_size)
+                if indent:
+                    block.hAlign='LEFT'
+                    block=Table([['',block]],colWidths=[indent,usable-indent],hAlign='LEFT',style=TableStyle([('LEFTPADDING',(0,0),(-1,-1),0),('RIGHTPADDING',(0,0),(-1,-1),0),('TOPPADDING',(0,0),(-1,-1),0),('BOTTOMPADDING',(0,0),(-1,-1),0)]))
+                content += [Paragraph(escape(label),section_style),block]
+            required=sum(item.wrap(usable,available)[1]+item.getSpaceBefore()+item.getSpaceAfter() for item in content)
+            if required<=available:break
+        story += [PageBreak(),KeepInFrame(usable,available,content,mode='shrink',hAlign='LEFT',vAlign='TOP')]
     def footer(canvas,doc):
         canvas.saveState();canvas.setFont('DocumentSans',8);canvas.setFillColor(colors.HexColor('#546b7b'));canvas.drawRightString(width-34,16,str(doc.page));canvas.restoreState()
     stream=io.BytesIO();SimpleDocTemplate(stream,pagesize=(width,height),leftMargin=34,rightMargin=34,topMargin=30,bottomMargin=32,title=title).build(story,onFirstPage=footer,onLaterPages=footer)
@@ -111,8 +138,9 @@ def work_report_pdf(db,user,report):
         (t('Dienstart'),t('Dienstschicht' if data.get('kind','Sonstige Erfassung')=='Sonstige Erfassung' else data['kind'])),
         (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'],data['start_at'])),(t('Arbeitszeit'),clock(credited)),
         (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
-        (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-'),(t('Begründung für mehr als zwölf Stunden'),data.get('overrun_reason','') or '-')]
-    lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Mindestpause nach Dienstregel'),str(view['minimum_pause_minutes'])+' min'),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
+        (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-')]
+    lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
+    if data.get('overrun_reason','').strip():lines.append((t('Begründung für mehr als zwölf Stunden'),data['overrun_reason']))
     transport={'train':'Zug','car':'Auto','taxi':'Taxi','public_transport':'ÖPNV','other':'Anderes Transportmittel'}
     guests=[[t(v) for v in ['Von','Nach','Beginn','Ende','Dauer','Verkehrsmittel','Sz']]]
     previous_guest=None
@@ -120,18 +148,26 @@ def work_report_pdf(db,user,report):
         guests.append([station(trip,'start_station'),station(trip,'end_station'),stamp(trip['start_at'],previous_guest),stamp(trip['end_at'],trip['start_at']),clock(minutes(datetime.fromisoformat(trip['start_at']),datetime.fromisoformat(trip['end_at']))),t(transport[trip['transport']])+(' / '+trip['transport_detail'] if trip.get('transport_detail') else ''),'✓' if trip.get('self_payer') else '-'])
         previous_guest=trip['end_at']
     if len(guests)==1:guests.append(['-']*7)
-    sections=[(t('Gastfahrten'),guests)]
+    if not any(trip.get('self_payer') for trip in data['trips']):guests=[row[:-1] for row in guests]
+    guest_weights=(.18,.18,.14,.14,.08,.22,.06) if len(guests[0])==7 else (.20,.20,.14,.14,.08,.24)
+    sections=[(t('Gastfahrten'),guests,0,guest_weights)]
+    train_pages=[]
     for train in data.get('train_journeys',[]):
-        header=[[t(v) for v in ['Zugnummer','StartBf','Abfahrt','ZielBf','Ankunft']],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'],train['start_at'])]]
-        sections.append((t('Zugfahrt')+' '+train['train_number'],header))
-        events=[[t(v) for v in ['Grund','Verursacher','Meldestelle/Ort','Von','Bis','Dauer']]]
-        previous_event=None
+        header=[[t(v) for v in ['Zugnr.','StartBf','Abfahrt','ZielBf','Ankunft']],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'],train['start_at'])]]
+        train_page=[(t('Zugfahrt')+' '+train['train_number'],header)]
+        events=[[t(v) for v in ['Grund','Verursacher','Ort/Bf','Von','Bis','Dauer']]]
+        previous_event=None;detail_rows=[]
         for event in train.get('events',[]):
-            events.append([t(event['reason'])+(' / '+event['reason_detail'] if event.get('reason_detail') else ''),t(event['cause'])+(' / '+event['cause_detail'] if event.get('cause_detail') else ''),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
+            events.append([t(event['reason']),t(event['cause']),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
+            details=[]
+            if event.get('reason_detail'):details.append(t('Grund')+': '+event['reason_detail'])
+            if event.get('cause_detail'):details.append(t('Verursacher')+': '+event['cause_detail'])
+            if details:
+                events.append([' / '.join(details),'','','','','']);detail_rows.append(len(events)-1)
             previous_event=event['end_at']
         if len(events)==1:events.append(['-']*6)
-        sections.append((t('Zugfahrt'),events,.12))
-    return pdf_document(t('Arbeitsbericht vom')+' '+datetime.fromisoformat(data['start_at']).strftime('%d.%m.%Y'),lines,sections=sections,wide=True)
+        train_page.append((t('Zugfahrt'),events,.12,None,detail_rows));train_pages.append(train_page)
+    return pdf_document(t('Arbeitsbericht vom')+' '+datetime.fromisoformat(data['start_at']).strftime('%d.%m.%Y'),lines,sections=sections,paired_head=True,train_pages=train_pages)
 
 
 def archive_report(db,user,report,queue_email=False,include_months=True):
