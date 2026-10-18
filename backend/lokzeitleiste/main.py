@@ -112,7 +112,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
             db.add(TfBahnCardValidity(user_id=user.id, valid_until=data.bahncard_valid_until))
         save_details(db,user,data)
         save_photo(db,user.id,image)
-        with directory_transaction(user):
+        with directory_transaction(user,creating=True):
             db.commit()
         return {"id": user.id, "username": user.username}
     except IntegrityError:
@@ -617,3 +617,7 @@ app.include_router(tf_portal_router(require_account))
 
 from .work_reports.api import create_router as work_report_router
 app.include_router(work_report_router(require_account))
+
+from .documents.api import create_router as documents_router,DocumentUploadLimit
+app.include_router(documents_router(require_account))
+app.add_middleware(DocumentUploadLimit)

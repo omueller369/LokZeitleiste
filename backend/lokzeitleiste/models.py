@@ -410,3 +410,18 @@ class DutyReceipt(Base):
     last_error:Mapped[str]=mapped_column(String(500),default='',nullable=False)
     created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
     sent_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
+
+
+class DocumentFile(Base):
+    __tablename__='document_files'
+    __table_args__=(UniqueConstraint('owner_id','source_key'),UniqueConstraint('owner_id','relative_path'))
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    uploader_id:Mapped[int|None]=mapped_column(ForeignKey('users.id'),nullable=True)
+    relative_path:Mapped[str]=mapped_column(String(500),nullable=False)
+    display_name:Mapped[str]=mapped_column(String(255),nullable=False)
+    source_key:Mapped[str|None]=mapped_column(String(100),nullable=True)
+    byte_size:Mapped[int]=mapped_column(Integer,nullable=False)
+    sha256:Mapped[str]=mapped_column(String(64),nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)

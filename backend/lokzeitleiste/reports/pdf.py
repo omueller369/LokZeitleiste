@@ -25,20 +25,20 @@ def _clock(minutes: int) -> str:
 
 def render_receipt_pdf(*, first_name: str, last_name: str, personnel_number: str,
                        federal_state: str, year: int, month: int,
-                       received_at: datetime, rows: list[DayRow], lang: str | None = None) -> bytes:
+                       received_at: datetime, rows: list[DayRow], lang: str | None = None, monthly: bool = False) -> bytes:
     token=request_language.set(lang or request_language.get())
     try:
-        return _render_receipt_pdf(first_name=first_name,last_name=last_name,personnel_number=personnel_number,federal_state=federal_state,year=year,month=month,received_at=received_at,rows=rows)
+        return _render_receipt_pdf(first_name=first_name,last_name=last_name,personnel_number=personnel_number,federal_state=federal_state,year=year,month=month,received_at=received_at,rows=rows,monthly=monthly)
     finally:
         request_language.reset(token)
 
 
-def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_state, year, month, received_at, rows):
+def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_state, year, month, received_at, rows, monthly=False):
     stream = BytesIO()
     doc = SimpleDocTemplate(stream, pagesize=landscape(A4),
                             leftMargin=14 * mm, rightMargin=14 * mm,
                             topMargin=13 * mm, bottomMargin=13 * mm,
-                            title="LokZeitleiste - Tabellarische Eingangsbestätigung")
+                            title="LokZeitleiste - Monatsbericht" if monthly else "LokZeitleiste - Tabellarische Eingangsbestätigung")
     heading = ParagraphStyle("heading", fontName="ReceiptSans-Bold", fontSize=12, leading=15, textColor=INK)
     body = ParagraphStyle("body", fontName="ReceiptSans", fontSize=8.2, leading=11, textColor=INK)
     small = ParagraphStyle("small", parent=body, fontSize=7.4, leading=9.5)
@@ -47,9 +47,9 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
         return Paragraph(escape(str(value)), style)
     story = []
     metadata = Table([
-        [p("LokZeitleiste - Eingangsbestätigung", heading), p(f"Monat: {month:02d}/{year}")],
+        [p("LokZeitleiste - Monatsbericht" if monthly else "LokZeitleiste - Eingangsbestätigung", heading), p(f"Monat: {month:02d}/{year}")],
         [p(f"Tf: {first_name} {last_name}"), p(f"Personalnummer: {personnel_number}")],
-        [p(f"Eingang: {received_at:%d.%m.%Y %H:%M} Uhr"), p(f"Feiertagskalender: DE-{federal_state}")],
+        [p(f"{'Erstellt' if monthly else 'Eingang'}: {received_at:%d.%m.%Y %H:%M} Uhr"), p(f"Feiertagskalender: DE-{federal_state}")],
     ], colWidths=[135 * mm, 134 * mm])
     metadata.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), PALE), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -86,7 +86,7 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
         table_data.append([p("Keine Einträge empfangen."), "", "", "", "", "", "", "", "", ""])
         span_rows.append(1)
     summed = totals(rows)
-    table_data.append([p("Summe der Übermittlung", small), "", "", "",
+    table_data.append([p("Monatssumme" if monthly else "Summe der Übermittlung", small), "", "", "",
                        *[p(_clock(summed[k]), center) for k in
                          ("pause", "work", "guest", "sunday", "holiday", "night")]])
     total_row = len(table_data) - 1
@@ -104,7 +104,7 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
     table.setStyle(TableStyle(style))
     story.extend([table, Spacer(1, 5 * mm)])
     notes = Table([[p("Bestätigung der empfangenen Daten - keine Entgelt- oder Tarifabrechnung.", small)],
-                   [p("Arbeitszeit = Zugfahrt, Bereitschaft und Sonstige Erfassung abzüglich Pause. Gastfahrt ist enthalten und separat ausgewiesen.", small)],
+                   [p("Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.", small)],
                    [p("Mangels genauer Zeitlage liegt die Pause rechnerisch am Ende, Gastfahrt am Beginn des Zeitraums. Sonntag, Feiertag und Nacht (22:00-06:00 Uhr) sind damit vorläufig; Zeitwechsel werden nicht gesondert bewertet.", small)]],
                   colWidths=[269 * mm])
     notes.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), PALE),

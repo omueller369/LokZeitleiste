@@ -129,7 +129,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
             save_photo(db,user.id,image)
             db.add(AccountPolicy(user_id=user.id,must_change_password=True))
             db.add(AccountAudit(actor_id=actor.id,target_id=user.id,action='staff_created'))
-            with directory_transaction(user):
+            with directory_transaction(user,creating=True):
                 db.commit()
             return {'id':user.id,'username':user.username,'password_change_required':True}
         except IntegrityError as exc:

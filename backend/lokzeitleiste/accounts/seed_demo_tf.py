@@ -119,7 +119,12 @@ def delete_tf_records(db):
 def replace_all_tf(db,today=None,seed=None):
     """Caller owns commit/rollback. Validate photos and all rows before deleting."""
     today=today or berlin_today()
-    records=build_records(today,seed,db.scalars(select(User.username)))
+    from ..user_directories import storage_root
+    folder=storage_root()/'TF'
+    if folder.is_symlink():raise ValueError('Ungültiger TF-Verzeichnisroot')
+    reserved=list(db.scalars(select(User.username)))
+    if folder.is_dir():reserved.extend(p.name for p in folder.iterdir())
+    records=build_records(today,seed,reserved)
     validate_records(records,today)
     photos=[]
     for record in records:

@@ -21,6 +21,9 @@ def process_dispatch(dispatch_id: int):
         try:
             if not dispatch.pdf_data:
                 raise RuntimeError("PDF-Daten fehlen")
+            from ..documents.archive import archive_dispatch
+            archive_dispatch(session,dispatch)
+            session.flush()
             send_receipt(recipient=dispatch.recipient_email, filename=dispatch.filename,
                          pdf_data=dispatch.pdf_data, lang=user_language(session,dispatch.tf_user_id))
         except Exception as exc:

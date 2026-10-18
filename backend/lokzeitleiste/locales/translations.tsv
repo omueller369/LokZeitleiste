@@ -968,3 +968,36 @@ Gastfahrten schließen|Close passenger journeys|Zamknij przejazdy|Закрыть
 Arbeitszeiten anzeigen|Show working times|Pokaż czasy pracy|Показать рабочее время|Mostrar horas de trabajo
 Arbeitszeiten ausblenden|Hide working times|Ukryj czasy pracy|Скрыть рабочее время|Ocultar horas de trabajo
 Benutzerverzeichnis konnte nicht vorbereitet werden. Bitte die Serverkonfiguration prüfen.|The user directory could not be prepared. Please check the server configuration.|Nie można przygotować katalogu użytkownika. Sprawdź konfigurację serwera.|Не удалось подготовить каталог пользователя. Проверьте настройки сервера.|No se pudo preparar el directorio del usuario. Compruebe la configuración del servidor.
+Dokumente|Documents|Dokumenty|Документы|Documentos
+Meine Dokumente|My documents|Moje dokumenty|Мои документы|Mis documentos
+Dokumente ansehen und hochladen.|View and upload documents.|Przeglądaj i przesyłaj dokumenty.|Просматривайте и загружайте документы.|Consulte y suba documentos.
+Verzeichnisse|Folders|Foldery|Папки|Carpetas
+Dokumente durchsuchen|Search documents|Szukaj dokumentów|Поиск документов|Buscar documentos
+Dateiname oder Ordner|File name or folder|Nazwa pliku lub folderu|Имя файла или папка|Nombre de archivo o carpeta
+Dokument hochladen (max. 10 MB)|Upload document (max. 10 MB)|Prześlij dokument (maks. 10 MB)|Загрузить документ (до 10 МБ)|Subir documento (máx. 10 MB)
+Hochladen|Upload|Prześlij|Загрузить|Subir
+Automatisch erstellte Dokumente können nicht gelöscht werden.|Automatically generated documents cannot be deleted.|Dokumentów wygenerowanych automatycznie nie można usuwać.|Автоматически созданные документы нельзя удалить.|Los documentos generados automáticamente no se pueden eliminar.
+Automatisch erstellt|Automatically generated|Wygenerowano automatycznie|Создан автоматически|Generado automáticamente
+Keine Dokumente vorhanden.|No documents found.|Brak dokumentów.|Документов нет.|No hay documentos.
+Herunterladen|Download|Pobierz|Скачать|Descargar
+Dokument wirklich löschen?|Delete this document?|Czy usunąć dokument?|Удалить документ?|¿Eliminar este documento?
+Dokument gelöscht.|Document deleted.|Dokument usunięto.|Документ удалён.|Documento eliminado.
+Dokument hochgeladen.|Document uploaded.|Dokument przesłano.|Документ загружен.|Documento subido.
+Dokument darf höchstens 10 MB groß sein.|Document must not exceed 10 MB.|Dokument nie może przekraczać 10 MB.|Размер документа не должен превышать 10 МБ.|El documento no debe superar los 10 MB.
+Nur selbst hochgeladene Dokumente dürfen gelöscht werden.|Only documents you uploaded yourself may be deleted.|Można usuwać tylko dokumenty przesłane samodzielnie.|Можно удалять только документы, загруженные вами.|Solo puede eliminar documentos que haya subido usted.
+Ungültiger Dokumentpfad.|Invalid document path.|Nieprawidłowa ścieżka dokumentu.|Недопустимый путь документа.|Ruta de documento no válida.
+Dokument oder Verzeichnis nicht gefunden.|Document or folder not found.|Nie znaleziono dokumentu lub folderu.|Документ или папка не найдены.|Documento o carpeta no encontrados.
+Ungültiger Dateiname.|Invalid file name.|Nieprawidłowa nazwa pliku.|Недопустимое имя файла.|Nombre de archivo no válido.
+Datei existiert bereits.|File already exists.|Plik już istnieje.|Файл уже существует.|El archivo ya existe.
+Arbeitsberichte|Work reports|Raporty pracy|Рабочие отчёты|Partes de trabajo
+Monatszusammenfassung|Monthly summary|Podsumowanie miesiąca|Месячная сводка|Resumen mensual
+Monatsbericht|Monthly report|Raport miesięczny|Месячный отчёт|Informe mensual
+Fahrpläne|Timetables|Rozkłady jazdy|Расписания|Horarios
+Trassen|Train paths|Trasy pociągów|Нитки графика|Surcos ferroviarios
+FPLO|FPLO|FPLO|FPLO|FPLO
+Protokolle|Records|Protokoły|Протоколы|Actas
+Arbeitszeit ohne Gastfahrten|Working time excluding passenger travel|Czas pracy bez przejazdów pasażerskich|Рабочее время без служебных поездок|Tiempo de trabajo sin desplazamientos
+LokZeitleiste - Monatsbericht|LokZeitleiste - Monthly report|LokZeitleiste - Raport miesięczny|LokZeitleiste - Месячный отчёт|LokZeitleiste - Informe mensual
+Erstellt|Created|Utworzono|Создан|Creado
+Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.|Working time includes the full duty span and documented breaks. Passenger travel is included and shown separately.|Czas pracy obejmuje całą służbę i udokumentowane przerwy. Przejazdy pasażerskie są wliczone i wykazane oddzielnie.|Рабочее время включает всю смену и документированные перерывы. Служебные поездки включены и указаны отдельно.|El tiempo de trabajo incluye toda la jornada y las pausas documentadas. Los desplazamientos están incluidos y se muestran por separado.
+Benutzerverzeichnis ist bereits vergeben.|User directory is already assigned.|Katalog użytkownika jest już przypisany.|Каталог пользователя уже занят.|El directorio de usuario ya está asignado.

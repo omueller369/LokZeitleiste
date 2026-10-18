@@ -29,6 +29,10 @@ def poll_once():
     with Session(engine()) as db:
         receipts=db.scalars(select(DutyReceipt.id).where(DutyReceipt.status.in_(('pending','failed')),DutyReceipt.attempts<MAX_ATTEMPTS).order_by(DutyReceipt.id).limit(20)).all()
     for receipt_id in receipts:process_receipt(receipt_id)
+    from ..documents.archive import backfill_documents
+    with Session(engine()) as db:
+        backfill_documents(db)
+        db.commit()
 
 
 def main():

@@ -29,7 +29,7 @@ def main():
             return
         user=User(username=username, password_hash=hash_password(password), role="admin")
         db.add(user)
-        with directory_transaction(user):
+        with directory_transaction(user,creating=True):
             db.commit()
     print("Admin angelegt.")
 

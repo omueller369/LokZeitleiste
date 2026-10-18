@@ -45,7 +45,7 @@ select_platform || die "Nicht unterstütztes System: ${ID:-?} ${VERSION_ID:-?}. 
 arch=$(dpkg --print-architecture)
 [[ "$arch" == amd64 || "$arch" == arm64 ]] || die 'Der MySQL-Teststack unterstützt hier amd64 oder arm64'
 [[ -d /run/systemd/system ]] || die 'Der Server muss mit systemd gestartet sein'
-for file in setup/auto-admin.sh backend/compose.test.yaml backend/Dockerfile backend/requirements.txt backend/testenv/prepare.sh backend/testenv/control.sh backend/apache/lokzeitleiste-local.conf; do
+for file in setup/install-user-service.sh setup/provision-users.py backend/lokzeitleiste/documents/api.py setup/auto-admin.sh backend/compose.test.yaml backend/Dockerfile backend/requirements.txt backend/testenv/prepare.sh backend/testenv/control.sh backend/apache/lokzeitleiste-local.conf; do
   [[ -r "$ROOT_DIR/$file" ]] || die "Projektdatei fehlt: $file"
 done
 if [[ -n "$ADMIN_USER" || -n "$ADMIN_PASSWORD_FILE" ]]; then
@@ -90,7 +90,7 @@ free_mb=$(df -Pm "$ROOT_DIR" | awk 'NR==2 {print $4}')
 (( free_mb >= 5120 )) || die 'Mindestens 5 GB freier Speicher für Container erforderlich (20 GB empfohlen)'
 echo "$PRETTY_NAME ($arch); Projekt und Ports geprüft; freier Speicher: ${free_mb} MB."
 missing=()
-for pkg in apache2 openssh-server git python3 openssl ca-certificates curl iproute2; do
+for pkg in apache2 openssh-server git python3 openssl ca-certificates curl iproute2 acl passwd; do
   if ! dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -qx 'install ok installed'; then
     missing+=("$pkg")
   fi
@@ -180,6 +180,7 @@ if [[ "$SKIP_ADMIN" == false ]]; then
   fi
 fi
 echo
+bash "$ROOT_DIR/setup/install-user-service.sh"
 echo 'LokZeitleiste-Testumgebung gestartet.'
 echo 'Admin: http://localhost:8080/admin | Testpostfach: http://localhost:8025'
 echo 'Planung: http://localhost:8080/admin/planning'

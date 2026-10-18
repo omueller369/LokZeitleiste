@@ -4,7 +4,8 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 [[ -f .env.test ]] || { echo 'Zuerst bash testenv/prepare.sh ausführen.' >&2; exit 1; }
 compose=(docker compose --env-file .env.test -f compose.test.yaml)
 case "${1:-status}" in
-  start) "${compose[@]}" config --quiet; "${compose[@]}" up -d --build --wait --wait-timeout 240 ;;
+  start) "${compose[@]}" config --quiet; "${compose[@]}" up -d --build --wait --wait-timeout 240
+    if [[ "$(uname -s)" == Linux && $EUID -eq 0 && -f /etc/systemd/system/lokzeitleiste-users.service ]]; then systemctl start lokzeitleiste-users.service; fi ;;
   stop) "${compose[@]}" stop ;;
   status) "${compose[@]}" ps ;;
   logs) "${compose[@]}" logs --tail 100 ;;

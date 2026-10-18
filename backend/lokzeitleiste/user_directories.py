@@ -29,10 +29,12 @@ def component(username):
 def private_directory(path):
     if path.is_symlink():
         raise ValueError('Symbolische Links sind als Benutzerverzeichnisse nicht zulässig.')
+    created=not path.exists()
     path.mkdir(mode=0o700, exist_ok=True)
     if not path.is_dir() or path.is_symlink():
         raise ValueError('Benutzerpfad ist kein Verzeichnis.')
-    path.chmod(0o700)
+    if created:
+        path.chmod(0o700)
     return path
 
 
@@ -48,12 +50,14 @@ def user_path(username, role):
 
 
 @contextmanager
-def directory_transaction(user, previous_username=None):
+def directory_transaction(user, previous_username=None, *, creating=False):
     """Provision before DB commit; undo an empty creation/rename if commit fails."""
     path = old = None
     created = moved = False
     try:
         path = user_path(user.username, user.role)
+        if creating and path.exists():
+            raise HTTPException(409, 'Benutzerverzeichnis ist bereits vergeben.')
         if previous_username and previous_username != user.username:
             old = user_path(previous_username, user.role)
             if old.exists():
@@ -68,12 +72,18 @@ def directory_transaction(user, previous_username=None):
             path.rename(old)
         raise HTTPException(503, STORAGE_ERROR) from exc
     try:
+        from .documents.storage import prepare_tree
+        prepare_tree(user)
         yield path
     except BaseException:
         try:
             if moved:
                 path.rename(old)
             elif created:
+                for folder in sorted(path.rglob('*'),key=lambda p:len(p.parts),reverse=True):
+                    if folder.is_dir() and not folder.is_symlink():
+                        try:folder.rmdir()
+                        except OSError:pass
                 path.rmdir()  # Never remove a directory containing documents.
         except OSError:
             logging.getLogger(__name__).exception('Leeres Benutzerverzeichnis konnte nicht zurückgesetzt werden.')
@@ -100,6 +110,7 @@ def prepare_container_root():
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     for path in (root, root / 'TF', root / 'VW'):
         private_directory(path)
+        if path.stat().st_uid != 10001:path.chmod(0o700)
         os.chown(path, 10001, 10001)
 
 

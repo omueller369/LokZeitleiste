@@ -109,7 +109,7 @@ Beispiel bei Installation unter `/opt/LokZeitleiste`: `/opt/LokZeitleiste/TF/787
 
 Beim regulären Start legt `init_db` fehlende Verzeichnisse auch für vorhandene und gesperrte Benutzer an. Neue TF, Verwaltungsmitarbeiter und Administratoren erhalten ihr Verzeichnis beim Anlegen. Bei Änderung einer TF-Nummer wird das bisherige Verzeichnis einschließlich seines Inhalts umbenannt. Ein belegtes Ziel wird nicht überschrieben oder zusammengeführt. Benutzerverzeichnisse werden beim Sperren oder beim Testdatenreset nicht gelöscht.
 
-Die beiden Compose-Konfigurationen binden ausschließlich `TF` und `VW` vom Host nach `/user-files/TF` und `/user-files/VW` ein. Der einmalige Dienst `user-directories` bereitet die Besitzrechte für den bestehenden API-Benutzer mit UID 10001 vor. API und Mailer arbeiten anschließend weiterhin ohne root. Die Daten bleiben bei Container-Neubau und -Austausch auf dem Host erhalten. Der Verzeichnismodus ist `0700`; die Ordner werden nicht als öffentliche Webdateien ausgeliefert und sind in Git ausgeschlossen.
+Die beiden Compose-Konfigurationen binden ausschließlich `TF` und `VW` vom Host nach `/user-files/TF` und `/user-files/VW` ein. Der einmalige Dienst `user-directories` bereitet die Besitzrechte für den bestehenden API-Benutzer mit UID 10001 vor. API und Mailer arbeiten anschließend weiterhin ohne root. Die Daten bleiben bei Container-Neubau und -Austausch auf dem Host erhalten. Die Basisrechte sind privat; nach Einrichtung der Hostkonten werden gezielte POSIX-ACLs ergänzt; die Ordner werden nicht als öffentliche Webdateien ausgeliefert und sind in Git ausgeschlossen.
 
 Nach Aktualisierung der Quellen den Stack wie üblich starten, damit Initialisierung und Bind-Mounts aktiv werden:
 
@@ -125,3 +125,47 @@ docker compose --env-file .env.test -f compose.test.yaml exec api python -m lokz
 ```
 
 Bei nativem Betrieb ist der Standard das Repository-Verzeichnis. Mit `LOKZEITLEISTE_FILES_ROOT` kann ein anderer **absoluter** Ablageroot angegeben werden; der Prozess benötigt dort Schreibrechte. Die Compose-Konfiguration setzt diese Variable im Container auf `/user-files`; auf dem Host bleiben die Ordner direkt im Projektverzeichnis. Änderungen an Login-Verzeichnissen dürfen nur über die Software oder durch den Serveradministrator erfolgen. Neben Datenbank und Konfiguration künftig auch beide Hostverzeichnisse `TF` und `VW` in die Datensicherung aufnehmen.
+
+## Dokumentenmodul und Linux-Konten ohne Anmeldung
+
+Für die Aktualisierung einschließlich Systemkonten und ACL-Paket einmal im Projektverzeichnis ausführen:
+
+```bash
+sudo bash setup.sh
+```
+
+Der Installer richtet `lokzeitleiste-users.service` und einen Timer ein. Beim Update erfolgt der Abgleich sofort, danach etwa jede Minute für neu angelegte Benutzer. Ein späterer Start über `sudo bash backend/testenv/control.sh start` stößt den eingerichteten Abgleich ebenfalls an. Der Containerstart allein erstellt die Ordner und ergänzt die Datenbank; die **Linux-Hostkonten** benötigen den einmaligen Installer-Aufruf mit root. Die Weboberfläche bleibt ohne root-Rechte.
+
+Der Home-/Ablagepfad folgt weiterhin dem Login. Unter diesem Pfad wird folgende Struktur vorbereitet:
+
+| TF | VW einschließlich Administratoren |
+|---|---|
+| `Dokumente/Arbeitsberichte/JJJJ-MM-TT/` | `Dokumente/Protokolle/` |
+| `Dokumente/Monatsabrechnung/JJJJ-MM/` | `Dokumente/Sonstiges/` |
+| `Dokumente/Fahrpläne/Trassen/` | |
+| `Dokumente/Fahrpläne/FPLO/` | |
+| `Dokumente/Fahrpläne/Sonstiges/` | |
+
+Datumsordner verwenden das ursprüngliche serverseitige Erstelldatum des Arbeitsberichts bzw. Eingangsauftrags in Europe/Berlin; Monatsordner verwenden den betreffenden Abrechnungsmonat. Bei neuen TF wird der aktuelle Tages-/Monatsordner vorbereitet. Beim nächsten Update werden fehlende Ordner für sämtliche vorhandenen Konten ergänzt. Vorhandene Arbeitsberichte werden aus den gespeicherten Berichtsdaten als PDFs ergänzt, vorhandene Monatsdaten als Monatszusammenfassung und Monatsbericht. Historische E-Mail-PDFs, deren Versanddaten bereits entfernt sind, werden nicht als unveränderte Original-E-Mails ausgegeben.
+
+Jeder Anwendungsbenutzer erhält das technische Linux-Konto `lz_u_<Datenbank-ID>` mit stabiler UID `200000 + Datenbank-ID`, gesperrtem Passwort und `/usr/sbin/nologin`. Es entstehen keine interaktiv nutzbaren SSH-/Shell-Anmeldungen; Backend-Passwörter bleiben davon unabhängig. Das zusätzliche technische Konto `lz_api` mit UID 10001 bildet den vorhandenen Containerbenutzer auf dem Host ab. Namens-/UID-Kollisionen mit fremden Konten werden abgewiesen. Bei geänderten TF-Nummern folgt das Home-Verzeichnis der umbenannten Ablage. Bestehende Konten werden nicht gelöscht. Noch belegte Ablagen eines früheren Logins werden keinem neuen Mitarbeiter zugeordnet; auch der Testdatenreset reserviert bereits vorhandene Verzeichnisnamen.
+
+Die Benutzer erhalten Eigentum und Lese-, Schreib- und Löschrechte in ihrer eigenen Ablage. POSIX-ACLs geben zusätzlich ausschließlich dem technischen API-/Mailer-Benutzer Zugriff; notwendige Elternverzeichnisse erhalten für den jeweiligen Benutzer nur Durchtrittsrecht. Default-ACLs erhalten diese Rechte auch bei neuen Dateien und Ordnern. Dies setzt ein Linux-Dateisystem mit ACL-Unterstützung voraus. Die Vorbereitungsroutine folgt keinen symbolischen Links. Ein anderer Linux-Benutzer erhält dadurch keinen Zugriff auf fremde Benutzerablagen.
+
+**Meine Dokumente** ist unter `/documents`, im TF Portal und im Backend-Menü für jeden angemeldeten Benutzer erreichbar. Das Modul benötigt keine fremden Mitarbeiterrechte und zeigt ausschließlich die eigene Ablage. Es bietet einen aufklappbaren Ordnerbaum, Suche nach Datei-/Ordnernamen, Downloads und Uploads in einen ausgewählten Ordner. Pro Upload sind höchstens 10 MiB zulässig; übergroße Requests werden bereits vor der Multipart-Verarbeitung begrenzt. Dateien werden nur als Downloads, niemals als ausführbare Webinhalte ausgeliefert. Doppelte Uploadnamen erhalten einen eindeutigen Zusatz.
+
+Die neue Tabelle `document_files` speichert Eigentümer, Hochladenden, Dateipfad, Prüfsumme und Herkunft. Löschen ist ausschließlich für eigene Uploads möglich. Automatisch erzeugte oder manuell auf dem Server abgelegte Dokumente haben keine entsprechende Uploadfreigabe. Die Linux-Dateirechte und die Löschprüfung im Modul sind getrennte Ebenen; Linux-Konten sind für Endbenutzer nicht anmeldbar. Keine neue Dokumentenroute ermöglicht den Zugriff auf einen anderen Benutzer.
+
+Beim Synchronisieren eines Arbeitsberichts werden sein PDF und die zugehörigen Monats-PDFs archiviert. Das Arbeitsbericht-PDF wird über die vorhandene dauerhafte Versandwarteschlange an die hinterlegte TF-E-Mail-Adresse versandt. Vor der E-Mail-Zustellung bestätigt der Versandworker die Archivablage; bei Fehlern bleibt der Versand wiederholbar. Änderungen an Zugfahrtdaten aktualisieren die Ablage und erzeugen eine neue Versandversion. Ein alter Versandwiederholungsversuch überschreibt keine neuere Berichtsversion. SMTP-Einstellungen und die bisherigen Wiederholungsgrenzen gelten weiterhin. Der bestehende Empfänger für Quittungsbelege wird dadurch nicht geändert.
+
+Monatszusammenfassung und Monatsbericht liegen als zwei PDFs im betreffenden Monatsordner. Pausen werden dokumentiert und nicht von der Arbeitszeit abgezogen. Monatsgrenzen und über Mitternacht reichende Dienste werden bei der Ablage berücksichtigt. Der vorhandene Worker ergänzt fehlende Dateien und aktualisiert Monatsausgaben nach Arbeitszeitkorrekturen. Keine nachträgliche Ordner-/Archivergänzung versendet alte Berichte erneut.
+
+Für eine vollständige Sicherung werden jetzt **Datenbank einschließlich `document_files`, beide Verzeichnisbäume und die Host-Konfiguration der Linux-Konten/ACLs** benötigt. Nach einer Wiederherstellung zuerst die Datenbank und Dateien zurückspielen und anschließend den Installer/Benutzerdienst erneut ausführen; dadurch werden die stabilen UID-Zuordnungen und ACLs wiederhergestellt.
+
+## Getrennte Installation und Aktualisierung
+
+- **Neue Testumgebung:** `sudo bash setup-new.sh` im Projektstamm. Verweigert die Wiederverwendung vorhandener Testkonfiguration, Benutzerdateien oder des Standard-Testdatenbankvolumes.
+- **Bestehende Testumgebung:** `sudo bash setup-update.sh` im bisherigen Projektstamm. Sichert vor dem Neubau Datenbank, TF/VW mit ACLs, Konfiguration und Zertifikate in einem geschützten zeitgestempelten Verzeichnis unter `backend/testenv/backups/`. Vorhandene Passwörter bleiben bestehen. Kein automatischer Datenbank-Rollback und kein Datenreset.
+- Beide unterstützen `--check` (nur prüfen) sowie die Admin-Optionen von `setup.sh`. Der Installer aktualisiert die aktuell ausgecheckten Quellen; `git pull --ff-only` vorher selbst ausführen.
+
+Die vollständigen Befehle für Ubuntu in **UTM auf dem Mac**, inklusive Clone, Neuinstallation, Update, SSH-Tunnel, Admin-Zugang und Betrieb, stehen in [UTM-Mac.md](UTM-Mac.md).

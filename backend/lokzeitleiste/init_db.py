@@ -20,6 +20,9 @@ def main():
         seed_stations(db)
         db.commit()
         sync_user_directories(db)
+        from .documents.archive import backfill_documents
+        backfill_documents(db)
+        db.commit()
     if len(sys.argv) == 2 and sys.argv[1] == "--create-admin":
         name = input("Admin-Benutzername: ").strip().lower()
         if not 3 <= len(name) <= 64 or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in name):
@@ -30,7 +33,7 @@ def main():
                 raise SystemExit("Benutzername bereits vorhanden")
             user=User(username=name, password_hash=hash_password(password), role="admin")
             db.add(user)
-            with directory_transaction(user):
+            with directory_transaction(user,creating=True):
                 db.commit()
         print("Admin angelegt.")
     else:

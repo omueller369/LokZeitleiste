@@ -84,6 +84,8 @@ def save_report(db,user,data):
     report=DutyReport(tf_user_id=user.id,entry_id=entry.id,client_id=str(data.client_id),payload_json=normalized);db.add(report);db.flush()
     for trip in data.trips:db.add(DutyGuestTrip(report_id=report.id,**trip.model_dump(exclude={'start_station_name','end_station_name','self_payer'})))
     db.add(WorkEntryAudit(entry_id=entry.id,actor_id=user.id,action='work_report_created'))
+    from ..documents.archive import archive_report
+    archive_report(db,user,report,queue_email=True)
     try:db.commit()
     except IntegrityError as exc:db.rollback();raise HTTPException(409,'Arbeitsbericht wurde inzwischen gespeichert. Bitte erneut laden.') from exc
     return report
@@ -124,5 +126,7 @@ def update_train_journeys(db,user,report,changes):
     entry.updated_at=now_utc()
     entry.pause_minutes=payload['actual_pause']+train_pause_minutes(trains)
     db.add(WorkEntryAudit(entry_id=entry.id,actor_id=user.id,action='work_report_trains_updated'))
+    from ..documents.archive import archive_report
+    archive_report(db,user,report,queue_email=True)
     db.commit()
     return report
