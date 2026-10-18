@@ -52,8 +52,8 @@ def apache(kind,domain):
     Header always set X-Content-Type-Options "nosniff"
     ProxyPass / http://127.0.0.1:8000/
     ProxyPassReverse / http://127.0.0.1:8000/
-    ErrorLog ${{APACHE_LOG_DIR}}/lokzeitleiste-demo-error.log
-    CustomLog ${{APACHE_LOG_DIR}}/lokzeitleiste-demo-access.log combined
+    ErrorLog ${{APACHE_LOG_DIR}}/lokzeitleiste-ctl-demo-error.log
+    CustomLog ${{APACHE_LOG_DIR}}/lokzeitleiste-ctl-demo-access.log combined
 </VirtualHost>
 '''
 

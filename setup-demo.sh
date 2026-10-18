@@ -2,29 +2,44 @@
 # Öffentliche Demo auf einem dedizierten Ubuntu-Server, mit internem Test-Mailversand.
 set -Eeuo pipefail
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
-domain=io-goerlitz.eu
+domain=ctl-software.io-goerlitz.eu
 server_ip=212.227.86.251
 email=''
+bind_update=false
 check=false
 while (($#)); do
  case "$1" in
   --email) (($#>=2)) || { echo 'E-Mail fehlt' >&2; exit 2; };email=$2;shift 2 ;;
   --check) check=true;shift ;;
-  --help|-h) echo 'sudo bash setup-demo.sh --email DEINE-EMAIL [--check]';exit 0 ;;
+  --bind-update) bind_update=true;shift ;;
+  --help|-h) echo 'sudo bash setup-demo.sh --email DEINE-EMAIL [--check] [--bind-update]';exit 0 ;;
   *) echo "Unbekannte Option: $1" >&2;exit 2 ;;
  esac
 done
 die(){ echo "FEHLER: $*" >&2;exit 1; }
 [[ $(uname -s) == Linux ]] || die 'Im Ubuntu-Server ausführen.'
 command -v python3 >/dev/null || die 'Zuerst sudo apt install python3 ausführen.'
+# Optional nur den Demo-Host in einer bereits lokal dynamisch aktualisierbaren Zone ändern.
+if [[ $bind_update == true && $check == false ]]; then
+ [[ $EUID == 0 ]] || die '--bind-update benötigt sudo.'
+ command -v nsupdate >/dev/null || die 'nsupdate fehlt: sudo apt install bind9-dnsutils'
+ nsupdate -l <<'DNS'
+zone io-goerlitz.eu.
+prereq nxrrset ctl-software.io-goerlitz.eu. CNAME
+prereq nxrrset ctl-software.io-goerlitz.eu. AAAA
+update delete ctl-software.io-goerlitz.eu. A
+update add ctl-software.io-goerlitz.eu. 300 A 212.227.86.251
+send
+DNS
+fi
 # DNS muss ausschließlich auf diesen IPv4-Server zeigen. IPv6 nicht stillschweigend ignorieren.
 python3 "$root/setup/demo-config.py" dns "$domain" "$server_ip"
 for site in http https; do
- file="/etc/apache2/sites-available/lokzeitleiste-demo-$site.conf"
+ file="/etc/apache2/sites-available/lokzeitleiste-ctl-demo-$site.conf"
  [[ ! -e "$file" ]] || head -1 "$file" | grep -qx '# Managed by LokZeitleiste demo setup' || die "Fremde Konfiguration: $file"
 done
 if [[ -d /etc/apache2/sites-enabled ]]; then
- conflicts=$(grep -RilE '^[[:space:]]*Server(Name|Alias)[[:space:]].*io-goerlitz\.eu([[:space:]]|$)' /etc/apache2/sites-enabled 2>/dev/null | grep -v '/lokzeitleiste-demo-' || true)
+ conflicts=$(grep -RilE '^[[:space:]]*Server(Name|Alias)[[:space:]]+([^#]*[[:space:]])?ctl-software\.io-goerlitz\.eu([[:space:]]|$)' /etc/apache2/sites-enabled 2>/dev/null | grep -v '/lokzeitleiste-ctl-demo-' || true)
  [[ -z "$conflicts" ]] || die "Domain bereits anderweitig in Apache eingerichtet: $conflicts"
 fi
 if [[ $check == true ]]; then
@@ -63,7 +78,7 @@ activate_site(){
 work=$(mktemp -d)
 trap 'rm -rf -- "$work"' EXIT
 python3 "$root/setup/demo-config.py" apache http "$domain" > "$work/http.conf"
-activate_site "$work/http.conf" lokzeitleiste-demo-http.conf
+activate_site "$work/http.conf" lokzeitleiste-ctl-demo-http.conf
 # HTTP veröffentlicht nur ACME-Challenges; die Anwendung wird ausschließlich über TLS proxiert.
 certbot certonly --webroot -w /var/www/lokzeitleiste-acme --cert-name "$domain" -d "$domain" \
  --non-interactive --agree-tos --email "$email" --keep-until-expiring
@@ -72,13 +87,13 @@ python3 "$root/setup/demo-config.py" apache https "$domain" > "$work/https.conf"
 python3 "$root/setup/demo-config.py" env "$root/backend/.env.test" "$domain"
 compose=(docker compose --project-directory "$root/backend" --env-file "$root/backend/.env.test" -f "$root/backend/compose.test.yaml")
 "${compose[@]}" up -d --build --wait --wait-timeout 240 api mailer
-activate_site "$work/https.conf" lokzeitleiste-demo-https.conf
+activate_site "$work/https.conf" lokzeitleiste-ctl-demo-https.conf
 install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
-cat > /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-apache <<'HOOK'
+cat > /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache <<'HOOK'
 #!/usr/bin/env sh
 apache2ctl configtest && systemctl reload apache2
 HOOK
-chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-apache
+chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/lokzeitleiste-ctl-apache
 systemctl enable --now certbot.timer
 curl --fail --silent --show-error --resolve "$domain:443:127.0.0.1" "https://$domain/health"
 echo

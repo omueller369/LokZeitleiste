@@ -172,4 +172,4 @@ Die vollständigen Befehle für Ubuntu in **UTM auf dem Mac**, inklusive Clone, 
 
 ## Öffentlicher Demo-Server
 
-`sudo bash setup-demo.sh --email DEINE-EMAIL@BEISPIEL.DE` richtet die Demo für **io-goerlitz.eu / 212.227.86.251** mit HTTPS und interner Test-E-Mail-Zustellung ein. Bei vorhandener Umgebung wird zuerst die Update-Sicherung ausgeführt. DNS, Firewallvoraussetzungen, SSH-/Clone-Befehle, Zugriff, Updates und Kontrollen: [DEMO-Server.md](DEMO-Server.md).
+`sudo bash setup-demo.sh --email DEINE-EMAIL@BEISPIEL.DE` richtet die Demo für **ctl-software.io-goerlitz.eu / 212.227.86.251** mit HTTPS und interner Test-E-Mail-Zustellung ein. Bei vorhandener Umgebung wird zuerst die Update-Sicherung ausgeführt. DNS, Firewallvoraussetzungen, SSH-/Clone-Befehle, Zugriff, Updates und Kontrollen: [DEMO-Server.md](DEMO-Server.md).
