@@ -36,13 +36,17 @@ def month_folder(year,month):
 def clock(n):return f'{int(n)//60}:{int(n)%60:02d}'
 
 
-FORMAT_VERSION=4
+FORMAT_VERSION=5
+
+
+def report_version(data):
+    return int(data.get('_train_revision',0))+1+int(data.get('_pdf_version_offset',0))
 
 
 def report_filename(report):
     data=json.loads(report.payload_json)
     day='-'.join(report_folder(report).split('/')[-3:])
-    version=int(data.get('_train_revision',0))+1
+    version=report_version(data)
     return f'{day}-{version}-{report.id}-Arbeitsbericht.pdf'
 
 
@@ -133,8 +137,8 @@ def work_report_pdf(db,user,report):
     view=report_view(db,report);credited=view['credited_minutes']
     stamp=lambda value,previous=None:report_time(value,data['start_at'],data['end_at'],previous)
     station=lambda row,key:(' '.join([row.get(key,''),row.get(key+'_name','')])).strip() or '-'
-    lines=[(t('TF-Nummer'),user.username),(t('Vorname')+' / '+t('Nachname'),f'{profile.first_name} {profile.last_name}'),
-        (t('Arbeitsbericht'),report.id),(t('Version'),int(data.get('_train_revision',0))+1),
+    lines=[(t('Vorname')+' / '+t('Nachname'),f'{profile.first_name} {profile.last_name}'),
+        (t('Arbeitsbericht'),report.id),(t('Version'),report_version(data)),
         (t('Dienstart'),t('Dienstschicht' if data.get('kind','Sonstige Erfassung')=='Sonstige Erfassung' else data['kind'])),
         (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'],data['start_at'])),(t('Arbeitszeit'),clock(credited)),
         (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
@@ -227,6 +231,10 @@ def backfill_documents(db):
         root=user_path(user.username,user.role)
         for report in db.scalars(select(DutyReport).where(DutyReport.tf_user_id==user.id)):
             stored=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key==f'work-report:{report.id}'))
+            if stored and needs_render(db,stored):
+                data=json.loads(report.payload_json)
+                data['_pdf_version_offset']=int(data.get('_pdf_version_offset',0))+1
+                report.payload_json=json.dumps(data,ensure_ascii=False)
             if stored:relocate(db,user,stored,f'{report_folder(report)}/{report_filename(report)}')
             if needs_render(db,stored) or not stored or not (stored.display_name==report_filename(report) or stored.display_name.startswith(report_filename(report)[:-4]+'-system-')) or not (root/stored.relative_path).is_file():archive_report(db,user,report,include_months=False)
         for stored in db.scalars(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.source_key.like('dispatch:%'))):

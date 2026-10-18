@@ -173,7 +173,7 @@ class DocumentsTest(unittest.TestCase):
 
 
     def test_upgrade_regenerates_archives_once_without_sending_old_reports(self):
-        report=self.create();root=Path(self.documents.name)/'TF'/'787100'
+        original=self.payload();report=self.create(original);root=Path(self.documents.name)/'TF'/'787100'
         with Session(self.engine) as db:
             rows=db.scalars(select(DocumentFile)).all()
             for row in rows:
@@ -192,10 +192,10 @@ class DocumentsTest(unittest.TestCase):
             hashes={}
             for row in db.scalars(select(DocumentFile)):
                 self.assertTrue((root/row.relative_path).read_bytes().startswith(b'%PDF'))
-                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,4)
+                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,5)
                 hashes[row.id]=row.sha256
             daily=db.scalar(select(DocumentFile).where(DocumentFile.source_key==f'work-report:{report["id"]}'))
-            self.assertEqual(daily.display_name,f'2026-10-12-1-{report["id"]}-Arbeitsbericht.pdf')
+            self.assertEqual(daily.display_name,f'2026-10-12-2-{report["id"]}-Arbeitsbericht.pdf')
             daily_bytes=(root/daily.relative_path).read_bytes()
             self.assertEqual(len(db.scalars(select(ReportDispatch)).all()),count)
             self.assertEqual(dispatch.pdf_data,dispatch_bytes)
@@ -204,6 +204,14 @@ class DocumentsTest(unittest.TestCase):
             dispatch_id=dispatch.id;daily_path=daily.relative_path
         process_dispatch(dispatch_id)
         self.assertEqual((root/daily_path).read_bytes(),daily_bytes)
+        retry=self.driver.post('/api/v1/tf/work-reports',json=original)
+        self.assertIn(retry.status_code,(200,201),retry.text)
+        self.assertNotIn('_pdf_version_offset',retry.json())
+        train=dict(id=str(uuid4()),train_number='TEST12',start_station='BHF',end_station='LL',start_at='2026-10-12T09:00',end_at='2026-10-12T10:00',events=[])
+        result=self.driver.put(f'/api/v1/tf/work-reports/{report["id"]}/train-journeys',json={'expected_revision':0,'train_journeys':[train]})
+        self.assertEqual(result.status_code,200,result.text)
+        self.assertNotIn('_pdf_version_offset',result.json())
+        self.assertEqual(next(f['name'] for f in self.listing()['files'] if f['name'].endswith('-Arbeitsbericht.pdf')),f'2026-10-12-3-{report["id"]}-Arbeitsbericht.pdf')
 
     def test_filename_version_increases_after_train_edit(self):
         report=self.create();train=dict(id=str(uuid4()),train_number='TEST12',start_station='BHF',end_station='LL',start_at='2026-10-12T09:00',end_at='2026-10-12T10:00',events=[])
@@ -241,6 +249,8 @@ class DocumentsTest(unittest.TestCase):
             with patch('lokzeitleiste.documents.archive.pdf_document',return_value=b'pdf') as render:
                 work_report_pdf(db,user,row);args,options=render.call_args
                 labels=[label for label,value in args[1]]
+                self.assertNotIn('TF-Nummer',labels)
+                self.assertNotIn(user.username,[str(value) for label,value in args[1]])
                 self.assertNotIn('Mindestpause nach Dienstregel',labels)
                 self.assertNotIn('Begründung für mehr als zwölf Stunden',labels)
                 self.assertNotIn('Sz',options['sections'][0][1][0]);self.assertTrue(options['paired_head'])
