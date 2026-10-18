@@ -169,3 +169,7 @@ Für eine vollständige Sicherung werden jetzt **Datenbank einschließlich `docu
 - Beide unterstützen `--check` (nur prüfen) sowie die Admin-Optionen von `setup.sh`. Der Installer aktualisiert die aktuell ausgecheckten Quellen; `git pull --ff-only` vorher selbst ausführen.
 
 Die vollständigen Befehle für Ubuntu in **UTM auf dem Mac**, inklusive Clone, Neuinstallation, Update, SSH-Tunnel, Admin-Zugang und Betrieb, stehen in [UTM-Mac.md](UTM-Mac.md).
+
+## Öffentlicher Demo-Server
+
+`sudo bash setup-demo.sh --email DEINE-EMAIL@BEISPIEL.DE` richtet die Demo für **io-goerlitz.eu / 212.227.86.251** mit HTTPS und interner Test-E-Mail-Zustellung ein. Bei vorhandener Umgebung wird zuerst die Update-Sicherung ausgeführt. DNS, Firewallvoraussetzungen, SSH-/Clone-Befehle, Zugriff, Updates und Kontrollen: [DEMO-Server.md](DEMO-Server.md).
