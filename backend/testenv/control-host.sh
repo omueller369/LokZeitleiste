@@ -14,9 +14,22 @@ case ${1:-status} in
   umask 077
   mkdir -p "$backend/testenv/backups"
   target=$(mktemp -d "$backend/testenv/backups/host-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")
+  # Remember only services that really were running before the snapshot.
+  running_list=$("${compose[@]}" ps --services --filter status=running)
+  resume=()
+  while IFS= read -r service;do
+    case "$service" in api|mailer) resume+=("$service");;esac
+  done <<< "$running_list"
+  recover_backup(){
+    local status=$?
+    trap - ERR
+    echo "Sicherung fehlgeschlagen/unvollständig: $target" >&2
+    if ((${#resume[@]}));then "${compose[@]}" start "${resume[@]}" || true;fi
+    return "$status"
+  }
+  trap recover_backup ERR
   # Existing containers are stopped without building new code before the snapshot.
   "${compose[@]}" stop api mailer
-  trap 'echo "Sicherung fehlgeschlagen/unvollständig: $target" >&2; "${compose[@]}" start api mailer || true' ERR
   python3 "$root/setup/host-mysql.py" backup "$backend/.env.host" "$target/database.sql.gz"
   files=(backend/.env.host)
   for name in TF VW backend/testenv/certs;do [[ ! -e "$root/$name" ]] || files+=("$name");done

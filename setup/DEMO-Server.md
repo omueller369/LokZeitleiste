@@ -163,3 +163,7 @@ sudo bash backend/testenv/control-host.sh start
 ```
 
 `stop` stoppt ausschließlich Anwendungscontainer und Mailpit, nicht den bestehenden MySQL-Server. `backup` erstellt eine Sicherung und lässt API/Mailer bis zum anschließenden `start` gestoppt. Es gibt keinen automatischen Import und kein `DROP DATABASE`. Auf dem Server wurde diese Variante noch nicht ausgeführt; geprüft sind Konfiguration, Zugangsdatenbehandlung und die vorbereiteten Befehle.
+
+## Backup-Client-Kompatibilität
+
+Die Sicherung prüft die Optionen des tatsächlich installierten `mysqldump` über dessen lokale Hilfe. MySQL-spezifisches `--set-gtid-purged=OFF` wird nur verwendet, wenn der Client diese Option unterstützt. Das gilt ebenso für `--no-tablespaces`. Ein echter Dump-Fehler bricht die Installation weiterhin vor den Schemaänderungen ab. Bei einem Backup-Abbruch werden ausschließlich API/Mailer wieder gestartet, die vorher tatsächlich liefen; bei einer frischen Installation werden keine fehlenden Container gestartet. Diagnose für diese Variante: `sudo bash backend/testenv/control-host.sh logs`.

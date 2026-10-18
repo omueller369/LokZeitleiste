@@ -45,9 +45,20 @@ class HostMySQLTest(unittest.TestCase):
                 self.assertEqual(private.stat().st_mode&0o777,0o600)
                 self.assertNotIn('synthetic',' '.join(args))
                 kwargs['stdout'].write(b'CREATE TABLE example (id INT);')
-            with patch.object(host.subprocess,'run',side_effect=dump):host.backup(path,target)
+            with patch.object(host,'dump_options',return_value=['--single-transaction']),patch.object(host.subprocess,'run',side_effect=dump):host.backup(path,target)
             self.assertIn(b'CREATE TABLE',gzip.decompress(target.read_bytes()))
             self.assertFalse(configs[0].exists())
+
+    def test_dump_options_match_installed_client(self):
+        from types import SimpleNamespace
+        for help_text,gtid in [('--single-transaction --no-tablespaces --set-gtid-purged=name',True),
+                               ('--single-transaction --no-tablespaces',False),('--single-transaction',False)]:
+            with patch.object(host.subprocess,'run',return_value=SimpleNamespace(stdout=help_text)) as run:
+                options=host.dump_options()
+                self.assertEqual('--set-gtid-purged=OFF' in options,gtid)
+                self.assertEqual('--no-tablespaces' in options,'--no-tablespaces' in help_text)
+                self.assertIn('--single-transaction',options)
+                self.assertEqual(run.call_args.args[0],['mysqldump','--no-defaults','--help'])
 
     def test_host_stack_has_no_database_service_and_binds_only_loopback(self):
         stack=yaml.safe_load((ROOT/'backend/compose.host.yaml').read_text())

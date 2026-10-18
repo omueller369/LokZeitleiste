@@ -133,7 +133,9 @@ if [[ "$CHECK_ONLY" == true ]]; then
   echo 'Vorprüfung beendet. Netzwerkdownloads, Docker-Daemon und Laufzeitdienste werden erst bei Installation geprüft.'
   exit 0
 fi
-trap 'echo "Setup fehlgeschlagen (Zeile $LINENO). Testdaten bleiben erhalten. Hinweise: sudo bash backend/testenv/control.sh logs" >&2' ERR
+control_script=backend/testenv/control.sh
+[[ $HOST_MYSQL != true ]] || control_script=backend/testenv/control-host.sh
+trap 'echo "Setup fehlgeschlagen (Zeile $LINENO). Daten bleiben erhalten. Hinweise: sudo bash $control_script logs" >&2' ERR
 export DEBIAN_FRONTEND=noninteractive
 if ((${#missing[@]})); then
   apt-get update

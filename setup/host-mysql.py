@@ -51,11 +51,20 @@ def prepare(path):
     print('Host-MySQL verbunden; vorhandene Tabellen bleiben erhalten.')
 
 
+def dump_options():
+    # Client capabilities matter: MariaDB clients omit MySQL's GTID option.
+    help_text=subprocess.run(['mysqldump','--no-defaults','--help'],check=True,capture_output=True,text=True).stdout
+    options=['--single-transaction']
+    for name,value in [('no-tablespaces','--no-tablespaces'),('set-gtid-purged','--set-gtid-purged=OFF')]:
+        if re.search(r'(?:^|\s)(?:--)?'+re.escape(name)+r'(?=[=\s]|$)',help_text):options.append(value)
+    return options
+
+
 def backup(path,target):
     user,password,database=settings(Path(path));config=client_file(user,password)
     try:
         with tempfile.TemporaryFile() as raw:
-            subprocess.run(['mysqldump','--defaults-file='+config,'--single-transaction','--no-tablespaces','--set-gtid-purged=OFF',database],check=True,stdout=raw)
+            subprocess.run(['mysqldump','--defaults-file='+config,*dump_options(),database],check=True,stdout=raw)
             raw.seek(0)
             with gzip.open(target,'wb') as out:
                 while chunk:=raw.read(1024*1024):out.write(chunk)
@@ -69,4 +78,4 @@ if __name__=='__main__':
         elif sys.argv[1]=='backup':backup(sys.argv[2],sys.argv[3])
         else:raise ValueError('Unknown command')
     except (OSError,ValueError,KeyError,subprocess.SubprocessError) as error:
-        raise SystemExit('Host-MySQL fehlgeschlagen. Verbindung/Benutzerrechte prüfen; keine Daten gelöscht. '+str(error))
+        raise SystemExit('Host-MySQL-Vorgang fehlgeschlagen; vorstehende Clientmeldung prüfen. Keine Daten gelöscht. '+str(error))
