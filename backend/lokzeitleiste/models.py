@@ -425,3 +425,9 @@ class DocumentFile(Base):
     sha256:Mapped[str]=mapped_column(String(64),nullable=False)
     created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class DocumentRenderState(Base):
+    __tablename__='document_render_states'
+    document_id:Mapped[int]=mapped_column(ForeignKey('document_files.id',ondelete='CASCADE'),primary_key=True)
+    format_version:Mapped[int]=mapped_column(Integer,nullable=False,default=2)

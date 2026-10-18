@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 import test_accounts
 import test_work_reports
 from lokzeitleiste.main import app
-from lokzeitleiste.models import DocumentFile,User,ReportDispatch
+from lokzeitleiste.models import DocumentFile,User,ReportDispatch,DocumentRenderState
 from lokzeitleiste.documents.storage import MAX_FILE
 from lokzeitleiste.documents.archive import backfill_documents
 from lokzeitleiste.reports.service import process_dispatch
@@ -85,7 +85,7 @@ class DocumentsTest(unittest.TestCase):
         self.assertTrue(any('/Arbeitsberichte/' in f['path'] for f in files))
         self.assertTrue(any(f['path'].endswith('/2026/10/Monatsbericht.pdf') for f in files))
         self.assertTrue(any(f['path'].endswith('/2026/10/Monatszusammenfassung.pdf') for f in files))
-        file=next(f for f in files if f['path'].endswith(f'Arbeitsbericht-{report["id"]}.pdf'))
+        file=next(f for f in files if f['path'].endswith(f'2026-10-12-1-{report["id"]}-Arbeitsbericht.pdf'))
         self.assertFalse(file['can_delete']);self.assertTrue(file['generated'])
         self.assertEqual(self.driver.delete('/api/v1/documents/file',params={'path':file['path']}).status_code,403)
         with Session(self.engine) as db:
@@ -151,7 +151,7 @@ class DocumentsTest(unittest.TestCase):
         payload=self.payload('2026-10-31T21:00','2026-11-01T09:00');payload['actual_pause']=120
         report=self.create(payload)
         paths=[file['path'] for file in self.listing()['files']]
-        self.assertIn(f'Dokumente/Arbeitsberichte/2026/10/31/Arbeitsbericht-{report["id"]}.pdf',paths)
+        self.assertIn(f'Dokumente/Arbeitsberichte/2026/10/31/2026-10-31-1-{report["id"]}-Arbeitsbericht.pdf',paths)
         for month in ('10','11'):
             for name in ('Monatsbericht','Monatszusammenfassung'):
                 self.assertIn(f'Dokumente/Monatsabrechnung/2026/{month}/{name}.pdf',paths)
@@ -170,6 +170,46 @@ class DocumentsTest(unittest.TestCase):
             db.add(row);db.commit();backfill_documents(db);db.commit()
             self.assertFalse(old.exists());self.assertEqual(row.relative_path,f'Dokumente/Monatsabrechnung/2026/10/Eingang-{dispatch.id}.pdf')
             self.assertEqual((root/row.relative_path).read_bytes(),b'monthly receipt')
+
+
+    def test_upgrade_regenerates_archives_once_without_sending_old_reports(self):
+        report=self.create();root=Path(self.documents.name)/'TF'/'787100'
+        with Session(self.engine) as db:
+            rows=db.scalars(select(DocumentFile)).all()
+            for row in rows:
+                db.delete(db.get(DocumentRenderState,row.id))
+                if row.source_key.startswith('work-report:'):
+                    old=root/row.relative_path;new=old.with_name(f'Arbeitsbericht-{report["id"]}.pdf');old.rename(new)
+                    row.relative_path=new.relative_to(root).as_posix();row.display_name=new.name
+                (root/row.relative_path).write_bytes(b'legacy PDF layout')
+            dispatch=db.scalar(select(ReportDispatch));dispatch.filename=f'Arbeitsbericht-{report["id"]}.pdf'
+            dispatch_bytes=dispatch.pdf_data;count=len(db.scalars(select(ReportDispatch)).all());db.commit()
+            backfill_documents(db);db.rollback()
+            self.assertTrue((root/rows[0].relative_path).exists())
+            backfill_documents(db);db.commit()
+            hashes={}
+            for row in db.scalars(select(DocumentFile)):
+                self.assertTrue((root/row.relative_path).read_bytes().startswith(b'%PDF'))
+                self.assertEqual(db.get(DocumentRenderState,row.id).format_version,2)
+                hashes[row.id]=row.sha256
+            daily=db.scalar(select(DocumentFile).where(DocumentFile.source_key==f'work-report:{report["id"]}'))
+            self.assertEqual(daily.display_name,f'2026-10-12-1-{report["id"]}-Arbeitsbericht.pdf')
+            daily_bytes=(root/daily.relative_path).read_bytes()
+            self.assertEqual(len(db.scalars(select(ReportDispatch)).all()),count)
+            self.assertEqual(dispatch.pdf_data,dispatch_bytes)
+            backfill_documents(db);db.commit()
+            self.assertEqual(hashes,{row.id:row.sha256 for row in db.scalars(select(DocumentFile))})
+            dispatch_id=dispatch.id;daily_path=daily.relative_path
+        process_dispatch(dispatch_id)
+        self.assertEqual((root/daily_path).read_bytes(),daily_bytes)
+
+    def test_filename_version_increases_after_train_edit(self):
+        report=self.create();train=dict(id=str(uuid4()),train_number='TEST12',start_station='BHF',end_station='LL',start_at='2026-10-12T09:00',end_at='2026-10-12T10:00',events=[])
+        result=self.driver.put(f'/api/v1/tf/work-reports/{report["id"]}/train-journeys',json={'expected_revision':0,'train_journeys':[train]})
+        self.assertEqual(result.status_code,200,result.text)
+        files=self.listing()['files'];daily=next(f for f in files if f['path'].endswith('-Arbeitsbericht.pdf'))
+        self.assertEqual(daily['name'],f'2026-10-12-2-{report["id"]}-Arbeitsbericht.pdf')
+        self.assertEqual(sum(f['path'].endswith('-Arbeitsbericht.pdf') for f in files),1)
 
 
 

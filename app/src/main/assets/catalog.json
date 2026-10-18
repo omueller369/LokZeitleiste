@@ -1003,7 +1003,8 @@
     "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.": "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.",
     "Benutzerverzeichnis ist bereits vergeben.": "Benutzerverzeichnis ist bereits vergeben.",
     "Dokumentenverwaltung": "Dokumentenverwaltung",
-    "Zurück zu TF-Portal": "Zurück zu TF-Portal"
+    "Zurück zu TF-Portal": "Zurück zu TF-Portal",
+    "Version": "Version"
   },
   "en": {
     "Administration": "Administration",
@@ -2009,7 +2010,8 @@
     "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.": "Working time includes the full duty span and documented breaks. Passenger travel is included and shown separately.",
     "Benutzerverzeichnis ist bereits vergeben.": "User directory is already assigned.",
     "Dokumentenverwaltung": "Document management",
-    "Zurück zu TF-Portal": "Back to TF Portal"
+    "Zurück zu TF-Portal": "Back to TF Portal",
+    "Version": "Version"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3015,7 +3017,8 @@
     "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.": "Czas pracy obejmuje całą służbę i udokumentowane przerwy. Przejazdy pasażerskie są wliczone i wykazane oddzielnie.",
     "Benutzerverzeichnis ist bereits vergeben.": "Katalog użytkownika jest już przypisany.",
     "Dokumentenverwaltung": "Zarządzanie dokumentami",
-    "Zurück zu TF-Portal": "Powrót do portalu maszynisty"
+    "Zurück zu TF-Portal": "Powrót do portalu maszynisty",
+    "Version": "Wersja"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4021,7 +4024,8 @@
     "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.": "Рабочее время включает всю смену и документированные перерывы. Служебные поездки включены и указаны отдельно.",
     "Benutzerverzeichnis ist bereits vergeben.": "Каталог пользователя уже занят.",
     "Dokumentenverwaltung": "Управление документами",
-    "Zurück zu TF-Portal": "Назад в портал машиниста"
+    "Zurück zu TF-Portal": "Назад в портал машиниста",
+    "Version": "Версия"
   },
   "es": {
     "Administration": "Administración",
@@ -5027,6 +5031,7 @@
     "Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.": "El tiempo de trabajo incluye toda la jornada y las pausas documentadas. Los desplazamientos están incluidos y se muestran por separado.",
     "Benutzerverzeichnis ist bereits vergeben.": "El directorio de usuario ya está asignado.",
     "Dokumentenverwaltung": "Gestión de documentos",
-    "Zurück zu TF-Portal": "Volver al portal de maquinistas"
+    "Zurück zu TF-Portal": "Volver al portal de maquinistas",
+    "Version": "Versión"
   }
 }

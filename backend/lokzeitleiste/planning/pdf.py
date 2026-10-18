@@ -59,8 +59,10 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     styles.add(ParagraphStyle("PlanHeader", fontName="PlanSans-Bold", fontSize=8, leading=11, textColor=colors.white))
     styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=8, leading=10, textColor=DARK))
     title = f"Jahresplan {plan['year']}" if yearly else f"Monatsplan {MONTHS[plan['month']]} {plan['year']}"
-    story = [Paragraph("LokZeitleiste · " + title, styles["Title"]),
-             Paragraph(f"Tf {escape(name)} · Personalnummer {escape(personnel_number)}", styles["Normal"]), Spacer(1, 12)]
+    metadata=Table([[Paragraph('LokZeitleiste · '+title,styles['Heading2'])],
+                    [Paragraph(f'Tf {escape(name)} · Personalnummer {escape(personnel_number)}',styles['Normal'])]],colWidths=[doc.width])
+    metadata.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
+    story=[metadata,Spacer(1,12)]
     sums = plan["totals"] if yearly else plan
     summary = [["Erforderliche Arbeitstage", "Urlaubstage", "Ruhetage", "Ungeplant"],
                [str(sums["work_days"]), str(sums["vacation_days"]), str(sums["rest_days"]), str(sums["unplanned_days"])],
@@ -68,7 +70,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                [clock(sums["work_target_minutes"]) + " h", clock(sums["vacation_minutes"]) + " h",
                 clock(sums["target_minutes"]) + " h", "Vollständig" if plan["complete"] else "Unvollständig"]]
     summary=[[Paragraph(str(value),styles['Normal']) for value in row] for row in summary]
-    summary_table = Table(summary, colWidths=[doc.width / 4] * 4, rowHeights=[34, 28, 34, 28])
+    summary_table = Table(summary, colWidths=[doc.width / 4] * 4)
     summary_table.setStyle(TableStyle([("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EEF4F8")),
                                       ("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                                       ("FONTNAME", (0, 1), (-1, 1), "PlanSans-Bold"),
@@ -130,25 +132,22 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
             rows.append(cells)
         rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
-        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=[doc.width / 7] * 7, rowHeights=[25] + [66] * (len(rows) - 1))
+        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=[doc.width / 7] * 7, rowHeights=[25] + [60] * (len(rows) - 1))
         table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK), ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                    ("FONTSIZE", (0, 0), (-1, 0), 9), ("VALIGN", (0, 0), (-1, -1), "TOP"),
                    ("LEFTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), 6),
                    ("GRID", (0, 0), (-1, -1), 1, colors.white)]))
         story.append(table)
-    story += [Spacer(1, 12), Paragraph("Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. "
-              "Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.", styles["Normal"])]
-    story += [Paragraph("GT = Grenzdienst Tag 09:00-21:00; GN = Grenzdienst Nacht 21:00-09:00 am Folgetag. Grenzdienst = 12 h Plansoll, Streckendienst = 8 h. Die Nachtschicht zählt zum Startdatum.",styles["Normal"])]
-    story += [Spacer(1,8), Paragraph(f"Feiertage Berlin: {sums['holiday_days']} Tage mit 0 h Soll.",styles["Normal"])]
+    information=[['Feiertag','Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.'],
+                 ['Grenzdienst','GT = Grenzdienst Tag 09:00-21:00; GN = Grenzdienst Nacht 21:00-09:00 am Folgetag. Grenzdienst = 12 h Plansoll, Streckendienst = 8 h. Die Nachtschicht zählt zum Startdatum.'],
+                 ['Feiertage Berlin',f"{sums['holiday_days']} Tage mit 0 h Soll."]]
     if not yearly:
-        for item in plan["days"]:
-            if item.get("is_holiday"):
-                story.append(Paragraph(f"{item['date']}: Feiertag - {escape(item['holiday_name'])} (0 h Soll)",styles["Normal"]))
-        notes = [d for d in plan["days"] if d["note"]]
-        if notes:
-            story += [Spacer(1, 12), Paragraph("Notizen", styles["Heading2"])]
-            for item in notes:
-                story.append(Paragraph(f"{item['date']}: {escape(item['note'])}", styles["Normal"]))
+        for item in plan['days']:
+            if item.get('is_holiday'):information.append([item['date'],f"Feiertag - {item['holiday_name']} (0 h Soll)"])
+            if item.get('note'):information.append([item['date'],item['note']])
+    info=Table([[Paragraph(escape(str(value)),styles['PlanCell']) for value in row] for row in information],colWidths=[doc.width*.22,doc.width*.78],splitInRow=1)
+    info.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(0,-1),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
+    story += [Spacer(1,12),info]
     def footer(canvas, document):
         canvas.setFont("PlanSans", 8)
         canvas.setFillColor(DARK)

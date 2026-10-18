@@ -81,6 +81,7 @@ def _remove_empty_parents(path, root):
 
 @event.listens_for(Session,'after_commit')
 def _commit_relocations(db):
+    db.info.pop('document_relocation_hashes',None)
     for old,new,digest,root in db.info.pop('document_relocations',[]):
         try:
             if new.is_file() and not new.is_symlink() and not old.is_symlink() and old.is_file() and hashlib.sha256(old.read_bytes()).hexdigest()==digest:
@@ -92,8 +93,9 @@ def _commit_relocations(db):
 
 @event.listens_for(Session,'after_rollback')
 def _rollback_relocations(db):
+    hashes=db.info.pop('document_relocation_hashes',{})
     for old,new,digest,root in db.info.pop('document_relocations',[]):
-        if not new.is_symlink() and new.is_file() and hashlib.sha256(new.read_bytes()).hexdigest()==digest:
+        if not new.is_symlink() and new.is_file() and hashlib.sha256(new.read_bytes()).hexdigest()==hashes.get(new,digest):
             new.unlink();_remove_empty_parents(new,root/'Dokumente')
 
 
@@ -150,6 +152,8 @@ def generated(db,user,relative,content,source):
     digest=hashlib.sha256(content).hexdigest()
     if existing and existing.sha256==digest and path.is_file():return existing
     write_atomic(path,content)
+    if any(new==path for old,new,original,base in db.info.get('document_relocations',[])):
+        db.info.setdefault('document_relocation_hashes',{})[path]=digest
     row=existing or DocumentFile(owner_id=user.id,source_key=source,uploader_id=None)
     row.relative_path=relative;row.display_name=path.name;row.byte_size=len(content);row.sha256=digest;row.updated_at=now_utc()
     if not existing:db.add(row)
