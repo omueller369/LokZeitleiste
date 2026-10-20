@@ -16,6 +16,7 @@ async function show(){const account=await request('/api/v1/account/me');if(accou
 async function refresh(){const users=await request('/api/v1/admin/tf');el('users').replaceChildren();for(const user of users){const filter=el('tfTypeFilter').value,type=user.driver_type||'route';if(filter&&type!==filter&&!(type==='both'&&filter!=='both'))continue;const tr=document.createElement('tr');
  for(const [index,text] of [user.first_name+' '+user.last_name,user.personnel_number,user.username||'—',({route:'Strecken-TF',border:'Grenz-TF',both:'Grenz- und Strecken-TF'})[user.driver_type||'route'],me.permissions.employees?user.email||'—':'—'].entries()){const td=document.createElement('td');td.textContent=text;if(index!==3)td.setAttribute('data-i18n-ignore','');tr.append(td);}
  const td=document.createElement('td');if(me.permissions.employees){link(td,'Ansehen','/admin/tf?id='+user.id+'&mode=view');if(me.permissions.employees>=2)link(td,'Bearbeiten','/admin/tf?id='+user.id+'&mode=edit');}
+ if(me.permissions.reports){const overtime=document.createElement('button');overtime.type='button';overtime.textContent='Überstundenkonto';overtime.onclick=()=>window.openTfOvertime(user,me.permissions);td.append(overtime);}
  if(me.permissions.planning&&(me.permissions.worktime||me.permissions.reports))link(td,'Stundenübersicht','/admin/tf/hours?tf='+user.id);
  if(me.permissions.planning)link(td,'Arbeitszeitplan','/admin/planning?tf='+user.id);
  if(me.permissions.worktime)link(td,'Arbeitszeiten korrigieren','/admin/worktime?tf='+user.id);

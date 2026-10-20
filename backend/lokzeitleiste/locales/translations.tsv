@@ -1011,3 +1011,37 @@ Sonstige Art (max. 50 Zeichen)|Other type (max. 50 characters)|Inny rodzaj (maks
 Bitte Grund und Art auswählen.|Please select a reason and type.|Wybierz powód i rodzaj.|Выберите причину и тип.|Seleccione un motivo y un tipo.
 Sonstige Art bitte beschreiben.|Please describe the other type.|Opisz inny rodzaj.|Опишите другой тип.|Describa el otro tipo.
 Felder ausblenden|Hide fields|Ukryj pola|Скрыть поля|Ocultar campos
+Überstundenkonto|Overtime account|Konto nadgodzin|Счёт сверхурочных часов|Cuenta de horas extra
+Je Dienstschicht zählt nur die Zeit über acht Stunden. Pausen werden nicht abgezogen; Gastfahrten außerhalb des Dienstes zählen nicht. Zuordnung nach Dienstbeginn.|Only time beyond eight hours per duty shift counts. Breaks are not deducted; travel outside duty is excluded. Assigned by duty start.|Liczy się tylko czas ponad osiem godzin na zmianę. Przerw nie odlicza się; dojazdy poza służbą nie są uwzględniane. Przypisanie według rozpoczęcia służby.|Учитывается только время свыше восьми часов за смену. Перерывы не вычитаются; поездки вне смены не учитываются. Месяц определяется началом смены.|Solo cuenta el tiempo que supera ocho horas por turno. No se descuentan las pausas; se excluyen los desplazamientos fuera del servicio. Se asigna según el inicio del turno.
+Konto ab ausgewähltem Monat aktivieren|Enable account from selected month|Aktywuj konto od wybranego miesiąca|Активировать счёт с выбранного месяца|Activar la cuenta desde el mes seleccionado
+Aktivierung speichern|Save activation|Zapisz aktywację|Сохранить активацию|Guardar activación
+Überstunden im Monat|Monthly overtime|Nadgodziny w miesiącu|Сверхурочные за месяц|Horas extra del mes
+Jahresüberstundenkonto|Annual overtime account|Roczne konto nadgodzin|Годовой счёт сверхурочных|Cuenta anual de horas extra
+Guthaben bleibt beim Jahreswechsel erhalten. Die 40-Stunden-Grenze gilt für den gesamten Kontostand.|Credit is retained at year end. The 40-hour limit applies to the entire account balance.|Saldo pozostaje po zmianie roku. Limit 40 godzin dotyczy całego salda konta.|Часы сохраняются при смене года. Лимит 40 часов действует на весь остаток счёта.|El saldo se conserva al cambiar de año. El límite de 40 horas se aplica al saldo total.
+Dienstzeiten nach Abschluss geändert. Abschluss prüfen und vor erneuter Buchung wieder öffnen.|Duty times changed after closing. Review and reopen the closing before posting again.|Czas służby zmieniono po zamknięciu. Sprawdź i otwórz rozliczenie przed ponownym księgowaniem.|Время смены изменено после закрытия. Проверьте и откройте расчёт перед новой проводкой.|Se modificaron los horarios tras el cierre. Revise y reabra el cierre antes de registrar de nuevo.
+Monatsabschluss|Month-end closing|Zamknięcie miesiąca|Закрытие месяца|Cierre mensual
+Auszahlung vorgemerkt|Marked for payout|Do wypłaty|Отмечено к выплате|Pendiente de pago
+Ins Jahreskonto|To annual account|Na konto roczne|На годовой счёт|A la cuenta anual
+Abschluss wieder öffnen|Reopen closing|Otwórz ponownie rozliczenie|Открыть расчёт повторно|Reabrir el cierre
+Begründung für Wiederöffnung|Reason for reopening|Powód ponownego otwarcia|Причина повторного открытия|Motivo de reapertura
+Die Buchung wird zurückgenommen. Bereits erfolgte Auszahlungen müssen separat korrigiert werden.|The posting will be reversed. Payments already made must be corrected separately.|Księgowanie zostanie cofnięte. Zrealizowane wypłaty wymagają osobnej korekty.|Проводка будет отменена. Уже выполненные выплаты следует исправить отдельно.|Se anulará el registro. Los pagos ya efectuados deben corregirse por separado.
+Verwendung beim Monatsabschluss|Allocation at month end|Rozdysponowanie przy zamknięciu miesiąca|Распределение при закрытии месяца|Destino al cierre mensual
+Monat abschließen|Close month|Zamknij miesiąc|Закрыть месяц|Cerrar mes
+Monatsabschluss erst nach Monatsende möglich.|Month can only be closed after it has ended.|Miesiąc można zamknąć dopiero po jego zakończeniu.|Закрытие возможно только после окончания месяца.|El cierre solo es posible cuando termine el mes.
+Dienstschichten|Duty shifts|Zmiany służbowe|Рабочие смены|Turnos de servicio
+Änderungsverlauf|Change history|Historia zmian|История изменений|Historial de cambios
+Überstundenkonto aktiv|Overtime account enabled|Konto nadgodzin aktywne|Счёт сверхурочных активен|Cuenta de horas extra activa
+Überstundenkonto inaktiv|Overtime account disabled|Konto nadgodzin nieaktywne|Счёт сверхурочных неактивен|Cuenta de horas extra inactiva
+Zur Auszahlung vormerken|Mark for payout|Oznacz do wypłaty|Отметить к выплате|Marcar para pago
+Ins Jahreskonto, Rest zur Auszahlung|To annual account, remainder for payout|Na konto roczne, reszta do wypłaty|На годовой счёт, остаток к выплате|A la cuenta anual, resto para pago
+Überstunden|Overtime|Nadgodziny|Сверхурочные часы|Horas extra
+Wiederöffnung|Reopening|Ponowne otwarcie|Повторное открытие|Reapertura
+Aktivierung|Activation|Aktywacja|Активация|Activación
+Überstundenkonto wurde geändert. Bitte neu laden.|Overtime account changed. Please reload.|Konto nadgodzin zostało zmienione. Odśwież dane.|Счёт сверхурочных изменён. Обновите данные.|La cuenta de horas extra ha cambiado. Vuelva a cargarla.
+Zuerst betroffene Monatsabschlüsse wieder öffnen.|Reopen affected monthly closings first.|Najpierw otwórz ponownie odpowiednie rozliczenia miesięczne.|Сначала откройте затронутые месячные расчёты.|Reabra primero los cierres mensuales afectados.
+Monat ist bereits abgeschlossen.|Month is already closed.|Miesiąc jest już zamknięty.|Месяц уже закрыт.|El mes ya está cerrado.
+Überstundenkonto ist für diesen Monat nicht aktiviert.|Overtime account is not enabled for this month.|Konto nadgodzin nie jest aktywne w tym miesiącu.|Счёт сверхурочных не активирован для этого месяца.|La cuenta de horas extra no está activa este mes.
+Geänderte Monatsabschlüsse zuerst prüfen und wieder öffnen.|Review and reopen changed monthly closings first.|Najpierw sprawdź i otwórz ponownie zmienione rozliczenia miesięczne.|Сначала проверьте и откройте изменённые месячные расчёты.|Revise y reabra primero los cierres mensuales modificados.
+Kein abgeschlossener Monat vorhanden.|No closed month exists.|Brak zamkniętego miesiąca.|Закрытый месяц отсутствует.|No hay ningún mes cerrado.
+Ungültige Dienstzeit im Überstundenkonto.|Invalid duty time in overtime account.|Nieprawidłowy czas służby na koncie nadgodzin.|Некорректное время смены в счёте сверхурочных.|Horario de servicio no válido en la cuenta de horas extra.
+Ungültiger Kontostand im Überstundenkonto.|Invalid overtime account balance.|Nieprawidłowe saldo konta nadgodzin.|Некорректный остаток счёта сверхурочных.|Saldo no válido en la cuenta de horas extra.

@@ -431,3 +431,39 @@ class DocumentRenderState(Base):
     __tablename__='document_render_states'
     document_id:Mapped[int]=mapped_column(ForeignKey('document_files.id',ondelete='CASCADE'),primary_key=True)
     format_version:Mapped[int]=mapped_column(Integer,nullable=False,default=5)
+
+
+class OvertimePolicy(Base):
+    __tablename__='overtime_policies'
+    tf_user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),primary_key=True)
+    month:Mapped[date]=mapped_column(Date,primary_key=True)
+    enabled:Mapped[bool]=mapped_column(Boolean,nullable=False)
+    actor_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class OvertimeClosing(Base):
+    __tablename__='overtime_closings'
+    tf_user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),primary_key=True)
+    month:Mapped[date]=mapped_column(Date,primary_key=True)
+    status:Mapped[str]=mapped_column(String(12),default='open',nullable=False)
+    mode:Mapped[str]=mapped_column(String(12),default='payout',nullable=False)
+    total_minutes:Mapped[int]=mapped_column(Integer,default=0,nullable=False)
+    annual_minutes:Mapped[int]=mapped_column(Integer,default=0,nullable=False)
+    payout_minutes:Mapped[int]=mapped_column(Integer,default=0,nullable=False)
+    fingerprint:Mapped[str]=mapped_column(String(64),default='',nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,default=0,nullable=False)
+    actor_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class OvertimeAudit(Base):
+    __tablename__='overtime_audits'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    tf_user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    month:Mapped[date]=mapped_column(Date,nullable=False)
+    actor_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False)
+    action:Mapped[str]=mapped_column(String(20),nullable=False)
+    snapshot_json:Mapped[str]=mapped_column(Text,nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+

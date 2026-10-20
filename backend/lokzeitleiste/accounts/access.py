@@ -74,6 +74,8 @@ def authorize_route(db, user, request):
         return demand(db,user,'employees',1 if method=='GET' else 2)
     if re.fullmatch(r'/api/v1/admin/staff/\d+/photo',path):
         return demand(db,user,'staff',1 if method=='GET' else 2)
+    if re.fullmatch(r'/api/v1/admin/tf/\d+/overtime/\d+(?:/\d+(?:/(?:policy|close|reopen))?)?',path):
+        return demand(db,user,'reports',1 if method=='GET' else 3 if path.endswith(('/policy','/reopen')) else 2)
     if path.startswith('/api/v1/admin/worktime/'):
         return demand(db,user,'worktime',1 if method=='GET' else 2)
     if path.startswith('/api/v1/admin/staff'):

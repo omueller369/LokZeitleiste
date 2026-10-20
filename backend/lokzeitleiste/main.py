@@ -621,3 +621,10 @@ app.include_router(work_report_router(require_account))
 from .documents.api import create_router as documents_router,DocumentUploadLimit
 app.include_router(documents_router(require_account))
 app.add_middleware(DocumentUploadLimit)
+
+from .overtime import create_router as overtime_router
+app.include_router(overtime_router(require_admin))
+
+@app.get('/admin/overtime-ui.js')
+def overtime_ui_script():
+    return FileResponse(Path(__file__).parent/'static'/'overtime-ui.js',media_type='text/javascript')
