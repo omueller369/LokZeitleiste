@@ -46,3 +46,13 @@
 @media(max-width:800px){#workReport .train-event-grid{grid-template-columns:minmax(0,1fr)}#workReport .train-event-grid label{grid-area:auto}.event-cause{order:1}.event-reason{order:2}.event-station{order:3}.event-start_at{order:4}.event-end_at{order:5}.event-cause_detail{order:6}.event-reason_detail{order:7}}
 
 #reportDetails[hidden]{display:none!important}
+
+/* The title remains visible; only the block body is collapsed. */
+#workReport .report-collapsible{position:relative;min-width:0}
+#workReport .report-collapsible>h2,#workReport .report-collapsible>legend{position:relative;box-sizing:border-box;min-height:44px;padding-inline-end:3.5rem}
+#workReport .report-collapsible>legend{width:100%}
+#workReport .report-block-toggle{position:absolute;inset-inline-end:0;top:0;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;margin:0;padding:0;border:1px solid #899ca8;border-radius:8px;background:#edf3f7;color:#173d52;font-size:26px;line-height:1;cursor:pointer;z-index:1}
+#workReport .report-block-toggle:hover{background:#dceaf3}
+#workReport .report-block-toggle:focus-visible{outline:3px solid #17445b;outline-offset:3px}
+#workReport .report-block-content[hidden]{display:none!important}
+#workReport .report-collapsible.is-collapsed{padding-bottom:12px;min-height:48px}

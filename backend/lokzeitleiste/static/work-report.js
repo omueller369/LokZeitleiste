@@ -1,7 +1,7 @@
 (()=>{
 const el=id=>document.getElementById(id),transport={train:'Zug',car:'Auto',taxi:'Taxi',public_transport:'ÖPNV',other:'Anderes Transportmittel'};
 let monthVisible=false,reportViewOnly=false;
-function reportFields(show){el('reportDetails').hidden=!show;el('hideReportFields').disabled=!show;el('hideReportFields').setAttribute('aria-expanded',String(show));}
+function reportFields(show){el('reportDetails').hidden=!show;if(show)window.ReportBlocks?.expandAll();el('hideReportFields').disabled=!show;el('hideReportFields').setAttribute('aria-expanded',String(show));}
 let user,key,state,trips=[],edit=-1,queue=[],busy=false,dbPromise=null,poll=null,monthVersion=0,pending=[],monthCache={},trainEditor=null,plans={},planVersion=0;
 const fields=['dutyStart','dutyEnd','actualPause','overrunReason'];
 function uuid(){if(crypto.randomUUID)return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=[...b].map(n=>n.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;}
@@ -78,3 +78,35 @@ el('receiptFiles').onchange=async()=>{try{for(const file of el('receiptFiles').f
 el('reportForm').onsubmit=event=>{event.preventDefault();saveLocal().catch(error=>message(error.message));};el('syncReport').onclick=synchronize;el('discardTrainChanges').onclick=async()=>{if(busy||!state.saved_id||!confirm('Nicht synchronisierte Zugfahrtänderungen verwerfen?'))return;busy=true;freeze();try{const report=await api('/api/v1/tf/work-reports/'+state.saved_id);state.train_dirty=false;state.train_revision=report.train_revision||0;state.locked=report.locked;state.train_readonly=report.train_editable===false;trainEditor.restore(report.train_journeys||[]);state.train_journeys=trainEditor.draft();totals();message('');}catch(error){message(error.message);}finally{busy=false;freeze();}};el('hideReportFields').onclick=()=>{if(!busy){storeDraft();reportFields(false);}};el('newReport').onclick=()=>newDuty().catch(error=>message(error.message));el('refreshReportMonth').onclick=()=>month().catch(error=>message(error.message));el('reportPeriod').onchange=()=>month().catch(error=>message(error.message));el('refreshReportList').onclick=()=>month().catch(error=>message(error.message));
 stations(el('guestFrom'),el('fromStations'));stations(el('guestTo'),el('toStations'));await loadPlan();await month();await renderServerFiles();poll=setInterval(()=>{if(state.saved_id&&!busy)renderServerFiles().catch(()=>{});},10000);window.addEventListener('pagehide',()=>clearInterval(poll));window.addEventListener('languagechange',()=>{guestLabels();guestVisibility();monthlyVisibility();month().catch(()=>{});});};
 })();
+
+// Keep collapse buttons in the first legend so disabled duty fields remain collapsible.
+(function setupReportBlocks(doc,win){
+ const blocks=[];
+ for(const id of ['dutyFields','guestSection','trainJourneys','monthlyReportList']){
+  const block=doc.getElementById(id);
+  if(!block)continue;
+  const heading=block.querySelector(id==='dutyFields'?':scope > legend':':scope > h2');
+  if(!heading)continue;
+  const title=heading.textContent.trim(),content=doc.createElement('div'),button=doc.createElement('button');
+  content.id=id+'Content';content.className='report-block-content';
+  for(const child of Array.from(block.childNodes))if(child!==heading)content.append(child);
+  block.append(content);block.classList.add('report-collapsible');
+  button.type='button';button.className='report-block-toggle';button.setAttribute('data-i18n-ignore','');
+  button.setAttribute('aria-controls',content.id);
+  const update=()=>{
+   const label=win.I18n?.t(title)||title;
+   button.textContent=content.hidden?'+':'−';
+   button.setAttribute('aria-expanded',String(!content.hidden));
+   button.setAttribute('aria-label',label);
+   button.title=label;
+   block.classList.toggle('is-collapsed',content.hidden);
+  };
+  const expand=()=>{content.hidden=false;update();};
+  button.addEventListener('click',()=>{content.hidden=!content.hidden;update();});
+  block.addEventListener('invalid',expand,true);
+  heading.append(button);update();
+  win.addEventListener('languagechange',update);
+  blocks.push({expand});
+ }
+ win.ReportBlocks={expandAll:()=>blocks.forEach(block=>block.expand())};
+})(document,window);
