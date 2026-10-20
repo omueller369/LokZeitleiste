@@ -40,5 +40,5 @@ tar -xOf "$backup/documents.tar.gz" TF/787123/Dokumente/test.txt | rg -q origina
 tar -xOf "$backup/config.tar.gz" backend/.env.test | rg -q private-test
 [[ $(cat "$case_dir/project/TF/787123/Dokumente/test.txt") == original ]]
 [[ $(tail -n1 "$case_dir/setup-calls") == --skip-admin ]]
-! rg -q 'down|--volumes|reset' "$case_dir/docker-calls"
+if rg -q 'down|--volumes|reset' "$case_dir/docker-calls"; then exit 1; fi
 echo 'Setup-Einstiege: read-only, Schutz vorhandener Daten, Sicherungen und Argumentweitergabe geprüft.'

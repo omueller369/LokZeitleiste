@@ -26,10 +26,10 @@ for running in '' api;do
  bash "$case_dir/project/backend/testenv/control-host.sh" backup || status=$?
  [[ $status == 7 ]]
  if [[ -z "$running" ]];then
-  ! rg -q ' start ' "$case_dir/calls"
+  if rg -q ' start ' "$case_dir/calls"; then exit 1; fi
  else
   rg -q ' start api$' "$case_dir/calls"
-  ! rg -q ' start .*mailer' "$case_dir/calls"
+  if rg -q ' start .*mailer' "$case_dir/calls"; then exit 1; fi
  fi
 done
 echo 'Backup-Abbruch: nur zuvor laufende Dienste wiederhergestellt; keine fehlenden Container gestartet.'

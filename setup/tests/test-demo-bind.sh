@@ -34,7 +34,7 @@ if (( EUID == 0 )); then
  [[ $status == 77 ]]
  rg -q '^zone io-goerlitz.eu\.$' "$case_dir/dns-update"
  [[ $(rg -c '^update (add|delete) ctl-software\.io-goerlitz\.eu\.' "$case_dir/dns-update") == 2 ]]
- ! rg -q '^update (add|delete) io-goerlitz\.eu\.' "$case_dir/dns-update"
- ! rg -q '^update (add|delete).* AAAA' "$case_dir/dns-update"
+ if rg -q '^update (add|delete) io-goerlitz\.eu\.' "$case_dir/dns-update"; then exit 1; fi
+ if rg -q '^update (add|delete).* AAAA' "$case_dir/dns-update"; then exit 1; fi
 fi
 echo 'Demo/BIND: Subdomain, read-only check und auf einzelnen Host begrenztes Update geprüft.'
