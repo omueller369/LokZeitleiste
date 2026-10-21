@@ -1,3 +1,4 @@
+import re
 import hashlib
 import mimetypes
 import os
@@ -21,7 +22,9 @@ class DocumentUploadLimit:
     def __init__(self,app):self.app=app
 
     async def __call__(self,scope,receive,send):
-        if scope['type']!='http' or scope.get('path')!='/api/v1/documents/upload':
+        path=scope.get('path','')
+        station_plan=scope.get('method')=='PUT' and re.fullmatch(r'/api/v1/tf/stations/[^/]+/plan',path)
+        if scope['type']!='http' or (path!='/api/v1/documents/upload' and not station_plan):
             return await self.app(scope,receive,send)
         limit=MAX_FILE+65536;headers=dict(scope.get('headers',[]));chunks=[];total=0
         async def reject():

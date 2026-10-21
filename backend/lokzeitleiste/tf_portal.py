@@ -30,6 +30,7 @@ def create_router(require_account):
     @router.get('/tf/lokuebergabebuch')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
+    @router.get('/tf/bahnhoefe')
     def page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
         user=user_from_token(db,admin_session)
         if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)

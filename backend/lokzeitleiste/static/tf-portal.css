@@ -2,3 +2,17 @@
 @media(max-width:650px){header{padding:18px}main{padding:14px;margin:10px auto}.modules{grid-template-columns:1fr}.card,.module{padding:18px}.table-wrap{overflow:visible}table,tbody{display:block}thead{display:none}tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #dce5eb;border-radius:10px;margin:14px 0;padding:6px}td{display:block;padding:8px;border:0;min-width:0!important;overflow-wrap:anywhere}.cell-label{display:block;font-size:12px;font-weight:700;color:#5d7484;margin-bottom:5px}td:nth-child(8){grid-column:1/-1}.controls input{max-width:100%}}
 
 .report-return{margin:18px 0}.portal-return-button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;background:#17445b;color:#fff;border:1px solid #103346;border-radius:8px;padding:11px 18px;font:inherit;font-weight:650;cursor:pointer;box-shadow:0 2px 4px #132c4030}.portal-return-button:hover{background:#103346}.portal-return-button:active{box-shadow:none;transform:translateY(1px)}
+
+.stations-layout{display:grid;grid-template-columns:minmax(16rem,.8fr) minmax(0,1.6fr);gap:18px;align-items:start}
+#stationDirectory input{max-width:100%;width:100%;min-width:0}
+#stationDirectory fieldset{min-width:0;border:1px solid #becdd7;border-radius:8px;margin:18px 0;padding:12px}
+#stationDirectory legend button{margin-inline-start:12px;padding:7px 10px;font-size:14px}
+.station-list,.station-catalog{list-style:none;margin:18px 0;padding:0}
+.station-list li,.station-catalog li{margin:8px 0}
+.station-option{display:grid;grid-template-columns:7ch minmax(0,1fr);gap:12px;width:100%;text-align:start;overflow-wrap:anywhere;background:#edf3f7;color:#173d52;border:1px solid #becdd7}
+.station-option[aria-current="true"]{background:#d8eaf6;border:2px solid #17445b}
+.station-contact-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end;margin:12px 0}
+#stationDetails button{margin:6px 4px 6px 0}
+#stationPlanLink{display:inline-block;overflow-wrap:anywhere;padding:10px 0}
+@media(max-width:850px){.stations-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:520px){.station-contact-row{grid-template-columns:minmax(0,1fr)}.station-contact-row button{justify-self:start}.station-catalog button{width:100%;text-align:start;overflow-wrap:anywhere}}

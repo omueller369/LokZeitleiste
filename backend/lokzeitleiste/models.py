@@ -467,3 +467,22 @@ class OvertimeAudit(Base):
     snapshot_json:Mapped[str]=mapped_column(Text,nullable=False)
     created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
 
+
+
+class TfStation(Base):
+    __tablename__='tf_stations'
+    __table_args__=(UniqueConstraint('owner_id','code'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    code:Mapped[str]=mapped_column(String(10),nullable=False)
+    name:Mapped[str]=mapped_column(String(200),nullable=False)
+    contacts_json:Mapped[str]=mapped_column(Text,default='[]',nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,default=1,nullable=False)
+
+
+class TfStationPlan(Base):
+    __tablename__='tf_station_plans'
+    station_id:Mapped[int]=mapped_column(ForeignKey('tf_stations.id',ondelete='CASCADE'),primary_key=True)
+    filename:Mapped[str]=mapped_column(String(120),nullable=False)
+    mime_type:Mapped[str]=mapped_column(String(40),nullable=False)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)

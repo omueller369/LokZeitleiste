@@ -1045,3 +1045,38 @@ Geänderte Monatsabschlüsse zuerst prüfen und wieder öffnen.|Review and reope
 Kein abgeschlossener Monat vorhanden.|No closed month exists.|Brak zamkniętego miesiąca.|Закрытый месяц отсутствует.|No hay ningún mes cerrado.
 Ungültige Dienstzeit im Überstundenkonto.|Invalid duty time in overtime account.|Nieprawidłowy czas służby na koncie nadgodzin.|Некорректное время смены в счёте сверхурочных.|Horario de servicio no válido en la cuenta de horas extra.
 Ungültiger Kontostand im Überstundenkonto.|Invalid overtime account balance.|Nieprawidłowe saldo konta nadgodzin.|Некорректный остаток счёта сверхурочных.|Saldo no válido en la cuenta de horas extra.
+Bahnhofsverzeichnis|Station directory|Spis stacji|Справочник станций|Directorio de estaciones
+Eigene Bahnhöfe, Rufnummern und Bahnhofspläne verwalten.|Manage your stations, contact numbers and station plans.|Zarządzaj swoimi stacjami, numerami i planami stacji.|Управление своими станциями, номерами и планами станций.|Gestione sus estaciones, números y planos de estaciones.
+Bahnhof hinzufügen|Add station|Dodaj stację|Добавить станцию|Añadir estación
+Bahnhof auswählen|Select station|Wybierz stację|Выбрать станцию|Seleccionar estación
+DS100 oder Ort|DS100 or place|DS100 lub miejscowość|DS100 или населённый пункт|DS100 o localidad
+Meine Bahnhöfe|My stations|Moje stacje|Мои станции|Mis estaciones
+Keine Bahnhöfe gefunden.|No stations found.|Nie znaleziono stacji.|Станции не найдены.|No se encontraron estaciones.
+Keine Bahnhöfe in dieser Auswahl.|No stations in this selection.|Brak stacji w tym wyborze.|В этой выборке нет станций.|No hay estaciones en esta selección.
+Bahnhofsplan|Station plan|Plan stacji|План станции|Plano de estación
+Kein Bahnhofsplan vorhanden.|No station plan available.|Brak planu stacji.|План станции отсутствует.|No hay plano de estación.
+Bahnhofsplan (PDF/JPEG/PNG, höchstens 10 MB)|Station plan (PDF/JPEG/PNG, maximum 10 MB)|Plan stacji (PDF/JPEG/PNG, maksymalnie 10 MB)|План станции (PDF/JPEG/PNG, не более 10 МБ)|Plano de estación (PDF/JPEG/PNG, máximo 10 MB)
+Kontakte speichern|Save contacts|Zapisz kontakty|Сохранить контакты|Guardar contactos
+Plan hochladen|Upload plan|Prześlij plan|Загрузить план|Subir plano
+Plan löschen|Delete plan|Usuń plan|Удалить план|Eliminar plano
+Bahnhof löschen|Delete station|Usuń stację|Удалить станцию|Eliminar estación
+Nummer hinzufügen|Add number|Dodaj numer|Добавить номер|Añadir número
+Festnetz|Landline|Telefon stacjonarny|Стационарная связь|Telefonía fija
+Mobilnetz|Mobile|Telefon komórkowy|Мобильная связь|Telefonía móvil
+Bada-Nummer|Bada number|Numer Bada|Номер Bada|Número Bada
+Langwahl|Long dial|Wybieranie długie|Длинный набор|Marcación larga
+Ortsfunk/Kurzwahl|Local radio/speed dial|Radio lokalne/wybieranie skrócone|Местная радиосвязь/короткий набор|Radio local/marcación abreviada
+Nummer|Number|Numer|Номер|Número
+Höchstens 100 Nummern pro Bahnhof.|Maximum 100 numbers per station.|Maksymalnie 100 numerów na stację.|Не более 100 номеров на станцию.|Máximo 100 números por estación.
+Kontakte gespeichert. Den gewählten Plan jetzt hochladen.|Contacts saved. Upload the selected plan now.|Kontakty zapisano. Teraz prześlij wybrany plan.|Контакты сохранены. Загрузите выбранный план.|Contactos guardados. Suba ahora el plano seleccionado.
+Bitte zuerst die Kontaktdaten speichern.|Please save the contact details first.|Najpierw zapisz dane kontaktowe.|Сначала сохраните контактные данные.|Guarde primero los datos de contacto.
+Bitte einen Bahnhofsplan wählen.|Please select a station plan.|Wybierz plan stacji.|Выберите план станции.|Seleccione un plano de estación.
+Bahnhof gespeichert.|Station saved.|Stacja zapisana.|Станция сохранена.|Estación guardada.
+Bahnhofsplan gespeichert.|Station plan saved.|Plan stacji zapisany.|План станции сохранён.|Plano de estación guardado.
+Bahnhofsplan löschen?|Delete station plan?|Usunąć plan stacji?|Удалить план станции?|¿Eliminar el plano de estación?
+Bahnhof mit allen Nummern und Bahnhofsplan aus Ihrer Liste löschen?|Delete the station with all numbers and its plan from your list?|Usunąć stację ze wszystkimi numerami i planem z Twojej listy?|Удалить станцию со всеми номерами и планом из вашего списка?|¿Eliminar la estación con todos sus números y plano de su lista?
+Bahnhofseintrag nicht gefunden.|Station entry not found.|Nie znaleziono wpisu stacji.|Запись станции не найдена.|No se encontró la entrada de estación.
+Bahnhofseintrag wurde geändert. Bitte neu laden.|Station entry changed. Please reload.|Wpis stacji został zmieniony. Odśwież dane.|Запись станции изменена. Обновите данные.|La entrada de estación ha cambiado. Vuelva a cargarla.
+Bahnhof ist bereits in Ihrer Liste.|Station is already in your list.|Stacja jest już na Twojej liście.|Станция уже есть в вашем списке.|La estación ya está en su lista.
+Bahnhofsplan muss eine gültige PDF-, JPEG- oder PNG-Datei sein.|Station plan must be a valid PDF, JPEG or PNG file.|Plan stacji musi być prawidłowym plikiem PDF, JPEG lub PNG.|План станции должен быть корректным файлом PDF, JPEG или PNG.|El plano de estación debe ser un archivo PDF, JPEG o PNG válido.
+Zu viele Kontaktdaten für einen Bahnhof.|Too much contact data for one station.|Za dużo danych kontaktowych dla jednej stacji.|Слишком много контактных данных для одной станции.|Demasiados datos de contacto para una estación.

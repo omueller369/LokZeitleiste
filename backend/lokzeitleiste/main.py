@@ -628,3 +628,6 @@ app.include_router(overtime_router(require_admin))
 @app.get('/admin/overtime-ui.js')
 def overtime_ui_script():
     return FileResponse(Path(__file__).parent/'static'/'overtime-ui.js',media_type='text/javascript')
+
+from .stations import create_router as station_router
+app.include_router(station_router(require_account))
