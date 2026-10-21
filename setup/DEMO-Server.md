@@ -167,3 +167,23 @@ sudo bash backend/testenv/control-host.sh start
 ## Backup-Client-Kompatibilität
 
 Die Sicherung prüft die Optionen des tatsächlich installierten `mysqldump` über dessen lokale Hilfe. MySQL-spezifisches `--set-gtid-purged=OFF` wird nur verwendet, wenn der Client diese Option unterstützt. Das gilt ebenso für `--no-tablespaces`. Ein echter Dump-Fehler bricht die Installation weiterhin vor den Schemaänderungen ab. Bei einem Backup-Abbruch werden ausschließlich API/Mailer wieder gestartet, die vorher tatsächlich liefen; bei einer frischen Installation werden keine fehlenden Container gestartet. Diagnose für diese Variante: `sudo bash backend/testenv/control-host.sh logs`.
+
+## Die 20 Test-TF inklusive Bilder auf dem Onlineserver einspielen
+
+Nach dem Git-Update im bestehenden Host-MySQL-Projekt:
+
+```bash
+cd /opt/LokZeitleiste
+git pull --ff-only origin setup/debian-testumgebung
+sudo bash setup-demo-tf.sh
+```
+
+Die Routine aktualisiert die vorhandene Host-MySQL-Demo über setup-demo.sh, erstellt direkt vor dem Import nochmals eine Datenbank-/Dateisicherung und pausiert API/Mailer während des Imports. Danach startet sie die Dienste wieder. Bei einem Importfehler wird die Datenbanktransaktion zurückgenommen; API/Mailer werden erneut gestartet. Scheitert erst der Neustart nach erfolgreichem Import, bleiben die bereits importierten Datensätze erhalten; ein erneuter Aufruf erzeugt keine Duplikate.
+
+Es werden die vorhandenen 20 fiktiven Personen und ihre mitgelieferten JPEG-Bilder importiert: 14 männlich, 4 weiblich, 1 divers, 1 keine Angabe; 3 Grenz-TF und 2 Grenz-/Strecken-TF; alle mit 40 Wochenstunden, 30 Urlaubstagen und der bisherigen Test-E-Mail-Adresse. Für neue Personen werden freie sechsstellige TF-Nummern mit 787 und freie fünfstellige Personalnummern verwendet. Die Importausgabe nennt Namen, TF-Nummern und Personalnummern.
+
+Neue Testkonten erhalten das Initialpasswort **tomcom123456**; beim ersten Login müssen sie es ändern. Vorhandene Konten behalten ihre Passwörter, Planungen, Arbeitsberichte, Überstundenkonten und Stammdaten. Der Import löst keinen E-Mail-Versand aus. Benutzerverzeichnisse werden vorbereitet.
+
+Ein erneuter Aufruf erkennt die importierten Personen über einen dauerhaften Importvermerk. Auch bereits mit der früheren Testdatenroutine angelegte Personen werden anhand ihres eindeutigen Namens, der Test-E-Mail-Adresse und des passenden Testbilds erkannt; ein fehlendes Bild wird ergänzt. Bei mehrdeutigen Namen oder einem abweichenden vorhandenen Foto bricht der Import vor Änderungen ab. Bereits importierte, anschließend administrativ geänderte Personen werden nicht wieder auf die Ursprungsdaten zurückgesetzt. Fehlende Bilder solcher Personen werden ergänzt.
+
+Diese Routine ergänzt Testpersonen und löscht keine TF. Die ältere Option --replace-all-tf ist hierfür ausdrücklich nicht erforderlich. Servervoraussetzung ist die bestehende Host-MySQL-Einrichtung mit backend/.env.host; MySQL-Zugangsdaten werden weiter aus dieser geschützten Datei verwendet.

@@ -20,3 +20,5 @@ backend/testenv/backups/
 /VW/
 
 backend/.env.host
+
+backend/testenv/demo-tf-import.lock
