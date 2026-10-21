@@ -1138,7 +1138,13 @@
     "Bahnhöfe wurden in die Zwischenablage des TF gesendet.": "Bahnhöfe wurden in die Zwischenablage des TF gesendet.",
     "Zusendung nicht gefunden.": "Zusendung nicht gefunden.",
     "Bitte einen anderen aktiven TF auswählen.": "Bitte einen anderen aktiven TF auswählen.",
-    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Jeden Zielbahnhof nur einmal pro Übernahme auswählen."
+    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.",
+    "Lokabstellung": "Lokabstellung",
+    "Züge sichern": "Züge sichern",
+    "Sonstige Besonderheiten": "Sonstige Besonderheiten",
+    "Verfügbare Zeichen": "Verfügbare Zeichen",
+    "Bahnhof speichern": "Bahnhof speichern",
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten."
   },
   "en": {
     "Administration": "Administration",
@@ -2279,7 +2285,13 @@
     "Bahnhöfe wurden in die Zwischenablage des TF gesendet.": "Stations were sent to the driver's inbox.",
     "Zusendung nicht gefunden.": "Delivery not found.",
     "Bitte einen anderen aktiven TF auswählen.": "Please select another active driver.",
-    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Select each destination station only once per import."
+    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Select each destination station only once per import.",
+    "Lokabstellung": "Locomotive stabling",
+    "Züge sichern": "Securing trains",
+    "Sonstige Besonderheiten": "Other special notes",
+    "Verfügbare Zeichen": "Characters remaining",
+    "Bahnhof speichern": "Save station",
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Empty note fields are filled in. Existing notes are preserved."
   },
   "pl": {
     "Administration": "Administracja",
@@ -3420,7 +3432,13 @@
     "Bahnhöfe wurden in die Zwischenablage des TF gesendet.": "Stacje wysłano do skrzynki odbiorczej maszynisty.",
     "Zusendung nicht gefunden.": "Nie znaleziono przesyłki.",
     "Bitte einen anderen aktiven TF auswählen.": "Wybierz innego aktywnego maszynistę.",
-    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Wybierz każdą stację docelową tylko raz na import."
+    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Wybierz każdą stację docelową tylko raz na import.",
+    "Lokabstellung": "Odstawianie lokomotywy",
+    "Züge sichern": "Zabezpieczanie pociągów",
+    "Sonstige Besonderheiten": "Inne uwagi szczególne",
+    "Verfügbare Zeichen": "Pozostałe znaki",
+    "Bahnhof speichern": "Zapisz stację",
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Puste pola uwag zostaną uzupełnione. Istniejące uwagi pozostaną zachowane."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4561,7 +4579,13 @@
     "Bahnhöfe wurden in die Zwischenablage des TF gesendet.": "Станции отправлены во входящие машиниста.",
     "Zusendung nicht gefunden.": "Полученные данные не найдены.",
     "Bitte einen anderen aktiven TF auswählen.": "Выберите другого активного машиниста.",
-    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Выбирайте каждую целевую станцию только один раз за импорт."
+    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Выбирайте каждую целевую станцию только один раз за импорт.",
+    "Lokabstellung": "Отстой локомотива",
+    "Züge sichern": "Закрепление поездов",
+    "Sonstige Besonderheiten": "Прочие особенности",
+    "Verfügbare Zeichen": "Осталось символов",
+    "Bahnhof speichern": "Сохранить станцию",
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Пустые поля примечаний будут заполнены. Существующие примечания сохраняются."
   },
   "es": {
     "Administration": "Administración",
@@ -5702,6 +5726,12 @@
     "Bahnhöfe wurden in die Zwischenablage des TF gesendet.": "Las estaciones se han enviado a la bandeja del maquinista.",
     "Zusendung nicht gefunden.": "Envío no encontrado.",
     "Bitte einen anderen aktiven TF auswählen.": "Seleccione otro maquinista activo.",
-    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Seleccione cada estación de destino solo una vez por importación."
+    "Jeden Zielbahnhof nur einmal pro Übernahme auswählen.": "Seleccione cada estación de destino solo una vez por importación.",
+    "Lokabstellung": "Estacionamiento de locomotoras",
+    "Züge sichern": "Asegurar trenes",
+    "Sonstige Besonderheiten": "Otras particularidades",
+    "Verfügbare Zeichen": "Caracteres disponibles",
+    "Bahnhof speichern": "Guardar estación",
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Se completan los campos de notas vacíos. Las notas existentes se conservan."
   }
 }

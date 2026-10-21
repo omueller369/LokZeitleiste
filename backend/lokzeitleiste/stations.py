@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import User,RailwayStation,TfStation,TfStationPlan
+from .models import User,RailwayStation,TfStation,TfStationPlan,TfStationNotes
 from .tf_portal import driver_dependency
 from .work_reports.receipts import MAX_FILE,validate_receipt
 
@@ -31,7 +31,28 @@ class StationContact(BaseModel):
         return value
 
 
-class StationCreate(BaseModel):
+NOTE_FIELDS=('locomotive_parking','train_securing','special_features')
+
+class StationNotes(BaseModel):
+    locomotive_parking:str=Field(default='',max_length=120)
+    train_securing:str=Field(default='',max_length=120)
+    special_features:str=Field(default='',max_length=1024)
+
+
+def notes_view(db,model,key):
+    row=db.get(model,key)
+    return {field:getattr(row,field) if row else '' for field in NOTE_FIELDS}
+
+
+def save_notes(db,station_id,data):
+    fields=set(NOTE_FIELDS)&data.model_fields_set
+    if not fields:return
+    row=db.get(TfStationNotes,station_id)
+    if not row:row=TfStationNotes(station_id=station_id);db.add(row)
+    for field in fields:setattr(row,field,getattr(data,field))
+
+
+class StationCreate(StationNotes):
     code:str=Field(min_length=1,max_length=10)
     contacts:list[StationContact]=Field(default_factory=list,max_length=100)
 
@@ -40,7 +61,7 @@ class StationCreate(BaseModel):
     def code_clean(cls,value):return value.strip().upper()
 
 
-class StationUpdate(BaseModel):
+class StationUpdate(StationNotes):
     expected_revision:int=Field(ge=1)
     contacts:list[StationContact]=Field(default_factory=list,max_length=100)
 
@@ -69,7 +90,7 @@ def create_router(require_account):
 
     def view(db,row):
         plan=db.get(TfStationPlan,row.id)
-        return dict(id=row.id,code=row.code,name=row.name,contacts=json.loads(row.contacts_json),revision=row.revision,
+        return dict(**notes_view(db,TfStationNotes,row.id),id=row.id,code=row.code,name=row.name,contacts=json.loads(row.contacts_json),revision=row.revision,
                     plan=dict(filename=plan.filename,mime_type=plan.mime_type) if plan else None)
 
     @router.get('/tf/stations.js')
@@ -102,6 +123,7 @@ def create_router(require_account):
         if existing:raise HTTPException(409,'Bahnhof ist bereits in Ihrer Liste.')
         row=TfStation(owner_id=user.id,code=station.code,name=station.name,contacts_json=contacts_json(data.contacts),revision=1)
         db.add(row)
+        db.flush();save_notes(db,row.id,data)
         try:db.commit()
         except IntegrityError as exc:
             db.rollback();raise HTTPException(409,'Bahnhof ist bereits in Ihrer Liste.') from exc
@@ -114,7 +136,7 @@ def create_router(require_account):
     @router.put('/api/v1/tf/stations/{station_id}')
     def edit(station_id:int,data:StationUpdate,user:User=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,station_id,True);check_revision(row,data.expected_revision)
-        row.contacts_json=contacts_json(data.contacts);row.revision+=1;db.commit()
+        row.contacts_json=contacts_json(data.contacts);save_notes(db,row.id,data);row.revision+=1;db.commit()
         return view(db,row)
 
     @router.delete('/api/v1/tf/stations/{station_id}')

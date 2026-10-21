@@ -116,3 +116,15 @@ class StationSharingTest(test_stations.StationDirectoryTest):
         recipients=self.driver.get('/api/v1/tf/station-recipients').json();self.assertEqual(len(recipients),2)
         self.assertNotIn(self.tf,[r['id'] for r in recipients])
         for recipient in [self.tf,999999]:self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']],'recipient_id':recipient}).status_code,422)
+
+    def test_notes_snapshot_and_fill_empty_without_overwriting(self):
+        source=self.driver.post('/api/v1/tf/stations',json={'code':'BBB','locomotive_parking':'Gleis 1','train_securing':'Hemmschuhe','special_features':'Achtung\nBesonderheit'}).json()
+        delivery=self.share([source]);item=self.preview(delivery)['items'][0]
+        self.assertEqual(item['special_features'],'Achtung\nBesonderheit')
+        self.driver.put('/api/v1/tf/stations/'+str(source['id']),json={'expected_revision':1,'special_features':'Später geändert'})
+        target=self.other.post('/api/v1/tf/stations',json={'code':'BBB','locomotive_parking':'Eigene Abstellung'}).json()
+        result=self.take(delivery);self.assertEqual(result.status_code,200,result.text)
+        own=self.other.get('/api/v1/tf/stations/'+str(target['id'])).json()
+        self.assertEqual(own['locomotive_parking'],'Eigene Abstellung')
+        self.assertEqual(own['train_securing'],'Hemmschuhe');self.assertEqual(own['special_features'],'Achtung\nBesonderheit')
+        self.assertEqual(self.take(delivery).json()['unchanged'],1)

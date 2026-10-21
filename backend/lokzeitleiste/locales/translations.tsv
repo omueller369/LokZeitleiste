@@ -1138,3 +1138,9 @@ Bahnhöfe wurden in die Zwischenablage des TF gesendet.|Stations were sent to th
 Zusendung nicht gefunden.|Delivery not found.|Nie znaleziono przesyłki.|Полученные данные не найдены.|Envío no encontrado.
 Bitte einen anderen aktiven TF auswählen.|Please select another active driver.|Wybierz innego aktywnego maszynistę.|Выберите другого активного машиниста.|Seleccione otro maquinista activo.
 Jeden Zielbahnhof nur einmal pro Übernahme auswählen.|Select each destination station only once per import.|Wybierz każdą stację docelową tylko raz na import.|Выбирайте каждую целевую станцию только один раз за импорт.|Seleccione cada estación de destino solo una vez por importación.
+Lokabstellung|Locomotive stabling|Odstawianie lokomotywy|Отстой локомотива|Estacionamiento de locomotoras
+Züge sichern|Securing trains|Zabezpieczanie pociągów|Закрепление поездов|Asegurar trenes
+Sonstige Besonderheiten|Other special notes|Inne uwagi szczególne|Прочие особенности|Otras particularidades
+Verfügbare Zeichen|Characters remaining|Pozostałe znaki|Осталось символов|Caracteres disponibles
+Bahnhof speichern|Save station|Zapisz stację|Сохранить станцию|Guardar estación
+Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.|Empty note fields are filled in. Existing notes are preserved.|Puste pola uwag zostaną uzupełnione. Istniejące uwagi pozostaną zachowane.|Пустые поля примечаний будут заполнены. Существующие примечания сохраняются.|Se completan los campos de notas vacíos. Las notas existentes se conservan.

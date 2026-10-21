@@ -227,3 +227,10 @@ Unter „Meine Zwischenablage“ sieht ausschließlich der Empfänger die Zusend
 Übernehmen entfernt die Zusendung nicht. Der Empfänger löscht sie mit „Zusendung löschen“ nach eigener Entscheidung; es gibt keinen automatischen Ablauf. Importierte Einträge bleiben erhalten. Spätere Änderungen des Absenders verändern die Kopie nicht. Andere TF und der Absender können die Zwischenablage nicht einsehen, importieren oder löschen.
 
 Das normale Setup/Update legt zusätzlich tf_station_deliveries an; vorhandene Stationen, Kontakte und Pläne bleiben erhalten. Die früheren Linkfreigaben sind nicht mehr über die API abrufbar und müssen bei Bedarf neu an einen ausgewählten TF gesendet werden. Bereits daraus übernommene Daten bleiben erhalten. Zusendungen inklusive Plänen liegen in der Datenbank und werden mitgesichert. Die Suche nach DS100/Ort steht direkt unter „Meine Bahnhöfe“ oberhalb der Auswahl und Liste.
+
+
+### Hinweise je Bahnhof
+
+Beim Anlegen und Bearbeiten stehen „Lokabstellung“ und „Züge sichern“ mit jeweils höchstens 120 Zeichen sowie „Sonstige Besonderheiten“ mit höchstens 1024 Zeichen zur Verfügung. Das mehrzeilige Feld hat fünf sichtbare Zeilen und darüber einen dynamischen Restzeichenzähler. Die Angaben werden in der Ansicht angezeigt und zusammen mit dem Bahnhof als unveränderliche Kopie an andere TF gesendet. Bei der Übernahme werden nur leere Hinweisfelder des Zielbahnhofs ergänzt; vorhandene eigene Hinweise bleiben erhalten. Die Vorschau zeigt die eingegangenen Texte vollständig.
+
+Das normale Update legt die zusätzlichen Tabellen tf_station_notes und tf_station_share_notes an. Vorhandene Bahnhöfe und ältere Zusendungen haben zunächst leere Hinweisfelder. Die bisherigen Daten bleiben unverändert; die neuen Tabellen werden über die bestehende Datenbanksicherung mitgesichert.

@@ -14,8 +14,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import User,TfProfile,TfStation,TfStationPlan,TfStationShare,TfStationShareItem,TfStationDelivery,TfEmployment,now_utc
-from .stations import StationContact,contacts_json
+from .models import User,TfProfile,TfStation,TfStationPlan,TfStationShare,TfStationShareItem,TfStationDelivery,TfStationNotes,TfStationShareNotes,TfEmployment,now_utc
+from .stations import StationContact,contacts_json,NOTE_FIELDS,notes_view
 from .work_reports.receipts import MAX_FILE
 
 MAX_STATIONS=50
@@ -96,8 +96,10 @@ def create_router(driver):
             total+=len(content) if content else 0
             if (content and len(content)>MAX_FILE) or total>MAX_PLANS:
                 raise HTTPException(413,'Bahnhofspläne zusammen höchstens 20 MB; Auswahl verkleinern oder ohne Pläne teilen.')
-            db.add(TfStationShareItem(share_id=share.id,code=row.code,name=row.name,contacts_json=contacts_json(contacts),
-                plan_filename=plan.filename if plan else None,plan_mime_type=plan.mime_type if plan else None,plan_content=content))
+            item=TfStationShareItem(share_id=share.id,code=row.code,name=row.name,contacts_json=contacts_json(contacts),
+                plan_filename=plan.filename if plan else None,plan_mime_type=plan.mime_type if plan else None,plan_content=content)
+            db.add(item);db.flush()
+            db.add(TfStationShareNotes(item_id=item.id,**notes_view(db,TfStationNotes,row.id)))
         delivery=TfStationDelivery(share_id=share.id,recipient_id=recipient.id);db.add(delivery);db.commit()
         return dict(id=delivery.id,stations=len(rows))
 
@@ -126,7 +128,7 @@ def create_router(driver):
         rows=db.scalars(select(TfStationShareItem).where(TfStationShareItem.share_id==share.id).order_by(TfStationShareItem.code)).all()
         own={row.code:row for row in db.scalars(select(TfStation).where(TfStation.owner_id==user.id,TfStation.code.in_([item.code for item in rows])))}
         return dict(sender=(profile.first_name+' '+profile.last_name) if profile else '',created_at=share.created_at.isoformat(),
-                    items=[dict(id=row.id,code=row.code,name=row.name,contacts=json.loads(row.contacts_json),
+                    items=[dict(**notes_view(db,TfStationShareNotes,row.id),id=row.id,code=row.code,name=row.name,contacts=json.loads(row.contacts_json),
                                 plan=dict(filename=row.plan_filename,mime_type=row.plan_mime_type) if row.plan_content else None,
                                 expected_revision=own[row.code].revision if row.code in own else 0) for row in rows])
 
@@ -172,6 +174,12 @@ def create_router(driver):
                 target=TfStation(owner_id=user.id,code=source.code,name=source.name,contacts_json=encoded,revision=1)
                 db.add(target);db.flush()
             else:target.contacts_json=encoded
+            incoming_notes=notes_view(db,TfStationShareNotes,source.id)
+            target_notes=db.get(TfStationNotes,target.id)
+            for field in NOTE_FIELDS:
+                if incoming_notes[field] and (not target_notes or not getattr(target_notes,field)):
+                    if not target_notes:target_notes=TfStationNotes(station_id=target.id);db.add(target_notes)
+                    setattr(target_notes,field,incoming_notes[field]);changed=True
             if data.include_plans and source.plan_content:
                 target_plan=db.scalar(select(TfStationPlan).where(TfStationPlan.station_id==target.id).with_for_update())
                 if not target_plan:

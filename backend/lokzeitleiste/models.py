@@ -516,3 +516,19 @@ class TfStationDelivery(Base):
     id:Mapped[int]=mapped_column(Integer,primary_key=True)
     share_id:Mapped[int]=mapped_column(ForeignKey('tf_station_shares.id',ondelete='CASCADE'),unique=True,nullable=False)
     recipient_id:Mapped[int]=mapped_column(ForeignKey('users.id'),index=True,nullable=False)
+
+
+class TfStationNotes(Base):
+    __tablename__='tf_station_notes'
+    station_id:Mapped[int]=mapped_column(ForeignKey('tf_stations.id',ondelete='CASCADE'),primary_key=True)
+    locomotive_parking:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    train_securing:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    special_features:Mapped[str]=mapped_column(Text,default='',nullable=False)
+
+
+class TfStationShareNotes(Base):
+    __tablename__='tf_station_share_notes'
+    item_id:Mapped[int]=mapped_column(ForeignKey('tf_station_share_items.id',ondelete='CASCADE'),primary_key=True)
+    locomotive_parking:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    train_securing:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    special_features:Mapped[str]=mapped_column(Text,default='',nullable=False)

@@ -120,3 +120,23 @@ class StationDirectoryTest(unittest.TestCase):
         self.assertEqual(self.driver.get('/api/v1/tf/stations').status_code,403)
         self.assertEqual(self.driver.get('/tf/bahnhoefe',follow_redirects=False).status_code,303)
         self.driver.cookies.clear();self.assertEqual(self.driver.get('/api/v1/tf/stations').status_code,401)
+
+    def test_station_notes_limits_roundtrip_and_partial_update(self):
+        notes=dict(locomotive_parking='L'*120,train_securing='Z'*120,special_features='Zeile 1\nZeile 2\n'+'ä'*1008)
+        self.assertEqual(len(notes['special_features']),1024)
+        response=self.driver.post('/api/v1/tf/stations',json={'code':'BBB',**notes})
+        self.assertEqual(response.status_code,201,response.text);row=response.json()
+        path='/api/v1/tf/stations/'+str(row['id'])
+        for field,value in notes.items():self.assertEqual(row[field],value)
+        for field,limit in [('locomotive_parking',120),('train_securing',120),('special_features',1024)]:
+            self.assertEqual(self.driver.put(path,json={'expected_revision':1,field:'x'*(limit+1)}).status_code,422)
+        changed=self.driver.put(path,json={'expected_revision':1,'contacts':[]})
+        self.assertEqual(changed.status_code,200,changed.text)
+        for field,value in notes.items():self.assertEqual(changed.json()[field],value)
+        clear=self.driver.put(path,json={'expected_revision':2,'locomotive_parking':'','train_securing':'','special_features':''})
+        self.assertEqual(clear.status_code,200,clear.text)
+        for field in notes:self.assertEqual(clear.json()[field],'')
+
+    def test_existing_station_notes_default_empty(self):
+        row=self.create()
+        for field in ['locomotive_parking','train_securing','special_features']:self.assertEqual(row[field],'')
