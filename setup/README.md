@@ -220,7 +220,7 @@ Beim regulären Update/bei der Neuinstallation legt init_db die zusätzlichen Ta
 
 ### Bahnhöfe direkt an andere TF senden
 
-Einzelne oder mehrere eigene Bahnhöfe auswählen (höchstens 50), „Auswahl an TF senden“ oder „Diesen Bahnhof an TF senden“ anklicken und den Empfänger aus der systeminternen TF-Liste auswählen. Angezeigt werden andere aktive TF mit Name und TF-Nummer; gesperrte oder ausgetretene TF werden ausgeschlossen. Optional werden die Bahnhofspläne mitgegeben (zusammen höchstens 20 MB). Erst „An TF senden“ legt eine unabhängige Kopie in der Zwischenablage dieses Empfängers ab. Es wird keine E-Mail versendet.
+Einzelne oder mehrere eigene Bahnhöfe auswählen (höchstens 50), „Auswahl an TF senden“ oder „Diesen Bahnhof an TF senden“ anklicken und den Empfänger aus der systeminternen TF-Liste auswählen. Angezeigt werden andere aktive TF ausschließlich mit Vor- und Nachname; gesperrte oder ausgetretene TF werden ausgeschlossen. Optional werden die Bahnhofspläne mitgegeben (zusammen höchstens 20 MB). Erst „An TF senden“ legt eine unabhängige Kopie in der Zwischenablage dieses Empfängers ab. Es wird keine E-Mail versendet.
 
 Unter „Meine Zwischenablage“ sieht ausschließlich der Empfänger die Zusendungen mit Absender, Datum und DS100-Codes. „Ansehen“ zeigt Rufnummern und Pläne. Für jeden ausgewählten Bahnhof kann er einen neuen Eintrag unter dem ursprünglichen DS100-Code oder einen vorhandenen eigenen Zielbahnhof wählen. Bei vorhandenem gleichem DS100-Code ist dieser als Ziel vorbelegt. „Nur neue Bahnhöfe übernehmen“ überspringt vorhandene Ziele; „Neue übernehmen und vorhandene ergänzen“ ergänzt Kontakte und optional fehlende Pläne. Zielname und DS100, eigene Kontakte und bestehende Pläne bleiben erhalten. Identische Kategorie, Bezeichnung und Nummer werden nicht doppelt angelegt. Pro Übernahme darf ein Ziel nur einmal ausgewählt werden. Konflikte oder eine Überschreitung der Kontaktgrenze brechen die gesamte Auswahl ab; danach die Zusendung erneut öffnen.
 
@@ -234,3 +234,12 @@ Das normale Setup/Update legt zusätzlich tf_station_deliveries an; vorhandene S
 Beim Anlegen und Bearbeiten stehen „Lokabstellung“ und „Züge sichern“ mit jeweils höchstens 120 Zeichen sowie „Sonstige Besonderheiten“ mit höchstens 1024 Zeichen zur Verfügung. Das mehrzeilige Feld hat fünf sichtbare Zeilen und darüber einen dynamischen Restzeichenzähler. Die Angaben werden in der Ansicht angezeigt und zusammen mit dem Bahnhof als unveränderliche Kopie an andere TF gesendet. Bei der Übernahme werden nur leere Hinweisfelder des Zielbahnhofs ergänzt; vorhandene eigene Hinweise bleiben erhalten. Die Vorschau zeigt die eingegangenen Texte vollständig.
 
 Das normale Update legt die zusätzlichen Tabellen tf_station_notes und tf_station_share_notes an. Vorhandene Bahnhöfe und ältere Zusendungen haben zunächst leere Hinweisfelder. Die bisherigen Daten bleiben unverändert; die neuen Tabellen werden über die bestehende Datenbanksicherung mitgesichert.
+
+
+### Vertrauliche TF-Nummer
+
+Die Empfängerauswahl liefert ausschließlich interne Datensatz-ID sowie Vor- und Nachname. Die Login-/TF-Nummer wird weder im Label noch in zusätzlichen API-Feldern an andere TF ausgeliefert; auch die Sortierung verwendet sie nicht. Zusendungen und Zwischenablagen enthalten keine TF-Nummer des Absenders oder Empfängers. Die eigene Identität bleibt für den jeweiligen TF sichtbar; administrative Stammdaten bleiben durch die bestehenden Verwaltungsrechte geschützt.
+
+Die Bahnhofsfelder Lokabstellung, Züge sichern und Sonstige Besonderheiten stehen nach den Kontakten und dem Bahnhofsplan am Ende der Angaben, unmittelbar vor dem Speichern.
+
+Automatisch versendete Quittungs-E-Mails enthalten ebenfalls keine Login-/TF-Nummer mehr. Die Zuordnung erfolgt über die Arbeitsbericht-ID.

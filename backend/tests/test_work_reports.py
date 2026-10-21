@@ -194,6 +194,7 @@ class WorkReportsTest(unittest.TestCase):
     def test_receipt_sends_attachment_once_and_survives_failed_mail(self):
         report=self.create()['id'];content=self.pdf();uploaded=self.upload(report,content);self.assertEqual(uploaded.status_code,202,uploaded.text);rid=uploaded.json()['id']
         self.assertEqual(self.send.call_count,1);message=self.send.call_args.args[0];self.assertEqual(message['To'],'omueller369@gmail.com');self.assertEqual(list(message.iter_attachments())[0].get_payload(decode=True),content)
+        self.assertNotIn('787100',message.get_body(preferencelist=('plain',)).get_content());self.assertNotIn('TF-Nummer',message.get_body(preferencelist=('plain',)).get_content())
         self.assertEqual(self.upload(report,content).json()['id'],rid);self.assertEqual(self.send.call_count,1)
         downloaded=self.driver.get(f'/api/v1/tf/work-reports/{report}/receipts/{rid}');self.assertEqual(downloaded.content,content)
         image=io.BytesIO();Image.new('RGB',(20,20),'white').save(image,format='PNG')

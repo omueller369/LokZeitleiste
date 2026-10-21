@@ -128,3 +128,21 @@ class StationSharingTest(test_stations.StationDirectoryTest):
         self.assertEqual(own['locomotive_parking'],'Eigene Abstellung')
         self.assertEqual(own['train_securing'],'Hemmschuhe');self.assertEqual(own['special_features'],'Achtung\nBesonderheit')
         self.assertEqual(self.take(delivery).json()['unchanged'],1)
+
+
+    def test_tf_numbers_private_in_recipient_and_delivery_responses(self):
+        recipients=self.driver.get('/api/v1/tf/station-recipients')
+        self.assertEqual(recipients.status_code,200)
+        for item in recipients.json():
+            self.assertEqual(set(item),{'id','label'})
+            self.assertNotIn('787200',item['label'])
+        delivery=self.share([self.create()])
+        for response in [recipients,self.other.get('/api/v1/tf/station-inbox'),self.other.get('/api/v1/tf/station-inbox/'+str(delivery['id']))]:
+            for private in ['787100','787200','tf_number','username']:self.assertNotIn(private,response.text)
+        # The driver's own identity remains available; staff-only lists stay protected.
+        self.assertEqual(self.driver.get('/api/v1/tf/portal').json()['username'],'787100')
+        for url in ['/api/v1/admin/tf','/api/v1/admin/directory']:
+            self.assertIn(self.other.get(url).status_code,(401,403))
+        response=self.client.get('/api/v1/admin/tf')
+        self.assertEqual(response.status_code,200)
+        self.assertIn('787100',response.text)

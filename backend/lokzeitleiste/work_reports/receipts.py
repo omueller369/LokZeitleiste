@@ -67,7 +67,7 @@ def process_receipt(receipt_id):
             message['To']=row.recipient_email
             t=lambda text:translate(text,user_language(db,user.id))
             message['Subject']=t('LokZeitleiste: Quittungsbeleg zum Arbeitsbericht')
-            message.set_content(f"{t('TF-Nummer')}: {user.username}\n{t('Arbeitsbericht')}: {report.id}\n{t('Quittungsbeleg')}: {row.filename}\n")
+            message.set_content(f"{t('Arbeitsbericht')}: {report.id}\n{t('Quittungsbeleg')}: {row.filename}\n")
             main,sub=row.mime_type.split('/')
             message.add_attachment(row.content,maintype=main,subtype=sub,filename=row.filename)
             message['Message-ID']=f'<duty-receipt-{row.id}-{row.content_hash[:16]}@lokzeitleiste.local>'

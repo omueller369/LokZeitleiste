@@ -71,8 +71,8 @@ def create_router(driver):
 
     @router.get('/api/v1/tf/station-recipients')
     def recipients(user:User=Depends(driver),db:Session=Depends(database_session)):
-        rows=db.execute(select(User,TfProfile).join(TfProfile,TfProfile.user_id==User.id).where(User.role=='tf',User.active.is_(True),User.id!=user.id).order_by(TfProfile.last_name,TfProfile.first_name,User.username)).all()
-        return [dict(id=u.id,label=f'{p.first_name} {p.last_name} · {u.username}') for u,p in rows if available(db,u)]
+        rows=db.execute(select(User,TfProfile).join(TfProfile,TfProfile.user_id==User.id).where(User.role=='tf',User.active.is_(True),User.id!=user.id).order_by(TfProfile.last_name,TfProfile.first_name,User.id)).all()
+        return [dict(id=u.id,label=f'{p.first_name} {p.last_name}') for u,p in rows if available(db,u)]
 
     @router.get('/tf/station-sharing.js')
     def script():
