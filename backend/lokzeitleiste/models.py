@@ -509,3 +509,10 @@ class TfStationShareItem(Base):
     plan_filename:Mapped[str|None]=mapped_column(String(120),nullable=True)
     plan_mime_type:Mapped[str|None]=mapped_column(String(40),nullable=True)
     plan_content:Mapped[bytes|None]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=True)
+
+
+class TfStationDelivery(Base):
+    __tablename__='tf_station_deliveries'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    share_id:Mapped[int]=mapped_column(ForeignKey('tf_station_shares.id',ondelete='CASCADE'),unique=True,nullable=False)
+    recipient_id:Mapped[int]=mapped_column(ForeignKey('users.id'),index=True,nullable=False)

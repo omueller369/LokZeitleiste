@@ -22,4 +22,4 @@
 .station-sharing label,.station-share-actions label{display:block;margin:12px 0}
 .station-sharing button{margin:8px 8px 8px 0}
 .station-sharing select{font:inherit;padding:10px;max-width:100%;border:1px solid #becdd7;border-radius:8px;display:block;margin-top:8px}
-#stationSharedItems{list-style:none;padding:0}#stationSharedItems>li{border:1px solid #d8e2e8;border-radius:8px;padding:12px;margin:12px 0;overflow-wrap:anywhere}#stationSharedItems details{margin:12px 0}#stationOwnShares li{padding:8px 0;overflow-wrap:anywhere}
+#stationSharedItems{list-style:none;padding:0}#stationSharedItems>li{border:1px solid #d8e2e8;border-radius:8px;padding:12px;margin:12px 0;overflow-wrap:anywhere}#stationSharedItems details{margin:12px 0}#stationInbox li{padding:8px 0;overflow-wrap:anywhere}

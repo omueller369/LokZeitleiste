@@ -91,7 +91,7 @@ def create_router(require_account):
         query=select(TfStation).where(TfStation.owner_id==user.id)
         value=q.strip().upper().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
         if value:query=query.where(or_(TfStation.code.ilike('%'+value+'%',escape='\\'),TfStation.name.ilike('%'+value+'%',escape='\\')))
-        return [dict(id=row.id,code=row.code,name=row.name) for row in db.scalars(query.order_by(TfStation.code,TfStation.id))]
+        return [dict(id=row.id,code=row.code,name=row.name,revision=row.revision) for row in db.scalars(query.order_by(TfStation.code,TfStation.id))]
 
     @router.post('/api/v1/tf/stations',status_code=201)
     def create(data:StationCreate,user:User=Depends(driver),db:Session=Depends(database_session)):

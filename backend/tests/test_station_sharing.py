@@ -5,7 +5,7 @@ from sqlalchemy import select,func
 from sqlalchemy.orm import Session
 import test_stations
 from lokzeitleiste.main import app
-from lokzeitleiste.models import TfStationShare,now_utc
+from lokzeitleiste.models import TfStationShare,TfStationDelivery,now_utc
 
 class StationSharingTest(test_stations.StationDirectoryTest):
     def setUp(self):
@@ -13,17 +13,18 @@ class StationSharingTest(test_stations.StationDirectoryTest):
         self.create_tf('787200','SHARE-RECIPIENT')
         self.other=TestClient(app,base_url='https://testserver');self.staff_clients.append(self.other)
         self.other.post('/api/v1/account/login',json={'username':'787200','password':'tf-secret-12345'})
+        self.recipient=self.driver.get('/api/v1/tf/station-recipients').json()[0]['id']
 
     def share(self,rows,plans=False):
-        r=self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id'] for row in rows],'include_plans':plans})
+        r=self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id'] for row in rows],'recipient_id':self.recipient,'include_plans':plans})
         self.assertEqual(r.status_code,201,r.text);return r.json()
 
     def preview(self,share):
-        r=self.other.get('/api/v1/tf/station-shares/'+share['token']);self.assertEqual(r.status_code,200,r.text);return r.json()
+        r=self.other.get('/api/v1/tf/station-inbox/'+str(share['id']));self.assertEqual(r.status_code,200,r.text);return r.json()
 
     def take(self,share,items=None,mode='merge'):
         items=items if items is not None else self.preview(share)['items']
-        return self.other.post('/api/v1/tf/station-shares/'+share['token']+'/import',json={'items':[{'id':i['id'],'expected_revision':i['expected_revision']} for i in items],'mode':mode})
+        return self.other.post('/api/v1/tf/station-inbox/'+str(share['id'])+'/import',json={'items':[{'id':i['id'],'expected_revision':i['expected_revision']} for i in items],'mode':mode})
 
     def test_snapshot_selection_repeat_and_source_isolation(self):
         row=self.create(contacts=[dict(category='bada',label='Fdl',number='00123')]);second=self.create('AAA')
@@ -58,28 +59,29 @@ class StationSharingTest(test_stations.StationDirectoryTest):
         self.assertEqual(self.take(share,items).status_code,409)
         self.assertEqual(self.take(share).json()['created'],1)
 
-    def test_plan_access_revocation_expiry_and_roles(self):
+    def test_plan_access_manual_removal_and_roles(self):
         row=self.create();self.driver.put('/api/v1/tf/stations/'+str(row['id'])+'/plan',data={'expected_revision':1},files={'file':('plan.png',self.png(),'image/png')})
         share=self.share([row],True);item=self.preview(share)['items'][0]
-        url='/api/v1/tf/station-shares/'+share['token'];plan=url+'/items/'+str(item['id'])+'/plan'
+        url='/api/v1/tf/station-inbox/'+str(share['id']);plan=url+'/items/'+str(item['id'])+'/plan'
         self.assertEqual(self.other.get(plan).content,self.png())
         self.assertEqual(self.client.get(url).status_code,403)
         self.assertEqual(self.other.get(url+'/items/999999/plan').status_code,404)
-        self.assertEqual(self.other.delete('/api/v1/tf/station-shares/mine/'+str(share['id'])).status_code,404)
+        self.assertEqual(self.driver.delete('/api/v1/tf/station-inbox/'+str(share['id'])).status_code,404)
         self.assertEqual(self.take(share).json()['plans_added'],1)
-        self.assertEqual(self.driver.delete('/api/v1/tf/station-shares/mine/'+str(share['id'])).status_code,200)
+        self.assertEqual(self.other.delete('/api/v1/tf/station-inbox/'+str(share['id'])).status_code,200)
         for response in (self.other.get(url),self.other.get(plan),self.take(share,[item])):self.assertEqual(response.status_code,404)
         self.assertEqual(len(self.other.get('/api/v1/tf/stations').json()),1)
-        another=self.share([row]);
-        with Session(self.engine) as db:db.get(TfStationShare,another['id']).expires_at=now_utc()-timedelta(seconds=1);db.commit()
-        self.assertEqual(self.other.get('/api/v1/tf/station-shares/'+another['token']).status_code,404)
+        another=self.share([row])
+        with Session(self.engine) as db:
+            delivery=db.get(TfStationDelivery,another['id']);db.get(TfStationShare,delivery.share_id).expires_at=now_utc()-timedelta(days=1);db.commit()
+        self.assertEqual(self.other.get('/api/v1/tf/station-inbox/'+str(another['id'])).status_code,200)
 
     def test_ownership_validation_and_size_rollback(self):
-        row=self.create();self.assertEqual(self.other.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']]}).status_code,404)
-        self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id'],row['id']]}).status_code,422)
+        row=self.create();self.assertEqual(self.other.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']],'recipient_id':self.tf}).status_code,404)
+        self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id'],row['id']],'recipient_id':self.recipient}).status_code,422)
         self.driver.put('/api/v1/tf/stations/'+str(row['id'])+'/plan',data={'expected_revision':1},files={'file':('plan.png',self.png(),'image/png')})
         with patch('lokzeitleiste.station_sharing.MAX_PLANS',1):
-            self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']],'include_plans':True}).status_code,413)
+            self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']],'recipient_id':self.recipient,'include_plans':True}).status_code,413)
         with Session(self.engine) as db:self.assertEqual(db.scalar(select(func.count()).select_from(TfStationShare)),0)
 
     def test_reset_cascades_shares(self):
@@ -87,3 +89,30 @@ class StationSharingTest(test_stations.StationDirectoryTest):
         self.share([self.create()])
         with Session(self.engine) as db:
             delete_tf_records(db);db.commit();self.assertEqual(db.scalar(select(func.count()).select_from(TfStationShare)),0)
+
+    def test_destination_choice_and_inbox_survives_import(self):
+        source=self.create('AAA',contacts=[dict(category='bada',label='Fdl',number='00123')])
+        target=self.other.post('/api/v1/tf/stations',json={'code':'CCC','contacts':[]}).json()
+        delivery=self.share([source]);item=self.preview(delivery)['items'][0]
+        result=self.other.post('/api/v1/tf/station-inbox/'+str(delivery['id'])+'/import',json={'items':[dict(id=item['id'],expected_revision=1,target_station_id=target['id'])]})
+        self.assertEqual(result.status_code,200,result.text);self.assertEqual(result.json()['extended'],1)
+        own=self.other.get('/api/v1/tf/stations/'+str(target['id'])).json()
+        self.assertEqual(own['code'],'CCC');self.assertEqual(own['contacts'][0]['number'],'00123')
+        self.assertEqual(len(self.other.get('/api/v1/tf/station-inbox').json()),1)
+        self.assertEqual(self.driver.get('/api/v1/tf/station-inbox').json(),[])
+        self.assertEqual(self.driver.get('/api/v1/tf/station-inbox/'+str(delivery['id'])).status_code,404)
+        self.assertEqual(self.driver.get('/api/v1/tf/station-shares/'+'a'*43).status_code,404)
+        foreign=self.create('BBB');result=self.other.post('/api/v1/tf/station-inbox/'+str(delivery['id'])+'/import',json={'items':[dict(id=item['id'],expected_revision=1,target_station_id=foreign['id'])]})
+        self.assertEqual(result.status_code,404)
+
+    def test_recipient_validation_and_unrelated_tf_isolation(self):
+        self.create_tf('787300','THIRD-TF')
+        third=TestClient(app,base_url='https://testserver');self.staff_clients.append(third)
+        third.post('/api/v1/account/login',json={'username':'787300','password':'tf-secret-12345'})
+        row=self.create();delivery=self.share([row]);item=self.preview(delivery)['items'][0]
+        url='/api/v1/tf/station-inbox/'+str(delivery['id'])
+        self.assertEqual(third.get('/api/v1/tf/station-inbox').json(),[])
+        for r in [third.get(url),third.delete(url),third.get(url+'/items/'+str(item['id'])+'/plan'),third.post(url+'/import',json={'items':[dict(id=item['id'],expected_revision=0)]})]:self.assertEqual(r.status_code,404)
+        recipients=self.driver.get('/api/v1/tf/station-recipients').json();self.assertEqual(len(recipients),2)
+        self.assertNotIn(self.tf,[r['id'] for r in recipients])
+        for recipient in [self.tf,999999]:self.assertEqual(self.driver.post('/api/v1/tf/station-shares',json={'station_ids':[row['id']],'recipient_id':recipient}).status_code,422)

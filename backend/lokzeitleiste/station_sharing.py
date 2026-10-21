@@ -1,4 +1,4 @@
-"""Authenticated TF sharing of immutable station snapshots by revocable token."""
+"""Authenticated TF sharing of immutable station snapshots through a recipient-owned inbox."""
 import hashlib
 import json
 import secrets
@@ -7,14 +7,14 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import quote
 
-from fastapi import APIRouter,Depends,HTTPException,Path as ApiPath
+from fastapi import APIRouter,Depends,HTTPException
 from fastapi.responses import FileResponse,Response
 from pydantic import BaseModel,Field,field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .db import database_session
-from .models import User,TfProfile,TfStation,TfStationPlan,TfStationShare,TfStationShareItem,now_utc
+from .models import User,TfProfile,TfStation,TfStationPlan,TfStationShare,TfStationShareItem,TfStationDelivery,TfEmployment,now_utc
 from .stations import StationContact,contacts_json
 from .work_reports.receipts import MAX_FILE
 
@@ -24,6 +24,7 @@ MAX_PLANS=20*1024*1024
 
 class ShareCreate(BaseModel):
     station_ids:list[int]=Field(min_length=1,max_length=MAX_STATIONS)
+    recipient_id:int=Field(ge=1)
     include_plans:bool=False
 
     @field_validator('station_ids')
@@ -36,6 +37,7 @@ class ShareCreate(BaseModel):
 class ImportItem(BaseModel):
     id:int=Field(ge=1)
     expected_revision:int=Field(ge=0)
+    target_station_id:int|None=Field(default=None,ge=1)
 
 
 class ShareImport(BaseModel):
@@ -57,12 +59,20 @@ def contact_key(contact):
 def create_router(driver):
     router=APIRouter()
 
-    def shared(db,token,lock=False):
-        query=select(TfStationShare).where(TfStationShare.token_hash==hashlib.sha256(token.encode()).hexdigest())
-        share=db.scalar(query.with_for_update(read=True) if lock else query)
-        if not share or share.revoked or share.expires_at<=now_utc():
-            raise HTTPException(404,'Freigabe nicht gefunden oder abgelaufen.')
-        return share
+    def shared(db,delivery_id,user,lock=False):
+        query=select(TfStationDelivery).where(TfStationDelivery.id==delivery_id,TfStationDelivery.recipient_id==user.id)
+        delivery=db.scalar(query.with_for_update() if lock else query)
+        if not delivery:raise HTTPException(404,'Zusendung nicht gefunden.')
+        return db.get(TfStationShare,delivery.share_id)
+
+    def available(db,user):
+        employment=db.get(TfEmployment,user.id)
+        return user.active and (not employment or (not employment.immediate_block and (not employment.exit_date or employment.exit_date>now_utc().date())))
+
+    @router.get('/api/v1/tf/station-recipients')
+    def recipients(user:User=Depends(driver),db:Session=Depends(database_session)):
+        rows=db.execute(select(User,TfProfile).join(TfProfile,TfProfile.user_id==User.id).where(User.role=='tf',User.active.is_(True),User.id!=user.id).order_by(TfProfile.last_name,TfProfile.first_name,User.username)).all()
+        return [dict(id=u.id,label=f'{p.first_name} {p.last_name} · {u.username}') for u,p in rows if available(db,u)]
 
     @router.get('/tf/station-sharing.js')
     def script():
@@ -71,6 +81,9 @@ def create_router(driver):
     @router.post('/api/v1/tf/station-shares',status_code=201)
     def create(data:ShareCreate,user:User=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
+        recipient=db.get(User,data.recipient_id)
+        if not recipient or recipient.role!='tf' or not available(db,recipient) or recipient.id==user.id or not db.get(TfProfile,recipient.id):
+            raise HTTPException(422,'Bitte einen anderen aktiven TF auswählen.')
         rows=db.scalars(select(TfStation).where(TfStation.owner_id==user.id,TfStation.id.in_(data.station_ids)).order_by(TfStation.code).with_for_update()).all()
         if len(rows)!=len(data.station_ids):raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
         token=secrets.token_urlsafe(32)
@@ -85,56 +98,64 @@ def create_router(driver):
                 raise HTTPException(413,'Bahnhofspläne zusammen höchstens 20 MB; Auswahl verkleinern oder ohne Pläne teilen.')
             db.add(TfStationShareItem(share_id=share.id,code=row.code,name=row.name,contacts_json=contacts_json(contacts),
                 plan_filename=plan.filename if plan else None,plan_mime_type=plan.mime_type if plan else None,plan_content=content))
-        db.commit()
-        return dict(id=share.id,token=token,expires_at=share.expires_at.isoformat(),stations=len(rows))
+        delivery=TfStationDelivery(share_id=share.id,recipient_id=recipient.id);db.add(delivery);db.commit()
+        return dict(id=delivery.id,stations=len(rows))
 
-    @router.get('/api/v1/tf/station-shares')
-    def mine(user:User=Depends(driver),db:Session=Depends(database_session)):
-        shares=db.scalars(select(TfStationShare).where(TfStationShare.owner_id==user.id).order_by(TfStationShare.id.desc()).limit(50)).all()
+    @router.get('/api/v1/tf/station-inbox')
+    def inbox(user:User=Depends(driver),db:Session=Depends(database_session)):
+        rows=db.execute(select(TfStationDelivery,TfStationShare).join(TfStationShare,TfStationDelivery.share_id==TfStationShare.id).where(TfStationDelivery.recipient_id==user.id).order_by(TfStationDelivery.id.desc())).all()
         result=[]
-        for share in shares:
+        for delivery,share in rows:
+            profile=db.get(TfProfile,share.owner_id)
             codes=list(db.scalars(select(TfStationShareItem.code).where(TfStationShareItem.share_id==share.id).order_by(TfStationShareItem.code)))
-            result.append(dict(id=share.id,codes=codes,created_at=share.created_at.isoformat(),expires_at=share.expires_at.isoformat(),
-                               revoked=share.revoked,active=not share.revoked and share.expires_at>now_utc()))
+            result.append(dict(id=delivery.id,codes=codes,sender=f'{profile.first_name} {profile.last_name}' if profile else '',created_at=share.created_at.isoformat()))
         return result
 
-    @router.delete('/api/v1/tf/station-shares/mine/{share_id}')
-    def revoke(share_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
+    @router.delete('/api/v1/tf/station-inbox/{delivery_id}')
+    def remove(delivery_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
-        share=db.scalar(select(TfStationShare).where(TfStationShare.id==share_id,TfStationShare.owner_id==user.id).with_for_update())
-        if not share:raise HTTPException(404,'Freigabe nicht gefunden oder abgelaufen.')
-        share.revoked=True;db.commit();return {'ok':True}
+        share=shared(db,delivery_id,user,True)
+        delivery=db.scalar(select(TfStationDelivery).where(TfStationDelivery.share_id==share.id))
+        db.delete(delivery);db.flush();db.delete(share);db.commit()
+        return {'ok':True}
 
-    @router.get('/api/v1/tf/station-shares/{token}')
-    def preview(token:str=ApiPath(pattern=r'^[A-Za-z0-9_-]{43}$'),user:User=Depends(driver),db:Session=Depends(database_session)):
-        share=shared(db,token)
+    @router.get('/api/v1/tf/station-inbox/{delivery_id}')
+    def preview(delivery_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
+        share=shared(db,delivery_id,user)
         profile=db.get(TfProfile,share.owner_id)
         rows=db.scalars(select(TfStationShareItem).where(TfStationShareItem.share_id==share.id).order_by(TfStationShareItem.code)).all()
         own={row.code:row for row in db.scalars(select(TfStation).where(TfStation.owner_id==user.id,TfStation.code.in_([item.code for item in rows])))}
-        return dict(sender=(profile.first_name+' '+profile.last_name) if profile else '',expires_at=share.expires_at.isoformat(),
+        return dict(sender=(profile.first_name+' '+profile.last_name) if profile else '',created_at=share.created_at.isoformat(),
                     items=[dict(id=row.id,code=row.code,name=row.name,contacts=json.loads(row.contacts_json),
                                 plan=dict(filename=row.plan_filename,mime_type=row.plan_mime_type) if row.plan_content else None,
                                 expected_revision=own[row.code].revision if row.code in own else 0) for row in rows])
 
-    @router.get('/api/v1/tf/station-shares/{token}/items/{item_id}/plan')
-    def plan(item_id:int,token:str=ApiPath(pattern=r'^[A-Za-z0-9_-]{43}$'),user:User=Depends(driver),db:Session=Depends(database_session)):
-        share=shared(db,token)
+    @router.get('/api/v1/tf/station-inbox/{delivery_id}/items/{item_id}/plan')
+    def plan(item_id:int,delivery_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
+        share=shared(db,delivery_id,user)
         row=db.scalar(select(TfStationShareItem).where(TfStationShareItem.id==item_id,TfStationShareItem.share_id==share.id))
         if not row or not row.plan_content:raise HTTPException(404,'Kein Bahnhofsplan vorhanden.')
         return Response(row.plan_content,media_type=row.plan_mime_type,headers={
             'Content-Disposition':"attachment; filename*=UTF-8''"+quote(row.plan_filename,safe=''),
             'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
 
-    @router.post('/api/v1/tf/station-shares/{token}/import')
-    def import_entries(data:ShareImport,token:str=ApiPath(pattern=r'^[A-Za-z0-9_-]{43}$'),user:User=Depends(driver),db:Session=Depends(database_session)):
+    @router.post('/api/v1/tf/station-inbox/{delivery_id}/import')
+    def import_entries(data:ShareImport,delivery_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
-        share=shared(db,token,True)
+        share=shared(db,delivery_id,user,True)
         rows=db.scalars(select(TfStationShareItem).where(TfStationShareItem.share_id==share.id,TfStationShareItem.id.in_([item.id for item in data.items])).order_by(TfStationShareItem.code)).all()
         if len(rows)!=len(data.items):raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
         revisions={item.id:item.expected_revision for item in data.items}
+        targets={item.id:item.target_station_id for item in data.items}
+        used=set()
         result=dict(created=0,extended=0,unchanged=0,skipped=0,plans_added=0)
         for source in rows:
-            target=db.scalar(select(TfStation).where(TfStation.owner_id==user.id,TfStation.code==source.code).with_for_update())
+            condition=TfStation.id==targets[source.id] if targets[source.id] else TfStation.code==source.code
+            target=db.scalar(select(TfStation).where(TfStation.owner_id==user.id,condition).with_for_update())
+            if targets[source.id] and not target:raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
+            destination=('id',target.id) if target else ('code',source.code)
+            if destination in used:raise HTTPException(422,'Jeden Zielbahnhof nur einmal pro Übernahme auswählen.')
+            used.add(destination)
             if (target.revision if target else 0)!=revisions[source.id]:
                 raise HTTPException(409,'Eigene Bahnhofsliste wurde geändert. Freigabe erneut laden.')
             if target and data.mode=='new_only':result['skipped']+=1;continue
