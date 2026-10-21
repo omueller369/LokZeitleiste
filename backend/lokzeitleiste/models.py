@@ -486,3 +486,26 @@ class TfStationPlan(Base):
     filename:Mapped[str]=mapped_column(String(120),nullable=False)
     mime_type:Mapped[str]=mapped_column(String(40),nullable=False)
     content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+
+
+class TfStationShare(Base):
+    __tablename__='tf_station_shares'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    token_hash:Mapped[str]=mapped_column(String(64),unique=True,nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+    expires_at:Mapped[datetime]=mapped_column(DateTime,nullable=False)
+    revoked:Mapped[bool]=mapped_column(Boolean,default=False,nullable=False)
+
+
+class TfStationShareItem(Base):
+    __tablename__='tf_station_share_items'
+    __table_args__=(UniqueConstraint('share_id','code'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    share_id:Mapped[int]=mapped_column(ForeignKey('tf_station_shares.id',ondelete='CASCADE'),nullable=False,index=True)
+    code:Mapped[str]=mapped_column(String(10),nullable=False)
+    name:Mapped[str]=mapped_column(String(200),nullable=False)
+    contacts_json:Mapped[str]=mapped_column(Text,nullable=False)
+    plan_filename:Mapped[str|None]=mapped_column(String(120),nullable=True)
+    plan_mime_type:Mapped[str|None]=mapped_column(String(40),nullable=True)
+    plan_content:Mapped[bytes|None]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=True)

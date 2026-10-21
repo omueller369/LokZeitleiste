@@ -152,4 +152,6 @@ def create_router(require_account):
         if plan:db.delete(plan)
         row.revision+=1;db.commit();return view(db,row)
 
+    from .station_sharing import create_router as sharing_router
+    router.include_router(sharing_router(driver))
     return router

@@ -16,3 +16,10 @@
 #stationPlanLink{display:inline-block;overflow-wrap:anywhere;padding:10px 0}
 @media(max-width:850px){.stations-layout{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:520px){.station-contact-row{grid-template-columns:minmax(0,1fr)}.station-contact-row button{justify-self:start}.station-catalog button{width:100%;text-align:start;overflow-wrap:anywhere}}
+
+.station-select-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+#stationDirectory .station-select-row input[type="checkbox"],#stationDirectory .station-share-actions input[type="checkbox"],#stationDirectory .station-sharing input[type="checkbox"]{display:inline-block;width:auto;min-width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle}
+.station-sharing label,.station-share-actions label{display:block;margin:12px 0}
+.station-sharing button{margin:8px 8px 8px 0}
+.station-sharing select{font:inherit;padding:10px;max-width:100%;border:1px solid #becdd7;border-radius:8px;display:block;margin-top:8px}
+#stationSharedItems{list-style:none;padding:0}#stationSharedItems>li{border:1px solid #d8e2e8;border-radius:8px;padding:12px;margin:12px 0;overflow-wrap:anywhere}#stationSharedItems details{margin:12px 0}#stationOwnShares li{padding:8px 0;overflow-wrap:anywhere}

@@ -1080,3 +1080,42 @@ Bahnhofseintrag wurde geändert. Bitte neu laden.|Station entry changed. Please 
 Bahnhof ist bereits in Ihrer Liste.|Station is already in your list.|Stacja jest już na Twojej liście.|Станция уже есть в вашем списке.|La estación ya está en su lista.
 Bahnhofsplan muss eine gültige PDF-, JPEG- oder PNG-Datei sein.|Station plan must be a valid PDF, JPEG or PNG file.|Plan stacji musi być prawidłowym plikiem PDF, JPEG lub PNG.|План станции должен быть корректным файлом PDF, JPEG или PNG.|El plano de estación debe ser un archivo PDF, JPEG o PNG válido.
 Zu viele Kontaktdaten für einen Bahnhof.|Too much contact data for one station.|Za dużo danych kontaktowych dla jednej stacji.|Слишком много контактных данных для одной станции.|Demasiados datos de contacto para una estación.
+Sichtbare Bahnhöfe auswählen|Select visible stations|Wybierz widoczne stacje|Выбрать видимые станции|Seleccionar estaciones visibles
+Bahnhofspläne mitgeben|Include station plans|Dołącz plany stacji|Включить схемы станций|Incluir planos de estaciones
+Auswahl teilen|Share selection|Udostępnij wybrane|Поделиться выбранными|Compartir selección
+Diesen Bahnhof teilen|Share this station|Udostępnij tę stację|Поделиться этой станцией|Compartir esta estación
+Zum Teilen auswählen|Select for sharing|Wybierz do udostępnienia|Выбрать для отправки|Seleccionar para compartir
+Bahnhöfe teilen und übernehmen|Share and import stations|Udostępnianie i import stacji|Обмен и импорт станций|Compartir e importar estaciones
+Freigaben enthalten den gespeicherten Stand. Jeder angemeldete TF mit dem Link kann die ausgewählten Daten bis zum Ablauf oder Widerruf übernehmen.|Shares contain a saved snapshot. Any signed-in driver with the link can import the selected data until expiry or revocation.|Udostępnienia zawierają zapisany stan. Każdy zalogowany maszynista z linkiem może zaimportować wybrane dane do wygaśnięcia lub cofnięcia udostępnienia.|Общий доступ содержит сохранённую копию. Любой вошедший машинист со ссылкой может импортировать выбранные данные до истечения срока или отзыва доступа.|Se comparte una copia guardada. Cualquier maquinista conectado con el enlace puede importar los datos seleccionados hasta que caduque o se revoque el acceso.
+Freigabelink|Sharing link|Link udostępnienia|Ссылка общего доступа|Enlace para compartir
+Link kopieren|Copy link|Kopiuj link|Копировать ссылку|Copiar enlace
+Den Link jetzt kopieren. Er wird nur einmal angezeigt.|Copy the link now. It is shown only once.|Skopiuj link teraz. Jest wyświetlany tylko raz.|Скопируйте ссылку сейчас. Она показывается только один раз.|Copie el enlace ahora. Solo se muestra una vez.
+Freigabecode oder Link|Sharing code or link|Kod lub link udostępnienia|Код или ссылка общего доступа|Código o enlace para compartir
+Freigabe laden|Load shared stations|Wczytaj udostępnione stacje|Загрузить общие станции|Cargar estaciones compartidas
+Alle freigegebenen Bahnhöfe auswählen|Select all shared stations|Wybierz wszystkie udostępnione stacje|Выбрать все общие станции|Seleccionar todas las estaciones compartidas
+Neue übernehmen und vorhandene ergänzen|Import new and extend existing entries|Importuj nowe i uzupełnij istniejące wpisy|Импортировать новые и дополнить существующие|Importar nuevas y completar las existentes
+Nur neue Bahnhöfe übernehmen|Import new stations only|Importuj tylko nowe stacje|Импортировать только новые станции|Importar solo estaciones nuevas
+Fehlende Bahnhofspläne übernehmen|Import missing station plans|Importuj brakujące plany stacji|Импортировать отсутствующие схемы станций|Importar planos de estaciones que falten
+Eigene Nummern und vorhandene Pläne bleiben erhalten. Identische Kontakte werden nicht doppelt angelegt.|Your numbers and existing plans are preserved. Identical contacts are not duplicated.|Własne numery i istniejące plany pozostają zachowane. Identyczne kontakty nie są powielane.|Ваши номера и существующие схемы сохраняются. Одинаковые контакты не дублируются.|Se conservan sus números y planos existentes. Los contactos idénticos no se duplican.
+Ausgewählte übernehmen|Import selected|Importuj wybrane|Импортировать выбранные|Importar seleccionadas
+Meine Freigaben|My shares|Moje udostępnienia|Мои общие ссылки|Mis enlaces compartidos
+Bitte zuerst speichern oder die Bearbeitung abbrechen.|Please save or cancel editing first.|Najpierw zapisz lub anuluj edycję.|Сначала сохраните или отмените редактирование.|Primero guarde o cancele la edición.
+Widerrufen|Revoked|Cofnięte|Отозвано|Revocado
+Abgelaufen|Expired|Wygasłe|Истекло|Caducado
+Freigabe widerrufen? Bereits importierte Kopien bleiben erhalten.|Revoke this share? Previously imported copies will remain.|Cofnąć udostępnienie? Wcześniej zaimportowane kopie pozostaną.|Отозвать доступ? Ранее импортированные копии сохранятся.|¿Revocar el acceso? Las copias ya importadas se conservarán.
+Bereits in eigener Liste|Already in your list|Już na własnej liście|Уже в вашем списке|Ya está en su lista
+Rufnummern anzeigen|Show phone numbers|Pokaż numery telefonów|Показать номера телефонов|Mostrar números de teléfono
+Bitte einen gültigen Freigabecode oder Link dieser Software eingeben.|Enter a valid sharing code or link for this software.|Wprowadź prawidłowy kod lub link udostępnienia z tego oprogramowania.|Введите действительный код или ссылку общего доступа этой программы.|Introduzca un código o enlace válido de este programa.
+Bitte mindestens einen Bahnhof auswählen.|Please select at least one station.|Wybierz co najmniej jedną stację.|Выберите хотя бы одну станцию.|Seleccione al menos una estación.
+Import abgeschlossen.|Import complete.|Import zakończony.|Импорт завершён.|Importación completada.
+Ergänzt|Extended|Uzupełnione|Дополнены|Completadas
+Unverändert|Unchanged|Bez zmian|Без изменений|Sin cambios
+Übersprungen|Skipped|Pominięte|Пропущены|Omitidas
+Pläne übernommen|Plans imported|Zaimportowane plany|Схемы импортированы|Planos importados
+Link ist markiert und kann kopiert werden.|The link is selected and can be copied.|Link jest zaznaczony i można go skopiować.|Ссылка выделена и готова к копированию.|El enlace está seleccionado y se puede copiar.
+Höchstens 50 Bahnhöfe pro Freigabe.|Maximum 50 stations per share.|Maksymalnie 50 stacji na udostępnienie.|Не более 50 станций на одну ссылку.|Máximo 50 estaciones por enlace.
+Freigabe nicht gefunden oder abgelaufen.|Share not found or expired.|Nie znaleziono udostępnienia lub wygasło.|Ссылка не найдена или срок действия истёк.|No se ha encontrado el enlace o ha caducado.
+Bahnhofspläne zusammen höchstens 20 MB; Auswahl verkleinern oder ohne Pläne teilen.|Station plans must total at most 20 MB; select fewer stations or share without plans.|Łączny rozmiar planów stacji nie może przekraczać 20 MB; wybierz mniej stacji lub udostępnij bez planów.|Общий размер схем не более 20 МБ; сократите выбор или отправьте без схем.|Los planos no pueden superar 20 MB en total; reduzca la selección o comparta sin planos.
+Eigene Bahnhofsliste wurde geändert. Freigabe erneut laden.|Your station list has changed. Reload the share.|Własna lista stacji uległa zmianie. Wczytaj udostępnienie ponownie.|Ваш список станций изменился. Загрузите ссылку повторно.|Su lista de estaciones ha cambiado. Vuelva a cargar el enlace.
+Ergänzung überschreitet 100 Nummern; Bahnhof einzeln prüfen.|Merging would exceed 100 numbers; review the station individually.|Uzupełnienie przekroczyłoby 100 numerów; sprawdź stację osobno.|После дополнения будет более 100 номеров; проверьте станцию отдельно.|Al completar se superarían 100 números; revise la estación por separado.
+Ungültige Bahnhofsauswahl.|Invalid station selection.|Nieprawidłowy wybór stacji.|Недопустимый выбор станций.|Selección de estaciones no válida.
