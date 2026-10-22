@@ -63,6 +63,7 @@ def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
             raise RevisionConflict(f"Plan {month:02d}/{year} wurde inzwischen geändert. Bitte neu laden.")
         periods[month] = period
     changes = 0
+    tf_type=driver_type(db,tf_id)
     for month in sorted(groups):
         period = periods[month]
         if period is None:
@@ -76,7 +77,7 @@ def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
             old_kind, old_note = (old.kind, old.note) if old else ("Ungeplant", "")
             note = item.note.strip() if item.kind != "Ungeplant" else ""
             duty=db.get(PlanDuty,(tf_id,item.date));old_shift=duty.shift if duty else "standard"
-            shift=resolve_shift(db,tf_id,item.kind,item.shift,old_shift,old_kind)
+            shift=resolve_shift(db,tf_id,item.kind,item.shift,old_shift,old_kind,known_driver_type=tf_type)
             if (old_kind, old_note,old_shift) == (item.kind, note,shift):
                 continue
             change=PlanChange(tf_user_id=tf_id, admin_user_id=admin_id, day=item.date,

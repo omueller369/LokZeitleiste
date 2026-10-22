@@ -43,6 +43,8 @@ def redact_plan(db,user,summary):
 
 def authorize_route(db, user, request):
     path, method = request.url.path.rstrip('/'), request.method
+    if path.startswith('/api/v1/admin/planning/collective/'):
+        return demand(db,user,'planning',2)
     if path=='/api/v1/admin/app-defaults' or path.startswith('/api/v1/admin/app-defaults/'):
         return demand(db,user,'app_defaults',1 if method=='GET' else 3 if method=='DELETE' else 2)
     if path=='/api/v1/admin/vehicles' or path.startswith('/api/v1/admin/vehicles/'):

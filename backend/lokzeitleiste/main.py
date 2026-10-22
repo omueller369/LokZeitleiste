@@ -646,3 +646,10 @@ app.include_router(gps_router(require_account))
 
 from .app_defaults import create_router as app_defaults_router
 app.include_router(app_defaults_router(require_admin,require_account))
+
+from .planning.collective import create_router as collective_planning_router
+app.include_router(collective_planning_router(require_admin))
+
+@app.get('/admin/planning-overview.js')
+def planning_overview_script():
+    return FileResponse(Path(__file__).parent/'static'/'planning-overview.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})

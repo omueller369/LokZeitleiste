@@ -1280,3 +1280,21 @@ Bezeichnung ist bereits vorhanden.|This label already exists.|Ta nazwa już istn
 Auswahlwert nicht gefunden.|Selection value not found.|Nie znaleziono wartości.|Значение не найдено.|Valor de selección no encontrado.
 Auswahlwert wurde geändert. Bitte neu laden.|Selection value changed. Please reload.|Wartość została zmieniona. Wczytaj ponownie.|Значение изменено. Загрузите заново.|El valor ha cambiado. Vuelva a cargarlo.
 Bereits verwendete Werte können nur deaktiviert werden.|Values already used can only be deactivated.|Użyte wartości można tylko dezaktywować.|Использованные значения можно только деактивировать.|Los valores ya utilizados solo pueden desactivarse.
+Felder anklicken oder antippen. Mit Umschalt-Klick einen rechteckigen Bereich über mehrere TF und Tage auswählen.|Click or tap cells. Shift-click to select a rectangle across multiple drivers and days.|Kliknij lub dotknij komórek. Kliknięcie z Shift zaznacza prostokątny obszar obejmujący wielu maszynistów i dni.|Нажимайте на ячейки. Shift + щелчок выделяет прямоугольную область для нескольких машинистов и дней.|Haga clic o toque las celdas. Mayús y clic selecciona un rectángulo de varios maquinistas y días.
+Mehrfachänderung|Bulk change|Zmiana zbiorcza|Массовое изменение|Cambio múltiple
+Alle sichtbaren Felder auswählen|Select all visible cells|Zaznacz wszystkie widoczne komórki|Выделить все видимые ячейки|Seleccionar todas las celdas visibles
+Auswahl aufheben|Clear selection|Usuń zaznaczenie|Снять выделение|Quitar selección
+Ausgewählte Felder|Selected cells|Zaznaczone komórki|Выбранные ячейки|Celdas seleccionadas
+Automatisch|Automatic|Automatycznie|Автоматически|Automático
+Notiz ersetzen|Replace note|Zastąp notatkę|Заменить примечание|Sustituir nota
+Änderungen prüfen|Review changes|Sprawdź zmiany|Проверить изменения|Revisar cambios
+Änderungen vor dem Speichern prüfen|Review changes before saving|Sprawdź zmiany przed zapisaniem|Проверьте изменения перед сохранением|Revise los cambios antes de guardar
+Vorher|Before|Przed|До|Antes
+Nachher|After|Po|После|Después
+Ich bestätige die aufgeführten Änderungen.|I confirm the listed changes.|Potwierdzam wymienione zmiany.|Подтверждаю перечисленные изменения.|Confirmo los cambios indicados.
+Bestätigen und speichern|Confirm and save|Potwierdź i zapisz|Подтвердить и сохранить|Confirmar y guardar
+Änderungsliste prüfen und bestätigen.|Review and confirm the change list.|Sprawdź i potwierdź listę zmian.|Проверьте и подтвердите список изменений.|Revise y confirme la lista de cambios.
+Auswahl verwerfen?|Discard selection?|Odrzucić zaznaczenie?|Сбросить выделение?|¿Descartar la selección?
+Maximal 10000 Felder pro Änderung.|At most 10000 cells per change.|Maksymalnie 10000 komórek na zmianę.|Не более 10000 ячеек за одно изменение.|Máximo de 10000 celdas por cambio.
+Plan wurde inzwischen geändert. Bitte neu laden und erneut bestätigen.|The plan has changed. Reload and confirm again.|Plan został zmieniony. Wczytaj ponownie i potwierdź.|План изменился. Загрузите заново и подтвердите ещё раз.|El plan ha cambiado. Vuelva a cargarlo y confirme de nuevo.
+Änderungsliste ist nicht mehr aktuell. Bitte erneut prüfen.|The change list is outdated. Please review again.|Lista zmian jest nieaktualna. Sprawdź ponownie.|Список изменений устарел. Проверьте заново.|La lista de cambios está desactualizada. Revísela de nuevo.

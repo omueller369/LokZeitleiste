@@ -12,11 +12,12 @@ def driver_type(db,tf_id):
     return row.driver_type if row else 'route'
 
 
-def resolve_shift(db,tf_id,kind,requested,previous='standard',previous_kind='Ungeplant'):
+def resolve_shift(db,tf_id,kind,requested,previous='standard',previous_kind='Ungeplant',known_driver_type=None):
     if kind!='Arbeitstag':return 'standard'
-    shift=requested or (previous if previous_kind=='Arbeitstag' else 'border_day' if driver_type(db,tf_id)=='border' else 'standard')
+    tf_type=known_driver_type or driver_type(db,tf_id)
+    shift=requested or (previous if previous_kind=='Arbeitstag' else 'border_day' if tf_type=='border' else 'standard')
     if shift not in SHIFTS:raise ValueError('Ungültige Schicht')
-    if shift!='standard' and driver_type(db,tf_id) not in ('border','both'):
+    if shift!='standard' and tf_type not in ('border','both'):
         raise ValueError('Grenzdienst erfordert Grenz-TF oder Grenz- und Strecken-TF.')
     return shift
 
