@@ -1144,3 +1144,9 @@ Sonstige Besonderheiten|Other special notes|Inne uwagi szczególne|Прочие 
 Verfügbare Zeichen|Characters remaining|Pozostałe znaki|Осталось символов|Caracteres disponibles
 Bahnhof speichern|Save station|Zapisz stację|Сохранить станцию|Guardar estación
 Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.|Empty note fields are filled in. Existing notes are preserved.|Puste pola uwag zostaną uzupełnione. Istniejące uwagi pozostaną zachowane.|Пустые поля примечаний будут заполнены. Существующие примечания сохраняются.|Se completan los campos de notas vacíos. Las notas existentes se conservan.
+Bahnhofsname|Station name|Nazwa stacji|Название станции|Nombre de estación
+Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.|The name or DS100 already exists in your station list. Please choose another name or DS100.|Nazwa lub DS100 już istnieje na Twojej liście stacji. Wybierz inną nazwę lub DS100.|Название или DS100 уже есть в вашем списке станций. Выберите другое название или DS100.|El nombre o DS100 ya existe en su lista de estaciones. Elija otro nombre o DS100.
+Name oder DS100 ändern|Change name or DS100|Zmień nazwę lub DS100|Изменить название или DS100|Cambiar nombre o DS100
+Name und DS100 dürfen nicht leer sein.|Name and DS100 must not be empty.|Nazwa i DS100 nie mogą być puste.|Название и DS100 не могут быть пустыми.|El nombre y DS100 no pueden estar vacíos.
+Ungültiger Name oder DS100.|Invalid name or DS100.|Nieprawidłowa nazwa lub DS100.|Недопустимое название или DS100.|Nombre o DS100 no válido.
+zurück TF-Portal|Back to TF Portal|Powrót do portalu maszynisty|Назад в портал машиниста|Volver al portal del maquinista

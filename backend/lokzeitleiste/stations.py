@@ -63,7 +63,19 @@ class StationCreate(StationNotes):
 
 class StationUpdate(StationNotes):
     expected_revision:int=Field(ge=1)
+    code:str|None=Field(default=None,min_length=1,max_length=10)
+    name:str|None=Field(default=None,min_length=1,max_length=200)
     contacts:list[StationContact]=Field(default_factory=list,max_length=100)
+
+    @field_validator('code','name',mode='before')
+    @classmethod
+    def identity_clean(cls,value,info):
+        if value is None:raise ValueError('Name und DS100 dürfen nicht leer sein.')
+        if isinstance(value,str):
+            value=value.strip()
+            if any(ord(c)<32 or ord(c)==127 for c in value):raise ValueError('Ungültiger Name oder DS100.')
+            if info.field_name=='code':value=value.upper()
+        return value
 
 
 def contacts_json(contacts):
@@ -136,7 +148,17 @@ def create_router(require_account):
     @router.put('/api/v1/tf/stations/{station_id}')
     def edit(station_id:int,data:StationUpdate,user:User=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,station_id,True);check_revision(row,data.expected_revision)
-        row.contacts_json=contacts_json(data.contacts);save_notes(db,row.id,data);row.revision+=1;db.commit()
+        code=data.code if 'code' in data.model_fields_set else row.code
+        name=data.name if 'name' in data.model_fields_set else row.name
+        if code!=row.code or name!=row.name:
+            others=db.execute(select(TfStation.code,TfStation.name).where(TfStation.owner_id==user.id,TfStation.id!=row.id)).all()
+            if any(other.code.strip().upper()==code or other.name.strip().casefold()==name.casefold() for other in others):
+                raise HTTPException(409,'Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.',headers={'X-Station-Conflict':'identity'})
+        row.code=code;row.name=name
+        row.contacts_json=contacts_json(data.contacts);save_notes(db,row.id,data);row.revision+=1
+        try:db.commit()
+        except IntegrityError as exc:
+            db.rollback();raise HTTPException(409,'Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.',headers={'X-Station-Conflict':'identity'}) from exc
         return view(db,row)
 
     @router.delete('/api/v1/tf/stations/{station_id}')

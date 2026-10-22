@@ -1144,7 +1144,13 @@
     "Sonstige Besonderheiten": "Sonstige Besonderheiten",
     "Verfügbare Zeichen": "Verfügbare Zeichen",
     "Bahnhof speichern": "Bahnhof speichern",
-    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten."
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.",
+    "Bahnhofsname": "Bahnhofsname",
+    "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.": "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.",
+    "Name oder DS100 ändern": "Name oder DS100 ändern",
+    "Name und DS100 dürfen nicht leer sein.": "Name und DS100 dürfen nicht leer sein.",
+    "Ungültiger Name oder DS100.": "Ungültiger Name oder DS100.",
+    "zurück TF-Portal": "zurück TF-Portal"
   },
   "en": {
     "Administration": "Administration",
@@ -2291,7 +2297,13 @@
     "Sonstige Besonderheiten": "Other special notes",
     "Verfügbare Zeichen": "Characters remaining",
     "Bahnhof speichern": "Save station",
-    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Empty note fields are filled in. Existing notes are preserved."
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Empty note fields are filled in. Existing notes are preserved.",
+    "Bahnhofsname": "Station name",
+    "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.": "The name or DS100 already exists in your station list. Please choose another name or DS100.",
+    "Name oder DS100 ändern": "Change name or DS100",
+    "Name und DS100 dürfen nicht leer sein.": "Name and DS100 must not be empty.",
+    "Ungültiger Name oder DS100.": "Invalid name or DS100.",
+    "zurück TF-Portal": "Back to TF Portal"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3438,7 +3450,13 @@
     "Sonstige Besonderheiten": "Inne uwagi szczególne",
     "Verfügbare Zeichen": "Pozostałe znaki",
     "Bahnhof speichern": "Zapisz stację",
-    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Puste pola uwag zostaną uzupełnione. Istniejące uwagi pozostaną zachowane."
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Puste pola uwag zostaną uzupełnione. Istniejące uwagi pozostaną zachowane.",
+    "Bahnhofsname": "Nazwa stacji",
+    "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.": "Nazwa lub DS100 już istnieje na Twojej liście stacji. Wybierz inną nazwę lub DS100.",
+    "Name oder DS100 ändern": "Zmień nazwę lub DS100",
+    "Name und DS100 dürfen nicht leer sein.": "Nazwa i DS100 nie mogą być puste.",
+    "Ungültiger Name oder DS100.": "Nieprawidłowa nazwa lub DS100.",
+    "zurück TF-Portal": "Powrót do portalu maszynisty"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4585,7 +4603,13 @@
     "Sonstige Besonderheiten": "Прочие особенности",
     "Verfügbare Zeichen": "Осталось символов",
     "Bahnhof speichern": "Сохранить станцию",
-    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Пустые поля примечаний будут заполнены. Существующие примечания сохраняются."
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Пустые поля примечаний будут заполнены. Существующие примечания сохраняются.",
+    "Bahnhofsname": "Название станции",
+    "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.": "Название или DS100 уже есть в вашем списке станций. Выберите другое название или DS100.",
+    "Name oder DS100 ändern": "Изменить название или DS100",
+    "Name und DS100 dürfen nicht leer sein.": "Название и DS100 не могут быть пустыми.",
+    "Ungültiger Name oder DS100.": "Недопустимое название или DS100.",
+    "zurück TF-Portal": "Назад в портал машиниста"
   },
   "es": {
     "Administration": "Administración",
@@ -5732,6 +5756,12 @@
     "Sonstige Besonderheiten": "Otras particularidades",
     "Verfügbare Zeichen": "Caracteres disponibles",
     "Bahnhof speichern": "Guardar estación",
-    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Se completan los campos de notas vacíos. Las notas existentes se conservan."
+    "Leere Hinweisfelder werden ergänzt. Vorhandene Hinweise bleiben erhalten.": "Se completan los campos de notas vacíos. Las notas existentes se conservan.",
+    "Bahnhofsname": "Nombre de estación",
+    "Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.": "El nombre o DS100 ya existe en su lista de estaciones. Elija otro nombre o DS100.",
+    "Name oder DS100 ändern": "Cambiar nombre o DS100",
+    "Name und DS100 dürfen nicht leer sein.": "El nombre y DS100 no pueden estar vacíos.",
+    "Ungültiger Name oder DS100.": "Nombre o DS100 no válido.",
+    "zurück TF-Portal": "Volver al portal del maquinista"
   }
 }

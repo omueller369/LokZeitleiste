@@ -25,3 +25,5 @@
 #stationSharedItems{list-style:none;padding:0}#stationSharedItems>li{border:1px solid #d8e2e8;border-radius:8px;padding:12px;margin:12px 0;overflow-wrap:anywhere}#stationSharedItems details{margin:12px 0}#stationInbox li{padding:8px 0;overflow-wrap:anywhere}
 
 .station-notes label{display:block;margin-top:.8rem}.station-notes input,.station-notes textarea{width:100%;box-sizing:border-box}.station-notes textarea{min-height:8em;resize:vertical;white-space:pre-wrap}#stationSpecialRemaining{margin:.25rem 0;font-size:.9em}
+
+.station-identity label{display:block;margin:.7rem 0}.station-identity input{width:100%;box-sizing:border-box}#stationIdentityWarning{border:2px solid #b77900;background:#fff5d6;color:#493100;padding:.8rem;margin:.8rem 0}

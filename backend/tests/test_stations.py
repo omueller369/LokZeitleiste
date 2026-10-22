@@ -140,3 +140,33 @@ class StationDirectoryTest(unittest.TestCase):
     def test_existing_station_notes_default_empty(self):
         row=self.create()
         for field in ['locomotive_parking','train_securing','special_features']:self.assertEqual(row[field],'')
+
+    def test_rename_preserves_station_data_and_validates_identity(self):
+        row=self.driver.post('/api/v1/tf/stations',json={'code':'BBB','special_features':'Hinweis','contacts':[dict(category='bada',label='Fdl',number='00123')]}).json()
+        path='/api/v1/tf/stations/'+str(row['id'])
+        self.driver.put(path+'/plan',data={'expected_revision':1},files={'file':('plan.png',self.png(),'image/png')})
+        for fields in [{'code':' '},{'name':' '},{'code':None},{'name':None},{'code':'X'*11},{'name':'X'*201}]:
+            self.assertEqual(self.driver.put(path,json={'expected_revision':2,**fields}).status_code,422)
+        result=self.driver.put(path,json={'expected_revision':2,'code':' zz1 ','name':' Neuer Bahnhof ','contacts':row['contacts']})
+        self.assertEqual(result.status_code,200,result.text);data=result.json()
+        self.assertEqual((data['id'],data['code'],data['name'],data['revision']),(row['id'],'ZZ1','Neuer Bahnhof',3))
+        self.assertEqual(data['contacts'],row['contacts']);self.assertEqual(data['special_features'],'Hinweis')
+        self.assertEqual(self.driver.get(path+'/plan').content,self.png())
+        self.assertEqual(self.driver.get('/api/v1/tf/stations',params={'q':'ZZ1'}).json()[0]['name'],'Neuer Bahnhof')
+        self.assertEqual(self.driver.get('/api/v1/tf/stations/catalog',params={'q':'BBB'}).json()[0]['name'],'Berlin Beispiel')
+        self.assertEqual(self.driver.put(path,json={'expected_revision':2,'name':'Veraltet'}).status_code,409)
+
+    def test_duplicate_rename_warns_without_mutation_and_allows_retry(self):
+        first=self.create('AAA');second=self.create('BBB');path='/api/v1/tf/stations/'+str(second['id'])
+        for fields in [dict(code='aaa',name='Anderer Name'),dict(code='NEW',name=' aachen beispiel ')]:
+            response=self.driver.put(path,json={'expected_revision':1,**fields})
+            self.assertEqual(response.status_code,409,response.text);self.assertEqual(response.headers['x-station-conflict'],'identity');self.assertIn('anderen Namen',response.json()['detail'])
+            stored=self.driver.get(path).json();self.assertEqual((stored['code'],stored['name'],stored['revision']),('BBB','Berlin Beispiel',1))
+        response=self.driver.put(path,json={'expected_revision':1,'code':'NEW','name':'Eigener Bahnhof'})
+        self.assertEqual(response.status_code,200,response.text)
+        self.create_tf('787200','RENAME-OTHER')
+        other=TestClient(app,base_url='https://testserver');self.staff_clients.append(other)
+        other.post('/api/v1/account/login',json={'username':'787200','password':'tf-secret-12345'})
+        own=other.post('/api/v1/tf/stations',json={'code':'BBB'}).json()
+        self.assertEqual(other.put('/api/v1/tf/stations/'+str(own['id']),json={'expected_revision':1,'code':'NEW','name':'Eigener Bahnhof'}).status_code,200)
+        self.assertEqual(other.put(path,json={'expected_revision':2,'name':'Fremd'}).status_code,404)

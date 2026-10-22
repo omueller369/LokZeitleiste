@@ -37,6 +37,9 @@ def create_router(require_account):
         if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
         return FileResponse(STATIC/'tf-portal.html')
 
+    @router.get('/tf/return.js')
+    def return_script():return FileResponse(STATIC/'tf-return.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+
     @router.get('/tf/portal.js')
     def script():return FileResponse(STATIC/'tf-portal.js',media_type='text/javascript')
 

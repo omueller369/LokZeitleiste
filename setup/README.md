@@ -243,3 +243,15 @@ Die Empfängerauswahl liefert ausschließlich interne Datensatz-ID sowie Vor- un
 Die Bahnhofsfelder Lokabstellung, Züge sichern und Sonstige Besonderheiten stehen nach den Kontakten und dem Bahnhofsplan am Ende der Angaben, unmittelbar vor dem Speichern.
 
 Automatisch versendete Quittungs-E-Mails enthalten ebenfalls keine Login-/TF-Nummer mehr. Die Zuordnung erfolgt über die Arbeitsbericht-ID.
+
+
+### Bahnhöfe umbenennen
+
+Beim Bearbeiten stehen DS100 (höchstens 10 Zeichen) und Bahnhofsname (höchstens 200 Zeichen) als freie Pflichtfelder bereit. DS100 wird ohne äußere Leerzeichen in Großbuchstaben gespeichert; beim Namen werden äußere Leerzeichen entfernt. Bei bereits vorhandenem DS100 oder gleichem Namen in der eigenen Liste erscheint ein Warnhinweis mit „Name oder DS100 ändern“. Die Eingaben bleiben erhalten, damit ein anderer Name oder Code gewählt werden kann. Namensvergleiche berücksichtigen Groß-/Kleinschreibung nicht. Andere TF haben unabhängige Listen.
+
+Die Umbenennung behält die Eintrags-ID, Kontakte, Hinweise und den Bahnhofsplan bei. Die globale DS100-Stammdatenliste und bereits versendete Kopien werden nicht verändert. Nach dem Speichern werden Suche und sortierte Liste aktualisiert. Vorhandene ältere Clients können ohne Namens-/Code-Felder weiterhin Kontakte speichern; deren bisheriger Name und DS100 bleiben dabei erhalten. Keine zusätzliche Datenbankmigration erforderlich.
+
+
+### Einheitliche Rückkehr ins TF-Portal
+
+Alle Seiten der Standardoberfläche erhalten über den gemeinsamen Seitenstart (i18n.js → /tf/return.js) automatisch oben und unten im Hauptbereich einen Button „zurück TF-Portal“, sobald ein TF angemeldet ist. Das gilt auch für neue Module, die den üblichen Seitenaufbau mit main und i18n.js verwenden. Die Portal-Startseite selbst erhält keine Rückkehr-Buttons. Verwaltungs- und abgemeldete Benutzer erhalten diese TF-Navigation nicht. An-/Abmeldung und Sprachwechsel werden berücksichtigt. Die Buttons verwenden die normale Seitennavigation; bestehende Warnungen vor ungespeicherten Änderungen bleiben wirksam. Einzelne, zusätzliche Rückkehr-Links sollen nicht mehr in Modultemplates eingebaut werden.
