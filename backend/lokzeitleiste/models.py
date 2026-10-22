@@ -532,3 +532,26 @@ class TfStationShareNotes(Base):
     locomotive_parking:Mapped[str]=mapped_column(String(120),default='',nullable=False)
     train_securing:Mapped[str]=mapped_column(String(120),default='',nullable=False)
     special_features:Mapped[str]=mapped_column(Text,default='',nullable=False)
+
+
+class RailwayVehicle(Base):
+    __tablename__='railway_vehicles'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    vehicle_number:Mapped[str]=mapped_column(String(16),unique=True,nullable=False)
+    status:Mapped[str]=mapped_column(String(20),nullable=False)
+    status_note:Mapped[str]=mapped_column(Text,default='',nullable=False)
+    series:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    lessor:Mapped[str]=mapped_column(String(200),default='',nullable=False)
+    hotline:Mapped[str]=mapped_column(String(60),default='',nullable=False)
+    name:Mapped[str]=mapped_column(String(120),default='',nullable=False)
+    power_kw:Mapped[str]=mapped_column(String(40),default='',nullable=False)
+    brake_r:Mapped[int]=mapped_column(Integer,nullable=False)
+    brake_p:Mapped[int]=mapped_column(Integer,nullable=False)
+    brake_g:Mapped[int]=mapped_column(Integer,nullable=False)
+    spring_brake:Mapped[int]=mapped_column(Integer,nullable=False)
+    spring_unit:Mapped[str]=mapped_column(String(2),nullable=False)
+    next_revision:Mapped[date|None]=mapped_column(Date,nullable=True)
+    mileage:Mapped[int]=mapped_column(Integer,nullable=False)
+    notes:Mapped[str]=mapped_column(Text,default='',nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,default=1,nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)

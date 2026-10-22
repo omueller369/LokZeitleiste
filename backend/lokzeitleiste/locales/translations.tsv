@@ -1164,3 +1164,40 @@ Keine TF vorhanden.|No drivers available.|Brak maszynistów.|Машинисто�
 TF gesamt|Total drivers|Łącznie maszynistów|Всего машинистов|Total de maquinistas
 Bitte einen gültigen Zeitraum wählen.|Please select a valid period.|Wybierz prawidłowy okres.|Выберите допустимый период.|Seleccione un período válido.
 Gesamtübersicht wird geladen…|Loading overall view…|Wczytywanie przeglądu…|Загрузка общего обзора…|Cargando vista general…
+Triebfahrzeuge|Locomotives|Pojazdy trakcyjne|Тяговый подвижной состав|Vehículos de tracción
+Triebfahrzeugübersicht|Locomotive overview|Przegląd pojazdów trakcyjnych|Обзор тягового подвижного состава|Listado de vehículos de tracción
+Triebfahrzeug|Locomotive|Pojazd trakcyjny|Тяговое транспортное средство|Vehículo de tracción
+Triebfahrzeug hinzufügen|Add locomotive|Dodaj pojazd trakcyjny|Добавить тяговое транспортное средство|Añadir vehículo de tracción
+Einsatzbereit|Operational|Gotowy do eksploatacji|Готов к эксплуатации|Operativo
+Nicht einsatzbereit|Not operational|Niegotowy do eksploatacji|Не готов к эксплуатации|No operativo
+Eingeschränkt einsatzbereit|Operational with restrictions|Gotowy z ograniczeniami|Готов с ограничениями|Operativo con restricciones
+Einschränkung|Restriction|Ograniczenie|Ограничение|Restricción
+Baureihe|Class|Seria|Серия|Serie
+Fahrzeugnummer|Vehicle number|Numer pojazdu|Номер транспортного средства|Número de vehículo
+Fahrzeugnummer, Baureihe, Name oder Leasing-Geber|Vehicle number, class, name or lessor|Numer pojazdu, seria, nazwa lub leasingodawca|Номер, серия, название или лизингодатель|Número de vehículo, serie, nombre o arrendador
+Leasing-Geber|Lessor|Leasingodawca|Лизингодатель|Arrendador
+Hotlinetelefon-Nr.|Hotline phone number|Numer infolinii|Телефон горячей линии|Teléfono de asistencia
+Leistung (kW)|Power (kW)|Moc (kW)|Мощность (кВт)|Potencia (kW)
+Bremsgewichte|Brake weights|Masy hamujące|Тормозные веса|Pesos de frenado
+Stellung R|Position R|Pozycja R|Режим R|Posición R
+Stellung P|Position P|Pozycja P|Режим P|Posición P
+Stellung G|Position G|Pozycja G|Режим G|Posición G
+G−25 % (automatisch)|G−25% (automatic)|G−25% (automatycznie)|G−25 % (автоматически)|G−25 % (automático)
+Federspeicher|Spring-applied brake|Hamulec sprężynowy|Пружинный стояночный тормоз|Freno de resorte
+Einheit Federspeicher|Spring brake unit|Jednostka hamulca sprężynowego|Единица пружинного тормоза|Unidad del freno de resorte
+Nächste Revision|Next inspection|Następna rewizja|Следующая ревизия|Próxima revisión
+Letzter Kilometerstand|Latest odometer reading|Ostatni przebieg|Последний пробег|Último kilometraje
+Hinweistext|Notes|Uwagi|Примечание|Observaciones
+Keine Triebfahrzeuge vorhanden.|No locomotives available.|Brak pojazdów trakcyjnych.|Тяговых транспортных средств нет.|No hay vehículos de tracción.
+Triebfahrzeug gespeichert.|Locomotive saved.|Pojazd trakcyjny zapisany.|Тяговое транспортное средство сохранено.|Vehículo de tracción guardado.
+Triebfahrzeug nicht gefunden.|Locomotive not found.|Nie znaleziono pojazdu trakcyjnego.|Тяговое транспортное средство не найдено.|Vehículo de tracción no encontrado.
+Fahrzeugnummer ist bereits vorhanden.|Vehicle number already exists.|Numer pojazdu już istnieje.|Номер транспортного средства уже существует.|El número de vehículo ya existe.
+Triebfahrzeug wurde geändert. Bitte neu laden.|Locomotive has changed. Please reload.|Pojazd został zmieniony. Wczytaj ponownie.|Данные транспортного средства изменены. Загрузите повторно.|Los datos del vehículo han cambiado. Vuelva a cargarlo.
+Bitte die Eingaben und Pflichtfelder prüfen.|Please check your entries and required fields.|Sprawdź dane i pola wymagane.|Проверьте данные и обязательные поля.|Revise los datos y los campos obligatorios.
+Grund oder Einschränkung ist erforderlich.|A reason or restriction is required.|Wymagany jest powód lub ograniczenie.|Необходимо указать причину или ограничение.|Es necesario indicar un motivo o una restricción.
+Fahrzeugnummer muss 12 Ziffern im Format 00 00 0000 000-0 enthalten.|Vehicle number must contain 12 digits in the format 00 00 0000 000-0.|Numer pojazdu musi zawierać 12 cyfr w formacie 00 00 0000 000-0.|Номер должен содержать 12 цифр в формате 00 00 0000 000-0.|El número debe contener 12 cifras con el formato 00 00 0000 000-0.
+Fahrzeugnummer: erste 2 Ziffern|Vehicle number: first 2 digits|Numer pojazdu: pierwsze 2 cyfry|Номер: первые 2 цифры|Número de vehículo: primeras 2 cifras
+Fahrzeugnummer: zweite 2 Ziffern|Vehicle number: second 2 digits|Numer pojazdu: drugie 2 cyfry|Номер: вторые 2 цифры|Número de vehículo: segundas 2 cifras
+Fahrzeugnummer: 4 Ziffern|Vehicle number: 4 digits|Numer pojazdu: 4 cyfry|Номер: 4 цифры|Número de vehículo: 4 cifras
+Fahrzeugnummer: 3 Ziffern|Vehicle number: 3 digits|Numer pojazdu: 3 cyfry|Номер: 3 цифры|Número de vehículo: 3 cifras
+Fahrzeugnummer: letzte Ziffer|Vehicle number: final digit|Numer pojazdu: ostatnia cyfra|Номер: последняя цифра|Número de vehículo: última cifra

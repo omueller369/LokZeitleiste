@@ -511,7 +511,7 @@ def shifts_script():
 
 @app.get('/admin/backend-nav.js')
 def backend_navigation_script():
-    return FileResponse(Path(__file__).parent/'static'/'backend-nav.js', media_type='text/javascript')
+    return FileResponse(Path(__file__).parent/'static'/'backend-nav.js', media_type='text/javascript',headers={'Cache-Control':'no-cache'})
 
 from .mailbox.api import create_router as mailbox_router
 app.include_router(mailbox_router(require_admin))
@@ -631,3 +631,6 @@ def overtime_ui_script():
 
 from .stations import create_router as station_router
 app.include_router(station_router(require_account))
+
+from .vehicles import create_router as vehicles_router
+app.include_router(vehicles_router(require_admin))
