@@ -1201,7 +1201,8 @@
     "Fahrzeugnummer: zweite 2 Ziffern": "Fahrzeugnummer: zweite 2 Ziffern",
     "Fahrzeugnummer: 4 Ziffern": "Fahrzeugnummer: 4 Ziffern",
     "Fahrzeugnummer: 3 Ziffern": "Fahrzeugnummer: 3 Ziffern",
-    "Fahrzeugnummer: letzte Ziffer": "Fahrzeugnummer: letzte Ziffer"
+    "Fahrzeugnummer: letzte Ziffer": "Fahrzeugnummer: letzte Ziffer",
+    "Hinzufügen": "Hinzufügen"
   },
   "en": {
     "Administration": "Administration",
@@ -2405,7 +2406,8 @@
     "Fahrzeugnummer: zweite 2 Ziffern": "Vehicle number: second 2 digits",
     "Fahrzeugnummer: 4 Ziffern": "Vehicle number: 4 digits",
     "Fahrzeugnummer: 3 Ziffern": "Vehicle number: 3 digits",
-    "Fahrzeugnummer: letzte Ziffer": "Vehicle number: final digit"
+    "Fahrzeugnummer: letzte Ziffer": "Vehicle number: final digit",
+    "Hinzufügen": "Add"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3609,7 +3611,8 @@
     "Fahrzeugnummer: zweite 2 Ziffern": "Numer pojazdu: drugie 2 cyfry",
     "Fahrzeugnummer: 4 Ziffern": "Numer pojazdu: 4 cyfry",
     "Fahrzeugnummer: 3 Ziffern": "Numer pojazdu: 3 cyfry",
-    "Fahrzeugnummer: letzte Ziffer": "Numer pojazdu: ostatnia cyfra"
+    "Fahrzeugnummer: letzte Ziffer": "Numer pojazdu: ostatnia cyfra",
+    "Hinzufügen": "Dodaj"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4813,7 +4816,8 @@
     "Fahrzeugnummer: zweite 2 Ziffern": "Номер: вторые 2 цифры",
     "Fahrzeugnummer: 4 Ziffern": "Номер: 4 цифры",
     "Fahrzeugnummer: 3 Ziffern": "Номер: 3 цифры",
-    "Fahrzeugnummer: letzte Ziffer": "Номер: последняя цифра"
+    "Fahrzeugnummer: letzte Ziffer": "Номер: последняя цифра",
+    "Hinzufügen": "Добавить"
   },
   "es": {
     "Administration": "Administración",
@@ -6017,6 +6021,7 @@
     "Fahrzeugnummer: zweite 2 Ziffern": "Número de vehículo: segundas 2 cifras",
     "Fahrzeugnummer: 4 Ziffern": "Número de vehículo: 4 cifras",
     "Fahrzeugnummer: 3 Ziffern": "Número de vehículo: 3 cifras",
-    "Fahrzeugnummer: letzte Ziffer": "Número de vehículo: última cifra"
+    "Fahrzeugnummer: letzte Ziffer": "Número de vehículo: última cifra",
+    "Hinzufügen": "Añadir"
   }
 }
