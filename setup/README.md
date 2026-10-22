@@ -278,3 +278,10 @@ Einträge werden über Revisionsnummern vor Überschreiben zwischenzeitlicher Ä
 
 
 Die Triebfahrzeugliste zeigt genau Status, Fahrzeugnummer und Name. Der Status wird mit einem grünen, roten bzw. gelben Kreis über dem ausgeschriebenen Statustext dargestellt. Oberhalb steht „Hinzufügen“ für Benutzer mit Schreibrecht. Ein Klick auf eine beliebige Stelle einer Zeile lädt die aktuellen Fahrzeugdaten direkt zur Bearbeitung; die Fahrzeugnummer ist zusätzlich als per Tastatur bedienbare Schaltfläche erreichbar. Benutzer mit ausschließlichem Leserecht öffnen dieselbe Maske schreibgeschützt. Der Menüpunkt „Triebfahrzeuge“ befindet sich im Backend-Menü unter Stammdaten und ist mit Modulfreigabe sichtbar.
+
+
+### Triebfahrzeuge nach Update nicht sichtbar
+
+Stammdaten → Triebfahrzeuge wird für angemeldetes Verwaltungspersonal immer angezeigt. Fehlende Modulrechte werden im Modul ausdrücklich erklärt; ein Administrator aktiviert für betroffene Verwaltungsmitarbeiter „Triebfahrzeuge“ mit Lesen bzw. Lesen und Schreiben. Fahrzeugdaten bleiben durch die API-Rechte geschützt. Administratoren haben Vollzugriff. Das Menü und die Kontorechte werden ohne Browsercache abgefragt; Verwaltungsseiten werden neu validiert und API-Antworten nicht gespeichert. Nach dem Update die Seite neu laden; bei einer noch geöffneten alten Sitzung einmal ab- und anmelden.
+
+Die direkte Moduladresse lautet /admin/vehicles. Bei Fehlern nach einem Update auf dem Server /health sowie /openapi.json prüfen: Unter paths müssen /api/v1/admin/vehicles und /admin/vehicles enthalten sein. Fehlen diese, läuft noch ein älterer API-Container; setup-demo.sh nach git pull erneut erfolgreich ausführen.

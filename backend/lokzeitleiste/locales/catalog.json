@@ -1203,7 +1203,9 @@
     "Fahrzeugnummer: 3 Ziffern": "Fahrzeugnummer: 3 Ziffern",
     "Fahrzeugnummer: letzte Ziffer": "Fahrzeugnummer: letzte Ziffer",
     "Hinzufügen": "Hinzufügen",
-    "Stammdaten": "Stammdaten"
+    "Stammdaten": "Stammdaten",
+    "Freigabe erforderlich": "Freigabe erforderlich",
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben."
   },
   "en": {
     "Administration": "Administration",
@@ -2409,7 +2411,9 @@
     "Fahrzeugnummer: 3 Ziffern": "Vehicle number: 3 digits",
     "Fahrzeugnummer: letzte Ziffer": "Vehicle number: final digit",
     "Hinzufügen": "Add",
-    "Stammdaten": "Master data"
+    "Stammdaten": "Master data",
+    "Freigabe erforderlich": "Permission required",
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "This account lacks the Locomotives permission. An administrator must enable Read or Read and Write under Administration staff → Permissions."
   },
   "pl": {
     "Administration": "Administracja",
@@ -3615,7 +3619,9 @@
     "Fahrzeugnummer: 3 Ziffern": "Numer pojazdu: 3 cyfry",
     "Fahrzeugnummer: letzte Ziffer": "Numer pojazdu: ostatnia cyfra",
     "Hinzufügen": "Dodaj",
-    "Stammdaten": "Dane podstawowe"
+    "Stammdaten": "Dane podstawowe",
+    "Freigabe erforderlich": "Wymagane uprawnienie",
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "To konto nie ma uprawnienia Pojazdy trakcyjne. Administrator musi włączyć Odczyt lub Odczyt i zapis w Pracownicy administracji → Uprawnienia."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4821,7 +4827,9 @@
     "Fahrzeugnummer: 3 Ziffern": "Номер: 3 цифры",
     "Fahrzeugnummer: letzte Ziffer": "Номер: последняя цифра",
     "Hinzufügen": "Добавить",
-    "Stammdaten": "Основные данные"
+    "Stammdaten": "Основные данные",
+    "Freigabe erforderlich": "Требуется разрешение",
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "У этой учётной записи нет разрешения на модуль тягового подвижного состава. Администратор должен включить чтение или чтение и запись в разделе Сотрудники администрации → Разрешения."
   },
   "es": {
     "Administration": "Administración",
@@ -6027,6 +6035,8 @@
     "Fahrzeugnummer: 3 Ziffern": "Número de vehículo: 3 cifras",
     "Fahrzeugnummer: letzte Ziffer": "Número de vehículo: última cifra",
     "Hinzufügen": "Añadir",
-    "Stammdaten": "Datos maestros"
+    "Stammdaten": "Datos maestros",
+    "Freigabe erforderlich": "Permiso necesario",
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Esta cuenta no tiene permiso para Vehículos de tracción. Un administrador debe activar Lectura o Lectura y escritura en Personal administrativo → Permisos."
   }
 }

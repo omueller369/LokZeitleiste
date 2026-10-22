@@ -546,7 +546,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 async def localized_requests(request: Request, call_next):
     token=request_language.set(language(request.query_params.get('lang') or request.headers.get('accept-language')))
     try:
-        return await call_next(request)
+        response=await call_next(request)
+        if request.url.path.startswith('/api/'):
+            response.headers['Cache-Control']='private, no-store'
+            response.headers.add_vary_header('Cookie, Authorization')
+        elif request.url.path.startswith('/admin'):
+            response.headers['Cache-Control']='no-cache'
+        return response
     finally:
         request_language.reset(token)
 

@@ -71,3 +71,15 @@ class VehicleTest(unittest.TestCase):
         self.assertEqual(client.get('/api/v1/admin/vehicles').status_code,403)
         modules=self.client.get('/api/v1/admin/modules').json()
         self.assertTrue(any(row['id']=='vehicles' for row in modules))
+
+
+    def test_identity_not_cached_and_missing_permission_still_denied(self):
+        response=self.client.get('/api/v1/admin/me')
+        self.assertEqual(response.json()['permissions']['vehicles'],3)
+        self.assertEqual(response.headers['cache-control'],'private, no-store')
+        self.assertIn('Cookie',response.headers['vary'])
+        self.assertEqual(self.client.get('/admin/vehicles').headers['cache-control'],'no-cache')
+        self.assertEqual(self.client.get('/admin/backend-nav.js').headers['cache-control'],'no-cache')
+        _,staff=self.active_staff({},'vehicle-no-permission')
+        self.assertEqual(staff.get('/api/v1/admin/me').json()['permissions']['vehicles'],0)
+        self.assertEqual(staff.get('/api/v1/admin/vehicles').status_code,403)
