@@ -1206,7 +1206,14 @@
     "Stammdaten": "Stammdaten",
     "Freigabe erforderlich": "Freigabe erforderlich",
     "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.",
-    "Legende": "Legende"
+    "Legende": "Legende",
+    "TFs": "TFs",
+    "TFs (Liste)": "TFs (Liste)",
+    "TF anlegen": "TF anlegen",
+    "Verwaltungsmitarbeiter (Liste)": "Verwaltungsmitarbeiter (Liste)",
+    "anlegen": "anlegen",
+    "TF-Übersicht": "TF-Übersicht",
+    "App Grundwerte (folgt später)": "App Grundwerte (folgt später)"
   },
   "en": {
     "Administration": "Administration",
@@ -2415,7 +2422,14 @@
     "Stammdaten": "Master data",
     "Freigabe erforderlich": "Permission required",
     "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "This account lacks the Locomotives permission. An administrator must enable Read or Read and Write under Administration staff → Permissions.",
-    "Legende": "Legend"
+    "Legende": "Legend",
+    "TFs": "Drivers",
+    "TFs (Liste)": "Drivers (list)",
+    "TF anlegen": "Create driver",
+    "Verwaltungsmitarbeiter (Liste)": "Administration staff (list)",
+    "anlegen": "create",
+    "TF-Übersicht": "Driver overview",
+    "App Grundwerte (folgt später)": "App defaults (coming later)"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3624,7 +3638,14 @@
     "Stammdaten": "Dane podstawowe",
     "Freigabe erforderlich": "Wymagane uprawnienie",
     "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "To konto nie ma uprawnienia Pojazdy trakcyjne. Administrator musi włączyć Odczyt lub Odczyt i zapis w Pracownicy administracji → Uprawnienia.",
-    "Legende": "Legenda"
+    "Legende": "Legenda",
+    "TFs": "Maszyniści",
+    "TFs (Liste)": "Maszyniści (lista)",
+    "TF anlegen": "Dodaj maszynistę",
+    "Verwaltungsmitarbeiter (Liste)": "Pracownicy administracji (lista)",
+    "anlegen": "dodaj",
+    "TF-Übersicht": "Przegląd maszynistów",
+    "App Grundwerte (folgt später)": "Ustawienia domyślne aplikacji (później)"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4833,7 +4854,14 @@
     "Stammdaten": "Основные данные",
     "Freigabe erforderlich": "Требуется разрешение",
     "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "У этой учётной записи нет разрешения на модуль тягового подвижного состава. Администратор должен включить чтение или чтение и запись в разделе Сотрудники администрации → Разрешения.",
-    "Legende": "Условные обозначения"
+    "Legende": "Условные обозначения",
+    "TFs": "Машинисты",
+    "TFs (Liste)": "Машинисты (список)",
+    "TF anlegen": "Добавить машиниста",
+    "Verwaltungsmitarbeiter (Liste)": "Сотрудники администрации (список)",
+    "anlegen": "добавить",
+    "TF-Übersicht": "Обзор машинистов",
+    "App Grundwerte (folgt später)": "Базовые настройки приложения (позже)"
   },
   "es": {
     "Administration": "Administración",
@@ -6042,6 +6070,13 @@
     "Stammdaten": "Datos maestros",
     "Freigabe erforderlich": "Permiso necesario",
     "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Esta cuenta no tiene permiso para Vehículos de tracción. Un administrador debe activar Lectura o Lectura y escritura en Personal administrativo → Permisos.",
-    "Legende": "Leyenda"
+    "Legende": "Leyenda",
+    "TFs": "Maquinistas",
+    "TFs (Liste)": "Maquinistas (lista)",
+    "TF anlegen": "Crear maquinista",
+    "Verwaltungsmitarbeiter (Liste)": "Personal administrativo (lista)",
+    "anlegen": "crear",
+    "TF-Übersicht": "Vista de maquinistas",
+    "App Grundwerte (folgt später)": "Valores básicos de la app (próximamente)"
   }
 }

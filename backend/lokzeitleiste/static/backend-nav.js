@@ -1,14 +1,39 @@
-(async()=>{try{const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok)return;const me=await response.json(),p=me.permissions;const fingerprint=JSON.stringify(p),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261022-access-3'&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint)return;existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label','Backend-Menü');nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
-function group(label){const item=document.createElement('li'),heading=document.createElement('span'),children=document.createElement('ul');heading.textContent=label;heading.className='menu-heading';item.append(heading,children);list.append(item);return children;}
-function link(box,label,href){const li=document.createElement('li'),a=document.createElement('a');a.textContent=label;a.href=href;if(location.pathname===href.split('?')[0]&&(location.pathname!=='/admin/planning'||new URL(href,location.href).searchParams.get('readonly')===new URLSearchParams(location.search).get('readonly')))a.setAttribute('aria-current','page');li.append(a);box.append(li);return a;}
-const admin=group('1. Administration');if(p.directory)link(admin,'1.1 Verwaltung','/admin/directory');if(p.staff===3)link(admin,'1.2 VM (Verwaltungsmitarbeiter) anlegen','/admin/staff/new');if(p.employees===3)link(admin,'1.3 TF (Triebfahrzeugführer) anlegen','/admin/tf/new');
-const masterData=group('Stammdaten');const vehicleLink=link(masterData,'Triebfahrzeuge','/admin/vehicles');if(me.role!=='admin'&&!p.vehicles)vehicleLink.title='Freigabe erforderlich';
-const planning=group('2. Personalplanung');if(p.planning)link(planning,'2.1 Personalplanung TF Übersicht','/admin/planning');if(p.shifts)link(planning,'2.2 Schichtplan','/admin/shifts');
-const tf=group('3. Triebfahrzeugführer');if(p.planning)link(tf,'3.1 Dienstplan','/admin/planning?readonly=1');if(p.planning&&(p.worktime||p.reports))link(tf,'3.2 Dienstzeit','/admin/tf/hours');if(p.email)link(tf,'3.3 Email','/admin/email');
-const other=document.createElement('li'),placeholder=document.createElement('span');placeholder.className='menu-heading';placeholder.textContent='4. Sonstiges';placeholder.setAttribute('aria-disabled','true');other.append(placeholder);list.append(other);const item=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent='5. Abmelden';logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error('Abmelden fehlgeschlagen');location.href='/admin';}catch(e){logout.disabled=false;alert(e.message);}};item.append(logout);list.append(item);
-const extra=document.createElement('div');extra.className='menu-account';link(extra,'Mein Passwort ändern','/account');if(me.role==='staff')link(extra,'Meine Arbeitszeiten','/my/worktime');if(p.staff)link(extra,'VM-Stammdaten und Rechte','/admin/staff');if(['employees','planning','worktime','reports','directory','shifts','email'].some(m=>p[m]))link(extra,'Tf-Übersicht','/admin/tf');if(p.worktime)link(extra,'Arbeitszeit erfassen und korrigieren','/admin/worktime');link(extra,'Meine Dokumente','/documents');nav.append(extra);
+(async()=>{try{const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok)return;const me=await response.json(),p=me.permissions;const fingerprint=JSON.stringify(p),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261022-tree-4'&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint)return;existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label','Backend-Menü');nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
+function group(label,parent=list,href=null,allowed=true){const item=document.createElement('li'),heading=document.createElement(href?'a':'span'),children=document.createElement('ul');heading.textContent=label;heading.className='menu-heading';if(href){heading.href=href;if(!allowed)heading.title='Freigabe erforderlich';markCurrent(heading,href);}item.append(heading,children);parent.append(item);return children;}
+function markCurrent(anchor,href){const target=new URL(href,location.href);if(location.pathname!==target.pathname)return;if(target.pathname==='/admin/planning'&&['readonly','overview'].some(key=>target.searchParams.get(key)!==new URLSearchParams(location.search).get(key)))return;anchor.setAttribute('aria-current','page');}
+function link(box,label,href,allowed=true){const li=document.createElement('li'),anchor=document.createElement('a');anchor.textContent=label;anchor.href=href;if(!allowed)anchor.title='Freigabe erforderlich';markCurrent(anchor,href);li.append(anchor);box.append(li);return anchor;}
+function placeholder(box,label){const item=document.createElement('li'),text=document.createElement('span');text.className='menu-placeholder';text.textContent=label;text.setAttribute('aria-disabled','true');item.append(text);box.append(item);}
+const hasEmployees=['employees','planning','worktime','reports','directory','shifts','email'].some(module=>p[module]);
+const modules=[
+ ['directory','Alle Mitarbeiter','/admin/directory',!!p.directory],
+ ['tf','TFs (Liste)','/admin/tf',hasEmployees],
+ ['tfNew','TF anlegen','/admin/tf/new',p.employees===3],
+ ['staff','Verwaltungsmitarbeiter (Liste)','/admin/staff',!!p.staff],
+ ['staffNew','Verwaltungsmitarbeiter anlegen','/admin/staff/new',p.staff===3],
+ ['planning','Arbeitszeitplanung','/admin/planning',!!p.planning],
+ ['shifts','Schichtplan','/admin/shifts',!!p.shifts],
+ ['overview','TF-Übersicht','/admin/planning?overview=all',!!p.planning],
+ ['vehicles','Triebfahrzeuge','/admin/vehicles',me.role==='admin'||!!p.vehicles],
+ ['roster','Dienstplan','/admin/planning?readonly=1',!!p.planning],
+ ['hours','Dienstzeit','/admin/tf/hours',!!p.planning&&!!(p.worktime||p.reports)],
+ ['worktime','Arbeitszeiterfassung und Korrekturen','/admin/worktime',!!p.worktime],
+ ['email','Email','/admin/email',!!p.email],
+ ['documents','Meine Dokumente','/documents',true],
+ ['password','Mein Passwort ändern','/account',true]
+];
+if(me.role==='staff')modules.push(['ownTime','Meine Arbeitszeiten','/my/worktime',true]);
+function moduleLink(parent,id,label=null){const module=modules.find(item=>item[0]===id);return link(parent,label||module[1],module[2],module[3]);}
+const administration=group('Administration');for(const module of modules)link(administration,module[1],module[2],module[3]);
+const management=group('Verwaltung'),employees=group('Mitarbeiter',management);
+const drivers=group('TFs',employees,'/admin/tf',hasEmployees);moduleLink(drivers,'tfNew','anlegen');
+const office=group('Verwaltung',employees,'/admin/staff',!!p.staff);moduleLink(office,'staffNew','anlegen');
+const planning=group('Personalplanung');for(const id of ['planning','shifts','overview'])moduleLink(planning,id);
+const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(master,'vehicles');placeholder(master,'App Grundwerte (folgt später)');
+for(const id of ['directory','roster','hours','worktime','email','documents','password',...(me.role==='staff'?['ownTime']:[])])moduleLink(other,id);
+const logoutItem=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent='Abmelden';logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error('Abmelden fehlgeschlagen');location.href='/admin';}catch(error){logout.disabled=false;alert(error.message);}};logoutItem.className='menu-logout';logoutItem.append(logout);list.append(logoutItem);
+const stylesheet=document.querySelector('link[href^="/responsive.css"]');if(stylesheet)stylesheet.href='/responsive.css?v=20261022-tree-4';
 const header=document.querySelector('header');if(!header)return;
-const control=document.createElement('div');control.className='backend-menu-control';control.dataset.menuRevision='20261022-access-3';control.dataset.accountId=String(me.id);control.dataset.permissions=fingerprint;
+const control=document.createElement('div');control.className='backend-menu-control';control.dataset.menuRevision='20261022-tree-4';control.dataset.accountId=String(me.id);control.dataset.permissions=fingerprint;
 const toggle=document.createElement('button');toggle.type='button';toggle.className='backend-menu-toggle';toggle.textContent='☰';toggle.setAttribute('aria-label','Backend-Menü');toggle.setAttribute('title','Backend-Menü');toggle.setAttribute('aria-controls','navigation');toggle.setAttribute('aria-expanded','false');
 control.append(toggle,nav);header.append(control);
 let pinned=false,closeTimer=null,suppressHover=false;

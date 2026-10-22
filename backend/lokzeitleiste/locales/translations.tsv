@@ -1206,3 +1206,10 @@ Stammdaten|Master data|Dane podstawowe|Основные данные|Datos maest
 Freigabe erforderlich|Permission required|Wymagane uprawnienie|Требуется разрешение|Permiso necesario
 Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.|This account lacks the Locomotives permission. An administrator must enable Read or Read and Write under Administration staff → Permissions.|To konto nie ma uprawnienia Pojazdy trakcyjne. Administrator musi włączyć Odczyt lub Odczyt i zapis w Pracownicy administracji → Uprawnienia.|У этой учётной записи нет разрешения на модуль тягового подвижного состава. Администратор должен включить чтение или чтение и запись в разделе Сотрудники администрации → Разрешения.|Esta cuenta no tiene permiso para Vehículos de tracción. Un administrador debe activar Lectura o Lectura y escritura en Personal administrativo → Permisos.
 Legende|Legend|Legenda|Условные обозначения|Leyenda
+TFs|Drivers|Maszyniści|Машинисты|Maquinistas
+TFs (Liste)|Drivers (list)|Maszyniści (lista)|Машинисты (список)|Maquinistas (lista)
+TF anlegen|Create driver|Dodaj maszynistę|Добавить машиниста|Crear maquinista
+Verwaltungsmitarbeiter (Liste)|Administration staff (list)|Pracownicy administracji (lista)|Сотрудники администрации (список)|Personal administrativo (lista)
+anlegen|create|dodaj|добавить|crear
+TF-Übersicht|Driver overview|Przegląd maszynistów|Обзор машинистов|Vista de maquinistas
+App Grundwerte (folgt später)|App defaults (coming later)|Ustawienia domyślne aplikacji (później)|Базовые настройки приложения (позже)|Valores básicos de la app (próximamente)

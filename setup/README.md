@@ -285,3 +285,10 @@ Die Triebfahrzeugliste zeigt genau Status, Fahrzeugnummer und Name. In der Statu
 Stammdaten → Triebfahrzeuge wird für angemeldetes Verwaltungspersonal immer angezeigt. Fehlende Modulrechte werden im Modul ausdrücklich erklärt; ein Administrator aktiviert für betroffene Verwaltungsmitarbeiter „Triebfahrzeuge“ mit Lesen bzw. Lesen und Schreiben. Fahrzeugdaten bleiben durch die API-Rechte geschützt. Administratoren haben Vollzugriff. Das Menü und die Kontorechte werden ohne Browsercache abgefragt; Verwaltungsseiten werden neu validiert und API-Antworten nicht gespeichert. Nach dem Update die Seite neu laden; bei einer noch geöffneten alten Sitzung einmal ab- und anmelden.
 
 Die direkte Moduladresse lautet /admin/vehicles. Bei Fehlern nach einem Update auf dem Server /health sowie /openapi.json prüfen: Unter paths müssen /api/v1/admin/vehicles und /admin/vehicles enthalten sein. Fehlen diese, läuft noch ein älterer API-Container; setup-demo.sh nach git pull erneut erfolgreich ausführen.
+
+
+### Neuer Backend-Menübaum
+
+Administration bietet direkte Links zu allen vorhandenen Modulen. Verwaltung → Mitarbeiter enthält die klickbaren Listenpunkte TFs und Verwaltung, jeweils mit dem Unterpunkt anlegen. Personalplanung enthält Arbeitszeitplanung, Schichtplan und TF-Übersicht. Letzteres öffnet direkt die gemeinsame Ruhetagsplanübersicht aller TF. Sonstiges → Stammdaten enthält Triebfahrzeuge und den deaktivierten Platzhalter App Grundwerte (folgt später). Die übrigen Module (Alle Mitarbeiter, Dienstplan, Dienstzeit, Arbeitszeiterfassung/Korrekturen, Email, Dokumente, Passwort und gegebenenfalls eigene Arbeitszeiten) stehen direkt unter Sonstiges. Abmelden steht separat am Menüende.
+
+Die Modulrechte bleiben serverseitig wirksam. Fehlende Freigaben werden an den Menülinks gekennzeichnet. Das Menü wird bei geänderten Rechten oder anderem Konto neu aufgebaut; Hover, Klick, Escape und Tastaturbedienung des Menüschalters bleiben erhalten.
