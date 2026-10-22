@@ -1205,7 +1205,8 @@
     "Hinzufügen": "Hinzufügen",
     "Stammdaten": "Stammdaten",
     "Freigabe erforderlich": "Freigabe erforderlich",
-    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben."
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.",
+    "Legende": "Legende"
   },
   "en": {
     "Administration": "Administration",
@@ -2413,7 +2414,8 @@
     "Hinzufügen": "Add",
     "Stammdaten": "Master data",
     "Freigabe erforderlich": "Permission required",
-    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "This account lacks the Locomotives permission. An administrator must enable Read or Read and Write under Administration staff → Permissions."
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "This account lacks the Locomotives permission. An administrator must enable Read or Read and Write under Administration staff → Permissions.",
+    "Legende": "Legend"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3621,7 +3623,8 @@
     "Hinzufügen": "Dodaj",
     "Stammdaten": "Dane podstawowe",
     "Freigabe erforderlich": "Wymagane uprawnienie",
-    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "To konto nie ma uprawnienia Pojazdy trakcyjne. Administrator musi włączyć Odczyt lub Odczyt i zapis w Pracownicy administracji → Uprawnienia."
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "To konto nie ma uprawnienia Pojazdy trakcyjne. Administrator musi włączyć Odczyt lub Odczyt i zapis w Pracownicy administracji → Uprawnienia.",
+    "Legende": "Legenda"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4829,7 +4832,8 @@
     "Hinzufügen": "Добавить",
     "Stammdaten": "Основные данные",
     "Freigabe erforderlich": "Требуется разрешение",
-    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "У этой учётной записи нет разрешения на модуль тягового подвижного состава. Администратор должен включить чтение или чтение и запись в разделе Сотрудники администрации → Разрешения."
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "У этой учётной записи нет разрешения на модуль тягового подвижного состава. Администратор должен включить чтение или чтение и запись в разделе Сотрудники администрации → Разрешения.",
+    "Legende": "Условные обозначения"
   },
   "es": {
     "Administration": "Administración",
@@ -6037,6 +6041,7 @@
     "Hinzufügen": "Añadir",
     "Stammdaten": "Datos maestros",
     "Freigabe erforderlich": "Permiso necesario",
-    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Esta cuenta no tiene permiso para Vehículos de tracción. Un administrador debe activar Lectura o Lectura y escritura en Personal administrativo → Permisos."
+    "Für dieses Konto fehlt die Modulfreigabe „Triebfahrzeuge“. Ein Administrator muss sie unter Verwaltungsmitarbeiter → Berechtigungen aktivieren: Lesen oder Lesen und Schreiben.": "Esta cuenta no tiene permiso para Vehículos de tracción. Un administrador debe activar Lectura o Lectura y escritura en Personal administrativo → Permisos.",
+    "Legende": "Leyenda"
   }
 }
