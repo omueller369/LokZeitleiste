@@ -1202,7 +1202,8 @@
     "Fahrzeugnummer: 4 Ziffern": "Fahrzeugnummer: 4 Ziffern",
     "Fahrzeugnummer: 3 Ziffern": "Fahrzeugnummer: 3 Ziffern",
     "Fahrzeugnummer: letzte Ziffer": "Fahrzeugnummer: letzte Ziffer",
-    "Hinzufügen": "Hinzufügen"
+    "Hinzufügen": "Hinzufügen",
+    "Stammdaten": "Stammdaten"
   },
   "en": {
     "Administration": "Administration",
@@ -2407,7 +2408,8 @@
     "Fahrzeugnummer: 4 Ziffern": "Vehicle number: 4 digits",
     "Fahrzeugnummer: 3 Ziffern": "Vehicle number: 3 digits",
     "Fahrzeugnummer: letzte Ziffer": "Vehicle number: final digit",
-    "Hinzufügen": "Add"
+    "Hinzufügen": "Add",
+    "Stammdaten": "Master data"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3612,7 +3614,8 @@
     "Fahrzeugnummer: 4 Ziffern": "Numer pojazdu: 4 cyfry",
     "Fahrzeugnummer: 3 Ziffern": "Numer pojazdu: 3 cyfry",
     "Fahrzeugnummer: letzte Ziffer": "Numer pojazdu: ostatnia cyfra",
-    "Hinzufügen": "Dodaj"
+    "Hinzufügen": "Dodaj",
+    "Stammdaten": "Dane podstawowe"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -4817,7 +4820,8 @@
     "Fahrzeugnummer: 4 Ziffern": "Номер: 4 цифры",
     "Fahrzeugnummer: 3 Ziffern": "Номер: 3 цифры",
     "Fahrzeugnummer: letzte Ziffer": "Номер: последняя цифра",
-    "Hinzufügen": "Добавить"
+    "Hinzufügen": "Добавить",
+    "Stammdaten": "Основные данные"
   },
   "es": {
     "Administration": "Administración",
@@ -6022,6 +6026,7 @@
     "Fahrzeugnummer: 4 Ziffern": "Número de vehículo: 4 cifras",
     "Fahrzeugnummer: 3 Ziffern": "Número de vehículo: 3 cifras",
     "Fahrzeugnummer: letzte Ziffer": "Número de vehículo: última cifra",
-    "Hinzufügen": "Añadir"
+    "Hinzufügen": "Añadir",
+    "Stammdaten": "Datos maestros"
   }
 }
