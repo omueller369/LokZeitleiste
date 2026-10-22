@@ -653,3 +653,6 @@ app.include_router(collective_planning_router(require_admin))
 @app.get('/admin/planning-overview.js')
 def planning_overview_script():
     return FileResponse(Path(__file__).parent/'static'/'planning-overview.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+
+from .backend_start import create_router as backend_start_router
+app.include_router(backend_start_router(require_admin))

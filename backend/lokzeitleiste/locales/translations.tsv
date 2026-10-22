@@ -1298,3 +1298,32 @@ Auswahl verwerfen?|Discard selection?|Odrzucić zaznaczenie?|Сбросить в
 Maximal 10000 Felder pro Änderung.|At most 10000 cells per change.|Maksymalnie 10000 komórek na zmianę.|Не более 10000 ячеек за одно изменение.|Máximo de 10000 celdas por cambio.
 Plan wurde inzwischen geändert. Bitte neu laden und erneut bestätigen.|The plan has changed. Reload and confirm again.|Plan został zmieniony. Wczytaj ponownie i potwierdź.|План изменился. Загрузите заново и подтвердите ещё раз.|El plan ha cambiado. Vuelva a cargarlo y confirme de nuevo.
 Änderungsliste ist nicht mehr aktuell. Bitte erneut prüfen.|The change list is outdated. Please review again.|Lista zmian jest nieaktualna. Sprawdź ponownie.|Список изменений устарел. Проверьте заново.|La lista de cambios está desactualizada. Revísela de nuevo.
+Hier finden Sie die Module, für die Sie berechtigt sind.|Here are the modules you are authorized to use.|Tutaj znajdziesz moduły, do których masz uprawnienia.|Здесь доступны модули, на которые у вас есть права.|Aquí encontrará los módulos para los que tiene permiso.
+Module werden geladen…|Loading modules…|Ładowanie modułów…|Загрузка модулей…|Cargando módulos…
+Modul suchen|Find a module|Znajdź moduł|Найти модуль|Buscar módulo
+Menüvorschläge ansehen|View menu proposals|Zobacz propozycje menu|Посмотреть варианты меню|Ver propuestas de menú
+Keine passenden Module gefunden.|No matching modules found.|Nie znaleziono pasujących modułów.|Подходящие модули не найдены.|No se encontraron módulos coincidentes.
+Menüvorschläge|Menu proposals|Propozycje menu|Варианты меню|Propuestas de menú
+Drei Bedienkonzepte für Desktop und Mobilgeräte. Die Vorschauen ändern das aktuelle Menü nicht.|Three navigation concepts for desktop and mobile. Previews do not change the current menu.|Trzy koncepcje nawigacji na komputer i telefon. Podgląd nie zmienia obecnego menu.|Три варианта навигации для компьютеров и телефонов. Просмотр не меняет текущее меню.|Tres conceptos de navegación para ordenador y móvil. Las vistas previas no cambian el menú actual.
+Desktop|Desktop|Komputer|Компьютер|Ordenador
+Mobil|Mobile|Telefon|Телефон|Móvil
+Empfehlung|Recommended|Rekomendacja|Рекомендуется|Recomendado
+1 · Seitenleiste|1 · Sidebar|1 · Panel boczny|1 · Боковая панель|1 · Barra lateral
+Desktop: Bereiche bleiben links sichtbar. Mobil: Menü per Schaltfläche öffnen und schließen.|Desktop: sections remain visible on the left. Mobile: open and close the menu with a button.|Komputer: sekcje są widoczne po lewej. Telefon: otwieraj i zamykaj menu przyciskiem.|На компьютере разделы видны слева. На телефоне меню открывается и закрывается кнопкой.|Ordenador: secciones visibles a la izquierda. Móvil: abra y cierre el menú con un botón.
+☰ Menü|☰ Menu|☰ Menu|☰ Меню|☰ Menú
+Beispielansicht|Example view|Widok przykładowy|Пример экрана|Vista de ejemplo
+Gut für häufige Wechsel zwischen vielen Modulen.|Useful for frequent switching between many modules.|Dobre rozwiązanie przy częstym przełączaniu wielu modułów.|Удобно для частого переключения между модулями.|Útil para cambiar con frecuencia entre muchos módulos.
+2 · Menü oben rechts|2 · Top-right menu|2 · Menu w prawym górnym rogu|2 · Меню справа вверху|2 · Menú arriba a la derecha
+Desktop: kompaktes Menü über der Arbeitsfläche. Mobil: dieselbe Struktur mit großen Schaltflächen.|Desktop: compact menu above the workspace. Mobile: the same structure with large buttons.|Komputer: kompaktowe menu nad obszarem roboczym. Telefon: ta sama struktura z dużymi przyciskami.|На компьютере компактное меню над рабочей областью. На телефоне та же структура с крупными кнопками.|Ordenador: menú compacto sobre el área de trabajo. Móvil: la misma estructura con botones grandes.
+Viel Platz für breite Planungs- und Datentabellen.|Plenty of room for wide planning and data tables.|Dużo miejsca na szerokie tabele planowania i danych.|Больше места для широких таблиц планирования и данных.|Amplio espacio para tablas de planificación y datos.
+3 · Hauptbereiche + Kacheln|3 · Main sections + tiles|3 · Główne sekcje i kafelki|3 · Основные разделы и плитки|3 · Áreas principales y tarjetas
+Desktop: Bereichsleiste oben. Mobil: die Hauptbereiche unten, weitere Module als Kacheln.|Desktop: section bar at the top. Mobile: main sections at the bottom, other modules as tiles.|Komputer: pasek sekcji u góry. Telefon: główne sekcje na dole, pozostałe moduły jako kafelki.|На компьютере панель разделов сверху. На телефоне основные разделы снизу, остальные модули в виде плиток.|Ordenador: barra de áreas arriba. Móvil: áreas principales abajo y otros módulos como tarjetas.
+Mehr|More|Więcej|Ещё|Más
+Kurze Wege auf dem Smartphone bei wenigen Hauptbereichen.|Quick access on phones with only a few main sections.|Szybki dostęp na telefonie przy niewielu głównych sekcjach.|Быстрый доступ на телефоне при небольшом числе основных разделов.|Acceso rápido en el móvil con pocas áreas principales.
+Mein Bereich|My area|Moja przestrzeń|Мой раздел|Mi área
+Eigener Bereich|Personal area|Obszar osobisty|Личный раздел|Área personal
+Module konnten nicht geladen werden.|Could not load modules.|Nie udało się załadować modułów.|Не удалось загрузить модули.|No se pudieron cargar los módulos.
+Vorschauformat|Preview format|Format podglądu|Формат просмотра|Formato de vista previa
+Vorschau Seitenleiste|Sidebar preview|Podgląd panelu bocznego|Просмотр боковой панели|Vista previa de barra lateral
+Vorschau kompaktes Menü|Compact menu preview|Podgląd menu kompaktowego|Просмотр компактного меню|Vista previa de menú compacto
+Vorschau Bereichsnavigation|Section navigation preview|Podgląd nawigacji sekcji|Просмотр навигации по разделам|Vista previa de navegación por áreas
