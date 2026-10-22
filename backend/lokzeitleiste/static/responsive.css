@@ -8,3 +8,14 @@ html{max-width:100%;overflow-x:clip}body{max-width:100%;overflow-x:clip}main,sec
 .backend-menu-control{position:relative;margin-left:auto;order:99;flex:0 0 auto;direction:ltr}.backend-menu-toggle{display:flex;align-items:center;justify-content:center;min-width:48px;min-height:44px;font-size:26px;line-height:1;border:1px solid #b6cbd6;border-radius:8px;background:white;color:#173e55;cursor:pointer}.backend-menu-toggle:focus-visible,.backend-menu a:focus-visible,.backend-menu button:focus-visible{outline:3px solid #e5ac35;outline-offset:3px}.backend-menu-control .backend-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:1000;width:min(860px,calc(100vw - 32px));max-height:calc(100dvh - 100px);overflow:auto;overscroll-behavior:contain;margin:0!important;padding:22px;background:white;color:#173e55;border:1px solid #d8e2e8;border-radius:12px;box-shadow:0 8px 30px #132c4033}.backend-menu[hidden]{display:none!important}.backend-menu a{color:#17445b}html[dir=rtl] .backend-menu{direction:rtl}header:has(.backend-menu-control){flex-direction:row;direction:ltr}html[dir=rtl] header:has(.backend-menu-control)>:not(.backend-menu-control){direction:rtl}@media(max-width:700px){.backend-menu-control .backend-menu{position:absolute;top:calc(100% + 8px);right:0;width:calc(100vw - 30px);max-height:calc(100dvh - 96px);padding:16px}.backend-menu .menu-tree{grid-template-columns:1fr}.backend-menu-toggle{min-width:48px}}
 
 .backend-menu .menu-tree{grid-template-columns:repeat(2,minmax(0,1fr))}.backend-menu .menu-tree>li>ul ul{padding-left:14px;margin:4px 0 12px;border-left:2px solid #d8e2e8}.backend-menu .menu-tree>li>ul .menu-heading{margin:8px 0 2px}.menu-placeholder{display:block;padding:9px 10px;color:#607887;font-style:italic;overflow-wrap:anywhere}.menu-logout{grid-column:1/-1;border-top:1px solid #d8e2e8;padding-top:12px}@media(max-width:700px){.backend-menu .menu-tree{grid-template-columns:1fr}}
+
+/* Each menu level starts closed; labels with destinations retain their own link. */
+.backend-menu .menu-tree ul[hidden]{display:none!important}
+.backend-menu .menu-group-row{display:flex;align-items:center;gap:4px}
+.backend-menu .menu-group-row>.menu-heading{flex:1;min-width:0;margin:0!important}
+.backend-menu .menu-tree .menu-submenu-toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;min-width:44px;padding:10px;border:1px solid #d8e2e8;background:#edf3f7;color:#17445b;text-align:start;font-weight:750}
+.backend-menu .menu-submenu-toggle::after{content:'▸';display:inline-block;flex:none}
+.backend-menu .menu-submenu-toggle[aria-expanded=true]::after{transform:rotate(90deg)}
+.backend-menu .menu-group-row>a+.menu-submenu-toggle{justify-content:center;flex:none}
+.backend-menu .menu-submenu-toggle:hover{background:#dce8ef}
+.backend-menu .menu-tree>li>ul{margin-top:6px}
