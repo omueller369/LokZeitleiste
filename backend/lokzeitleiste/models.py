@@ -572,3 +572,19 @@ class GpsStationCache(Base):
     cell:Mapped[str]=mapped_column(String(40),primary_key=True)
     payload_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+class AppDefaultValue(Base):
+    __tablename__='app_default_values'
+    __table_args__=(UniqueConstraint('category','value'),UniqueConstraint('category','label_key'))
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    category:Mapped[str]=mapped_column(String(10),nullable=False)
+    value:Mapped[str]=mapped_column(String(64),nullable=False)
+    label:Mapped[str]=mapped_column(String(200),nullable=False)
+    label_key:Mapped[str]=mapped_column(String(400),nullable=False)
+    active:Mapped[bool]=mapped_column(Boolean,nullable=False,default=True)
+    ever_used:Mapped[bool]=mapped_column(Boolean,nullable=False,default=False)
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+
+class AppDefaultSeed(Base):
+    __tablename__='app_default_seed'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)

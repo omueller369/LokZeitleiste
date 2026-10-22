@@ -6,7 +6,7 @@ from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter,Depends,HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel,Field,model_validator,field_validator
+from pydantic import BaseModel,Field,model_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -14,7 +14,6 @@ from .db import database_session
 from .models import User,RailwayStation,TrainGpsRecording,GpsStationCache,now_utc
 from .tf_portal import driver_dependency
 from .gps_analysis import analyse,candidates
-from .work_reports.schemas import REASONS
 
 _finite=Annotated[float,Field(allow_inf_nan=False)]
 class Point(BaseModel):
@@ -34,13 +33,8 @@ class Recording(BaseModel):
         if self.points[-1].t-self.points[0].t>48*3600_000:raise ValueError('GPS-Aufzeichnung höchstens 48 Stunden.')
         return self
 class StopReason(BaseModel):
-    reason:str=Field(default='',max_length=32)
+    reason:str=Field(default='',max_length=64)
     detail:str=Field(default='',max_length=256)
-    @field_validator('reason')
-    @classmethod
-    def valid_reason(cls,value):
-        if value and value not in REASONS:raise ValueError('Ungültiger Grund.')
-        return value
     @model_validator(mode='after')
     def valid_detail(self):
         self.detail=self.detail.strip() if self.reason=='sonstiges' else ''
@@ -144,6 +138,8 @@ def create_router(require_account):
         return result
     @router.put('/api/v1/tf/gps/{journey_id}/stations')
     def choose(journey_id:UUID,data:Choices,user:User=Depends(driver),db:Session=Depends(database_session)):
+        from .app_defaults import ensure_defaults,use_value
+        ensure_defaults(db)
         row=owned(db,user,journey_id,True)
         if row.revision!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
         payload=json.loads(row.payload_json);keys={item['key'] for item in analyse(payload['points'])['rows']};selected={}
@@ -153,6 +149,9 @@ def create_router(require_account):
             selected[key]=dict(code=station.code,name=station.name)
         if data.reasons is not None:
             if any(key not in keys for key in data.reasons):raise HTTPException(422,'Ungültiger Grund.')
-            payload['reasons']={key:value.model_dump() for key,value in data.reasons.items() if value.reason}
+            labels={}
+            for key,value in sorted(data.reasons.items()):
+                if value.reason:labels[key]=use_value(db,'reason',value.reason,payload.get('reasons',{}).get(key,{}).get('reason')).label
+            payload['reasons']={key:dict(value.model_dump(),label=labels[key]) for key,value in data.reasons.items() if value.reason}
         payload['stations']=selected;row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     return router

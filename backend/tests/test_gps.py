@@ -97,7 +97,7 @@ class RecordingTest(unittest.TestCase):
         for reason in REASONS:
             data={'expected_revision':revision,'stations':{},'reasons':{'s0':{'reason':reason,'detail':'Warten auf Ersatzlok' if reason=='sonstiges' else 'ignored'}}}
             result=self.driver.put(path+'/stations',json=data);self.assertEqual(result.status_code,200,result.text)
-            revision+=1;expected={'reason':reason,'detail':'Warten auf Ersatzlok' if reason=='sonstiges' else ''}
+            revision+=1;expected={'label':reason,'reason':reason,'detail':'Warten auf Ersatzlok' if reason=='sonstiges' else ''}
             self.assertEqual(result.json()['analysis']['rows'][1]['reason'],expected)
             self.assertEqual(self.driver.get(path).json()['reasons']['s0'],expected)
         for reasons in [{'no-row':{'reason':'V1'}},{'s0':{'reason':'invented'}},{'s0':{'reason':'sonstiges'}},{'s0':{'reason':'sonstiges','detail':'x'*257}}]:

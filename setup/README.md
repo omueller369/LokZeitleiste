@@ -289,10 +289,16 @@ Die direkte Moduladresse lautet /admin/vehicles. Bei Fehlern nach einem Update a
 
 ### Neuer Backend-Menübaum
 
-Administration bietet direkte Links zu allen vorhandenen Modulen. Verwaltung → Mitarbeiter enthält die klickbaren Listenpunkte TFs und Verwaltung, jeweils mit dem Unterpunkt anlegen. Personalplanung enthält Arbeitszeitplanung, Schichtplan und TF-Übersicht. Letzteres öffnet direkt die gemeinsame Ruhetagsplanübersicht aller TF. Sonstiges → Stammdaten enthält Triebfahrzeuge und den deaktivierten Platzhalter App Grundwerte (folgt später). Die übrigen Module (Alle Mitarbeiter, Dienstplan, Dienstzeit, Arbeitszeiterfassung/Korrekturen, Email, Dokumente, Passwort und gegebenenfalls eigene Arbeitszeiten) stehen direkt unter Sonstiges. Abmelden steht separat am Menüende.
+Administration bietet direkte Links zu allen vorhandenen Modulen. Verwaltung → Mitarbeiter enthält die klickbaren Listenpunkte TFs und Verwaltung, jeweils mit dem Unterpunkt anlegen. Personalplanung enthält Arbeitszeitplanung, Schichtplan und TF-Übersicht. Letzteres öffnet direkt die gemeinsame Ruhetagsplanübersicht aller TF. Sonstiges → Stammdaten enthält Triebfahrzeuge und App Grundwerte. Die übrigen Module (Alle Mitarbeiter, Dienstplan, Dienstzeit, Arbeitszeiterfassung/Korrekturen, Email, Dokumente, Passwort und gegebenenfalls eigene Arbeitszeiten) stehen direkt unter Sonstiges. Abmelden steht separat am Menüende.
 
 Die Modulrechte bleiben serverseitig wirksam. Fehlende Freigaben werden an den Menülinks gekennzeichnet. Das Menü wird bei geänderten Rechten oder anderem Konto neu aufgebaut; Hover, Klick, Escape und Tastaturbedienung des Menüschalters bleiben erhalten.
 
 ## GPS-Browsertest und kostenloses HTTPS
 
 [Schritt-für-Schritt-Anleitung für den Demo-Server](GPS-HTTPS-Test.md): `sudo bash setup-https.sh` richtet kostenloses Let's-Encrypt-HTTPS für `ctl-software.io-goerlitz.eu` ein. Spätere Demo-Updates behalten HTTPS bei. Die Browser-Testaufzeichnung wird nach Eingabe der Zugnummer angeboten, speichert GPS separat und wertet Halte unter 3 km/h über fünf Minuten aus. Der Tab muss sichtbar bleiben.
+
+## App Grundwerte
+
+Das Modul liegt unter **Sonstiges → Stammdaten → App Grundwerte**. Gründe und Arten können angelegt, umbenannt und deaktiviert werden. Unverwendete Werte dürfen mit Administrationsrecht gelöscht werden; einmal verwendete Werte bleiben dauerhaft vor dem Löschen geschützt. Vorhandene Berichte und deren PDF-Bezeichnungen bleiben erhalten. Die Dropdowns für Zugfahrten und GPS-Gründe verwenden dieselben Stammdaten.
+
+`init_db` legt bei Neuinstallation und beim normalen Update einmalig die bisherigen 16 Gründe und vier aktuellen Arten an. Bereits verwendete historische Werte werden berücksichtigt; zusätzliche Altwerte bleiben inaktiv erhalten. Spätere Updates setzen Änderungen oder Löschungen an diesen Stammdaten nicht zurück. Verwaltungsmitarbeiter benötigen die neue Modulfreigabe **App Grundwerte** (Lesen / Lesen und Schreiben / Administration); Administratoren haben automatisch Zugriff.

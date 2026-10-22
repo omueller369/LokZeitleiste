@@ -51,9 +51,11 @@ CAUSES=('CTL','CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle'
 
 class TrainEventIn(BaseModel):
     id:UUID
-    reason:Literal['V1','V3','A1','A1A','A3','Pause','Rangieren','Zugvorbereitung','BrP','vBrP','Zugfolge','Warten auf Zug','Warten auf Fpl','Warten auf FPLO','Lok defekt','sonstiges']
+    reason:str=Field(min_length=1,max_length=64)
+    reason_label:str=Field(default='',max_length=200)
     reason_detail:str=Field(default='',max_length=256)
-    cause:Literal['CTL','CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle','sonstiges']
+    cause:str=Field(min_length=1,max_length=64)
+    cause_label:str=Field(default='',max_length=200)
     cause_detail:str=Field(default='',max_length=50)
     station:str=Field(default='',max_length=10)
     station_name:str=Field(default='',max_length=255)

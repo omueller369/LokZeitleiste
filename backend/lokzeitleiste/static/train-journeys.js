@@ -1,6 +1,6 @@
 (()=>{
 const REASONS=['V1','V3','A1','A1A','A3','Pause','Rangieren','Zugvorbereitung','BrP','vBrP','Zugfolge','Warten auf Zug','Warten auf Fpl','Warten auf FPLO','Lok defekt','sonstiges'];
-window.TrainJourneyReasons=Object.freeze(REASONS);
+window.TrainJourneyReasons=REASONS;
 const CAUSES=['CTL','DB InfraGo','Dritte Stelle','sonstiges'];
 const node=(tag,value)=>{const n=document.createElement(tag);if(value!==undefined)n.textContent=value;return n;};
 const t=value=>window.I18n?.t(value)||value;
@@ -8,6 +8,17 @@ const labelStation=(code,name)=>name?code+' · '+name:code;
 const stationParts=value=>{const parts=value.trim().split(' · ');return {code:parts[0],name:parts.slice(1).join(' · ')};};
 window.ReportTableTime=(value,start,end,previous=start)=>{if(!value)return '';const day=value.slice(0,10),time=value.slice(11,16);return start&&end&&start.slice(0,10)!==end.slice(0,10)&&day!==(previous||start).slice(0,10)?day.split('-').reverse().join('.')+' · '+time:time;};
 const causeLabel=value=>value==='CTL Logistics DE'?'CTL':value;
+const choiceLabels={};
+const choiceLabel=(kind,value)=>choiceLabels[kind+':'+value]||value;
+window.TrainJourneyReasonLabel=value=>choiceLabel('reason',value);
+window.loadTrainJourneyChoices=async()=>{
+ let values;
+ try{const response=await fetch('/api/v1/tf/app-defaults',{credentials:'same-origin',cache:'no-store'});if(!response.ok)throw Error('Choices unavailable');values=await response.json();localStorage.setItem('lokzeitleiste.app-defaults',JSON.stringify(values));}catch(error){try{values=JSON.parse(localStorage.getItem('lokzeitleiste.app-defaults')||'null');}catch(ignored){}}
+ if(!Array.isArray(values))return;
+ for(const row of values)choiceLabels[row.category+':'+row.value]=row.label;
+ REASONS.splice(0,REASONS.length,...values.filter(row=>row.category==='reason'&&row.active).map(row=>row.value));
+ CAUSES.splice(0,CAUSES.length,...values.filter(row=>row.category==='cause'&&row.active).map(row=>row.value));
+};
 window.TrainJourneyEditor=class{
  constructor(options){
   this.o=options;this.stationCache=new Map();this.items=[];this.active=null;
@@ -34,7 +45,7 @@ window.TrainJourneyEditor=class{
  }
  select(parent,title,values){
   const label=node('label'),select=node('select');select.required=true;const placeholder=node('option','Bitte wählen');placeholder.value='';select.append(placeholder);
-  for(const value of values){const option=node('option',value==='Pause'?'Pause (Pausenzeit dokumentieren)':value);option.value=value;select.append(option);}label.append(node('span',title),select);parent.append(label);return select;
+  for(const value of values){const option=node('option',choiceLabel(values===REASONS?'reason':'cause',value));option.value=value;select.append(option);}label.append(node('span',title),select);parent.append(label);return select;
  }
  make(data){
   this.cacheStation(data.start_station,data.start_station_name);this.cacheStation(data.end_station,data.end_station_name);for(const event of data.events||[])this.cacheStation(event.station,event.station_name);
@@ -54,7 +65,7 @@ window.TrainJourneyEditor=class{
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
   item.gps=window.GpsRecorder?.mount({userId:this.o.userId,journeyId:item.id,container:item.panel,numberField:fields.train_number,trainNumber:()=>fields.train_number.value,readonly:()=>this.o.readonly(),stations:this.o.stations,resolve:this.o.resolve});
   for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{if(name==='start_at'){item.autoStart=false;if(item.autoEnd)fields.end_at.value=this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;}if(name==='end_at')item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.gps?.freeze();this.ready(item);this.table(item);this.changed();this.refreshTabs();});}
-  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrt'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid train-event-grid';const f=item.eventFields={};
+  item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrt'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.hidden=!REASONS.includes('Pause')||!CAUSES.includes('CTL');item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid train-event-grid';const f=item.eventFields={};
   f.cause=this.select(eventGrid,'Art',CAUSES);
   f.reason=this.select(eventGrid,'Grund',REASONS);
   f.cause_detail=this.field(eventGrid,'Sonstige Art (max. 50 Zeichen)','text',{maxLength:50});
@@ -87,10 +98,10 @@ window.TrainJourneyEditor=class{
  refreshTabs(){this.bar.hidden=!this.items.length;if(this.items.length)this.bar.append(this.o.button);else this.o.container.before(this.o.button);for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
   item.rows.replaceChildren();const f=item.fields,bounds=this.o.bounds();let previous=bounds.start;const stamp=(value,prior)=>window.ReportTableTime(value,bounds.start,bounds.end,prior);
-  for(const event of item.events){const row=node('tr');row.tabIndex=0;row.classList.toggle('selected',item.editing===event.id);const n=this.o.minute(event.end_at)-this.o.minute(event.start_at),reason=t(event.reason)+(event.reason==='sonstiges'?' · '+event.reason_detail:''),cause=t(event.cause)+(event.cause==='sonstiges'?' · '+event.cause_detail:'');
+  for(const event of item.events){const row=node('tr');row.tabIndex=0;row.classList.toggle('selected',item.editing===event.id);const n=this.o.minute(event.end_at)-this.o.minute(event.start_at),reason=t(event.reason_label||choiceLabel('reason',event.reason))+(event.reason==='sonstiges'?' · '+event.reason_detail:''),cause=t(event.cause_label||choiceLabel('cause',event.cause))+(event.cause==='sonstiges'?' · '+event.cause_detail:'');
    for(const value of [f.train_number.value,f.start_station.value,stamp(f.start_at.value),f.end_station.value,stamp(f.end_at.value,f.start_at.value),cause,reason,labelStation(event.station,event.station_name),stamp(event.start_at,previous),stamp(event.end_at,event.start_at),this.o.clock(n),this.o.clock(event.reason==='Pause'?n:0)]){const cell=node('td',value);cell.setAttribute('data-i18n-ignore','');row.append(cell);}
    previous=event.end_at;
-   const load=()=>{if(this.o.readonly())return;item.editing=event.id;if(!CAUSES.includes(event.cause)&&![...item.eventFields.cause.options].some(o=>o.value===event.cause)){const legacy=node('option',event.cause);legacy.value=event.cause;legacy.disabled=true;item.eventFields.cause.append(legacy);}for(const name of ['reason','reason_detail','cause','cause_detail','start_at','end_at'])item.eventFields[name].value=(event[name]||'').toString().slice(0,name.endsWith('_at')?16:undefined);item.eventFields.station.value=labelStation(event.station,event.station_name);item.eventFields.start_at.dataset.previous=item.eventFields.start_at.value;item.eventFields.end_at.min=item.eventFields.start_at.value;this.details(item);item.submit.textContent='Speichern';item.cancel.hidden=false;item.deleteEvent.hidden=false;this.table(item);item.form.scrollIntoView?.({behavior:'smooth',block:'nearest'});};row.onclick=load;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();load();}};item.rows.append(row);
+   const load=()=>{if(this.o.readonly())return;item.editing=event.id;for(const kind of ['reason','cause']){if(![...item.eventFields[kind].options].some(o=>o.value===event[kind])){const legacy=node('option',event[kind+'_label']||choiceLabel(kind,event[kind]));legacy.value=event[kind];legacy.disabled=true;item.eventFields[kind].append(legacy);}}for(const name of ['reason','reason_detail','cause','cause_detail','start_at','end_at'])item.eventFields[name].value=(event[name]||'').toString().slice(0,name.endsWith('_at')?16:undefined);item.eventFields.station.value=labelStation(event.station,event.station_name);item.eventFields.start_at.dataset.previous=item.eventFields.start_at.value;item.eventFields.end_at.min=item.eventFields.start_at.value;this.details(item);item.submit.textContent='Speichern';item.cancel.hidden=false;item.deleteEvent.hidden=false;this.table(item);item.form.scrollIntoView?.({behavior:'smooth',block:'nearest'});};row.onclick=load;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();load();}};item.rows.append(row);
   }
  }
  draft(){return this.items.map(item=>{const f=item.fields,a=stationParts(f.start_station.value),b=stationParts(f.end_station.value);return {id:item.id,train_number:f.train_number.value.trim(),start_station:a.code,start_station_name:a.name,start_at:f.start_at.value,end_station:b.code,end_station_name:b.name,end_at:f.end_at.value,events:item.events.map(e=>({...e}))};});}
@@ -109,9 +120,9 @@ window.TrainJourneyEditor=class{
  async insert(item){
   if(this.o.readonly()||!item.form.reportValidity())return;
   this.o.block(true);
-  try{await this.header(item);const f=item.eventFields;if(!REASONS.includes(f.reason.value)||!CAUSES.includes(f.cause.value))throw Error('Bitte Grund und Art auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=f.reason.value==='Pause'&&f.cause.value==='CTL'?{code:'',name:''}:await this.resolve(f.station);
+  try{await this.header(item);const f=item.eventFields;const prior=item.events.find(e=>e.id===item.editing);if((!REASONS.includes(f.reason.value)&&prior?.reason!==f.reason.value)||(!CAUSES.includes(f.cause.value)&&prior?.cause!==f.cause.value))throw Error('Bitte Grund und Art auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=f.reason.value==='Pause'&&f.cause.value==='CTL'?{code:'',name:''}:await this.resolve(f.station);
    if(f.reason.value==='sonstiges'&&(!f.reason_detail.value.trim()||f.reason_detail.value.length>256))throw Error('Sonstigen Grund bitte beschreiben.');if(f.cause.value==='sonstiges'&&(!f.cause_detail.value.trim()||f.cause_detail.value.length>50))throw Error('Sonstige Art bitte beschreiben.');
-   const event={id:item.editing||this.o.uuid(),reason:f.reason.value,reason_detail:f.reason.value==='sonstiges'?f.reason_detail.value.trim():'',cause:f.cause.value,cause_detail:f.cause.value==='sonstiges'?f.cause_detail.value.trim():'',station:station.code,station_name:station.name,start_at:f.start_at.value,end_at:f.end_at.value};
+   const event={id:item.editing||this.o.uuid(),reason:f.reason.value,reason_label:prior?.reason===f.reason.value?prior.reason_label||choiceLabel('reason',f.reason.value):choiceLabel('reason',f.reason.value),reason_detail:f.reason.value==='sonstiges'?f.reason_detail.value.trim():'',cause:f.cause.value,cause_label:prior?.cause===f.cause.value?prior.cause_label||choiceLabel('cause',f.cause.value):choiceLabel('cause',f.cause.value),cause_detail:f.cause.value==='sonstiges'?f.cause_detail.value.trim():'',station:station.code,station_name:station.name,start_at:f.start_at.value,end_at:f.end_at.value};
    const all=this.items.flatMap(train=>train.events.filter(e=>e.id!==event.id));if(event.reason==='Pause'&&all.some(e=>e.reason==='Pause'&&this.o.minute(event.start_at)<this.o.minute(e.end_at)&&this.o.minute(event.end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
    if(item.editing)item.events=item.events.map(e=>e.id===item.editing?event:e);else{if(item.events.length>=500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');item.events.push(event);}this.clearEvent(item,event.end_at);this.changed();this.o.message('');
   }catch(error){this.o.message(error.message);}finally{this.o.block(false);}

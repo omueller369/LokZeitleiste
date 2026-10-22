@@ -14,6 +14,8 @@ def main():
     Base.metadata.create_all(engine())
     from .accounts.tf_profiles import migrate_existing, seed_stations, migrate_legacy_gender, ensure_gender_column
     with Session(engine()) as db:
+        from .app_defaults import ensure_defaults
+        ensure_defaults(db)
         ensure_gender_column(db)
         migrate_existing(db)
         migrate_legacy_gender(db)

@@ -41,6 +41,8 @@ def report_view(db,report):
 
 
 def save_report(db,user,data):
+    from ..app_defaults import ensure_defaults
+    ensure_defaults(db)
     db.scalar(select(User).where(User.id==user.id).with_for_update())
     existing=db.scalar(select(DutyReport).where(DutyReport.tf_user_id==user.id,DutyReport.client_id==str(data.client_id)))
     if existing:
@@ -62,6 +64,8 @@ def save_report(db,user,data):
             station=db.get(RailwayStation,code)
             if not station:raise HTTPException(422,'Unbekanntes DS100-Kürzel: '+code)
             setattr(trip,name_field,station.name)
+    from ..app_defaults import use_journeys
+    use_journeys(db,data.train_journeys)
     resolve_train_stations(db,data.train_journeys)
     normalized=data.model_dump_json()
     if len(normalized.encode('utf-8'))>60000:raise HTTPException(422,'Arbeitsbericht enthält zu viele Zugfahrtdaten.')
@@ -112,6 +116,8 @@ def update_train_journeys(db,user,report,changes):
     payload=json.loads(report.payload_json)
     current=payload.get('train_journeys',[]);revision=payload.get('_train_revision',0)
     data=ReportIn.model_validate(dict(payload,train_journeys=[t.model_dump(mode='json') for t in changes.train_journeys]))
+    from ..app_defaults import use_journeys
+    use_journeys(db,data.train_journeys,current)
     resolve_train_stations(db,data.train_journeys)
     trains=[t.model_dump(mode='json') for t in data.train_journeys]
     if trains==current:return report

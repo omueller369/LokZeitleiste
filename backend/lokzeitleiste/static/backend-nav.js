@@ -1,4 +1,4 @@
-(async()=>{try{const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok)return;const me=await response.json(),p=me.permissions;const fingerprint=JSON.stringify(p),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261022-collapse-5'&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint)return;existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label','Backend-Menü');nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
+(async()=>{try{const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok)return;const me=await response.json(),p=me.permissions;const fingerprint=JSON.stringify(p),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261022-defaults-6'&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint)return;existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label','Backend-Menü');nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
 let groupCount=0;
 function group(label,parent=list,href=null,allowed=true){
  const item=document.createElement('li'),row=document.createElement('div'),heading=document.createElement(href?'a':'button'),children=document.createElement('ul'),toggle=href?document.createElement('button'):heading;
@@ -22,6 +22,7 @@ const modules=[
  ['planning','Arbeitszeitplanung','/admin/planning',!!p.planning],
  ['shifts','Schichtplan','/admin/shifts',!!p.shifts],
  ['overview','TF-Übersicht','/admin/planning?overview=all',!!p.planning],
+ ['app_defaults','App Grundwerte','/admin/app-defaults',me.role==='admin'||!!p.app_defaults],
  ['vehicles','Triebfahrzeuge','/admin/vehicles',me.role==='admin'||!!p.vehicles],
  ['roster','Dienstplan','/admin/planning?readonly=1',!!p.planning],
  ['hours','Dienstzeit','/admin/tf/hours',!!p.planning&&!!(p.worktime||p.reports)],
@@ -37,12 +38,12 @@ const management=group('Verwaltung'),employees=group('Mitarbeiter',management);
 const drivers=group('TFs',employees,'/admin/tf',hasEmployees);moduleLink(drivers,'tfNew','anlegen');
 const office=group('Verwaltung',employees,'/admin/staff',!!p.staff);moduleLink(office,'staffNew','anlegen');
 const planning=group('Personalplanung');for(const id of ['planning','shifts','overview'])moduleLink(planning,id);
-const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(master,'vehicles');placeholder(master,'App Grundwerte (folgt später)');
+const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(master,'vehicles');moduleLink(master,'app_defaults');
 for(const id of ['directory','roster','hours','worktime','email','documents','password',...(me.role==='staff'?['ownTime']:[])])moduleLink(other,id);
 const logoutItem=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent='Abmelden';logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error('Abmelden fehlgeschlagen');location.href='/admin';}catch(error){logout.disabled=false;alert(error.message);}};logoutItem.className='menu-logout';logoutItem.append(logout);list.append(logoutItem);
-const stylesheet=document.querySelector('link[href^="/responsive.css"]');if(stylesheet)stylesheet.href='/responsive.css?v=20261022-collapse-5';
+const stylesheet=document.querySelector('link[href^="/responsive.css"]');if(stylesheet)stylesheet.href='/responsive.css?v=20261022-defaults-6';
 const header=document.querySelector('header');if(!header)return;
-const control=document.createElement('div');control.className='backend-menu-control';control.dataset.menuRevision='20261022-collapse-5';control.dataset.accountId=String(me.id);control.dataset.permissions=fingerprint;
+const control=document.createElement('div');control.className='backend-menu-control';control.dataset.menuRevision='20261022-defaults-6';control.dataset.accountId=String(me.id);control.dataset.permissions=fingerprint;
 const toggle=document.createElement('button');toggle.type='button';toggle.className='backend-menu-toggle';toggle.textContent='☰';toggle.setAttribute('aria-label','Backend-Menü');toggle.setAttribute('title','Backend-Menü');toggle.setAttribute('aria-controls','navigation');toggle.setAttribute('aria-expanded','false');
 control.append(toggle,nav);header.append(control);
 let pinned=false,closeTimer=null,suppressHover=false;

@@ -162,7 +162,7 @@ def work_report_pdf(db,user,report):
         events=[[t(v) for v in ['Grund','Verursacher','Ort/Bf','Von','Bis','Dauer']]]
         previous_event=None;detail_rows=[]
         for event in train.get('events',[]):
-            events.append([t(event['reason']),t(event['cause']),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
+            events.append([t(event.get('reason_label') or event['reason']),t(event.get('cause_label') or event['cause']),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
             details=[]
             if event.get('reason_detail'):details.append(t('Grund')+': '+event['reason_detail'])
             if event.get('cause_detail'):details.append(t('Verursacher')+': '+event['cause_detail'])

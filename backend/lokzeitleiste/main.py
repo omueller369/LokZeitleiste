@@ -643,3 +643,6 @@ app.include_router(vehicles_router(require_admin))
 
 from .gps import create_router as gps_router
 app.include_router(gps_router(require_account))
+
+from .app_defaults import create_router as app_defaults_router
+app.include_router(app_defaults_router(require_admin,require_account))

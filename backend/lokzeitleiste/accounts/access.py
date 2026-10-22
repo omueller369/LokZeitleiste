@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from ..models import AccountPolicy, ModulePermission, User
 
-MODULES = {"vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
+MODULES = {"app_defaults":"App Grundwerte", "vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
            "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
            "staff":"Verwaltungsmitarbeiter und Berechtigungen", "directory":"Verwaltung: alle Mitarbeiter",
            "shifts":"Schichtmodelle und Zuweisungen", "email":"Tf-E-Mail-Postfächer"}
@@ -43,6 +43,8 @@ def redact_plan(db,user,summary):
 
 def authorize_route(db, user, request):
     path, method = request.url.path.rstrip('/'), request.method
+    if path=='/api/v1/admin/app-defaults' or path.startswith('/api/v1/admin/app-defaults/'):
+        return demand(db,user,'app_defaults',1 if method=='GET' else 3 if method=='DELETE' else 2)
     if path=='/api/v1/admin/vehicles' or path.startswith('/api/v1/admin/vehicles/'):
         return demand(db,user,'vehicles',1 if method=='GET' else 2)
     if path == '/api/v1/admin/logout':

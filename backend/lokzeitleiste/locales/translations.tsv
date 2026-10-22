@@ -1265,3 +1265,18 @@ ZMS und Gründe speichern|Save operating sites and reasons|Zapisz posterunki i p
 ZMS und Gründe gespeichert.|Operating sites and reasons saved.|Zapisano posterunki i przyczyny.|Пункты и причины сохранены.|Puntos ferroviarios y motivos guardados.
 Ungültiger Grund.|Invalid reason.|Nieprawidłowa przyczyna.|Недопустимая причина.|Motivo no válido.
 Sonstigen Grund bitte angeben.|Please specify the other reason.|Podaj inną przyczynę.|Укажите другую причину.|Indique el otro motivo.
+App Grundwerte|App defaults|Ustawienia podstawowe aplikacji|Базовые значения приложения|Valores básicos de la aplicación
+Standzeit Grund|Stop reason|Przyczyna postoju|Причина стоянки|Motivo de parada
+Zugfahrt Art|Train journey type|Rodzaj zdarzenia przejazdu|Вид события поездки|Tipo de evento del trayecto
+Bezeichnung|Label|Nazwa|Наименование|Denominación
+Als Auswahl verfügbar|Available for selection|Dostępne do wyboru|Доступно для выбора|Disponible para seleccionar
+Verwendet|Used|Używane|Использовано|Utilizado
+Deaktivieren|Deactivate|Dezaktywuj|Деактивировать|Desactivar
+Ja|Yes|Tak|Да|Sí
+Nein|No|Nie|Нет|No
+Bezeichnung ist erforderlich.|A label is required.|Nazwa jest wymagana.|Укажите наименование.|La denominación es obligatoria.
+Auswahlwert ist nicht mehr verfügbar. Bitte neu auswählen.|This value is no longer available. Please select again.|Ta wartość nie jest już dostępna. Wybierz ponownie.|Значение больше недоступно. Выберите другое.|Este valor ya no está disponible. Seleccione otro.
+Bezeichnung ist bereits vorhanden.|This label already exists.|Ta nazwa już istnieje.|Такое наименование уже существует.|Esta denominación ya existe.
+Auswahlwert nicht gefunden.|Selection value not found.|Nie znaleziono wartości.|Значение не найдено.|Valor de selección no encontrado.
+Auswahlwert wurde geändert. Bitte neu laden.|Selection value changed. Please reload.|Wartość została zmieniona. Wczytaj ponownie.|Значение изменено. Загрузите заново.|El valor ha cambiado. Vuelva a cargarlo.
+Bereits verwendete Werte können nur deaktiviert werden.|Values already used can only be deactivated.|Użyte wartości można tylko dezaktywować.|Использованные значения можно только деактивировать.|Los valores ya utilizados solo pueden desactivarse.
