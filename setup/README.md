@@ -292,3 +292,7 @@ Die direkte Moduladresse lautet /admin/vehicles. Bei Fehlern nach einem Update a
 Administration bietet direkte Links zu allen vorhandenen Modulen. Verwaltung → Mitarbeiter enthält die klickbaren Listenpunkte TFs und Verwaltung, jeweils mit dem Unterpunkt anlegen. Personalplanung enthält Arbeitszeitplanung, Schichtplan und TF-Übersicht. Letzteres öffnet direkt die gemeinsame Ruhetagsplanübersicht aller TF. Sonstiges → Stammdaten enthält Triebfahrzeuge und den deaktivierten Platzhalter App Grundwerte (folgt später). Die übrigen Module (Alle Mitarbeiter, Dienstplan, Dienstzeit, Arbeitszeiterfassung/Korrekturen, Email, Dokumente, Passwort und gegebenenfalls eigene Arbeitszeiten) stehen direkt unter Sonstiges. Abmelden steht separat am Menüende.
 
 Die Modulrechte bleiben serverseitig wirksam. Fehlende Freigaben werden an den Menülinks gekennzeichnet. Das Menü wird bei geänderten Rechten oder anderem Konto neu aufgebaut; Hover, Klick, Escape und Tastaturbedienung des Menüschalters bleiben erhalten.
+
+## GPS-Browsertest und kostenloses HTTPS
+
+[Schritt-für-Schritt-Anleitung für den Demo-Server](GPS-HTTPS-Test.md): `sudo bash setup-https.sh` richtet kostenloses Let's-Encrypt-HTTPS für `ctl-software.io-goerlitz.eu` ein. Spätere Demo-Updates behalten HTTPS bei. Die Browser-Testaufzeichnung wird nach Eingabe der Zugnummer angeboten, speichert GPS separat und wertet Halte unter 3 km/h über fünf Minuten aus. Der Tab muss sichtbar bleiben.

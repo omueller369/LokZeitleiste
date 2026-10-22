@@ -187,3 +187,7 @@ Neue Testkonten erhalten das Initialpasswort **tomcom123456**; beim ersten Login
 Ein erneuter Aufruf erkennt die importierten Personen über einen dauerhaften Importvermerk. Auch bereits mit der früheren Testdatenroutine angelegte Personen werden anhand ihres eindeutigen Namens, der Test-E-Mail-Adresse und des passenden Testbilds erkannt; ein fehlendes Bild wird ergänzt. Bei mehrdeutigen Namen oder einem abweichenden vorhandenen Foto bricht der Import vor Änderungen ab. Bereits importierte, anschließend administrativ geänderte Personen werden nicht wieder auf die Ursprungsdaten zurückgesetzt. Fehlende Bilder solcher Personen werden ergänzt.
 
 Diese Routine ergänzt Testpersonen und löscht keine TF. Die ältere Option --replace-all-tf ist hierfür ausdrücklich nicht erforderlich. Servervoraussetzung ist die bestehende Host-MySQL-Einrichtung mit backend/.env.host; MySQL-Zugangsdaten werden weiter aus dieser geschützten Datei verwendet.
+
+## Kostenloses HTTPS für GPS-Tests
+
+Die vollständigen Befehle inklusive DNS-/AAAA-Prüfung, Firewall, Zertifikat, Verlängerung und Browser-Test stehen in [GPS-HTTPS-Test.md](GPS-HTTPS-Test.md). Auf dem bestehenden Server nach dem Git-Update `sudo bash setup-https.sh` ausführen. Ein bereits eingerichtetes HTTPS bleibt bei späterem `setup-demo.sh` erhalten; `--http` schaltet ausdrücklich zurück. Vor dem ersten Wechsel lokale HTTP-Arbeitsberichte synchronisieren.

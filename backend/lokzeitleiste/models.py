@@ -555,3 +555,20 @@ class RailwayVehicle(Base):
     notes:Mapped[str]=mapped_column(Text,default='',nullable=False)
     revision:Mapped[int]=mapped_column(Integer,default=1,nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class TrainGpsRecording(Base):
+    __tablename__='train_gps_recordings'
+    __table_args__=(UniqueConstraint('owner_id','journey_id'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),nullable=False,index=True)
+    journey_id:Mapped[str]=mapped_column(String(36),nullable=False)
+    payload_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,default=1,nullable=False)
+
+
+class GpsStationCache(Base):
+    __tablename__='gps_station_cache'
+    cell:Mapped[str]=mapped_column(String(40),primary_key=True)
+    payload_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)

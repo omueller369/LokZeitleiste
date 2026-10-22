@@ -640,3 +640,6 @@ app.include_router(station_router(require_account))
 
 from .vehicles import create_router as vehicles_router
 app.include_router(vehicles_router(require_admin))
+
+from .gps import create_router as gps_router
+app.include_router(gps_router(require_account))

@@ -56,3 +56,4 @@
 #workReport .report-block-toggle:focus-visible{outline:3px solid #17445b;outline-offset:3px}
 #workReport .report-block-content[hidden]{display:none!important}
 #workReport .report-collapsible.is-collapsed{padding-bottom:12px;min-height:48px}
+.gps-box{padding:14px;border:1px solid #b6cbd6;border-radius:9px;margin:14px 0;background:#f3f7fa}.gps-tools{display:flex;flex-wrap:wrap;gap:8px}.gps-box svg{display:block;width:100%;max-height:240px;background:#fff;border:1px solid #d7e1e8}.gps-box table input{min-width:220px;max-width:340px}.gps-box p{overflow-wrap:anywhere}

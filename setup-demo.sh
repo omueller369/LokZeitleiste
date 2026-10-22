@@ -7,19 +7,26 @@ server_ip=212.227.86.251
 email=''
 bind_update=false
 check=false
-scheme=http
+scheme=auto
 host_mysql=true
 while (($#)); do
  case "$1" in
   --email) (($#>=2)) || { echo 'E-Mail fehlt' >&2; exit 2; };email=$2;shift 2 ;;
   --check) check=true;shift ;;
   --https) scheme=https;shift ;;
+  --http) scheme=http;shift ;;
   --docker-mysql) host_mysql=false;shift ;;
   --bind-update) bind_update=true;shift ;;
-  --help|-h) echo 'sudo bash setup-demo.sh [--check] [--bind-update] [--docker-mysql] [--https --email DEINE-EMAIL]';exit 0 ;;
+  --help|-h) echo 'sudo bash setup-demo.sh [--check] [--bind-update] [--docker-mysql] [--https --email DEINE-EMAIL | --http]';exit 0 ;;
   *) echo "Unbekannte Option: $1" >&2;exit 2 ;;
  esac
 done
+# Preserve an established HTTPS demo on later updates.
+if [[ $scheme == auto ]];then
+ if grep -qs '^PUBLIC_ORIGIN=https://' "$root/backend/.env.host" "$root/backend/.env.test" || [[ -e /etc/apache2/sites-enabled/lokzeitleiste-ctl-demo-https.conf ]];then scheme=https;else scheme=http;fi
+fi
+email_file=/var/lib/lokzeitleiste/letsencrypt-email
+if [[ -z $email && -r $email_file && ! -L $email_file ]];then IFS= read -r email < "$email_file";fi
 die(){ echo "FEHLER: $*" >&2;exit 1; }
 [[ $(uname -s) == Linux ]] || die 'Im Ubuntu-Server ausführen.'
 command -v python3 >/dev/null || die 'Zuerst sudo apt install python3 ausführen.'
@@ -94,6 +101,9 @@ if [[ $scheme == https ]]; then
  activate_site "$work/http.conf" lokzeitleiste-ctl-demo-http.conf
  certbot certonly --webroot -w /var/www/lokzeitleiste-acme --cert-name "$domain" -d "$domain" \
   --non-interactive --agree-tos --email "$email" --keep-until-expiring
+ install -d -m 0700 /var/lib/lokzeitleiste
+ [[ ! -L $email_file ]] || die 'Symlink als Zertifikatskonto-Datei nicht zulässig.'
+ (umask 077;printf '%s\n' "$email" > "$email_file")
 fi
 python3 "$root/setup/demo-config.py" env "$env_file" "$domain" "$scheme"
 compose=(docker compose --project-directory "$root/backend" --env-file "$env_file" -f "$compose_file")
