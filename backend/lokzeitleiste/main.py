@@ -656,3 +656,10 @@ def planning_overview_script():
 
 from .backend_start import create_router as backend_start_router
 app.include_router(backend_start_router(require_admin))
+
+@app.get('/admin/backend-nav.css')
+def backend_navigation_styles():
+    return FileResponse(Path(__file__).parent/'static'/'backend-nav.css',media_type='text/css',headers={'Cache-Control':'no-cache'})
+
+from .backend_navigation import create_router as backend_navigation_router
+app.include_router(backend_navigation_router(require_admin))

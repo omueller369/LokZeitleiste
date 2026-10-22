@@ -588,3 +588,9 @@ class AppDefaultValue(Base):
 class AppDefaultSeed(Base):
     __tablename__='app_default_seed'
     id:Mapped[int]=mapped_column(Integer,primary_key=True)
+
+class BackendMenuPreference(Base):
+    __tablename__='backend_menu_preferences'
+    user_id:Mapped[int]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),primary_key=True)
+    variant:Mapped[str]=mapped_column(String(16),nullable=False,default='sidebar')
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)

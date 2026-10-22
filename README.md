@@ -143,3 +143,13 @@ Passwörter können ab v0.24 sechs Zeichen lang sein: TF-/Verwaltungskontoanlage
 ## Arbeitsbericht v0.25
 
 Im [TF Portal](backend/lokzeitleiste/work_reports/README.md) Dienstbeginn/-ende, sofortige Dienstzeit-/Pausenberechnung, Pflichtbegründung bei mehr als zwölf Stunden, mehrere DS100-Gastfahrten, Beleg-Upload und die Monatsübersicht nutzen. Synchronisierte Berichte fließen einmalig in die bestehende Arbeitszeitberechnung ein. Belege werden nach dem Speichern über eine dauerhafte Warteschlange versendet; `WORK_REPORT_RECEIPT_EMAIL` konfiguriert das Ziel in API und Mailer. Der Teststack verwendet `omueller369@gmail.com` und fängt Nachrichten in Mailpit ab. Details zu Pausen, Originaldaten, lokalen Entwürfen, Dateigrenzen und Versand stehen in der Modulbeschreibung.
+
+## Persönliche Menüvariante
+
+Unter **Startseite → Menü anpassen** kann jeder Backend-Benutzer seine Navigation wählen und mit **Menüvariante speichern** dauerhaft im eigenen Benutzerkonto speichern. Der Menüpunkt **Menü anpassen** bleibt in allen Varianten erreichbar. Die Auswahl lässt sich jederzeit ändern und gilt nach erneutem Login auch auf anderen Geräten. Modulberechtigungen bleiben bestehen.
+
+- **Seitenleiste** (Voreinstellung): links am Desktop, aufklappbares Seitenmenü auf Mobilgeräten.
+- **Menü oben rechts**: kompaktes Menü mit mehr Platz für die Arbeitsfläche.
+- **Hauptbereiche + Kacheln**: Bereichsleiste am Desktop und unten auf Mobilgeräten; „Mehr“ öffnet den vollständigen Menübaum.
+
+Beim regulären Update bzw. bei der Neuinstallation wird die Tabelle `backend_menu_preferences` automatisch angelegt. Bestehende Benutzer starten ohne Datenmigration mit der Seitenleiste. Die Auswahl benötigt keine zusätzliche Modulfreigabe. TF verwenden weiterhin das TF-Portal.

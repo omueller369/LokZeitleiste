@@ -52,7 +52,7 @@ def authorize_route(db, user, request):
     if path == '/api/v1/admin/logout':
         return
     ready(db,user)
-    if path in ('/api/v1/admin/me','/api/v1/admin/modules','/api/v1/admin/start'):
+    if path in ('/api/v1/admin/me','/api/v1/admin/modules','/api/v1/admin/start','/api/v1/admin/menu-preference'):
         return
     if path in ('/api/v1/admin/tf-metadata','/api/v1/admin/stations') and method == 'GET':
         return demand(db,user,'employees',1)

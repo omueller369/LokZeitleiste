@@ -1327,7 +1327,18 @@
     "Vorschauformat": "Vorschauformat",
     "Vorschau Seitenleiste": "Vorschau Seitenleiste",
     "Vorschau kompaktes Menü": "Vorschau kompaktes Menü",
-    "Vorschau Bereichsnavigation": "Vorschau Bereichsnavigation"
+    "Vorschau Bereichsnavigation": "Vorschau Bereichsnavigation",
+    "Menü schließen": "Menü schließen",
+    "Menü anpassen": "Menü anpassen",
+    "Meine Menüvariante": "Meine Menüvariante",
+    "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.": "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.",
+    "Menüvariante wählen": "Menüvariante wählen",
+    "Menüvariante speichern": "Menüvariante speichern",
+    "Aktive Menüvariante": "Aktive Menüvariante",
+    "Menüvariante gespeichert.": "Menüvariante gespeichert.",
+    "Menüeinstellung wurde geändert. Bitte neu laden.": "Menüeinstellung wurde geändert. Bitte neu laden.",
+    "Menüeinstellung konnte nicht gespeichert werden.": "Menüeinstellung konnte nicht gespeichert werden.",
+    "Hauptbereiche": "Hauptbereiche"
   },
   "en": {
     "Administration": "Administration",
@@ -2657,7 +2668,18 @@
     "Vorschauformat": "Preview format",
     "Vorschau Seitenleiste": "Sidebar preview",
     "Vorschau kompaktes Menü": "Compact menu preview",
-    "Vorschau Bereichsnavigation": "Section navigation preview"
+    "Vorschau Bereichsnavigation": "Section navigation preview",
+    "Menü schließen": "Close menu",
+    "Menü anpassen": "Customize menu",
+    "Meine Menüvariante": "My menu layout",
+    "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.": "Your choice is saved in your account and can be changed at any time.",
+    "Menüvariante wählen": "Choose menu layout",
+    "Menüvariante speichern": "Save menu layout",
+    "Aktive Menüvariante": "Active menu layout",
+    "Menüvariante gespeichert.": "Menu layout saved.",
+    "Menüeinstellung wurde geändert. Bitte neu laden.": "Menu settings have changed. Please reload.",
+    "Menüeinstellung konnte nicht gespeichert werden.": "Menu settings could not be saved.",
+    "Hauptbereiche": "Main sections"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3987,7 +4009,18 @@
     "Vorschauformat": "Format podglądu",
     "Vorschau Seitenleiste": "Podgląd panelu bocznego",
     "Vorschau kompaktes Menü": "Podgląd menu kompaktowego",
-    "Vorschau Bereichsnavigation": "Podgląd nawigacji sekcji"
+    "Vorschau Bereichsnavigation": "Podgląd nawigacji sekcji",
+    "Menü schließen": "Zamknij menu",
+    "Menü anpassen": "Dostosuj menu",
+    "Meine Menüvariante": "Mój układ menu",
+    "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.": "Wybór jest zapisywany na Twoim koncie i można go zmienić w każdej chwili.",
+    "Menüvariante wählen": "Wybierz układ menu",
+    "Menüvariante speichern": "Zapisz układ menu",
+    "Aktive Menüvariante": "Aktywny układ menu",
+    "Menüvariante gespeichert.": "Układ menu zapisany.",
+    "Menüeinstellung wurde geändert. Bitte neu laden.": "Ustawienia menu uległy zmianie. Odśwież stronę.",
+    "Menüeinstellung konnte nicht gespeichert werden.": "Nie udało się zapisać ustawień menu.",
+    "Hauptbereiche": "Główne obszary"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5317,7 +5350,18 @@
     "Vorschauformat": "Формат просмотра",
     "Vorschau Seitenleiste": "Просмотр боковой панели",
     "Vorschau kompaktes Menü": "Просмотр компактного меню",
-    "Vorschau Bereichsnavigation": "Просмотр навигации по разделам"
+    "Vorschau Bereichsnavigation": "Просмотр навигации по разделам",
+    "Menü schließen": "Закрыть меню",
+    "Menü anpassen": "Настроить меню",
+    "Meine Menüvariante": "Мой вариант меню",
+    "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.": "Выбор сохраняется в вашей учётной записи и может быть изменён в любое время.",
+    "Menüvariante wählen": "Выбрать вариант меню",
+    "Menüvariante speichern": "Сохранить вариант меню",
+    "Aktive Menüvariante": "Текущий вариант меню",
+    "Menüvariante gespeichert.": "Вариант меню сохранён.",
+    "Menüeinstellung wurde geändert. Bitte neu laden.": "Настройки меню изменены. Обновите страницу.",
+    "Menüeinstellung konnte nicht gespeichert werden.": "Не удалось сохранить настройки меню.",
+    "Hauptbereiche": "Основные разделы"
   },
   "es": {
     "Administration": "Administración",
@@ -6647,6 +6691,17 @@
     "Vorschauformat": "Formato de vista previa",
     "Vorschau Seitenleiste": "Vista previa de barra lateral",
     "Vorschau kompaktes Menü": "Vista previa de menú compacto",
-    "Vorschau Bereichsnavigation": "Vista previa de navegación por áreas"
+    "Vorschau Bereichsnavigation": "Vista previa de navegación por áreas",
+    "Menü schließen": "Cerrar menú",
+    "Menü anpassen": "Personalizar menú",
+    "Meine Menüvariante": "Mi diseño de menú",
+    "Die Auswahl wird in Ihrem Benutzerkonto gespeichert und kann jederzeit geändert werden.": "La selección se guarda en su cuenta y puede cambiarse en cualquier momento.",
+    "Menüvariante wählen": "Elegir diseño de menú",
+    "Menüvariante speichern": "Guardar diseño de menú",
+    "Aktive Menüvariante": "Diseño de menú activo",
+    "Menüvariante gespeichert.": "Diseño de menú guardado.",
+    "Menüeinstellung wurde geändert. Bitte neu laden.": "La configuración del menú ha cambiado. Vuelva a cargar la página.",
+    "Menüeinstellung konnte nicht gespeichert werden.": "No se pudo guardar la configuración del menú.",
+    "Hauptbereiche": "Secciones principales"
   }
 }
