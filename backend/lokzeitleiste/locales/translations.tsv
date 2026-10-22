@@ -1150,3 +1150,17 @@ Name oder DS100 ändern|Change name or DS100|Zmień nazwę lub DS100|Измен�
 Name und DS100 dürfen nicht leer sein.|Name and DS100 must not be empty.|Nazwa i DS100 nie mogą być puste.|Название и DS100 не могут быть пустыми.|El nombre y DS100 no pueden estar vacíos.
 Ungültiger Name oder DS100.|Invalid name or DS100.|Nieprawidłowa nazwa lub DS100.|Недопустимое название или DS100.|Nombre o DS100 no válido.
 zurück TF-Portal|Back to TF Portal|Powrót do portalu maszynisty|Назад в портал машиниста|Volver al portal del maquinista
+Ruhetagsplan aller TF|Rest-day plan for all drivers|Plan dni wolnych wszystkich maszynistów|План выходных всех машинистов|Plan de días libres de todos los maquinistas
+Monat: alle TF|Month: all drivers|Miesiąc: wszyscy maszyniści|Месяц: все машинисты|Mes: todos los maquinistas
+Jahr: alle TF|Year: all drivers|Rok: wszyscy maszyniści|Год: все машинисты|Año: todos los maquinistas
+Gespeicherte Planung aller TF. Die Übersicht ist schreibgeschützt. Änderungen erfolgen in der Einzelplanung.|Saved plans for all drivers. This overview is read-only. Make changes in the individual planning view.|Zapisane plany wszystkich maszynistów. Przegląd jest tylko do odczytu. Zmiany wprowadza się w planie indywidualnym.|Сохранённые планы всех машинистов. Обзор доступен только для чтения. Изменения вносятся в индивидуальном плане.|Planes guardados de todos los maquinistas. Esta vista es de solo lectura. Los cambios se realizan en la planificación individual.
+A = Arbeitstag|A = Working day|A = Dzień pracy|A = Рабочий день|A = Día de trabajo
+U = Urlaub|U = Vacation|U = Urlop|U = Отпуск|U = Vacaciones
+R = Ruhetag|R = Rest day|R = Dzień wolny|R = Выходной|R = Día libre
+? = Ungeplant|? = Unplanned|? = Niezaplanowany|? = Не запланировано|? = Sin planificar
+GT = Grenzdienst Tag|GT = Border day shift|GT = Dzienna służba graniczna|GT = Дневная пограничная смена|GT = Turno fronterizo diurno
+GN = Grenzdienst Nacht|GN = Border night shift|GN = Nocna służba graniczna|GN = Ночная пограничная смена|GN = Turno fronterizo nocturno
+Keine TF vorhanden.|No drivers available.|Brak maszynistów.|Машинистов нет.|No hay maquinistas.
+TF gesamt|Total drivers|Łącznie maszynistów|Всего машинистов|Total de maquinistas
+Bitte einen gültigen Zeitraum wählen.|Please select a valid period.|Wybierz prawidłowy okres.|Выберите допустимый период.|Seleccione un período válido.
+Gesamtübersicht wird geladen…|Loading overall view…|Wczytywanie przeglądu…|Загрузка общего обзора…|Cargando vista general…

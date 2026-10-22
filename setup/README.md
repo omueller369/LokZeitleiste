@@ -255,3 +255,12 @@ Die Umbenennung behält die Eintrags-ID, Kontakte, Hinweise und den Bahnhofsplan
 ### Einheitliche Rückkehr ins TF-Portal
 
 Alle Seiten der Standardoberfläche erhalten über den gemeinsamen Seitenstart (i18n.js → /tf/return.js) automatisch oben und unten im Hauptbereich einen Button „zurück TF-Portal“, sobald ein TF angemeldet ist. Das gilt auch für neue Module, die den üblichen Seitenaufbau mit main und i18n.js verwenden. Die Portal-Startseite selbst erhält keine Rückkehr-Buttons. Verwaltungs- und abgemeldete Benutzer erhalten diese TF-Navigation nicht. An-/Abmeldung und Sprachwechsel werden berücksichtigt. Die Buttons verwenden die normale Seitennavigation; bestehende Warnungen vor ungespeicherten Änderungen bleiben wirksam. Einzelne, zusätzliche Rückkehr-Links sollen nicht mehr in Modultemplates eingebaut werden.
+
+
+### Ruhetagsplan aller TF in der Personalplanung
+
+Die neue Gesamtübersicht oberhalb der Einzelplanung zeigt standardmäßig den aktuellen Monat (Berliner Datum). Jahr und Monat lassen sich separat wählen. „Monat: alle TF“ listet alle TF alphabetisch nach Nachname/Vorname untereinander mit sämtlichen Monatstagen als Spalten. „Jahr: alle TF“ zeigt dieselben Zeilen mit allen 365 bzw. 366 Tagen, nach Monaten gruppiert. Die Namen bleiben beim horizontalen Scrollen sichtbar; die Datumsköpfe bleiben beim vertikalen Scrollen sichtbar. Die Ansicht lässt sich auf mobilen Geräten in beide Richtungen scrollen.
+
+R steht für Ruhetag, U für Urlaub, A für Arbeitstag, GT/GN für Grenzdienst Tag/Nacht und ? für ungeplant. Berliner Feiertage werden mit der jeweiligen Tagesart diagonal kombiniert; ungeplante Feiertage erscheinen violett. Wochenenden sind zusätzlich unterstrichen. Titel und zugängliche Zellbeschreibungen zeigen Datum, Name, Status und gegebenenfalls Feiertag und Schicht.
+
+Die Gesamtübersicht verwendet ausschließlich die gespeicherten Einzelpläne über die bestehenden Planungs-APIs. Sie steht mit Lesefreigabe für Personalplanung zur Verfügung und enthält alle vorhandenen TF einschließlich Konten ohne gespeicherten Plan (deren Tage erscheinen ungeplant). Änderungen erfolgen weiterhin in der Einzelplanung. Ungespeicherte Entwürfe werden von der Übersicht nicht übernommen oder verworfen. „Aktualisieren“ lädt die TF-Liste und Planungsdaten neu. Erfolgreiches Speichern oder Übernehmen eines Excel-Imports aktualisiert die Übersicht ebenfalls. Die Jahresübersicht lädt höchstens vier TF-Pläne gleichzeitig; fehlgeschlagene Anfragen zeigen einen Fehler statt einer unvollständigen Tabelle. Keine Datenbankänderung erforderlich.

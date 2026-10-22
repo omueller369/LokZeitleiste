@@ -195,7 +195,7 @@ el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay,
 el('selectAll').onchange=()=>{for(const d of scopeDays())el('selectAll').checked?selectedSet().add(d.date):selectedSet().delete(d.date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
 el('clearSelection').onclick=()=>{selectedSet().clear();renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
 el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){d.kind=el('bulkKind').value;d.shift=d.kind==='Arbeitstag'?el('bulkShift').value:'standard';if(d.kind==='Ungeplant')d.note='';updateDuty(d);}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
-el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note,shift})=>({date,kind,note,shift})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');}));
+el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note,shift})=>({date,kind,note,shift})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');window.refreshPlanningOverview?.();}));
 el('inspect').onclick = handle(() => exclusive(async () => {
   if (dirty) throw Error('Bitte Monatsänderungen zuerst speichern oder den Plan neu laden.');
   const file = el('excel').files[0]; if (!file) throw Error('Bitte eine XLSX-Datei auswählen.');
@@ -209,7 +209,7 @@ el('confirm').onclick = handle(() => exclusive(async () => {
   if (!importData) throw Error('Zuerst Import prüfen.'); if (dirty) throw Error('Ungespeicherte Monatsänderungen vorhanden.');
   const result = await api(prefix() + '/import', {method: 'POST', headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({days: importData.days.map(({date,kind,note,shift}) => ({date,kind,note,shift})), expected_revisions: importData.expected_revisions})});
-  await load(true); message(result.changed_days + ' Tagesplanungen aus Excel übernommen.');
+  await load(true); message(result.changed_days + ' Tagesplanungen aus Excel übernommen.');window.refreshPlanningOverview?.();
 }));
 el('cancel').onclick = clearPreview;
 window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
@@ -230,7 +230,58 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }
+    window.startPlanningOverview(users);
     const selected = new URLSearchParams(location.search).get('tf'); if (users.some(u => String(u.id) === selected)) el('tf').value = selected;
     if (users.length) await exclusive(() => load()); else message('Zuerst einen Tf in der Verwaltung anlegen.');
   } catch (error) { message(error.message, true); }
+})();
+
+// Shared saved-plan overview; editing and unsaved single-driver plans stay independent.
+(()=>{
+const element=id=>document.getElementById(id),translate=value=>window.I18n?.t(value)||value;
+const node=(tag,value)=>{const result=document.createElement(tag);if(value!==undefined)result.textContent=value;return result;};
+let mode='month',snapshot=null,ticket=0;
+function locale(){return window.I18n?.locale||'de-DE';}
+function monthName(year,month){return new Intl.DateTimeFormat(locale(),{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(year,month-1,1)));}
+function render(){
+ if(!snapshot)return;
+ const {year,month,rows,view}=snapshot;
+ element('overviewTitle').textContent=view==='year'?String(year):monthName(year,month);
+ element('overviewGrid').replaceChildren();
+ if(!rows.length){element('overviewMessage').textContent=translate('Keine TF vorhanden.');return;}
+ const months=view==='year'?Array.from({length:12},(_,i)=>i+1):[month];
+ const table=node('table');table.className='overview-matrix';
+ const caption=node('caption',translate('Ruhetagsplan aller TF')+' · '+element('overviewTitle').textContent);table.append(caption);
+ const head=node('thead'),monthRow=node('tr'),dayRow=node('tr'),nameHeader=node('th',translate('Triebfahrzeugführer'));nameHeader.rowSpan=2;nameHeader.scope='col';nameHeader.className='overview-name';monthRow.append(nameHeader);
+ for(const m of months){const days=new Date(Date.UTC(year,m,0)).getUTCDate(),header=node('th',monthName(year,m));header.colSpan=days;header.scope='colgroup';header.setAttribute('data-i18n-ignore','');monthRow.append(header);
+ for(let d=1;d<=days;d++){const date=new Date(Date.UTC(year,m-1,d)),label=node('th',String(d));label.scope='col';label.title=new Intl.DateTimeFormat(locale(),{dateStyle:'full',timeZone:'UTC'}).format(date);if([0,6].includes(date.getUTCDay()))label.className='overview-weekend';dayRow.append(label);}}
+ head.append(monthRow,dayRow);table.append(head);
+ const body=node('tbody');
+ for(let index=0;index<rows.length;index++){const {user,plans}=rows[index],row=node('tr'),name=node('th',String(index+1)+'. '+user.first_name+' '+user.last_name);name.scope='row';name.className='overview-name';name.setAttribute('data-i18n-ignore','');row.append(name);
+ for(const m of months){for(const day of plans.find(plan=>plan.month===m).days){const cell=node('td',dayCode(day));cell.dataset.kind=day.kind;cell.dataset.holiday=String(day.is_holiday);cell.setAttribute('data-i18n-ignore','');planColor(cell,day);const weekday=new Date(day.date+'T00:00:00Z').getUTCDay();if([0,6].includes(weekday))cell.className='overview-weekend';const title=day.date+' · '+user.first_name+' '+user.last_name+' · '+translate(day.kind)+(day.is_holiday?' · '+translate(day.holiday_name):'')+(day.kind==='Arbeitstag'?' · '+translate(shiftLabels[day.shift]||'Streckendienst'):'');cell.title=title;cell.setAttribute('aria-label',title);row.append(cell);}}
+ body.append(row);}
+ table.append(body);element('overviewGrid').append(table);element('overviewMessage').textContent=translate('TF gesamt')+': '+rows.length;
+}
+async function load(next,initialUsers=null){
+ mode=next;const currentTicket=++ticket,year=Number(element('overviewYear').value),month=Number(element('overviewMonth').value);
+ snapshot=null;element('overviewGrid').replaceChildren();element('overviewGrid').setAttribute('aria-busy','false');element('overviewTitle').textContent='';
+ element('overviewMonthView').setAttribute('aria-pressed',String(mode==='month'));element('overviewYearView').setAttribute('aria-pressed',String(mode==='year'));
+ if(!Number.isInteger(year)||year<2000||year>2100||month<1||month>12){element('overviewMessage').textContent=translate('Bitte einen gültigen Zeitraum wählen.');return;}
+ element('overviewMessage').textContent=translate('Gesamtübersicht wird geladen…');element('overviewGrid').setAttribute('aria-busy','true');
+ try{
+ const users=(initialUsers||await api('/api/v1/admin/tf')).slice().sort((a,b)=>a.last_name.localeCompare(b.last_name,locale())||a.first_name.localeCompare(b.first_name,locale())||a.id-b.id);
+ const rows=new Array(users.length);let index=0;
+ async function worker(){while(index<users.length&&currentTicket===ticket){const position=index++,user=users[position];const result=await api('/api/v1/admin/tf/'+user.id+'/plan/'+year+(next==='month'?'/'+month:''));rows[position]={user,plans:next==='month'?[result]:result.months};}}
+ await Promise.all(Array.from({length:Math.min(4,users.length)},worker));
+ if(currentTicket!==ticket)return;snapshot={year,month,view:next,rows};render();
+ }catch(error){if(currentTicket===ticket){ticket++;snapshot=null;element('overviewGrid').replaceChildren();element('overviewMessage').textContent=error.message;element('overviewGrid').setAttribute('aria-busy','false');}}
+ finally{if(currentTicket===ticket)element('overviewGrid').setAttribute('aria-busy','false');}
+}
+window.refreshPlanningOverview=()=>load(mode);
+window.startPlanningOverview=users=>{
+ element('collectiveOverview').hidden=false;const now=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',timeZone:'Europe/Berlin'}).formatToParts(new Date());element('overviewYear').value=now.find(part=>part.type==='year').value;
+ for(let m=1;m<=12;m++){const option=node('option',new Intl.DateTimeFormat(locale(),{month:'long',timeZone:'UTC'}).format(new Date(Date.UTC(2026,m-1,1))));option.value=String(m);element('overviewMonth').append(option);}element('overviewMonth').value=String(Number(now.find(part=>part.type==='month').value));
+ element('overviewMonthView').onclick=()=>load('month');element('overviewYearView').onclick=()=>load('year');element('overviewReload').onclick=()=>load(mode);element('overviewYear').onchange=()=>load(mode);element('overviewMonth').onchange=()=>load(mode);
+ window.addEventListener('languagechange',()=>{for(const option of element('overviewMonth').children)option.textContent=new Intl.DateTimeFormat(locale(),{month:'long',timeZone:'UTC'}).format(new Date(Date.UTC(2026,Number(option.value)-1,1)));render();});load('month',users);
+};
 })();
