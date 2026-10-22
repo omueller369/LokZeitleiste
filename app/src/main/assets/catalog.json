@@ -1260,7 +1260,8 @@
     "GPS-Aufzeichnung wurde geändert. Bitte neu laden.": "GPS-Aufzeichnung wurde geändert. Bitte neu laden.",
     "Bitte gültige DS100-Betriebsstellen wählen.": "Bitte gültige DS100-Betriebsstellen wählen.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.",
-    "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap-Mitwirkende · ODbL"
+    "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap-Mitwirkende · ODbL",
+    "Häufige Orte": "Häufige Orte"
   },
   "en": {
     "Administration": "Administration",
@@ -2523,7 +2524,8 @@
     "GPS-Aufzeichnung wurde geändert. Bitte neu laden.": "GPS recording changed. Please reload.",
     "Bitte gültige DS100-Betriebsstellen wählen.": "Select valid DS100 operating sites.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Delete the GPS recording before removing the train journey.",
-    "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap contributors · ODbL"
+    "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap contributors · ODbL",
+    "Häufige Orte": "Frequent places"
   },
   "pl": {
     "Administration": "Administracja",
@@ -3786,7 +3788,8 @@
     "GPS-Aufzeichnung wurde geändert. Bitte neu laden.": "Rejestracja GPS została zmieniona. Wczytaj ponownie.",
     "Bitte gültige DS100-Betriebsstellen wählen.": "Wybierz prawidłowe posterunki DS100.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Usuń rejestrację GPS przed usunięciem przejazdu.",
-    "© OpenStreetMap-Mitwirkende · ODbL": "© autorzy OpenStreetMap · ODbL"
+    "© OpenStreetMap-Mitwirkende · ODbL": "© autorzy OpenStreetMap · ODbL",
+    "Häufige Orte": "Często używane miejsca"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5049,7 +5052,8 @@
     "GPS-Aufzeichnung wurde geändert. Bitte neu laden.": "Запись GPS изменена. Загрузите заново.",
     "Bitte gültige DS100-Betriebsstellen wählen.": "Выберите допустимые раздельные пункты DS100.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Удалите запись GPS перед удалением поездки.",
-    "© OpenStreetMap-Mitwirkende · ODbL": "© участники OpenStreetMap · ODbL"
+    "© OpenStreetMap-Mitwirkende · ODbL": "© участники OpenStreetMap · ODbL",
+    "Häufige Orte": "Часто используемые места"
   },
   "es": {
     "Administration": "Administración",
@@ -6312,6 +6316,7 @@
     "GPS-Aufzeichnung wurde geändert. Bitte neu laden.": "La grabación GPS ha cambiado. Vuelva a cargarla.",
     "Bitte gültige DS100-Betriebsstellen wählen.": "Seleccione puntos ferroviarios DS100 válidos.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Elimine la grabación GPS antes de eliminar el trayecto.",
-    "© OpenStreetMap-Mitwirkende · ODbL": "© colaboradores de OpenStreetMap · ODbL"
+    "© OpenStreetMap-Mitwirkende · ODbL": "© colaboradores de OpenStreetMap · ODbL",
+    "Häufige Orte": "Lugares frecuentes"
   }
 }

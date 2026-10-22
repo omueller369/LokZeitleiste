@@ -4,7 +4,8 @@ from pathlib import Path
 from sqlalchemy import select,func,or_,case
 import calendar
 from datetime import date,datetime,time,timedelta
-from collections import defaultdict
+from collections import defaultdict,Counter
+import json
 from sqlalchemy.orm import Session
 from ..db import database_session
 from ..models import User,DutyReport,DutyGuestTrip,DutyReceipt,RailwayStation,TfProfile
@@ -41,6 +42,31 @@ def create_router(require_account):
         rows=db.scalars(select(RailwayStation).where(
             or_(RailwayStation.code.ilike(text+'%',escape='\\'),RailwayStation.name.ilike('%'+text+'%',escape='\\'))).order_by(case((RailwayStation.code==q.strip().upper(),0),(RailwayStation.code.ilike(text+'%',escape='\\'),1),else_=2),RailwayStation.code).limit(20)).all()
         return [{'code':r.code,'name':r.name} for r in rows]
+
+    @router.get('/api/v1/tf/work-reports/stations/frequent')
+    def frequent_stations(user:User=Depends(driver),db:Session=Depends(database_session)):
+        counts=Counter()
+        # Count current saved reports, never retry submissions or another TF's data.
+        for raw in db.scalars(select(DutyReport.payload_json).where(DutyReport.tf_user_id==user.id)):
+            payload=json.loads(raw)
+            for trip in payload.get('trips',[])+payload.get('train_journeys',[]):
+                for key in ('start_station','end_station'):
+                    code=trip.get(key,'').strip().upper()
+                    if code:counts[code]+=1
+            for train in payload.get('train_journeys',[]):
+                for event in train.get('events',[]):
+                    code=event.get('station','').strip().upper()
+                    if code:counts[code]+=1
+        if not counts:return []
+        # Resolve against today's catalogue so obsolete codes are not suggested.
+        ordered=sorted(counts,key=lambda code:(-counts[code],code));result=[]
+        for offset in range(0,len(ordered),200):
+            codes=ordered[offset:offset+200]
+            catalogue={row.code:row.name for row in db.scalars(select(RailwayStation).where(RailwayStation.code.in_(codes)))}
+            for code in codes:
+                if code in catalogue:result.append(dict(code=code,name=catalogue[code],count=counts[code]))
+                if len(result)==6:return result
+        return result
 
     @router.post('/api/v1/tf/work-reports',status_code=201)
     def create(data:ReportIn,user:User=Depends(driver),db:Session=Depends(database_session)):
