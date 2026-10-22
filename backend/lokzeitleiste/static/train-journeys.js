@@ -1,5 +1,6 @@
 (()=>{
 const REASONS=['V1','V3','A1','A1A','A3','Pause','Rangieren','Zugvorbereitung','BrP','vBrP','Zugfolge','Warten auf Zug','Warten auf Fpl','Warten auf FPLO','Lok defekt','sonstiges'];
+window.TrainJourneyReasons=Object.freeze(REASONS);
 const CAUSES=['CTL','DB InfraGo','Dritte Stelle','sonstiges'];
 const node=(tag,value)=>{const n=document.createElement(tag);if(value!==undefined)n.textContent=value;return n;};
 const t=value=>window.I18n?.t(value)||value;

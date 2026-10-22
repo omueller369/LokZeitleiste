@@ -89,3 +89,21 @@ class RecordingTest(unittest.TestCase):
         with Session(self.engine) as db:
             self.assertEqual(db.query(TrainGpsRecording).count(),1)
             delete_tf_records(db);db.commit();self.assertEqual(db.query(TrainGpsRecording).count(),0)
+
+    def test_stop_reasons_validation_roundtrip_and_legacy_update(self):
+        from lokzeitleiste.work_reports.schemas import REASONS
+        path,response=self.save();self.assertEqual(response.status_code,200)
+        revision=1
+        for reason in REASONS:
+            data={'expected_revision':revision,'stations':{},'reasons':{'s0':{'reason':reason,'detail':'Warten auf Ersatzlok' if reason=='sonstiges' else 'ignored'}}}
+            result=self.driver.put(path+'/stations',json=data);self.assertEqual(result.status_code,200,result.text)
+            revision+=1;expected={'reason':reason,'detail':'Warten auf Ersatzlok' if reason=='sonstiges' else ''}
+            self.assertEqual(result.json()['analysis']['rows'][1]['reason'],expected)
+            self.assertEqual(self.driver.get(path).json()['reasons']['s0'],expected)
+        for reasons in [{'no-row':{'reason':'V1'}},{'s0':{'reason':'invented'}},{'s0':{'reason':'sonstiges'}},{'s0':{'reason':'sonstiges','detail':'x'*257}}]:
+            self.assertEqual(self.driver.put(path+'/stations',json={'expected_revision':revision,'stations':{},'reasons':reasons}).status_code,422)
+        self.assertEqual(self.driver.put(path+'/stations',json={'expected_revision':1,'stations':{},'reasons':{}}).status_code,409)
+        legacy=self.driver.put(path+'/stations',json={'expected_revision':revision,'stations':{}})
+        self.assertEqual(legacy.json()['reasons']['s0']['reason'],'sonstiges');revision+=1
+        same=self.save(path,expected_revision=revision)[1];self.assertEqual(same.json()['reasons']['s0']['reason'],'sonstiges');revision+=1
+        changed=self.save(path,expected_revision=revision,points=points(310))[1];self.assertEqual(changed.json()['reasons'],{})

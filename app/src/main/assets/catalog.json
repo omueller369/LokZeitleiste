@@ -1261,7 +1261,11 @@
     "Bitte gültige DS100-Betriebsstellen wählen.": "Bitte gültige DS100-Betriebsstellen wählen.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.",
     "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap-Mitwirkende · ODbL",
-    "Häufige Orte": "Häufige Orte"
+    "Häufige Orte": "Häufige Orte",
+    "ZMS und Gründe speichern": "ZMS und Gründe speichern",
+    "ZMS und Gründe gespeichert.": "ZMS und Gründe gespeichert.",
+    "Ungültiger Grund.": "Ungültiger Grund.",
+    "Sonstigen Grund bitte angeben.": "Sonstigen Grund bitte angeben."
   },
   "en": {
     "Administration": "Administration",
@@ -2525,7 +2529,11 @@
     "Bitte gültige DS100-Betriebsstellen wählen.": "Select valid DS100 operating sites.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Delete the GPS recording before removing the train journey.",
     "© OpenStreetMap-Mitwirkende · ODbL": "© OpenStreetMap contributors · ODbL",
-    "Häufige Orte": "Frequent places"
+    "Häufige Orte": "Frequent places",
+    "ZMS und Gründe speichern": "Save operating sites and reasons",
+    "ZMS und Gründe gespeichert.": "Operating sites and reasons saved.",
+    "Ungültiger Grund.": "Invalid reason.",
+    "Sonstigen Grund bitte angeben.": "Please specify the other reason."
   },
   "pl": {
     "Administration": "Administracja",
@@ -3789,7 +3797,11 @@
     "Bitte gültige DS100-Betriebsstellen wählen.": "Wybierz prawidłowe posterunki DS100.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Usuń rejestrację GPS przed usunięciem przejazdu.",
     "© OpenStreetMap-Mitwirkende · ODbL": "© autorzy OpenStreetMap · ODbL",
-    "Häufige Orte": "Często używane miejsca"
+    "Häufige Orte": "Często używane miejsca",
+    "ZMS und Gründe speichern": "Zapisz posterunki i przyczyny",
+    "ZMS und Gründe gespeichert.": "Zapisano posterunki i przyczyny.",
+    "Ungültiger Grund.": "Nieprawidłowa przyczyna.",
+    "Sonstigen Grund bitte angeben.": "Podaj inną przyczynę."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5053,7 +5065,11 @@
     "Bitte gültige DS100-Betriebsstellen wählen.": "Выберите допустимые раздельные пункты DS100.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Удалите запись GPS перед удалением поездки.",
     "© OpenStreetMap-Mitwirkende · ODbL": "© участники OpenStreetMap · ODbL",
-    "Häufige Orte": "Часто используемые места"
+    "Häufige Orte": "Часто используемые места",
+    "ZMS und Gründe speichern": "Сохранить пункты и причины",
+    "ZMS und Gründe gespeichert.": "Пункты и причины сохранены.",
+    "Ungültiger Grund.": "Недопустимая причина.",
+    "Sonstigen Grund bitte angeben.": "Укажите другую причину."
   },
   "es": {
     "Administration": "Administración",
@@ -6317,6 +6333,10 @@
     "Bitte gültige DS100-Betriebsstellen wählen.": "Seleccione puntos ferroviarios DS100 válidos.",
     "Bitte die GPS-Aufzeichnung vor dem Entfernen der Zugfahrt löschen.": "Elimine la grabación GPS antes de eliminar el trayecto.",
     "© OpenStreetMap-Mitwirkende · ODbL": "© colaboradores de OpenStreetMap · ODbL",
-    "Häufige Orte": "Lugares frecuentes"
+    "Häufige Orte": "Lugares frecuentes",
+    "ZMS und Gründe speichern": "Guardar puntos ferroviarios y motivos",
+    "ZMS und Gründe gespeichert.": "Puntos ferroviarios y motivos guardados.",
+    "Ungültiger Grund.": "Motivo no válido.",
+    "Sonstigen Grund bitte angeben.": "Indique el otro motivo."
   }
 }
