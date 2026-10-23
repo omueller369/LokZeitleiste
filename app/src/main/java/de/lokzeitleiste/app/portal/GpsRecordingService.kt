@@ -45,7 +45,11 @@ class GpsRecordingService : Service(), LocationListener {
             .put("speed",if(location.hasSpeed() && location.speed>=0 && location.speed<=200) location.speed.toDouble() else JSONObject.NULL)
         try { store.append(key,point);last=t;if(first==0L)first=t;count++ } catch(_:Exception) { stopSelf() }
     }
-    override fun onDestroy() { locations.removeUpdates(this);currentKey=null;stopForeground(STOP_FOREGROUND_REMOVE);super.onDestroy() }
+    @Suppress("DEPRECATION")
+    override fun onStatusChanged(provider:String?,status:Int,extras:android.os.Bundle?) { }
+    override fun onProviderEnabled(provider:String) { }
+    override fun onProviderDisabled(provider:String) { }
+    override fun onDestroy() { runCatching { locations.removeUpdates(this) };currentKey=null;stopForeground(STOP_FOREGROUND_REMOVE);super.onDestroy() }
     override fun onBind(intent: Intent?): IBinder? = null
     companion object { @Volatile var currentKey: String?=null }
 }
