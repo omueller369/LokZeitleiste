@@ -103,13 +103,14 @@ def create_router(require_admin,require_account):
         @sub.get('/vehicles/{vehicle_id}/protocols/{protocol_id}')
         def details(vehicle_id:int,protocol_id:int,user=Depends(access),db:Session=Depends(database_session)):
             row=protocol(db,vehicle_id,protocol_id)
-            return dict(**view(row),files=[dict(id=f.id,filename=f.filename) for f in db.scalars(select(Attachment).where(Attachment.protocol_id==protocol_id).order_by(Attachment.id))])
+            return dict(**view(row),files=[dict(id=f.id,filename=f.filename,mime_type=f.mime_type) for f in db.scalars(select(Attachment).where(Attachment.protocol_id==protocol_id).order_by(Attachment.id))])
         @sub.get('/vehicles/{vehicle_id}/protocols/{protocol_id}/files/{file_id}')
-        def download(vehicle_id:int,protocol_id:int,file_id:int,user=Depends(access),db:Session=Depends(database_session)):
+        def download(vehicle_id:int,protocol_id:int,file_id:int,preview:bool=False,user=Depends(access),db:Session=Depends(database_session)):
             protocol(db,vehicle_id,protocol_id);file=db.get(Attachment,file_id)
             if not file or file.protocol_id!=protocol_id:raise HTTPException(404,'Datei nicht gefunden.')
             content=file.content or b''.join(db.scalars(select(Chunk.content).where(Chunk.attachment_id==file.id).order_by(Chunk.position)))
-            return Response(content,media_type=file.mime_type,headers={'Content-Disposition':"attachment; filename*=UTF-8''"+quote(file.filename,safe=''),'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
+            disposition='inline' if preview and file.mime_type in ('image/jpeg','image/png') else 'attachment'
+            return Response(content,media_type=file.mime_type,headers={'Content-Disposition':disposition+"; filename*=UTF-8''"+quote(file.filename,safe=''),'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
         router.include_router(sub)
     routes('/api/v1/admin/loco-handover',require_admin)
     routes('/api/v1/tf/loco-handover',driver_dependency(require_account))

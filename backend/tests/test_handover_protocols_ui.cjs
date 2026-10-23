@@ -8,7 +8,7 @@ const context={document:{getElementById:id=>elements[id],createElement:tag=>new 
  if(path.endsWith('/recipients'))return reply([{id:3,label:'Leitstelle'}]);
  if(path.includes('/stations?')){stationRequests++;return reply([{code:'BGO',name:'Görlitz'}]);}
  if(options?.method==='POST'){if(uploadError)return {ok:false,status:413,json:async()=>{throw Error('HTML response');}};posted=JSON.parse(options.body.values.payload);records=[{id:4,author_name:'Mira Beispiel',vehicle_number:'91 80 6185 001-2',vehicle_status:'limited',vehicle_status_label:'Eingeschränkt einsatzbereit',station_name:'Görlitz',recipient_name:'Leitstelle',...posted}];return reply(records[0]);}
- if(path.endsWith('/protocols/4'))return reply({...records[0],files:[{id:8,filename:'Bild.png'}]});
+ if(path.endsWith('/protocols/4'))return reply({...records[0],files:[{id:8,filename:'Bild.png',mime_type:'image/png'},{id:9,filename:'Dokument.pdf',mime_type:'application/pdf'}]});
  return reply(records);
 }};
 (async()=>{
@@ -21,7 +21,7 @@ const context={document:{getElementById:id=>elements[id],createElement:tag=>new 
  elements.protocolLocData.checked=true;elements.protocolFiles.files=[{name:'bild.png',size:3000000}];
  await elements.protocolForm.onsubmit({preventDefault(){}});assert.equal(posted.locomotive_data,true);assert.equal(posted.station_code,'BGO');assert.equal(posted.recipient_id,3);assert.equal(posted.train_number,'000123');assert.equal(elements.protocolEditor.hidden,true);assert.equal(elements.protocolRows.children.length,1);assert.equal(elements.protocolRows.children[0].children.length,7);assert.equal(elements.protocolRows.children[0].children[0].children[0].textContent,'23.10.2026');
  assert.equal(elements.protocolRows.children[0].children[1].textContent,'09.05');assert.equal(elements.protocolRows.children[0].children[2].textContent,'V1');
- await elements.protocolRows.children[0].children[0].children[0].onclick();assert.equal(elements.protocolDetail.hidden,false);assert(elements.protocolData.children.some(e=>e.textContent==='Mira Beispiel'));assert(elements.protocolDownloads.children[0].children[0].href.endsWith('/protocols/4/files/8'));
+ await elements.protocolRows.children[0].children[0].children[0].onclick();assert.equal(elements.protocolDetail.hidden,false);assert(elements.protocolData.children.some(e=>e.textContent==='Mira Beispiel'));const image=elements.protocolDownloads.children[0].children[0].children[0];assert.equal(image.tag,'img');assert(image.src.endsWith('/protocols/4/files/8?preview=true'));assert.equal(image.alt,'Bild.png');assert.equal(elements.protocolDownloads.children[1].children[0].tag,'a');assert(elements.protocolDownloads.children[1].children[0].href.endsWith('/protocols/4/files/9'));
  await elements.handoverNew.onclick();elements.protocolStation.value='BGO';elements.protocolStation.oninput();await new Promise(r=>setTimeout(r,300));elements.protocolTime.value='2026-10-23T09:05';uploadError=true;await elements.protocolForm.onsubmit({preventDefault(){}});assert.equal(elements.protocolEditor.hidden,false);assert.equal(elements.protocolUploadMessage.hidden,false);assert(elements.protocolUploadMessage.textContent.includes('Größenbegrenzung'));assert.equal(elements.protocolSave.disabled,false);
  await context.window.HandoverProtocols.select({id:1,status:'limited'},false);assert.equal(elements.handoverNew.hidden,true);assert.equal(elements.protocolRows.children.length,1);
  context.window.HandoverProtocols.clear();assert.equal(elements.protocolDetail.hidden,true);assert.equal(elements.protocolRows.children.length,0);
