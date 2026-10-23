@@ -10,7 +10,7 @@ Enthalten sind Arbeitsberichte mit Dienstarten, Pausen, Ausbleibe, Gastfahrten u
 
 ## Offline und Synchronisation
 
-Nach einer erfolgreichen Online-Anmeldung kann das gebündelte Portal ohne Netz erneut geöffnet werden. Arbeitsberichte und Quittungen verwenden wie im Browser LocalStorage bzw. IndexedDB. Bereits abgerufene Pläne, Berichtslisten und Suchergebnisse sind kontogetrennt zwischengespeichert. Neue Bahnhofssuchen und serverseitige Änderungen benötigen eine Verbindung. Lokale Arbeitsberichte über **Synchronisieren** übertragen; es gibt keinen unbeaufsichtigten automatischen Versand aller Dokumente. Uploadfehler löschen keine lokalen Belege. HTTP 401/403 wird nicht durch einen Offline-Cache übergangen. Eine Offline-Abmeldung entfernt die Sitzung auf dem Gerät; eine serverseitige Sperrung kann offline erst beim nächsten Kontakt erkannt werden.
+Nach einer erfolgreichen Online-Anmeldung kann das gebündelte Portal ohne Netz erneut geöffnet werden. Arbeitsberichte und Quittungen verwenden wie im Browser LocalStorage bzw. IndexedDB. Zuletzt abgerufene Pläne und Suchergebnisse sind in einem begrenzten, kontogetrennten Zwischenspeicher verfügbar; Berichtslisten nutzen zusätzlich den vorhandenen Monatscache. Nicht die gesamte Serverhistorie ist offline verfügbar. Neue Bahnhofssuchen und serverseitige Änderungen benötigen eine Verbindung. Lokale Arbeitsberichte über **Synchronisieren** übertragen; es gibt keinen unbeaufsichtigten automatischen Versand aller Dokumente. Uploadfehler löschen keine lokalen Belege. HTTP 401/403 wird nicht durch einen Offline-Cache übergangen. Eine Offline-Abmeldung entfernt die Sitzung auf dem Gerät; eine serverseitige Sperrung kann offline erst beim nächsten Kontakt erkannt werden.
 
 ## GPS unter Android
 

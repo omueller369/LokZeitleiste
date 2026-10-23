@@ -233,12 +233,15 @@ class TfPortalActivity : ComponentActivity() {
     private fun download(url:String,destination:Uri) {
         val cookie=CookieManager.getInstance().getCookie(policy.origin)
         lifecycleScope.launch {
-            try { withContext(Dispatchers.IO) {
+            try { val mime=withContext(Dispatchers.IO) {
                 require(policy.sameOrigin(url));val connection=URL(url).openConnection() as HttpURLConnection
                 try { connection.instanceFollowRedirects=false;connection.connectTimeout=15000;connection.readTimeout=30000;connection.setRequestProperty("Cookie",cookie.orEmpty());require(connection.responseCode in 200..299) { "Download fehlgeschlagen (${connection.responseCode})." }
                     contentResolver.openOutputStream(destination,"wt")!!.use { output->connection.inputStream.use { input->input.copyTo(output) } }
+                    connection.contentType?.substringBefore(';')?:"application/octet-stream"
                 } finally { connection.disconnect() }
-            };toast("Dokument gespeichert.") } catch(error:Exception) { toast(error.message?:"Download fehlgeschlagen.") }
+            };android.app.AlertDialog.Builder(this@TfPortalActivity).setMessage(LanguageRuntime.translate("Dokument gespeichert.",LanguageRuntime.code)).setPositiveButton(LanguageRuntime.translate("Ansehen",LanguageRuntime.code)) { _,_->
+                    runCatching { startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(destination,mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)) }.onFailure { toast("Keine passende App zum Öffnen vorhanden.") }
+                }.setNegativeButton(android.R.string.cancel,null).show() } catch(error:Exception) { toast(error.message?:"Download fehlgeschlagen.") }
         }
     }
     override fun onDestroy() { fileCallback?.onReceiveValue(null);exportStream?.close();if(::web.isInitialized){web.stopLoading();web.destroy()};super.onDestroy() }
