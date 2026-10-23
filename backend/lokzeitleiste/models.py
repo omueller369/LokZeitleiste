@@ -594,3 +594,18 @@ class BackendMenuPreference(Base):
     user_id:Mapped[int]=mapped_column(ForeignKey('users.id',ondelete='CASCADE'),primary_key=True)
     variant:Mapped[str]=mapped_column(String(16),nullable=False,default='sidebar')
     revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+
+class LocoHandoverDefault(Base):
+    """Separate vocabulary for handovers; never mixed with train-event choices."""
+    __tablename__='loco_handover_defaults'
+    __table_args__=(UniqueConstraint('kind','scope_id','label_key'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    kind:Mapped[str]=mapped_column(String(16),nullable=False)
+    label:Mapped[str]=mapped_column(String(255),nullable=False)
+    label_key:Mapped[str]=mapped_column(String(510),nullable=False)
+    email:Mapped[str]=mapped_column(String(254),nullable=False,default='')
+    hotline_name:Mapped[str]=mapped_column(String(255),nullable=False,default='')
+    hotline_email:Mapped[str]=mapped_column(String(254),nullable=False,default='')
+    parent_id:Mapped[int|None]=mapped_column(ForeignKey('loco_handover_defaults.id'),nullable=True)
+    scope_id:Mapped[int]=mapped_column(Integer,nullable=False,default=0)
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)

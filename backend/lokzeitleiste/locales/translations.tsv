@@ -1358,3 +1358,18 @@ Android-Paketinstallation konnte nicht geöffnet werden.|Android package install
 PZB|PZB|PZB|PZB|PZB
 Störungen|Faults|Usterki|Неисправности|Averías
 Zurück zur Übersicht|Back to overview|Powrót do przeglądu|Назад к обзору|Volver al listado
+Lokübergabe|Locomotive handover|Przekazanie lokomotywy|Передача локомотива|Entrega de locomotora
+Meldung an|Report to|Zgłoszenie do|Сообщить кому|Notificar a
+Emailadresse|Email address|Adres e-mail|Адрес электронной почты|Dirección de correo electrónico
+PZB Gründe|PZB reasons|Powody PZB|Причины PZB|Motivos PZB
+Kategorie Störung|Fault category|Kategoria usterki|Категория неисправности|Categoría de avería
+Name Hotline|Hotline name|Nazwa infolinii|Название горячей линии|Nombre de la línea de asistencia
+Eingrenzung der Schadstelle|Damage location details|Doprecyzowanie miejsca uszkodzenia|Уточнение места повреждения|Localización del daño
+Eingrenzungen der Schadstelle|Damage location entries|Wpisy miejsc uszkodzenia|Записи мест повреждения|Entradas de localización del daño
+Vorhandene Einträge|Existing entries|Istniejące wpisy|Существующие записи|Entradas existentes
+Bitte zuerst eine vorhandene Kategorie auswählen.|Please select an existing category first.|Najpierw wybierz istniejącą kategorię.|Сначала выберите существующую категорию.|Seleccione primero una categoría existente.
+Kategorie darf maximal 100 Zeichen enthalten.|Category must not exceed 100 characters.|Kategoria może zawierać maksymalnie 100 znaków.|Категория может содержать не более 100 символов.|La categoría no puede superar los 100 caracteres.
+Emailadresse ist erforderlich.|Email address is required.|Adres e-mail jest wymagany.|Необходимо указать адрес электронной почты.|La dirección de correo electrónico es obligatoria.
+Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.|Please enter both the hotline name and email address.|Podaj nazwę infolinii i adres e-mail razem.|Укажите название горячей линии и адрес электронной почты вместе.|Introduzca el nombre y el correo electrónico de la línea de asistencia.
+Eine Kategoriezuordnung ist nur für Schadstellen zulässig.|Only damage locations can be assigned to a category.|Tylko miejsca uszkodzenia można przypisać do kategorii.|Только места повреждения можно отнести к категории.|Solo las localizaciones de daños pueden asignarse a una categoría.
+Bitte eine gültige Emailadresse eingeben.|Please enter a valid email address.|Wprowadź poprawny adres e-mail.|Введите действительный адрес электронной почты.|Introduzca una dirección de correo electrónico válida.
