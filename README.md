@@ -199,3 +199,7 @@ Hochgeladene JPEG- und PNG-Bilder erscheinen in den Protokolldetails direkt als 
 ## Interaktive Installation mit einer Datei
 
 **`install-ctl-software.sh`** enthält die vollständige Setup-Logik für eine vorhandene ISPConfig-Subdomain. Es fragt Subdomain, MariaDB-Datenbank und -Benutzer sowie verdeckt das Passwort ab; fehlendes Python, venv, Git und weitere Anwendungswerkzeuge werden mit sudo nachinstalliert. Der bestehende Web-/Datenbank-/ISPConfig-Stack wird weiterverwendet. Die 20 Test-TF inklusive Bildern sind enthalten. [Download, Aufruf und verbleibende ISPConfig-Weiterleitung](docs/INSTALL-CTL-SOFTWARE.md).
+
+## Vollständiger neuer Ubuntu-26.04-Testserver
+
+**`install-ctlsoftware-test.sh`** richtet auf einem frischen Ubuntu 26.04 die gesamte Serverumgebung ein: Apache/HTTPS, MariaDB (`db_ctl`/`dbo_ctl`, Passwort wird abgefragt), BIND, Postfix/Dovecot, DKIM/SRS und die CTL-Anwendung mit 20 Test-TF samt Bildern. Domain `ctl-software.io-goerlitz.de`, IP `212.227.86.251`. Die vier Postfächer `info`, `diso`, `vkplanung` und `railpool` speichern Nachrichten lokal und leiten sie zusätzlich an `omueller369@gmail.com` weiter. [Vollständige Anleitung, DNS-Voraussetzungen, Mailzugänge und Fortsetzung](docs/INSTALL-CTLSOFTWARE-TEST.md). Dies ist eine eigene Installationsart ohne ISPConfig und kein Update der bisherigen laufenden Umgebung.

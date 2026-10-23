@@ -265,7 +265,7 @@ def preflight(args):
     for command in ('systemctl','useradd'):
         if not shutil.which(command):problems.append(command+' fehlt.')
     if not Path('/run/systemd/system').is_dir():problems.append('Laufendes systemd wird benötigt.')
-    if not Path('/usr/local/ispconfig').is_dir():problems.append('Bestehende ISPConfig-Installation unter /usr/local/ispconfig nicht gefunden.')
+    if not getattr(args,'standalone',False) and not Path('/usr/local/ispconfig').is_dir():problems.append('Bestehende ISPConfig-Installation unter /usr/local/ispconfig nicht gefunden.')
     if args.webserver=='apache':
         apache=shutil.which('apache2ctl')
         if not apache:problems.append('Vorhandener Apache wurde nicht gefunden; --webserver nginx verwenden, falls nginx eingerichtet ist.')
@@ -304,6 +304,8 @@ def run_application(arguments,env,account,input=None,capture=False):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--standalone',action='store_true',help='Anwendung für den eigenständigen Ubuntu-Testserver einrichten')
+    parser.add_argument('--db-password-file',help='Root-private Passwortdatei für eingebettete Serverinstallation')
     parser.add_argument('--domain',help='In ISPConfig angelegte Domain, ohne Protokoll')
     parser.add_argument('--webserver',choices=('apache','nginx'),default='apache')
     parser.add_argument('--http',action='store_true',help='HTTP statt des standardmäßigen HTTPS verwenden')
@@ -317,6 +319,10 @@ def main():
     parser.add_argument('--require-existing-site',action='store_true',help='Aktiven VirtualHost der vorhandenen Subdomain prüfen')
     parser.add_argument('--resume',action='store_true',help='Nur eigene unterbrochene Neuinstallation fortsetzen')
     args=parser.parse_args()
+    if args.standalone:
+        global INSTALL,CONFIG,DATA,ACCOUNT,SERVICE
+        INSTALL=Path('/opt/ctlsoftware-test');CONFIG=Path('/etc/ctlsoftware-test');DATA=Path('/var/lib/ctlsoftware-test')
+        ACCOUNT=SERVICE='ctlsoftware-test'
     if args.require_existing_site and not args.domain and not args.resume:parser.error('--domain für die Website-Prüfung angeben.')
     if not 1024<=args.port<=65535:parser.error('--port muss zwischen 1024 und 65535 liegen.')
     if not re.fullmatch(r'[a-z0-9._-]{3,64}',args.admin_user):parser.error('Ungültiger --admin-user.')
@@ -338,7 +344,11 @@ def main():
         if folder.is_symlink():raise ValueError('Symlink als Installationsziel nicht zulässig.')
     password=None
     if not args.resume:
-        password=getpass.getpass('Passwort des vorhandenen ISPConfig-Datenbankbenutzers: ')
+        if args.db_password_file:
+            secret=Path(args.db_password_file)
+            if secret.is_symlink() or secret.stat().st_uid!=0 or secret.stat().st_mode&0o077:raise ValueError('Passwortdatei muss root gehören und darf nur für root lesbar sein.')
+            password=secret.read_text()
+        else:password=getpass.getpass('Passwort des vorhandenen ISPConfig-Datenbankbenutzers: ')
         if not password:raise ValueError('Datenbankpasswort darf nicht leer sein.')
         dburl=database_url(args.db_host,args.db_port,args.db_name,args.db_user,password)
     os.umask(0o022)
@@ -404,12 +414,12 @@ def main():
         subprocess.run(['systemctl','is-active','--quiet',SERVICE+'.service',SERVICE+'-worker.service'],check=True)
         state['complete']=True;private_write(state_file,json.dumps(state))
         print('\nAnwendung und 20 Test-TF mit Bildern installiert. API: http://127.0.0.1:'+str(args.port))
-        print('In ISPConfig noch die Website-Weiterleitung eintragen: sudo cat '+str(CONFIG/'ispconfig-directives.conf'))
+        if not args.standalone:print('In ISPConfig noch die Website-Weiterleitung eintragen: sudo cat '+str(CONFIG/'ispconfig-directives.conf'))
         print('Danach öffentlich prüfen: '+origin(args.domain,args.http)+'/health')
         print('Backend: '+origin(args.domain,args.http)+'/admin/start | TF: '+origin(args.domain,args.http)+'/tf')
         print('Admin: '+args.admin_user+' | Passwortdatei: sudo cat '+str(CONFIG/'admin-initial-password'))
         print('TF-Liste: sudo cat '+str(CONFIG/'demo-tf.json')+' | Initialpasswort: tomcom123456 (Wechsel beim ersten Login).')
-        print('Echter Emailversand ist für diese Testinstallation deaktiviert.')
+        print('Anwendung installiert; das äußere Server-Setup ergänzt Apache und Email.' if args.standalone else 'Echter Emailversand ist für diese Testinstallation deaktiviert.')
 
 if __name__=='__main__':
     try:main()
