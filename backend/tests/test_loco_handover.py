@@ -100,3 +100,22 @@ class LocoHandoverTest(unittest.TestCase):
         self.assertEqual(driver.get(path).status_code,401)
         driver.post('/api/v1/account/login',json={'username':'787100','password':'abcdef'})
         self.assertEqual(driver.get(path).status_code,403)
+
+    def test_explicit_tf_entry_and_update_cache_headers(self):
+        driver=TestClient(app,base_url='https://testserver');self.staff_clients.append(driver)
+        self.assertEqual(driver.get('/tf/loco-handover',follow_redirects=False).status_code,303)
+        driver.post('/api/v1/account/login',json={'username':'787100','password':'tf-secret-12345'})
+        landing=driver.get('/tf')
+        self.assertIn('href="/tf/loco-handover"',landing.text)
+        self.assertEqual(landing.headers['cache-control'],'no-store')
+        for path in ('/tf/loco-handover','/tf/lokuebergabebuch','/tf/loco-handover/'):
+            page=driver.get(path)
+            self.assertEqual(page.status_code,200,page.text)
+            self.assertIn('id="vehicleRows"',page.text)
+            self.assertIn('id="handoverDetails"',page.text)
+            self.assertNotIn('id="placeholder"',page.text)
+            self.assertEqual(page.headers['cache-control'],'no-store')
+        script=driver.get('/tf/portal.js')
+        self.assertEqual(script.headers['cache-control'],'no-store')
+        self.assertNotIn("'/tf/lokuebergabebuch':'Lokübergabebuch'",script.text)
+        self.assertEqual(self.client.get('/tf/loco-handover').status_code,403)

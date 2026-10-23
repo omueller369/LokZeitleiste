@@ -10,6 +10,7 @@ class PortalPolicyTest {
     }
     @Test fun onlyPackagedPublicViews() {
         assertEquals("loco-handover.html",policy.asset("/tf/lokuebergabebuch"))
+        assertEquals("loco-handover.html",policy.asset("/tf/loco-handover"))
         assertEquals("loco-handover.js",policy.asset("/tf/loco-handover.js"))
         for(path in listOf("/tf","/tf/arbeitsbericht","/tf/bahnhoefe","/tf/arbeitsplan","/documents","/account","/my/worktime")) assertNotNull(policy.asset(path))
         for(path in listOf("/admin","/api/v1/tf/portal","/api/v1/documents/download","/tf/../../secret")) assertNull(policy.asset(path))

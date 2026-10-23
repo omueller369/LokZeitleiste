@@ -1,6 +1,6 @@
 """TF landing pages and read-only access to the driver's own personnel plan."""
 from pathlib import Path as FilePath
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Path, Request
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Path
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from .db import database_session
@@ -27,24 +27,29 @@ def create_router(require_account):
 
     @router.get('/tf')
     @router.get('/tf/arbeitsbericht')
-    @router.get('/tf/lokuebergabebuch')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
     @router.get('/tf/bahnhoefe')
-    def page(request:Request,admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+    def page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
         user=user_from_token(db,admin_session)
         if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)
         if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
-        if request.url.path=='/tf/lokuebergabebuch':
-            html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
-            return HTMLResponse(html,headers={'Cache-Control':'no-cache'})
-        return FileResponse(STATIC/'tf-portal.html')
+        return FileResponse(STATIC/'tf-portal.html',headers={'Cache-Control':'no-store'})
+
+    @router.get('/tf/loco-handover')
+    @router.get('/tf/lokuebergabebuch')
+    def handover_page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+        user=user_from_token(db,admin_session)
+        if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)
+        if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
+        html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
+        return HTMLResponse(html,headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/return.js')
     def return_script():return FileResponse(STATIC/'tf-return.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
 
     @router.get('/tf/portal.js')
-    def script():return FileResponse(STATIC/'tf-portal.js',media_type='text/javascript')
+    def script():return FileResponse(STATIC/'tf-portal.js',media_type='text/javascript',headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/portal.css')
     def styles():return FileResponse(STATIC/'tf-portal.css',media_type='text/css')
