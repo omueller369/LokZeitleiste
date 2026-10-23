@@ -17,6 +17,7 @@ def start_modules(user,p):
         ('planning','Arbeitszeitplanung','/admin/planning','Personalplanung',p.get('planning',0)),
         ('overview','TF-Übersicht','/admin/planning?overview=all','Personalplanung',p.get('planning',0)),
         ('shifts','Schichtplan','/admin/shifts','Personalplanung',p.get('shifts',0)),
+        ('loco_handover','Lokübergabebuch','/admin/loco-handover','Sonstiges',p.get('loco_handover',0)),
         ('vehicles','Triebfahrzeuge','/admin/vehicles','Stammdaten',p.get('vehicles',0)),
         ('app_defaults','App Grundwerte','/admin/app-defaults','Stammdaten',p.get('app_defaults',0)),
         ('worktime','Arbeitszeiterfassung und Korrekturen','/admin/worktime','Sonstiges',p.get('worktime',0)),

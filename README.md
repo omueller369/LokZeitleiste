@@ -159,3 +159,7 @@ Beim regulären Update bzw. bei der Neuinstallation wird die Tabelle `backend_me
 Die Android-App übernimmt den aktuellen TF-Portalstand als gemeinsam gebündelte Oberfläche, ergänzt um native Dateiauswahl, Downloads und einen GPS-Standortdienst für die Bildschirmsperre. Die bisherige native Erfassung bleibt erreichbar. [Funktionen, Offline-Verhalten, Build und Installation](app/docs/TF-PORTAL.md). Eine aktualisierte Serverinstallation und eine neu gebaute APK sind erforderlich.
 
 Die [Schritt-für-Schritt-Anleitung für Android Studio, Tabletinstallation und GitHub-Updates](app/docs/ANDROID-STUDIO-TABLET.md) beschreibt insbesondere den dauerhaft identischen Signierschlüssel und die vier notwendigen Repository-Secrets. Die App prüft beim Öffnen/Fortsetzen automatisch auf signierte Test-Releases; Android verlangt weiterhin eine Installationsbestätigung.
+
+## Lokübergabebuch im Web-Backend
+
+Unter **Sonstiges → Lokübergabebuch** steht die Fahrzeugübersicht mit denselben drei Spalten wie in der Fahrzeugverwaltung bereit: farbiger Statuskreis, Fahrzeugnummer und Name. Die Statuslegende folgt unter der Tabelle; Suche und Statusfilter nutzen dieselben aktuellen Stammdaten. Das Modul ist auf der berechtigten Startseite verfügbar. Verwaltungsmitarbeiter benötigen die neue Modulfreigabe **Lokübergabebuch → Lesen**; Administratoren haben Zugriff. Der erste Ausbauschritt ist eine Übersicht, ohne neue Fahrzeugstammdaten oder Übergabeeinträge anzulegen.

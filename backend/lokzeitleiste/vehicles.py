@@ -62,6 +62,15 @@ def vehicle_view(row):
                 brake_g_25=row.brake_g*75//100,status_label=label,status_color=color)
 
 
+def find_vehicles(db,q="",status=None):
+    query=select(RailwayVehicle)
+    if q.strip():
+        text=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
+        query=query.where(or_(*[field.ilike('%'+text+'%',escape='\\') for field in [RailwayVehicle.vehicle_number,RailwayVehicle.name,RailwayVehicle.series,RailwayVehicle.lessor]]))
+    if status:query=query.where(RailwayVehicle.status==status)
+    return db.scalars(query.order_by(RailwayVehicle.vehicle_number)).all()
+
+
 def create_router(require_admin):
     router=APIRouter()
     @router.get('/admin/vehicles')
@@ -71,12 +80,7 @@ def create_router(require_admin):
 
     @router.get('/api/v1/admin/vehicles',dependencies=[Depends(require_admin)])
     def listing(q:str=Query(default='',max_length=200),status:Literal['ready','unavailable','limited']|None=None,db:Session=Depends(database_session)):
-        query=select(RailwayVehicle)
-        if q.strip():
-            text=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
-            query=query.where(or_(*[field.ilike('%'+text+'%',escape='\\') for field in [RailwayVehicle.vehicle_number,RailwayVehicle.name,RailwayVehicle.series,RailwayVehicle.lessor]]))
-        if status:query=query.where(RailwayVehicle.status==status)
-        return [vehicle_view(row) for row in db.scalars(query.order_by(RailwayVehicle.vehicle_number))]
+        return [vehicle_view(row) for row in find_vehicles(db,q,status)]
 
     @router.get('/api/v1/admin/vehicles/{vehicle_id}',dependencies=[Depends(require_admin)])
     def details(vehicle_id:int,db:Session=Depends(database_session)):

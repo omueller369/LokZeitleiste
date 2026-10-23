@@ -1,0 +1,29 @@
+"""Lokübergabebuch: read-only vehicle overview, backed by the vehicle master data."""
+from pathlib import Path
+from typing import Literal
+from fastapi import APIRouter, Depends, Query
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
+from .db import database_session
+from .vehicles import find_vehicles, VEHICLE_STATUSES
+
+
+def create_router(require_admin):
+    router = APIRouter()
+
+    @router.get('/admin/loco-handover')
+    def page():
+        return FileResponse(Path(__file__).parent/'static'/'loco-handover.html', headers={'Cache-Control':'no-cache'})
+
+    @router.get('/admin/loco-handover.js')
+    def script():
+        return FileResponse(Path(__file__).parent/'static'/'loco-handover.js', media_type='text/javascript', headers={'Cache-Control':'no-cache'})
+
+    @router.get('/api/v1/admin/loco-handover/vehicles', dependencies=[Depends(require_admin)])
+    def listing(q:str=Query(default='',max_length=200), status:Literal['ready','unavailable','limited']|None=None,
+                db:Session=Depends(database_session)):
+        return [dict(id=row.id, vehicle_number=row.vehicle_number, name=row.name, status=row.status,
+                     status_label=VEHICLE_STATUSES[row.status][0], status_note=row.status_note)
+                for row in find_vehicles(db,q,status)]
+
+    return router
