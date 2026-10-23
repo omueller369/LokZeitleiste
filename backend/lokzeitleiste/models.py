@@ -627,3 +627,10 @@ class LocoHandoverAttachment(Base):
     filename:Mapped[str]=mapped_column(String(120),nullable=False)
     mime_type:Mapped[str]=mapped_column(String(80),nullable=False)
     content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+
+class LocoHandoverAttachmentChunk(Base):
+    """Bound SQL packet size for host MySQL installations with small packet limits."""
+    __tablename__='loco_handover_attachment_chunks'
+    attachment_id:Mapped[int]=mapped_column(ForeignKey('loco_handover_attachments.id',ondelete='CASCADE'),primary_key=True)
+    position:Mapped[int]=mapped_column(Integer,primary_key=True)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)

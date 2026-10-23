@@ -1385,7 +1385,12 @@
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Bitte einen gültigen Meldungsempfänger auswählen.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximal 10 Dateien pro Übergabeprotokoll.",
     "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Dateien dürfen zusammen höchstens 30 MB groß sein.",
-    "Uhrzeit": "Uhrzeit"
+    "Uhrzeit": "Uhrzeit",
+    "Lokdaten": "Lokdaten",
+    "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Verbindung zum Server unterbrochen. Bitte erneut versuchen.",
+    "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.",
+    "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen."
   },
   "en": {
     "Administration": "Administration",
@@ -2773,7 +2778,12 @@
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Please select a valid report recipient.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximum 10 files per handover protocol.",
     "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Files must not exceed 30 MB in total.",
-    "Uhrzeit": "Time"
+    "Uhrzeit": "Time",
+    "Lokdaten": "Locomotive data",
+    "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Connection to the server interrupted. Please try again.",
+    "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "The server rejected the upload because of its size limit.",
+    "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Saving failed. Please try again.",
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Saving failed. The protocol and files were not saved. Please try again."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4161,7 +4171,12 @@
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Wybierz prawidłowego odbiorcę zgłoszenia.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maksymalnie 10 plików na protokół przekazania.",
     "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Łączny rozmiar plików nie może przekraczać 30 MB.",
-    "Uhrzeit": "Godzina"
+    "Uhrzeit": "Godzina",
+    "Lokdaten": "Dane lokomotywy",
+    "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Połączenie z serwerem zostało przerwane. Spróbuj ponownie.",
+    "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Serwer odrzucił przesyłanie z powodu limitu rozmiaru.",
+    "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Zapis nie powiódł się. Spróbuj ponownie.",
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Zapis nie powiódł się. Protokół i pliki nie zostały zapisane. Spróbuj ponownie."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5549,7 +5564,12 @@
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Выберите действительного получателя сообщения.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Не более 10 файлов на протокол передачи.",
     "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Общий размер файлов не должен превышать 30 МБ.",
-    "Uhrzeit": "Время"
+    "Uhrzeit": "Время",
+    "Lokdaten": "Данные локомотива",
+    "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Соединение с сервером прервано. Повторите попытку.",
+    "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Сервер отклонил загрузку из-за ограничения размера.",
+    "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Не удалось сохранить. Повторите попытку.",
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Не удалось сохранить протокол и файлы. Повторите попытку."
   },
   "es": {
     "Administration": "Administración",
@@ -6937,6 +6957,11 @@
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Seleccione un destinatario válido.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Máximo 10 archivos por acta de entrega.",
     "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Los archivos no pueden superar 30 MB en total.",
-    "Uhrzeit": "Hora"
+    "Uhrzeit": "Hora",
+    "Lokdaten": "Datos de la locomotora",
+    "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Se interrumpió la conexión con el servidor. Inténtelo de nuevo.",
+    "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "El servidor rechazó la carga por su límite de tamaño.",
+    "Speichern fehlgeschlagen. Bitte erneut versuchen.": "No se pudo guardar. Inténtelo de nuevo.",
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "No se guardaron el acta ni los archivos. Inténtelo de nuevo."
   }
 }

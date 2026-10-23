@@ -1,11 +1,12 @@
-import io,json,unittest
+import io,json,os,unittest
 from fastapi.testclient import TestClient
 from PIL import Image
-from sqlalchemy import select,func
+from sqlalchemy import select,func,event
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import OperationalError
 import test_vehicles
 from lokzeitleiste.main import app
-from lokzeitleiste.models import RailwayStation,LocoHandoverProtocol,LocoHandoverAttachment
+from lokzeitleiste.models import RailwayStation,LocoHandoverProtocol,LocoHandoverAttachment,LocoHandoverAttachmentChunk
 
 class HandoverProtocolTest(unittest.TestCase):
     setUp=test_vehicles.VehicleTest.setUp
@@ -69,3 +70,52 @@ class HandoverProtocolTest(unittest.TestCase):
         self.assertEqual(anonymous.get(path).status_code,401)
         self.assertEqual(self.post(anonymous,path).status_code,401)
         self.assertEqual(driver.get(adminpath).status_code,401)
+
+    def test_multimegabyte_upload_small_sql_packets_and_locomotive_data(self):
+        vehicle,driver,path=self.setup_protocol()
+        image=io.BytesIO();Image.frombytes('RGB',(1024,1024),os.urandom(1024*1024*3)).save(image,'PNG');content=image.getvalue()
+        self.assertGreater(len(content),2*1024*1024);self.assertLess(len(content),10*1024*1024)
+        def check_packets(conn,cursor,statement,parameters,context,executemany):
+            def check(value):
+                if isinstance(value,(bytes,bytearray,memoryview)):self.assertLessEqual(len(value),1024*1024,'Binary exceeds a small host-MySQL packet limit')
+                elif isinstance(value,(tuple,list)):
+                    for item in value:check(item)
+                elif isinstance(value,dict):
+                    for item in value.values():check(item)
+            check(parameters)
+        event.listen(self.engine,'before_cursor_execute',check_packets)
+        try:
+            response=self.post(driver,path,self.protocol_data(locomotive_data=True),[('files',('lokdaten.png',content,'image/png')),('files',('zweites.png',content,'image/png'))])
+            self.assertEqual(response.status_code,201,response.text);row=response.json();self.assertTrue(row['locomotive_data'])
+            details=driver.get(path+'/'+str(row['id'])).json();self.assertTrue(details['locomotive_data']);self.assertEqual(len(details['files']),2)
+            for file in details['files']:
+                self.assertEqual(driver.get(path+'/'+str(row['id'])+'/files/'+str(file['id'])).content,content)
+            with Session(self.engine) as db:
+                chunks=db.scalars(select(LocoHandoverAttachmentChunk)).all();self.assertGreater(len(chunks),2)
+        finally:event.remove(self.engine,'before_cursor_execute',check_packets)
+
+    def test_legacy_attachment_download_and_missing_locomotive_flag(self):
+        vehicle,driver,path=self.setup_protocol();row=self.post(driver,path).json()
+        with Session(self.engine) as db:
+            protocol=db.get(LocoHandoverProtocol,row['id']);data=json.loads(protocol.payload_json);data.pop('locomotive_data',None);protocol.payload_json=json.dumps(data)
+            file=LocoHandoverAttachment(protocol_id=row['id'],filename='alt.png',mime_type='image/png',content=b'legacy-file');db.add(file);db.commit();file_id=file.id
+        detail=driver.get(path+'/'+str(row['id'])).json();self.assertFalse(detail['locomotive_data'])
+        self.assertEqual(driver.get(path+'/'+str(row['id'])+'/files/'+str(file_id)).content,b'legacy-file')
+
+    def test_database_upload_failure_is_visible_and_atomic(self):
+        vehicle,driver,path=self.setup_protocol()
+        image=io.BytesIO();Image.new('RGB',(2,2)).save(image,'PNG')
+        def fail_chunk(conn,cursor,statement,parameters,context,executemany):
+            if statement.startswith('INSERT INTO loco_handover_attachment_chunks'):
+                raise OperationalError(statement,None,Exception('simulated database failure'))
+        event.listen(self.engine,'before_cursor_execute',fail_chunk)
+        try:
+            with self.assertLogs('lokzeitleiste.handover_protocols',level='ERROR'):
+                response=self.post(driver,path,files=[('files',('bild.png',image.getvalue(),'image/png'))])
+            self.assertEqual(response.status_code,503,response.text)
+            self.assertIn('Speichern fehlgeschlagen',response.json()['detail'])
+        finally:event.remove(self.engine,'before_cursor_execute',fail_chunk)
+        with Session(self.engine) as db:
+            self.assertEqual(db.scalar(select(func.count()).select_from(LocoHandoverProtocol)),0)
+            self.assertEqual(db.scalar(select(func.count()).select_from(LocoHandoverAttachment)),0)
+            self.assertEqual(db.scalar(select(func.count()).select_from(LocoHandoverAttachmentChunk)),0)
