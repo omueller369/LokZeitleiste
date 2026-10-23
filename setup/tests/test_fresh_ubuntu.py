@@ -15,6 +15,15 @@ spec=importlib.util.spec_from_file_location('fresh_ubuntu',ROOT/'setup/fresh_ubu
 fresh=importlib.util.module_from_spec(spec);spec.loader.exec_module(fresh)
 
 class FreshUbuntuTest(unittest.TestCase):
+    def test_roundcube_php85_patch_is_guarded_idempotent_and_preserves_other_code(self):
+        old="<?php\nfunction array_first($array)\n{\n    if (is_array($array)) {\n        return reset($array);\n    }\n    return null;\n}\n// next function\n"
+        fixed=fresh.roundcube_php85_patch(old)
+        self.assertIn("if (!function_exists('array_first')) {",fixed)
+        self.assertTrue(fixed.endswith('// next function\n'))
+        self.assertEqual(fresh.roundcube_php85_patch(fixed),fixed)
+        self.assertEqual(fresh.roundcube_php85_patch('<?php // no polyfill'), '<?php // no polyfill')
+        with self.assertRaises(ValueError):fresh.roundcube_php85_patch('<?php function array_first($x) {}')
+
     def test_fixed_identity_and_secure_service_configs(self):
         self.assertEqual(fresh.DOMAIN,'ctl-software.io-goerlitz.eu');self.assertEqual(fresh.IP,'212.227.86.251')
         self.assertEqual(fresh.DB_USER,'dbo_ctl');self.assertEqual(fresh.DB_NAME,'db_ctl')
@@ -92,7 +101,7 @@ class FreshUbuntuTest(unittest.TestCase):
             with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=a_only),patch.object(fresh,'local_dkim',return_value='v=DKIM1; p=key'):
                 with self.assertRaisesRegex(ValueError,'MX muss'):fresh.public_dns_check()
     def test_resume_does_not_repeat_completed_database_stage(self):
-        names=['prepare_packages','prepare_hostname','prepare_firewall','prepare_database','prepare_php_apps','prepare_dns','public_dns_check','prepare_certificate','prepare_mail','prepare_application','finish_web','verify']
+        names=['prepare_packages','prepare_hostname','prepare_firewall','prepare_database','prepare_php_apps','prepare_dns','public_dns_check','prepare_certificate','prepare_mail','prepare_application','finish_web','repair_roundcube_php85','verify']
         with tempfile.TemporaryDirectory() as folder:
             state=Path(folder);(state/'database-password').write_text('existing-password')
             mocks={name:Mock() for name in names};mocks['public_dns_check'].side_effect=ValueError('DNS records missing')

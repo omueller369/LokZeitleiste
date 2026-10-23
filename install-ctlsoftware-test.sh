@@ -749,6 +749,35 @@ def prepare_php_apps():
     run(['systemctl','restart',f'php{version}-fpm'])
 
 
+def roundcube_php85_patch(source):
+    # Backport the function_exists guard from Roundcube upstream commit 060fc956.
+    if re.search(r"if\s*\(\s*!\s*function_exists\s*\(\s*['\"]array_first['\"]",source):return source
+    pattern=r'^function array_first\(\$array\)\s*\n\{\n.*?^\}'
+    match=re.search(pattern,source,re.MULTILINE|re.DOTALL)
+    if not match:
+        if re.search(r'function\s+array_first\s*\(',source):raise ValueError('Unbekannte Roundcube-array_first-Definition; kein automatischer Patch.')
+        return source
+    block=match.group(0)
+    guarded="if (!function_exists('array_first')) {\n"+'\n'.join('    '+line for line in block.splitlines())+'\n}'
+    return source[:match.start()]+guarded+source[match.end():]
+
+
+def repair_roundcube_php85():
+    bootstrap=Path('/usr/share/roundcube/program/lib/Roundcube/bootstrap.php')
+    source=bootstrap.read_text();patched=roundcube_php85_patch(source)
+    if patched!=source:
+        write(bootstrap,patched)
+        try:run(['php','-l',str(bootstrap)])
+        except Exception:
+            write(bootstrap,source)
+            raise
+    write('/etc/apache2/conf-available/ctl-servername.conf','ServerName '+DOMAIN+'\n')
+    run(['a2enconf','ctl-servername'])
+    version=(STATE/'php-version').read_text().strip()
+    run(['systemctl','restart',f'php{version}-fpm'])
+    run(['apache2ctl','configtest']);run(['systemctl','reload','apache2'])
+
+
 def prepare_dns():
     key_dir=Path('/etc/opendkim/keys')/DOMAIN;key_dir.mkdir(parents=True,exist_ok=True)
     if not (key_dir/'ctl.private').exists():run(['opendkim-genkey','-b','2048','-d',DOMAIN,'-s','ctl','-D',str(key_dir)])
@@ -987,7 +1016,7 @@ def main():
     if IP not in [a['local'] for item in interfaces for a in item.get('addr_info',[])]:raise ValueError(IP+' ist nicht als lokale IPv4 konfiguriert.')
     stages=[('packages',prepare_packages),('hostname',prepare_hostname),('firewall',prepare_firewall),('database',prepare_database),('php-apps',prepare_php_apps),('dns-external-v2',prepare_dns),
             ('public-dns-external-v2',public_dns_check),('certificate',prepare_certificate),('mail',prepare_mail),
-            ('application',lambda:prepare_application(args)),('web',finish_web),('verify',verify)]
+            ('application',lambda:prepare_application(args)),('web',finish_web),('roundcube-php85-v1',repair_roundcube_php85),('verify',verify)]
     for name,action in stages:
         if name in state['completed']:continue
         print('Schritt: '+name,flush=True);action();state['completed'].append(name)
