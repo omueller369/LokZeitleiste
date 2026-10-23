@@ -36,7 +36,7 @@ Das Script fragt nur das neue Passwort für `dbo_ctl` ab. Mindestens sechs Zeich
 - Installation der Server- und Anwendungsabhängigkeiten über Ubuntu-Pakete: Apache, MariaDB, BIND, Postfix, Dovecot, OpenDKIM, PostSRSd, Certbot, UFW, Python und Hilfswerkzeuge.
 - Apache mit HTTP-ACME-Pfad, öffentlich gültigem TLS-Zertifikat und HTTPS-Weiterleitung zur CTL-Anwendung. Certbot erhält `omueller369@gmail.com` als Kontaktadresse.
 - MariaDB nur an `127.0.0.1`; Benutzer `dbo_ctl` erhält Rechte innerhalb `db_ctl`, keine globalen Administratorrechte.
-- BIND als autoritativer Nameserver für **nur diese Subdomain**, ohne öffentliche Rekursion. A-, NS-, MX-, SPF-, DKIM- und DMARC-Einträge werden angelegt. Es wird nicht die übergeordnete Zone `io-goerlitz.eu` überschrieben.
+- Öffentliche DNS-Verwaltung bei STRATO; BIND nur lokal, ohne öffentliche Rekursion. Die nötigen Provider-Einträge werden ausgegeben.
 - Postfix für SMTP-Empfang und authentifizierten Versand, Dovecot 2.4 für IMAP, Authentifizierung und lokale Zustellung. OpenDKIM signiert eigene ausgehende Nachrichten. PostSRSd verwendet die 2.x-Socketmap-Schnittstelle zur Absenderumschreibung bei Weiterleitungen.
 - Vier virtuelle Postfächer, ohne eigene Linux-Login-Konten. Passwörter stehen gehasht in einer root-/Dovecot-lesbaren Datei. Die Sieve-Regel führt sowohl `redirect` als auch ausdrücklich `keep` aus.
 - UFW-Freigaben für die Dienste. Die tatsächlich konfigurierte SSH-Portnummer wird vorher ermittelt und freigegeben; vorhandene SSH-Schlüssel werden nicht ersetzt.
@@ -45,26 +45,27 @@ Das Script fragt nur das neue Passwort für `dbo_ctl` ab. Mindestens sechs Zeich
 
 ## Öffentliche DNS-Voraussetzungen
 
-Das Script überprüft die öffentlichen Antworten bei zwei DNS-Resolvern. Ein bestehender A-Eintrag auf die Server-IP ist **keine NS-Delegation**. Damit BIND auf dem neuen Server für die erzeugten Einträge zuständig ist, muss beim Provider die entsprechende Delegation bestehen:
+Die STRATO-Standardnameserver bleiben zuständig. Keine eigenen Nameserver, NS-Delegation oder Glue-Einträge einrichten. BIND bleibt ausschließlich lokal auf 127.0.0.1 erreichbar.
 
-```dns
-ctl-software.io-goerlitz.eu.      NS  ns1.ctl-software.io-goerlitz.eu.
-ns1.ctl-software.io-goerlitz.eu.  A   212.227.86.251
-```
+In der DNS-Verwaltung von `io-goerlitz.eu` diese Einträge anlegen:
 
-Der Provider muss dabei den nötigen Glue-Eintrag für den unterhalb der delegierten Zone liegenden Nameserver veröffentlichen. Der **PTR-/Reverse-DNS-Eintrag** wird im Serverprovider-Panel gesetzt:
+| Typ | Name relativ zu io-goerlitz.eu | Wert |
+| --- | --- | --- |
+| A | ctl-software | 212.227.86.251 |
+| MX | ctl-software | Priorität 10, ctl-software.io-goerlitz.eu. |
+| TXT | ctl-software | v=spf1 ip4:212.227.86.251 -all |
+| TXT | _dmarc.ctl-software | v=DMARC1; p=none; rua=mailto:info@ctl-software.io-goerlitz.eu |
+| TXT | ctl._domainkey.ctl-software | individueller Schlüssel aus dem Script |
 
-```text
-212.227.86.251 → ctl-software.io-goerlitz.eu
-```
+Das Script erzeugt den DKIM-Schlüssel und zeigt alle Werte an. Sie stehen ebenfalls in `/etc/ctlsoftware-test-setup/provider-dns.txt`. TXT-Werte ohne zusätzliche äußere Anführungszeichen eingeben. Bei Bearbeitung direkt innerhalb der Subdomain die relativen Namen entsprechend kürzen. Konkurrierende MX/SPF-Einträge und CNAME prüfen; AAAA entfernen, solange kein IPv6 eingerichtet ist.
 
-Eine lokale BIND-Reverse-Zone kann diesen Provider-PTR nicht ersetzen. Die geplanten Provider-Einträge werden zusätzlich unter `/etc/ctlsoftware-test-setup/provider-dns.txt` gespeichert. Falls Delegation, sichtbarer MX/DKIM oder PTR noch fehlen, hält die Routine mit einer konkreten Fehlermeldung an. Nach DNS-Korrektur/Propagation:
+PTR beim Serveranbieter: `212.227.86.251 → ctl-software.io-goerlitz.eu`. Der bereits gesetzte Wert wird öffentlich überprüft. Das Script prüft A, AAAA, MX, den passenden DKIM-Schlüssel, SPF, DMARC und PTR bei zwei Resolvern. Solange Einträge fehlen, stoppt es vor Zertifikats- und Mailinstallation. Nach DNS-Änderung und deren Verteilung fortsetzen:
 
 ```bash
 sudo bash install-ctlsoftware-test.sh --resume
 ```
 
-Auch eine externe Provider-Firewall muss die unten genannten öffentlichen Ports zulassen. Das Script kann nur die lokale UFW konfigurieren. Ein vorhandener AAAA-Eintrag muss entfernt werden, solange kein passendes IPv6 eingerichtet ist. Alte DS-/DNSSEC-Einträge bei geänderter Delegation müssen durch die zuständige DNS-Verwaltung geprüft werden.
+Auch wenn ein vorheriger Lauf bereits am Delegationstest gestoppt wurde: aktualisiertes Script herunterladen und mit `--resume` fortsetzen. Eine neue DNS-Stufe ersetzt dabei die alte lokale Zone und erzeugt die STRATO-Anweisungen; abgeschlossene Datenbank-Schritte werden nicht wiederholt.
 
 ## Postfächer
 
@@ -139,4 +140,3 @@ Die Abschlussprüfung kontrolliert zusätzlich PHP-FPM und beide Anmeldeseiten. 
 
 Für die komplette Neuinstallation gilt ausschließlich `ctl-software.io-goerlitz.eu`. Die IP bleibt `212.227.86.251`. Auf dem frisch aufgesetzten Server ohne `--resume` beginnen; diese Option dient nur zum Fortsetzen eines abgebrochenen Laufs derselben Installation.
 
-Bei STRATO verlangt die Einrichtung eigener Nameserver laut Anbieter zwei Nameserver auf unterschiedlichen IP-Adressen. Dieses Script richtet nur `ns1` ein. Vor einer Delegation muss ein tatsächlich betriebener sekundärer Nameserver ergänzt und für die Zone eingerichtet werden. Alternativ müssen DNS-Verwaltung und Setup-Prüfung auf extern verwaltetes DNS umgestellt werden; ein A-Eintrag allein erfüllt die aktuelle Prüfung nicht. Die Domainkorrektur beseitigt diese Voraussetzung nicht.

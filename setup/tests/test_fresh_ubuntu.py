@@ -74,28 +74,30 @@ class FreshUbuntuTest(unittest.TestCase):
                 cursor.reset_mock();cursor.fetchone.return_value=(2,)
                 with self.assertRaisesRegex(ValueError,'bereits Tabellen'):fresh.prepare_database()
                 self.assertEqual(cursor.execute.call_count,1)
-    def test_public_dns_requires_delegation_and_ptr_not_only_a_record(self):
+    def test_public_dns_accepts_strato_without_delegation(self):
         def dns(command):
             if '-x' in command:return fresh.DOMAIN+'.'
             kind=command[-1];name=command[-2]
             if kind=='A':return fresh.IP
             if kind=='AAAA':return ''
-            if kind=='NS':return 'ns1.'+fresh.DOMAIN+'.'
+            if kind=='NS':raise AssertionError('No NS lookup allowed')
             if kind=='MX':return '10 '+fresh.DOMAIN+'.'
+            if name.startswith('_dmarc.'):return '"v=DMARC1; p=none"'
+            if name==fresh.DOMAIN:return '"v=spf1 ip4:'+fresh.IP+' -all"'
             return '"v=DKIM1; p=key"'
         with tempfile.TemporaryDirectory() as folder:
             state=Path(folder);(state/'provider-dns.txt').write_text('Provider-Einträge prüfen')
-            with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=dns):fresh.public_dns_check()
+            with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=dns),patch.object(fresh,'local_dkim',return_value='v=DKIM1; p=key'):fresh.public_dns_check()
             def a_only(command):return fresh.IP if command[-1]=='A' else ''
-            with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=a_only):
-                with self.assertRaisesRegex(ValueError,'NS-Delegation fehlt'):fresh.public_dns_check()
+            with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=a_only),patch.object(fresh,'local_dkim',return_value='v=DKIM1; p=key'):
+                with self.assertRaisesRegex(ValueError,'MX muss'):fresh.public_dns_check()
     def test_resume_does_not_repeat_completed_database_stage(self):
         names=['prepare_packages','prepare_hostname','prepare_firewall','prepare_database','prepare_php_apps','prepare_dns','public_dns_check','prepare_certificate','prepare_mail','prepare_application','finish_web','verify']
         with tempfile.TemporaryDirectory() as folder:
             state=Path(folder);(state/'database-password').write_text('existing-password')
-            mocks={name:Mock() for name in names};mocks['public_dns_check'].side_effect=ValueError('DNS not delegated')
+            mocks={name:Mock() for name in names};mocks['public_dns_check'].side_effect=ValueError('DNS records missing')
             with patch.object(fresh,'STATE',state),patch.object(fresh.os,'geteuid',return_value=0),patch.object(fresh,'output',return_value=json.dumps([{'addr_info':[{'local':fresh.IP}]}])),patch.multiple(fresh,**mocks),patch.object(sys,'argv',['fresh','--engine','/test/engine.py']):
-                with self.assertRaisesRegex(ValueError,'DNS not delegated'):fresh.main()
+                with self.assertRaisesRegex(ValueError,'DNS records missing'):fresh.main()
                 self.assertEqual(mocks['prepare_database'].call_count,1);mocks['prepare_application'].assert_not_called()
                 mocks['public_dns_check'].side_effect=None
                 with patch.object(sys,'argv',['fresh','--resume','--engine','/test/engine.py']):fresh.main()

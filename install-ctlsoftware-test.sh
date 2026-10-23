@@ -662,8 +662,7 @@ def prepare_firewall():
     ports=[line.split()[1] for line in ssh.splitlines() if line.startswith('port ')]
     if not ports:raise ValueError('SSH-Port nicht ermittelt. Firewall wird nicht aktiviert.')
     for port in ports:run(['ufw','allow',port+'/tcp'])
-    for port in (25,53,80,143,443,465,587,993):run(['ufw','allow',str(port)+'/tcp'])
-    run(['ufw','allow','53/udp'])
+    for port in (25,80,143,443,465,587,993):run(['ufw','allow',str(port)+'/tcp'])
     run(['ufw','default','deny','incoming']);run(['ufw','default','allow','outgoing'])
     run(['ufw','--force','enable'])
 
@@ -755,43 +754,69 @@ def prepare_dns():
     if not (key_dir/'ctl.private').exists():run(['opendkim-genkey','-b','2048','-d',DOMAIN,'-s','ctl','-D',str(key_dir)])
     user=pwd.getpwnam('opendkim');os.chown(key_dir,user.pw_uid,user.pw_gid)
     os.chown(key_dir/'ctl.private',user.pw_uid,user.pw_gid);(key_dir/'ctl.private').chmod(0o600)
-    key=(key_dir/'ctl.txt').read_text();zone=Path('/etc/bind/ctlsoftware-test.zone')
-    write(zone,bind_zone(key,int(time.time())))
-    write('/etc/bind/named.conf.local',MARKER+f'zone "{DOMAIN}" {{ type primary; file "{zone}"; allow-transfer {{ none; }}; }};\n')
-    write('/etc/bind/named.conf.options',MARKER+f'''options {{
+    # DNS stays authoritative at STRATO. Keep optional local BIND loopback-only.
+    write('/etc/bind/named.conf.local',MARKER+'// Public DNS is managed at STRATO.\n')
+    write('/etc/bind/named.conf.options',MARKER+'''options {
  directory "/var/cache/bind";
- listen-on port 53 {{ 127.0.0.1; {IP}; }};
- listen-on-v6 {{ none; }};
+ listen-on port 53 { 127.0.0.1; };
+ listen-on-v6 { none; };
  recursion no;
- allow-query {{ any; }};
- allow-transfer {{ none; }};
- dnssec-validation auto;
- minimal-responses yes;
-}};
+ allow-query { localhost; };
+};
 ''')
-    run(['named-checkconf']);run(['named-checkzone',DOMAIN,str(zone)])
+    run(['named-checkconf'])
     run(['systemctl','enable','--now','named']);run(['systemctl','restart','named'])
-    required=f'''Beim Provider muss eine echte NS-Delegation bestehen, nicht nur ein A-Eintrag:
-{DOMAIN}. NS ns1.{DOMAIN}.
-Glue/A: ns1.{DOMAIN}. A {IP}
-PTR beim Serverprovider: {IP} -> {DOMAIN}
-Es wird keine unzuständige lokale Reverse-Zone als Ersatz angelegt.
-'''
+    required=provider_dns_records((key_dir/'ctl.txt').read_text())
     write(STATE/'provider-dns.txt',required,0o600)
+    print(required,flush=True)
+
+
+def dkim_value(key):
+    value=''.join(re.findall(r'"([^"\n]*)"',key))
+    if 'v=DKIM1' not in value or not re.search(r'\bp=[A-Za-z0-9+/=]+',value):
+        raise ValueError('OpenDKIM TXT-Schlüssel konnte nicht gelesen werden.')
+    return value
+
+
+def provider_dns_records(key):
+    return f'''STRATO-Standardnameserver beibehalten. Keine NS-Delegation und kein Glue nötig.
+Unter io-goerlitz.eu folgende DNS-Einträge setzen (Namen relativ zur Hauptdomain):
+Typ  Name                              Wert
+A    ctl-software                      {IP}
+MX   ctl-software                      Priorität 10, Ziel {DOMAIN}.
+TXT  ctl-software                      v=spf1 ip4:{IP} -all
+TXT  _dmarc.ctl-software               v=DMARC1; p=none; rua=mailto:info@{DOMAIN}
+TXT  ctl._domainkey.ctl-software        {dkim_value(key)}
+Kein CNAME für ctl-software; konkurrierende MX/SPF-Einträge prüfen.
+AAAA für ctl-software entfernen, solange IPv6 nicht eingerichtet ist.
+PTR beim Serverprovider: {IP} -> {DOMAIN}
+TXT-Werte als einen logischen Wert eingeben, ohne zusätzliche äußere Anführungszeichen.
+'''
+
+
+def local_dkim():
+    return dkim_value((Path('/etc/opendkim/keys')/DOMAIN/'ctl.txt').read_text())
 
 
 def public_dns_check():
+    required=(STATE/'provider-dns.txt').read_text()
+    print(required,flush=True)
+    expected_dkim=local_dkim()
     errors=[]
     for resolver in ('1.1.1.1','8.8.8.8'):
         def query(name,kind):return output(['dig','@'+resolver,'+short','+time=5','+tries=1',name,kind]).splitlines()
+        def txt(name):return [''.join(re.findall(r'"([^"\n]*)"',row)) for row in query(name,'TXT')]
         if query(DOMAIN,'A')!=[IP]:errors.append(resolver+': A-Eintrag stimmt nicht.')
         if query(DOMAIN,'AAAA'):errors.append(resolver+': AAAA vorhanden; diese IPv4-Routine konfiguriert kein IPv6.')
-        if 'ns1.'+DOMAIN+'.' not in query(DOMAIN,'NS'):errors.append(resolver+': NS-Delegation fehlt.')
-        if not any(line.split()[-1:]==[DOMAIN+'.'] for line in query(DOMAIN,'MX')):errors.append(resolver+': MX fehlt.')
-        if not query('ctl._domainkey.'+DOMAIN,'TXT'):errors.append(resolver+': DKIM ist noch nicht öffentlich sichtbar.')
+        mx=query(DOMAIN,'MX')
+        if not mx or any(line.split()[-1:]!=[DOMAIN+'.'] for line in mx):errors.append(resolver+': MX muss auf den eigenen Mailserver zeigen.')
+        if expected_dkim not in txt('ctl._domainkey.'+DOMAIN):errors.append(resolver+': DKIM stimmt noch nicht mit dem lokalen Schlüssel überein.')
+        spf=[value for value in txt(DOMAIN) if value.startswith('v=spf1')]
+        if spf!=['v=spf1 ip4:'+IP+' -all']:errors.append(resolver+': SPF fehlt oder ist widersprüchlich.')
+        if not any(value.startswith('v=DMARC1;') for value in txt('_dmarc.'+DOMAIN)):errors.append(resolver+': DMARC fehlt.')
         reverse=output(['dig','@'+resolver,'+short','+time=5','+tries=1','-x',IP]).splitlines()
         if DOMAIN+'.' not in reverse:errors.append(resolver+': PTR/Reverse-DNS stimmt nicht.')
-    if errors:raise ValueError('\n'.join(errors)+'\n'+(STATE/'provider-dns.txt').read_text()+'Nach DNS-Korrektur: sudo bash install-ctlsoftware-test.sh --resume')
+    if errors:raise ValueError('\n'.join(errors)+'\n'+required+'Nach DNS-Korrektur: sudo bash install-ctlsoftware-test.sh --resume')
 
 
 def prepare_certificate():
@@ -960,8 +985,8 @@ def main():
     # Require this exact public IP on an interface; no IPv6 or NAT configuration is guessed.
     interfaces=json.loads(output(['ip','-j','-4','addr']))
     if IP not in [a['local'] for item in interfaces for a in item.get('addr_info',[])]:raise ValueError(IP+' ist nicht als lokale IPv4 konfiguriert.')
-    stages=[('packages',prepare_packages),('hostname',prepare_hostname),('firewall',prepare_firewall),('database',prepare_database),('php-apps',prepare_php_apps),('dns',prepare_dns),
-            ('public-dns',public_dns_check),('certificate',prepare_certificate),('mail',prepare_mail),
+    stages=[('packages',prepare_packages),('hostname',prepare_hostname),('firewall',prepare_firewall),('database',prepare_database),('php-apps',prepare_php_apps),('dns-external-v2',prepare_dns),
+            ('public-dns-external-v2',public_dns_check),('certificate',prepare_certificate),('mail',prepare_mail),
             ('application',lambda:prepare_application(args)),('web',finish_web),('verify',verify)]
     for name,action in stages:
         if name in state['completed']:continue
