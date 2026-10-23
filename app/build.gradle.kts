@@ -15,9 +15,18 @@ android {
         applicationId = "de.lokzeitleiste.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.11"
+        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("11").get().toInt()
+        versionName = providers.gradleProperty("lokzeitleisteVersionName").orElse("0.11").get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
+    }
+    val signingPath = providers.gradleProperty("lokzeitleisteSigningStoreFile").orElse(providers.environmentVariable("ANDROID_KEYSTORE_PATH")).orNull
+    if (signingPath != null && file(signingPath).exists()) {
+        signingConfigs.getByName("debug") {
+            storeFile = file(signingPath)
+            storePassword = providers.gradleProperty("lokzeitleisteSigningStorePassword").orElse(providers.environmentVariable("ANDROID_KEYSTORE_PASSWORD")).get()
+            keyAlias = providers.gradleProperty("lokzeitleisteSigningKeyAlias").orElse(providers.environmentVariable("ANDROID_KEY_ALIAS")).get()
+            keyPassword = providers.gradleProperty("lokzeitleisteSigningKeyPassword").orElse(providers.environmentVariable("ANDROID_KEY_PASSWORD")).get()
+        }
     }
     buildFeatures { compose = true; buildConfig = true }
 }

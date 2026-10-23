@@ -157,3 +157,5 @@ Beim regulären Update bzw. bei der Neuinstallation wird die Tabelle `backend_me
 ## Android TF-Portal 0.11
 
 Die Android-App übernimmt den aktuellen TF-Portalstand als gemeinsam gebündelte Oberfläche, ergänzt um native Dateiauswahl, Downloads und einen GPS-Standortdienst für die Bildschirmsperre. Die bisherige native Erfassung bleibt erreichbar. [Funktionen, Offline-Verhalten, Build und Installation](app/docs/TF-PORTAL.md). Eine aktualisierte Serverinstallation und eine neu gebaute APK sind erforderlich.
+
+Die [Schritt-für-Schritt-Anleitung für Android Studio, Tabletinstallation und GitHub-Updates](app/docs/ANDROID-STUDIO-TABLET.md) beschreibt insbesondere den dauerhaft identischen Signierschlüssel und die vier notwendigen Repository-Secrets. Die App prüft beim Öffnen/Fortsetzen automatisch auf signierte Test-Releases; Android verlangt weiterhin eine Installationsbestätigung.

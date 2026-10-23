@@ -87,7 +87,7 @@ private fun fetchQuery(query: String): List<Station> {
     try {
         connection.outputStream.use { it.write("data=${java.net.URLEncoder.encode(query, "UTF-8")}".toByteArray()) }
         if (connection.responseCode !in 200..299) error("OSM-Datenserver: HTTP ${connection.responseCode}")
-        val elements = JSONObject(connection.inputStream.bufferedReader().use { it.readLocalizedText() }).getJSONArray("elements")
+        val elements = JSONObject(connection.inputStream.bufferedReader().use { it.readText() }).getJSONArray("elements")
         return (0 until elements.length()).mapNotNull { i ->
             val e = elements.getJSONObject(i)
             val tags = e.optJSONObject("tags") ?: return@mapNotNull null

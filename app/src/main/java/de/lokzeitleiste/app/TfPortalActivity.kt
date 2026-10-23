@@ -31,6 +31,7 @@ class TfPortalActivity : ComponentActivity() {
     private lateinit var web: WebView
     private lateinit var policy: PortalPolicy
     private lateinit var store: GpsTrackStore
+    private lateinit var updater:PortalUpdater
     private var session=JSONObject()
     private var fileCallback: ValueCallback<Array<Uri>>?=null
     private var pendingGps: Pair<JSONObject,JavaScriptReplyProxy>?=null
@@ -74,6 +75,8 @@ class TfPortalActivity : ComponentActivity() {
         tool("Bisherige Erfassungen") { if(GpsRecordingService.currentKey!=null) toast("Bitte zuerst die GPS-Aufzeichnung beenden.") else { startActivity(Intent(this,LegacyActivity::class.java));finish() } }
         tool("Abmelden") { logout() }
         web=WebView(this);layout.addView(tools);layout.addView(web,LinearLayout.LayoutParams(-1,0,1f));setContentView(layout)
+        updater=PortalUpdater(this)
+        tool("Update") { updater.check(true) }
         configureWebView()
         onBackPressedDispatcher.addCallback(this,object:OnBackPressedCallback(true) { override fun handleOnBackPressed() {
             if(GpsRecordingService.currentKey!=null) { toast("Bitte zuerst die GPS-Aufzeichnung beenden.");return }
@@ -117,7 +120,7 @@ class TfPortalActivity : ComponentActivity() {
         CookieManager.getInstance().setAcceptCookie(true)
         CookieManager.getInstance().setCookie(policy.origin,"admin_session=$token; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000$secure") {
             CookieManager.getInstance().flush()
-            web.loadUrl(policy.origin+if(session.getJSONObject("account").optBoolean("password_change_required")) "/account" else "/tf")
+            web.loadUrl(policy.origin+if(session.getJSONObject("account").optBoolean("password_change_required")) "/account" else if(GpsRecordingService.currentKey!=null) "/tf/arbeitsbericht" else "/tf")
         }
     }
     @SuppressLint("SetJavaScriptEnabled")
@@ -244,5 +247,6 @@ class TfPortalActivity : ComponentActivity() {
                 }.setNegativeButton(android.R.string.cancel,null).show() } catch(error:Exception) { toast(error.message?:"Download fehlgeschlagen.") }
         }
     }
+    override fun onResume() { super.onResume();if(::updater.isInitialized)updater.resume() }
     override fun onDestroy() { fileCallback?.onReceiveValue(null);exportStream?.close();if(::web.isInitialized){web.stopLoading();web.destroy()};super.onDestroy() }
 }

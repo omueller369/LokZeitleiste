@@ -2,6 +2,7 @@
 const el=id=>document.getElementById(id),transport={train:'Zug',car:'Auto',taxi:'Taxi',public_transport:'ÖPNV',other:'Anderes Transportmittel'};
 let monthVisible=false,reportViewOnly=false;
 function reportFields(show){el('reportDetails').hidden=!show;if(show)window.ReportBlocks?.expandAll();}
+window.openActiveGpsReport=id=>{reportFields(true);trainEditor?.activate(id);};
 let user,key,state,trips=[],edit=-1,queue=[],busy=false,dbPromise=null,poll=null,monthVersion=0,pending=[],monthCache={},trainEditor=null,plans={},planVersion=0;
 const fields=['dutyStart','dutyEnd','actualPause','overrunReason'];
 function uuid(){if(crypto.randomUUID)return crypto.randomUUID();const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=[...b].map(n=>n.toString(16).padStart(2,'0')).join('');return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;}

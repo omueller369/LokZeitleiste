@@ -22,3 +22,8 @@ backend/testenv/backups/
 backend/.env.host
 
 backend/testenv/demo-tf-import.lock
+
+# Personal Android signing material
+*.jks
+*.keystore
+keystore.properties
