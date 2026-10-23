@@ -18,7 +18,8 @@ import time
 from urllib.parse import quote,urlsplit
 from urllib.request import urlopen
 
-SOURCE=Path(__file__).resolve().parents[1]
+SOURCE=Path(os.environ.get('CTL_INSTALL_SOURCE',str(Path(__file__).resolve().parents[1]))).resolve()
+APP_HELPER=Path(os.environ.get('CTL_INSTALL_HELPER',str(SOURCE/'setup/ispconfig_app.py')))
 INSTALL=Path('/opt/lokzeitleiste-ispconfig')
 CONFIG=Path('/etc/lokzeitleiste-ispconfig')
 DATA=Path('/var/lib/lokzeitleiste-ispconfig')
@@ -107,6 +108,17 @@ location ^~ / {{
 '''
 
 
+def existing_site(domain,webserver,directory=None):
+    directory=Path(directory) if directory is not None else Path('/etc/apache2/sites-enabled' if webserver=='apache' else '/etc/nginx/sites-enabled')
+    pattern=r'^\s*Server(?:Name|Alias)\s+([^#\n]+)' if webserver=='apache' else r'^\s*server_name\s+([^;#\n]+)'
+    for path in directory.glob('*'):
+        if not path.is_file():continue
+        try:content=path.read_text(errors='replace')
+        except OSError:continue
+        if any(domain.lower() in line.lower().split() for line in re.findall(pattern,content,re.MULTILINE)):return True
+    return False
+
+
 def preflight(args):
     problems=[]
     if sys.version_info<(3,11):problems.append('Python >=3.11 wird benötigt.')
@@ -136,6 +148,8 @@ def preflight(args):
         path=UNIT_DIR/(name+'.service')
         if path.is_symlink() or (path.exists() and not path.read_text().startswith('# Managed by LokZeitleiste application-only ISPConfig setup')):
             problems.append('Fremde systemd-Unit wird nicht überschrieben: '+str(path))
+    if getattr(args,'require_existing_site',False) and not existing_site(args.domain,args.webserver):
+        problems.append('Die Subdomain wurde in keiner aktiven Website-Konfiguration gefunden. Zuerst in ISPConfig anlegen/aktivieren.')
     if not (SOURCE/'backend/lokzeitleiste/accounts/demo_tf/people.json').is_file():problems.append('Vollständiger Repository-Checkout mit TF-Testdaten erforderlich.')
     if problems:raise ValueError('\n'.join(problems)+'\nEs wurden keine Serverpakete installiert.')
 
@@ -165,8 +179,10 @@ def main():
     parser.add_argument('--db-user',help='Exakter ISPConfig-Datenbankbenutzer inklusive Präfix')
     parser.add_argument('--admin-user',default='admin')
     parser.add_argument('--check',action='store_true',help='Nur lokale Voraussetzungen prüfen; keine Änderungen/Passwortabfrage')
+    parser.add_argument('--require-existing-site',action='store_true',help='Aktiven VirtualHost der vorhandenen Subdomain prüfen')
     parser.add_argument('--resume',action='store_true',help='Nur eigene unterbrochene Neuinstallation fortsetzen')
     args=parser.parse_args()
+    if args.require_existing_site and not args.domain and not args.resume:parser.error('--domain für die Website-Prüfung angeben.')
     if not 1024<=args.port<=65535:parser.error('--port muss zwischen 1024 und 65535 liegen.')
     if not re.fullmatch(r'[a-z0-9._-]{3,64}',args.admin_user):parser.error('Ungültiger --admin-user.')
     if args.domain:origin(args.domain,args.http)
@@ -215,8 +231,12 @@ def main():
         else:env=json.loads((CONFIG/'environment.json').read_text())
         backend=INSTALL/'backend';backend.mkdir(exist_ok=True)
         shutil.copytree(SOURCE/'backend/lokzeitleiste',backend/'lokzeitleiste',dirs_exist_ok=True,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+        # Checkout permissions may come from a restrictive root umask. Code is not secret.
+        for path in (backend/'lokzeitleiste',*(backend/'lokzeitleiste').rglob('*')):
+            path.chmod(0o755 if path.is_dir() else 0o644)
         shutil.copy2(SOURCE/'backend/requirements.txt',INSTALL/'requirements.txt')
-        shutil.copy2(SOURCE/'setup/ispconfig_app.py',INSTALL/'ispconfig_app.py')
+        shutil.copy2(APP_HELPER,INSTALL/'ispconfig_app.py')
+        (INSTALL/'ispconfig_app.py').chmod(0o644)
         if not (INSTALL/'venv/bin/python').exists():subprocess.run([sys.executable,'-m','venv',str(INSTALL/'venv')],check=True)
         subprocess.run([str(INSTALL/'venv/bin/python'),'-m','pip','install','--disable-pip-version-check','-r',str(INSTALL/'requirements.txt')],check=True)
         helper=str(INSTALL/'ispconfig_app.py')

@@ -195,3 +195,7 @@ Hochgeladene JPEG- und PNG-Bilder erscheinen in den Protokolldetails direkt als 
 ## Neuinstallation auf vorhandenem Ubuntu mit ISPConfig
 
 `sudo bash setup-ispconfig.sh` installiert ausschließlich die Anwendung mit ihren Python-Abhängigkeiten, eigenen systemd-Diensten und den 20 Test-TF samt Bildern. Sie nutzt eine bereits in ISPConfig angelegte Website und eine leere Datenbank. Es werden keine Web-/Datenbank-/Mailserver, Docker oder ISPConfig installiert und keine fremden VirtualHosts verändert. [Vollständige Anleitung mit Prüf- und Installationsbefehlen, HTTP/HTTPS, Apache/nginx und Testzugängen](docs/SETUP-ISPCONFIG.md).
+
+## Interaktive Installation mit einer Datei
+
+**`install-ctl-software.sh`** enthält die vollständige Setup-Logik für eine vorhandene ISPConfig-Subdomain. Es fragt Subdomain, MariaDB-Datenbank und -Benutzer sowie verdeckt das Passwort ab; fehlendes Python, venv, Git und weitere Anwendungswerkzeuge werden mit sudo nachinstalliert. Der bestehende Web-/Datenbank-/ISPConfig-Stack wird weiterverwendet. Die 20 Test-TF inklusive Bildern sind enthalten. [Download, Aufruf und verbleibende ISPConfig-Weiterleitung](docs/INSTALL-CTL-SOFTWARE.md).

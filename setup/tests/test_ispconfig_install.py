@@ -39,6 +39,7 @@ class IspconfigInstallTest(unittest.TestCase):
     def test_complete_install_generates_private_config_and_only_app_services(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder);install=root/'app';config=root/'config';data=root/'data';units=root/'units';units.mkdir()
+            helper=root/'private-helper.py';helper.write_text((ROOT/'setup/ispconfig_app.py').read_text());helper.chmod(0o600)
             account=SimpleNamespace(pw_uid=99,pw_gid=99,pw_shell='/usr/sbin/nologin')
             reply=SimpleNamespace(stdout=json.dumps({'created':20,'people':[]}))
             response=SimpleNamespace(status=200,__enter__=lambda self:self,__exit__=lambda *a:None)
@@ -46,7 +47,7 @@ class IspconfigInstallTest(unittest.TestCase):
                 def __enter__(self):return response
                 def __exit__(self,*args):pass
             args=['setup-ispconfig','--domain','ctl-software.example.com','--http','--db-name','c1_ctl','--db-user','c1_ctl']
-            with patch.multiple(setup,INSTALL=install,CONFIG=config,DATA=data,UNIT_DIR=units),patch.object(sys,'argv',args),patch.object(setup,'preflight'),patch.object(setup.os,'geteuid',return_value=0),patch.object(setup.os,'chown'),patch.object(setup.pwd,'getpwnam',return_value=account),patch.object(setup.getpass,'getpass',return_value='secret@Password'),patch.object(setup.subprocess,'run') as run,patch.object(setup,'run_application',return_value=reply) as application,patch.object(setup,'urlopen',return_value=Healthy()):
+            with patch.multiple(setup,INSTALL=install,CONFIG=config,DATA=data,UNIT_DIR=units,APP_HELPER=helper),patch.object(sys,'argv',args),patch.object(setup,'preflight'),patch.object(setup.os,'geteuid',return_value=0),patch.object(setup.os,'chown'),patch.object(setup.pwd,'getpwnam',return_value=account),patch.object(setup.getpass,'getpass',return_value='secret@Password'),patch.object(setup.subprocess,'run') as run,patch.object(setup,'run_application',return_value=reply) as application,patch.object(setup,'urlopen',return_value=Healthy()):
                 setup.main()
                 self.assertTrue(json.loads((config/'installation.json').read_text())['complete'])
                 env=json.loads((config/'environment.json').read_text())
@@ -64,6 +65,8 @@ class IspconfigInstallTest(unittest.TestCase):
                 self.assertEqual(modes[0][-1],'empty')
                 self.assertIn(['-m','lokzeitleiste.accounts.import_demo_tf','--seed','23'],modes)
                 self.assertTrue((units/'lokzeitleiste-ispconfig.service').is_file())
+                self.assertEqual((install/'ispconfig_app.py').stat().st_mode&0o777,0o644)
+                self.assertEqual((install/'backend/lokzeitleiste/main.py').stat().st_mode&0o777,0o644)
                 with patch.object(sys,'argv',['setup-ispconfig','--resume']):
                     with self.assertRaisesRegex(ValueError,'bereits vollständig'):setup.main()
                 state=json.loads((config/'installation.json').read_text());state['complete']=False
