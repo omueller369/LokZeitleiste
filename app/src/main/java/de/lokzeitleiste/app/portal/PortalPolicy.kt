@@ -15,6 +15,7 @@ class PortalPolicy(base: String) {
     fun asset(path: String): String? = when(path) {
         "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
         "/tf/lokuebergabebuch", "/tf/loco-handover" -> "loco-handover.html"
+        "/tf/handover-protocols.js" -> "handover-protocols.js"
         "/tf/loco-handover.js" -> "loco-handover.js"
         "/documents" -> "documents.html"
         "/account" -> "account.html"

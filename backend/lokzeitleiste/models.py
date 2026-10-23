@@ -609,3 +609,21 @@ class LocoHandoverDefault(Base):
     parent_id:Mapped[int|None]=mapped_column(ForeignKey('loco_handover_defaults.id'),nullable=True)
     scope_id:Mapped[int]=mapped_column(Integer,nullable=False,default=0)
     revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+
+class LocoHandoverProtocol(Base):
+    __tablename__='loco_handover_protocols'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),nullable=False,index=True)
+    author_id:Mapped[int|None]=mapped_column(ForeignKey('users.id',ondelete='SET NULL'),nullable=True)
+    author_name:Mapped[str]=mapped_column(String(255),nullable=False)
+    occurred_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,index=True)
+    payload_json:Mapped[str]=mapped_column(Text,nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+class LocoHandoverAttachment(Base):
+    __tablename__='loco_handover_attachments'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    protocol_id:Mapped[int]=mapped_column(ForeignKey('loco_handover_protocols.id',ondelete='CASCADE'),nullable=False,index=True)
+    filename:Mapped[str]=mapped_column(String(120),nullable=False)
+    mime_type:Mapped[str]=mapped_column(String(80),nullable=False)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)

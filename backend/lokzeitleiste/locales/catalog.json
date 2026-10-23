@@ -1373,7 +1373,18 @@
     "Emailadresse ist erforderlich.": "Emailadresse ist erforderlich.",
     "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.": "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.",
     "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.": "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.",
-    "Bitte eine gültige Emailadresse eingeben.": "Bitte eine gültige Emailadresse eingeben."
+    "Bitte eine gültige Emailadresse eingeben.": "Bitte eine gültige Emailadresse eingeben.",
+    "Datum / Uhrzeit": "Datum / Uhrzeit",
+    "V/A Dienst": "V/A Dienst",
+    "keiner": "keiner",
+    "Betriebsstelle (DS100 + Bahnhofsname)": "Betriebsstelle (DS100 + Bahnhofsname)",
+    "Km-Stand": "Km-Stand",
+    "Datei-Upload": "Datei-Upload",
+    "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.": "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.",
+    "Übergabeprotokoll nicht gefunden.": "Übergabeprotokoll nicht gefunden.",
+    "Bitte einen gültigen Meldungsempfänger auswählen.": "Bitte einen gültigen Meldungsempfänger auswählen.",
+    "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximal 10 Dateien pro Übergabeprotokoll.",
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Dateien dürfen zusammen höchstens 30 MB groß sein."
   },
   "en": {
     "Administration": "Administration",
@@ -2749,7 +2760,18 @@
     "Emailadresse ist erforderlich.": "Email address is required.",
     "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.": "Please enter both the hotline name and email address.",
     "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.": "Only damage locations can be assigned to a category.",
-    "Bitte eine gültige Emailadresse eingeben.": "Please enter a valid email address."
+    "Bitte eine gültige Emailadresse eingeben.": "Please enter a valid email address.",
+    "Datum / Uhrzeit": "Date / time",
+    "V/A Dienst": "V/A duty",
+    "keiner": "None",
+    "Betriebsstelle (DS100 + Bahnhofsname)": "Operating location (DS100 + station name)",
+    "Km-Stand": "Odometer reading",
+    "Datei-Upload": "File upload",
+    "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.": "PDF, JPEG or PNG: up to 10 files, 10 MB each, 30 MB total.",
+    "Übergabeprotokoll nicht gefunden.": "Handover protocol not found.",
+    "Bitte einen gültigen Meldungsempfänger auswählen.": "Please select a valid report recipient.",
+    "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximum 10 files per handover protocol.",
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Files must not exceed 30 MB in total."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4125,7 +4147,18 @@
     "Emailadresse ist erforderlich.": "Adres e-mail jest wymagany.",
     "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.": "Podaj nazwę infolinii i adres e-mail razem.",
     "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.": "Tylko miejsca uszkodzenia można przypisać do kategorii.",
-    "Bitte eine gültige Emailadresse eingeben.": "Wprowadź poprawny adres e-mail."
+    "Bitte eine gültige Emailadresse eingeben.": "Wprowadź poprawny adres e-mail.",
+    "Datum / Uhrzeit": "Data / godzina",
+    "V/A Dienst": "Służba V/A",
+    "keiner": "Brak",
+    "Betriebsstelle (DS100 + Bahnhofsname)": "Posterunek (DS100 + nazwa stacji)",
+    "Km-Stand": "Przebieg w km",
+    "Datei-Upload": "Przesyłanie plików",
+    "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.": "PDF, JPEG lub PNG: maks. 10 plików, po 10 MB, łącznie 30 MB.",
+    "Übergabeprotokoll nicht gefunden.": "Nie znaleziono protokołu przekazania.",
+    "Bitte einen gültigen Meldungsempfänger auswählen.": "Wybierz prawidłowego odbiorcę zgłoszenia.",
+    "Maximal 10 Dateien pro Übergabeprotokoll.": "Maksymalnie 10 plików na protokół przekazania.",
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Łączny rozmiar plików nie może przekraczać 30 MB."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5501,7 +5534,18 @@
     "Emailadresse ist erforderlich.": "Необходимо указать адрес электронной почты.",
     "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.": "Укажите название горячей линии и адрес электронной почты вместе.",
     "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.": "Только места повреждения можно отнести к категории.",
-    "Bitte eine gültige Emailadresse eingeben.": "Введите действительный адрес электронной почты."
+    "Bitte eine gültige Emailadresse eingeben.": "Введите действительный адрес электронной почты.",
+    "Datum / Uhrzeit": "Дата / время",
+    "V/A Dienst": "Смена V/A",
+    "keiner": "Нет",
+    "Betriebsstelle (DS100 + Bahnhofsname)": "Раздельный пункт (DS100 + название станции)",
+    "Km-Stand": "Пробег в км",
+    "Datei-Upload": "Загрузка файлов",
+    "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.": "PDF, JPEG или PNG: до 10 файлов, по 10 МБ, всего 30 МБ.",
+    "Übergabeprotokoll nicht gefunden.": "Протокол передачи не найден.",
+    "Bitte einen gültigen Meldungsempfänger auswählen.": "Выберите действительного получателя сообщения.",
+    "Maximal 10 Dateien pro Übergabeprotokoll.": "Не более 10 файлов на протокол передачи.",
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Общий размер файлов не должен превышать 30 МБ."
   },
   "es": {
     "Administration": "Administración",
@@ -6877,6 +6921,17 @@
     "Emailadresse ist erforderlich.": "La dirección de correo electrónico es obligatoria.",
     "Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.": "Introduzca el nombre y el correo electrónico de la línea de asistencia.",
     "Eine Kategoriezuordnung ist nur für Schadstellen zulässig.": "Solo las localizaciones de daños pueden asignarse a una categoría.",
-    "Bitte eine gültige Emailadresse eingeben.": "Introduzca una dirección de correo electrónico válida."
+    "Bitte eine gültige Emailadresse eingeben.": "Introduzca una dirección de correo electrónico válida.",
+    "Datum / Uhrzeit": "Fecha / hora",
+    "V/A Dienst": "Servicio V/A",
+    "keiner": "Ninguno",
+    "Betriebsstelle (DS100 + Bahnhofsname)": "Punto de operación (DS100 + nombre de estación)",
+    "Km-Stand": "Kilometraje",
+    "Datei-Upload": "Carga de archivos",
+    "PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.": "PDF, JPEG o PNG: máximo 10 archivos, 10 MB por archivo, 30 MB en total.",
+    "Übergabeprotokoll nicht gefunden.": "No se encontró el acta de entrega.",
+    "Bitte einen gültigen Meldungsempfänger auswählen.": "Seleccione un destinatario válido.",
+    "Maximal 10 Dateien pro Übergabeprotokoll.": "Máximo 10 archivos por acta de entrega.",
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Los archivos no pueden superar 30 MB en total."
   }
 }

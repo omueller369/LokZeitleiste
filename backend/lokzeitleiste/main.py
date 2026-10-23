@@ -669,3 +669,6 @@ app.include_router(loco_handover_router(require_admin, require_account))
 
 from .loco_handover_defaults import create_router as loco_handover_defaults_router
 app.include_router(loco_handover_defaults_router(require_admin))
+
+from .handover_protocols import create_router as handover_protocols_router
+app.include_router(handover_protocols_router(require_admin,require_account))

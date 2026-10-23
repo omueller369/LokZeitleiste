@@ -1373,3 +1373,14 @@ Emailadresse ist erforderlich.|Email address is required.|Adres e-mail jest wyma
 Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.|Please enter both the hotline name and email address.|Podaj nazwę infolinii i adres e-mail razem.|Укажите название горячей линии и адрес электронной почты вместе.|Introduzca el nombre y el correo electrónico de la línea de asistencia.
 Eine Kategoriezuordnung ist nur für Schadstellen zulässig.|Only damage locations can be assigned to a category.|Tylko miejsca uszkodzenia można przypisać do kategorii.|Только места повреждения можно отнести к категории.|Solo las localizaciones de daños pueden asignarse a una categoría.
 Bitte eine gültige Emailadresse eingeben.|Please enter a valid email address.|Wprowadź poprawny adres e-mail.|Введите действительный адрес электронной почты.|Introduzca una dirección de correo electrónico válida.
+Datum / Uhrzeit|Date / time|Data / godzina|Дата / время|Fecha / hora
+V/A Dienst|V/A duty|Służba V/A|Смена V/A|Servicio V/A
+keiner|None|Brak|Нет|Ninguno
+Betriebsstelle (DS100 + Bahnhofsname)|Operating location (DS100 + station name)|Posterunek (DS100 + nazwa stacji)|Раздельный пункт (DS100 + название станции)|Punto de operación (DS100 + nombre de estación)
+Km-Stand|Odometer reading|Przebieg w km|Пробег в км|Kilometraje
+Datei-Upload|File upload|Przesyłanie plików|Загрузка файлов|Carga de archivos
+PDF, JPEG oder PNG: maximal 10 Dateien, jeweils 10 MB, insgesamt 30 MB.|PDF, JPEG or PNG: up to 10 files, 10 MB each, 30 MB total.|PDF, JPEG lub PNG: maks. 10 plików, po 10 MB, łącznie 30 MB.|PDF, JPEG или PNG: до 10 файлов, по 10 МБ, всего 30 МБ.|PDF, JPEG o PNG: máximo 10 archivos, 10 MB por archivo, 30 MB en total.
+Übergabeprotokoll nicht gefunden.|Handover protocol not found.|Nie znaleziono protokołu przekazania.|Протокол передачи не найден.|No se encontró el acta de entrega.
+Bitte einen gültigen Meldungsempfänger auswählen.|Please select a valid report recipient.|Wybierz prawidłowego odbiorcę zgłoszenia.|Выберите действительного получателя сообщения.|Seleccione un destinatario válido.
+Maximal 10 Dateien pro Übergabeprotokoll.|Maximum 10 files per handover protocol.|Maksymalnie 10 plików na protokół przekazania.|Не более 10 файлов на протокол передачи.|Máximo 10 archivos por acta de entrega.
+Dateien dürfen zusammen höchstens 30 MB groß sein.|Files must not exceed 30 MB in total.|Łączny rozmiar plików nie może przekraczać 30 MB.|Общий размер файлов не должен превышать 30 МБ.|Los archivos no pueden superar 30 MB en total.

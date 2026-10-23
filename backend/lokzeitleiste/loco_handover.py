@@ -18,6 +18,10 @@ def create_router(require_admin, require_account):
     def page():
         return FileResponse(Path(__file__).parent/'static'/'loco-handover.html', headers={'Cache-Control':'no-cache'})
 
+    @router.get('/tf/handover-protocols.js')
+    def protocols_script():
+        return FileResponse(Path(__file__).parent/'static'/'handover-protocols.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+
     @router.get('/tf/loco-handover.js')
     @router.get('/admin/loco-handover.js')
     def script():
