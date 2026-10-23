@@ -150,7 +150,7 @@ class TfPortalActivity : ComponentActivity() {
                 val name=policy.asset(request.url.path.orEmpty()) ?: return null
                 return try {
                     var bytes=assets.open("tf-portal/$name").use { it.readBytes() }
-                    if(name.endsWith(".html")) bytes=String(bytes,Charsets.UTF_8).replace("<head>","<head><script src=\"/android-portal.js\"></script>").replace("</body>","<script src=\"/tf/return.js\"></script></body>").toByteArray(Charsets.UTF_8)
+                    if(name.endsWith(".html")) bytes=String(bytes,Charsets.UTF_8).replace("<head>","<head><script src=\"/android-portal.js\"></script>").toByteArray(Charsets.UTF_8)
                     val mime=when { name.endsWith(".html")->"text/html";name.endsWith(".css")->"text/css";else->"text/javascript" }
                     WebResourceResponse(mime,"UTF-8",200,"OK",mapOf("Cache-Control" to "no-store","Content-Security-Policy" to "frame-src 'none'; object-src 'none'"),ByteArrayInputStream(bytes))
                 } catch(_:Exception) { WebResourceResponse("text/plain","UTF-8",500,"Missing portal asset",emptyMap(),ByteArrayInputStream(byteArrayOf())) }

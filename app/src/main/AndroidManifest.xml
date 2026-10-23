@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application android:supportsRtl="true" android:theme="@style/Theme.LokZeit" android:label="LokZeitleiste" android:usesCleartextTraffic="false" android:allowBackup="false">
         <service android:name=".portal.GpsRecordingService" android:exported="false" android:foregroundServiceType="location" />
-        <activity android:name=".TfPortalActivity" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity android:name=".TfPortalActivity" android:exported="false" android:launchMode="singleTask" android:configChanges="orientation|screenSize|keyboardHidden" />
         <activity android:name=".LegacyActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

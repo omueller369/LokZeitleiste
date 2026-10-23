@@ -2,9 +2,9 @@ name: Android TF Portal APK
 on:
   push:
     branches: ['setup/debian-testumgebung']
-    paths: ['app/**', 'build.gradle.kts', 'settings.gradle.kts', 'backend/lokzeitleiste/static/**', '.github/workflows/android.yml']
+    paths: ['app/**', 'build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'backend/lokzeitleiste/static/**', '.github/workflows/android.yml']
   pull_request:
-    paths: ['app/**', 'build.gradle.kts', 'settings.gradle.kts', 'backend/lokzeitleiste/static/**', '.github/workflows/android.yml']
+    paths: ['app/**', 'build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'backend/lokzeitleiste/static/**', '.github/workflows/android.yml']
   workflow_dispatch:
 permissions:
   contents: read
