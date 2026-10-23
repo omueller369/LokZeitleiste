@@ -373,7 +373,7 @@ Die APK aus **Releases**, nicht irgendeine alte unsignierte/anders signierte Tes
 3. Bei erfolgreichen Prüfungen und eingerichteten Secrets veröffentlicht die Action eine neue signierte Testversion mit einem höheren Versionscode.
 4. Beim nächsten Öffnen/Fortsetzen prüft die Tablet-App den Testkanal; spätestens eine erneute Prüfung nach dem Sechs-Stunden-Intervall erkennt die neue Version. Sofortprüfung über **Update**.
 5. Die APK wird automatisch heruntergeladen und geprüft.
-6. **Update installieren** antippen.
+6. Offene Eingaben zunächst mit den jeweiligen Speichern-Schaltflächen sichern. Danach **Update installieren** antippen.
 7. Falls Android fragt: für **LokZeitleiste** einmal **Aus dieser Quelle zulassen** aktivieren und zur App zurückkehren.
 8. Im Android-Paketinstaller **Aktualisieren/Installieren** bestätigen.
 9. App erneut öffnen und den aktuellen Stand prüfen. Bei regulärem Update bleiben lokale Berichte und die Anmeldung grundsätzlich erhalten; ein serverseitig ungültig gewordenes Konto muss sich neu anmelden.

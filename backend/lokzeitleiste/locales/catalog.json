@@ -1342,7 +1342,18 @@
     "GPS-Aufzeichnung (Android)": "GPS-Aufzeichnung (Android)",
     "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.",
     "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.",
-    "Bisherige Erfassungen": "Bisherige Erfassungen"
+    "Bisherige Erfassungen": "Bisherige Erfassungen",
+    "Update": "Update",
+    "Keine neuere Testversion verfügbar.": "Keine neuere Testversion verfügbar.",
+    "Update-Prüfung fehlgeschlagen": "Update-Prüfung fehlgeschlagen",
+    "Neue TF-Portal-Testversion": "Neue TF-Portal-Testversion",
+    "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.": "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.",
+    "Update installieren": "Update installieren",
+    "Später": "Später",
+    "App-Updates erlauben": "App-Updates erlauben",
+    "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.",
+    "Update ist nicht für diese Installation geeignet.": "Update ist nicht für diese Installation geeignet.",
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android-Paketinstallation konnte nicht geöffnet werden."
   },
   "en": {
     "Administration": "Administration",
@@ -2687,7 +2698,18 @@
     "GPS-Aufzeichnung (Android)": "GPS recording (Android)",
     "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android records using a location service and a persistent notification. GPS loss or stopping the app can cause gaps.",
     "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "GPS service stopped. Recording can be resumed.",
-    "Bisherige Erfassungen": "Previous entries"
+    "Bisherige Erfassungen": "Previous entries",
+    "Update": "Update",
+    "Keine neuere Testversion verfügbar.": "No newer test version available.",
+    "Update-Prüfung fehlgeschlagen": "Update check failed",
+    "Neue TF-Portal-Testversion": "New TF portal test version",
+    "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.": "The new version has been downloaded and verified. Save open entries first. Open the Android update now? A regular update preserves your app data.",
+    "Update installieren": "Install update",
+    "Später": "Later",
+    "App-Updates erlauben": "Allow app updates",
+    "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Enable “Allow from this source” for LokZeitleiste. Then return and confirm installation.",
+    "Update ist nicht für diese Installation geeignet.": "The update is not suitable for this installation.",
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android package installer could not be opened."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4032,7 +4054,18 @@
     "GPS-Aufzeichnung (Android)": "Rejestracja GPS (Android)",
     "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android rejestruje za pomocą usługi lokalizacji i stałego powiadomienia. Utrata GPS lub zatrzymanie aplikacji może powodować przerwy.",
     "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "Usługa GPS została zatrzymana. Można wznowić rejestrację.",
-    "Bisherige Erfassungen": "Dotychczasowe wpisy"
+    "Bisherige Erfassungen": "Dotychczasowe wpisy",
+    "Update": "Aktualizacja",
+    "Keine neuere Testversion verfügbar.": "Brak nowszej wersji testowej.",
+    "Update-Prüfung fehlgeschlagen": "Sprawdzanie aktualizacji nie powiodło się",
+    "Neue TF-Portal-Testversion": "Nowa wersja testowa portalu TF",
+    "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.": "Nowa wersja została pobrana i sprawdzona. Najpierw zapisz otwarte wpisy. Otworzyć aktualizację Androida? Zwykła aktualizacja zachowuje dane aplikacji.",
+    "Update installieren": "Zainstaluj aktualizację",
+    "Später": "Później",
+    "App-Updates erlauben": "Zezwól na aktualizacje aplikacji",
+    "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Włącz opcję zezwalającą na instalowanie z tego źródła dla LokZeitleiste. Następnie wróć i potwierdź instalację.",
+    "Update ist nicht für diese Installation geeignet.": "Aktualizacja nie jest zgodna z tą instalacją.",
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Nie można otworzyć instalatora pakietów Androida."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5377,7 +5410,18 @@
     "GPS-Aufzeichnung (Android)": "Запись GPS (Android)",
     "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android ведёт запись через службу геолокации с постоянным уведомлением. Потеря GPS или остановка приложения могут вызвать пропуски.",
     "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "Служба GPS остановлена. Запись можно продолжить.",
-    "Bisherige Erfassungen": "Прежние записи"
+    "Bisherige Erfassungen": "Прежние записи",
+    "Update": "Обновление",
+    "Keine neuere Testversion verfügbar.": "Новой тестовой версии нет.",
+    "Update-Prüfung fehlgeschlagen": "Не удалось проверить обновления",
+    "Neue TF-Portal-Testversion": "Новая тестовая версия портала TF",
+    "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.": "Новая версия загружена и проверена. Сначала сохраните открытые записи. Открыть обновление Android? При обычном обновлении данные приложения сохраняются.",
+    "Update installieren": "Установить обновление",
+    "Später": "Позже",
+    "App-Updates erlauben": "Разрешить обновления приложения",
+    "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Разрешите установку из этого источника для LokZeitleiste. Затем вернитесь и подтвердите установку.",
+    "Update ist nicht für diese Installation geeignet.": "Обновление не подходит для этой установки.",
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Не удалось открыть установщик Android."
   },
   "es": {
     "Administration": "Administración",
@@ -6722,6 +6766,17 @@
     "GPS-Aufzeichnung (Android)": "Grabación GPS (Android)",
     "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android graba mediante un servicio de ubicación y una notificación permanente. La pérdida de GPS o detener la aplicación puede causar lagunas.",
     "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "El servicio GPS se ha detenido. Se puede reanudar la grabación.",
-    "Bisherige Erfassungen": "Registros anteriores"
+    "Bisherige Erfassungen": "Registros anteriores",
+    "Update": "Actualizar",
+    "Keine neuere Testversion verfügbar.": "No hay una versión de prueba más reciente.",
+    "Update-Prüfung fehlgeschlagen": "No se pudo buscar actualizaciones",
+    "Neue TF-Portal-Testversion": "Nueva versión de prueba del portal TF",
+    "Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.": "La nueva versión se ha descargado y verificado. Guarde primero las entradas abiertas. ¿Abrir la actualización de Android? Una actualización normal conserva los datos.",
+    "Update installieren": "Instalar actualización",
+    "Später": "Más tarde",
+    "App-Updates erlauben": "Permitir actualizaciones",
+    "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Active «Permitir de esta fuente» para LokZeitleiste. Vuelva y confirme la instalación.",
+    "Update ist nicht für diese Installation geeignet.": "La actualización no es compatible con esta instalación.",
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "No se pudo abrir el instalador de Android."
   }
 }

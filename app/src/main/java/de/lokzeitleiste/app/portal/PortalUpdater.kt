@@ -12,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import de.lokzeitleiste.app.BuildConfig
+import de.lokzeitleiste.app.LanguageRuntime
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -28,7 +29,8 @@ class PortalUpdater(private val activity:ComponentActivity) {
     private var offered=false
     private var awaitingSettings=false
     private var pending:File?=null
-    private fun message(value:String) { Toast.makeText(activity,value,Toast.LENGTH_LONG).show() }
+    private fun t(value:String)=LanguageRuntime.translate(value,LanguageRuntime.code)
+    private fun message(value:String) { Toast.makeText(activity,t(value),Toast.LENGTH_LONG).show() }
     fun resume() {
         if(GpsRecordingService.currentKey!=null)return
         if(awaitingSettings) { awaitingSettings=false;if(activity.packageManager.canRequestPackageInstalls())pending?.let { install(it) };return }
@@ -119,16 +121,16 @@ class PortalUpdater(private val activity:ComponentActivity) {
     private fun offer(file:File) {
         if(activity.isFinishing||activity.isDestroyed)return
         pending=file;offered=true
-        AlertDialog.Builder(activity).setTitle("Neue TF-Portal-Testversion").setMessage("Die neue Version ist heruntergeladen und geprüft. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten.")
-            .setPositiveButton("Update installieren") { _,_->install(file) }.setNegativeButton("Später",null).show()
+        AlertDialog.Builder(activity).setTitle(t("Neue TF-Portal-Testversion")).setMessage(t("Die neue Version ist heruntergeladen und geprüft. Vorher offene Eingaben speichern. Jetzt das Android-Update öffnen? Ihre App-Daten bleiben bei einem regulären Update erhalten."))
+            .setPositiveButton(t("Update installieren")) { _,_->install(file) }.setNegativeButton(t("Später"),null).show()
     }
     private fun install(file:File) {
         if(GpsRecordingService.currentKey!=null){message("Bitte zuerst die GPS-Aufzeichnung beenden.");return}
         if(!verified(file)){message("Update ist nicht für diese Installation geeignet.");return}
         if(!activity.packageManager.canRequestPackageInstalls()) {
             awaitingSettings=true;pending=file
-            AlertDialog.Builder(activity).setTitle("App-Updates erlauben").setMessage("Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.")
-                .setPositiveButton("Einstellungen") { _,_->activity.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+activity.packageName))) }.setNegativeButton("Abbrechen") { _,_->awaitingSettings=false }.show();return
+            AlertDialog.Builder(activity).setTitle(t("App-Updates erlauben")).setMessage(t("Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen."))
+                .setPositiveButton(t("Einstellungen")) { _,_->activity.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:"+activity.packageName))) }.setNegativeButton(t("Abbrechen")) { _,_->awaitingSettings=false }.show();return
         }
         val uri=FileProvider.getUriForFile(activity,activity.packageName+".updates",file)
         runCatching { activity.startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(uri,"application/vnd.android.package-archive").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)) }.onFailure { message("Android-Paketinstallation konnte nicht geöffnet werden.") }
