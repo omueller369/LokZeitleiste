@@ -306,7 +306,7 @@ Die später in Abschnitt 12 veröffentlichte **signierte GitHub-Test-APK** im Ta
 Am besten einen eigens vorgesehenen Test-TF verwenden, damit keine echten Dienstberichte verändert werden.
 
 1. **Anmeldung:** TF-Nummer und Passwort; bei Initialkonto sofortiger Passwortwechsel.
-2. **Portal:** Arbeitsbericht, Arbeitsplan, Dokumentenverwaltung und Bahnhofsverzeichnis öffnen. Lokübergabebuch/Leuna zeigen wie im Browser weiterhin die vorhandenen Platzhalter.
+2. **Portal:** Arbeitsbericht, Arbeitsplan, Dokumentenverwaltung und Bahnhofsverzeichnis öffnen. Im Lokübergabebuch Fahrzeugliste, Auswahl, Status und Einschränkungen prüfen. Übergabeprotokoll, PZB, Störungen und das Leuna-Modul sind noch Platzhalter.
 3. **Arbeitsbericht:** neuen Bericht, Beginn/Ende einschließlich Folgetag, Dienstart und berechnete Zeiten prüfen. Blöcke mit `−`/`+` ein-/ausklappen.
 4. **Gastfahrt:** Von/Nach über DS100 oder Ortsname suchen, speichern. Ohne Selbstzahler keinen Beleg erzwingen; mit **Sz** einen kleinen Testbeleg auswählen.
 5. **Zugfahrt:** Zugnummer, Bahnhöfe und Zeiten; Ereignis eintragen, Tabellenzeile erneut bearbeiten; **CTL Pause** prüfen.

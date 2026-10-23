@@ -1,7 +1,7 @@
 """TF landing pages and read-only access to the driver's own personnel plan."""
 from pathlib import Path as FilePath
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Path
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Path, Request
+from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from .db import database_session
 from .models import User, TfProfile
@@ -31,10 +31,13 @@ def create_router(require_account):
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
     @router.get('/tf/bahnhoefe')
-    def page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+    def page(request:Request,admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
         user=user_from_token(db,admin_session)
         if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)
         if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
+        if request.url.path=='/tf/lokuebergabebuch':
+            html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
+            return HTMLResponse(html,headers={'Cache-Control':'no-cache'})
         return FileResponse(STATIC/'tf-portal.html')
 
     @router.get('/tf/return.js')

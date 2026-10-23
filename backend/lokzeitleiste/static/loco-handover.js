@@ -1,5 +1,7 @@
 (()=>{
 const el=id=>document.getElementById(id),t=value=>window.I18n?.t(value)||value;
+const tf=location.pathname?.startsWith('/tf/'),api='/api/v1/'+(tf?'tf':'admin')+'/loco-handover/vehicles';
+if(tf){const home=el('handoverHome');home.href='/tf';home.textContent=t('TF Portal');}else{const nav=document.createElement('script');nav.src='/admin/backend-nav.js';document.head?.append(nav);}
 let rows=[],ticket=0,detailTicket=0,current=null,timer,allowed=false;
 function message(value){el('vehicleMessage').textContent=t(value);}
 function render(){
@@ -20,16 +22,16 @@ function renderDetails(){
 }
 async function selectVehicle(id){
  const version=++detailTicket;current=null;el('handoverDetails').hidden=true;message('');render();
- try{const response=await fetch('/api/v1/admin/loco-handover/vehicles/'+id,{credentials:'same-origin',cache:'no-store'});if(version!==detailTicket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==detailTicket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');current=data;renderDetails();render();el('handoverDetails').scrollIntoView?.({behavior:'smooth',block:'start'});el('handoverTitle').focus({preventScroll:true});}catch(error){if(version===detailTicket)message(error.message);}
+ try{const response=await fetch(api+'/'+id,{credentials:'same-origin',cache:'no-store'});if(version!==detailTicket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==detailTicket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');current=data;renderDetails();render();el('handoverDetails').scrollIntoView?.({behavior:'smooth',block:'start'});el('handoverTitle').focus({preventScroll:true});}catch(error){if(version===detailTicket)message(error.message);}
 }
 el('handoverClose').onclick=()=>{detailTicket++;const id=current?.id;current=null;el('handoverDetails').hidden=true;render();const index=rows.findIndex(row=>row.id===id);el('vehicleRows').children[index]?.querySelector('button')?.focus();};
 async function listing(){
  detailTicket++;current=null;el('handoverDetails').hidden=true;
  const version=++ticket,params=new URLSearchParams({q:el('vehicleSearch').value});if(el('vehicleFilter').value)params.set('status',el('vehicleFilter').value);
  rows=[];render();el('vehicleEmpty').hidden=true;message('');
- try{const response=await fetch('/api/v1/admin/loco-handover/vehicles?'+params,{credentials:'same-origin',cache:'no-store'});if(version!==ticket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==ticket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');rows=data;render();}catch(error){if(version===ticket)message(error.message);}
+ try{const response=await fetch(api+'?'+params,{credentials:'same-origin',cache:'no-store'});if(version!==ticket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==ticket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');rows=data;render();}catch(error){if(version===ticket)message(error.message);}
 }
 el('vehicleSearch').oninput=()=>{clearTimeout(timer);ticket++;timer=setTimeout(listing,250);};el('vehicleFilter').onchange=listing;el('vehicleReload').onclick=listing;
 window.addEventListener('languagechange',()=>{if(allowed){render();renderDetails();}});
-(async()=>{try{const response=await fetch('/api/v1/account/me',{credentials:'same-origin',cache:'no-store'});if(response.status===401){location.href='/account';return;}if(!response.ok)throw Error('Anmeldung erforderlich');const me=await response.json();if(me.password_change_required){location.href='/account';return;}if(me.role==='tf'){location.href='/tf';return;}if(me.role!=='admin'&&!me.permissions?.loco_handover){message('Freigabe erforderlich');return;}allowed=true;el('handoverContent').hidden=false;await listing();}catch(error){message(error.message);}})();
+(async()=>{try{const response=await fetch('/api/v1/account/me',{credentials:'same-origin',cache:'no-store'});if(response.status===401){location.href='/account';return;}if(!response.ok)throw Error('Anmeldung erforderlich');const me=await response.json();if(me.password_change_required){location.href='/account';return;}if(tf&&me.role!=='tf'){location.href='/admin/start';return;}if(!tf&&me.role==='tf'){location.href='/tf';return;}if(!tf&&me.role!=='admin'&&!me.permissions?.loco_handover){message('Freigabe erforderlich');return;}allowed=true;el('handoverContent').hidden=false;await listing();}catch(error){message(error.message);}})();
 })();

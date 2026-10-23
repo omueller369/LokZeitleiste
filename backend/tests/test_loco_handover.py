@@ -78,3 +78,25 @@ class LocoHandoverTest(unittest.TestCase):
         page=self.client.get('/admin/loco-handover').text
         for label in ('Übergabeprotokoll','PZB','Störungen','Übergabeprotokolle'):
             self.assertIn(label,page)
+
+    def test_tf_portal_uses_shared_live_read_only_module(self):
+        row=self.create(status='limited',status_note='Nur Rangieren')
+        driver=TestClient(app,base_url='https://testserver');self.staff_clients.append(driver)
+        path='/api/v1/tf/loco-handover/vehicles'
+        self.assertEqual(driver.get(path).status_code,401)
+        driver.post('/api/v1/account/login',json={'username':'787100','password':'tf-secret-12345'})
+        page=driver.get('/tf/lokuebergabebuch')
+        self.assertEqual(page.status_code,200)
+        self.assertIn('id="vehicleRows"',page.text)
+        self.assertIn('href="/tf">TF Portal',page.text)
+        self.assertNotIn('/admin/backend-nav.js',page.text)
+        self.assertEqual(driver.get(path).json(),self.client.get(self.path).json())
+        self.assertEqual(driver.get(path+'/'+str(row['id'])).json(),self.client.get(self.path+'/'+str(row['id'])).json())
+        self.assertEqual(driver.post(path,json={}).status_code,405)
+        self.assertEqual(driver.put(path+'/'+str(row['id']),json={}).status_code,405)
+        self.assertEqual(driver.get(self.path).status_code,401)
+        self.assertEqual(self.client.get(path).status_code,403)
+        self.client.post('/api/v1/admin/accounts/'+str(self.tf)+'/reset-password',json={'initial_password':'abcdef'})
+        self.assertEqual(driver.get(path).status_code,401)
+        driver.post('/api/v1/account/login',json={'username':'787100','password':'abcdef'})
+        self.assertEqual(driver.get(path).status_code,403)

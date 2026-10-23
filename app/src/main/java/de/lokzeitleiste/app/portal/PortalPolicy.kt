@@ -13,7 +13,9 @@ class PortalPolicy(base: String) {
         uri.rawUserInfo == null && uri.scheme == root.scheme && uri.host.equals(root.host, true) && port(uri) == port(root)
     }.getOrDefault(false)
     fun asset(path: String): String? = when(path) {
-        "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/lokuebergabebuch", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
+        "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
+        "/tf/lokuebergabebuch" -> "loco-handover.html"
+        "/tf/loco-handover.js" -> "loco-handover.js"
         "/documents" -> "documents.html"
         "/account" -> "account.html"
         "/my/worktime" -> "my-worktime.html"

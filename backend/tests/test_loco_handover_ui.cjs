@@ -9,12 +9,13 @@ class Element{
  scrollIntoView(){}
 }
 let focused=null,delays=new Map(),events={};
-const ids=['vehicleRows','vehicleEmpty','vehicleMessage','vehicleSearch','vehicleFilter','vehicleReload','handoverContent','handoverDetails','handoverTitle','handoverStatus','handoverNoteLabel','handoverNoteBox','handoverNote','handoverName','handoverNumber','handoverSeries','handoverClose'];
+const ids=['vehicleRows','vehicleEmpty','vehicleMessage','vehicleSearch','vehicleFilter','vehicleReload','handoverContent','handoverDetails','handoverTitle','handoverStatus','handoverNoteLabel','handoverNoteBox','handoverNote','handoverName','handoverNumber','handoverSeries','handoverClose','handoverHome'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.handoverDetails.hidden=true;
 const vehicles=[{id:1,status:'limited',status_label:'Eingeschränkt einsatzbereit',status_note:'Nur Rangieren',vehicle_number:'00 01 0002 003-4',name:'<img src=x onerror=alert(1)>',series:'185'},{id:2,status:'ready',status_label:'Einsatzbereit',status_note:'',vehicle_number:'91 80 6185 001-2',name:'Lok 2',series:'186'}];
 const reply=data=>({ok:true,status:200,json:async()=>data});
-const context={document:{getElementById:id=>elements[id],createElement:tag=>new Element(tag)},window:{addEventListener:(event,fn)=>events[event]=fn},location:{},URLSearchParams,setTimeout,clearTimeout,console,fetch:async(path)=>{
- if(path==='/api/v1/account/me')return reply({role:'staff',permissions:{loco_handover:1}});
+const context={document:{getElementById:id=>elements[id],createElement:tag=>new Element(tag)},window:{addEventListener:(event,fn)=>events[event]=fn},location:{pathname:process.env.TF_HANDOVER_TEST?'/tf/lokuebergabebuch':'/admin/loco-handover'},URLSearchParams,setTimeout,clearTimeout,console,fetch:async(path)=>{
+ if(path==='/api/v1/account/me')return reply({role:process.env.TF_HANDOVER_TEST?'tf':'staff',permissions:{loco_handover:1}});
+ assert(path.startsWith('/api/v1/'+(process.env.TF_HANDOVER_TEST?'tf':'admin')+'/loco-handover/vehicles')); 
  const match=/\/vehicles\/(\d+)$/.exec(path);if(match){const id=Number(match[1]);if(delays.has(id))return delays.get(id);return reply({...vehicles.find(v=>v.id===id)});}return reply(vehicles);
 }};
 const tick=()=>new Promise(r=>setTimeout(r,0));

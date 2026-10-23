@@ -665,4 +665,4 @@ from .backend_navigation import create_router as backend_navigation_router
 app.include_router(backend_navigation_router(require_admin))
 
 from .loco_handover import create_router as loco_handover_router
-app.include_router(loco_handover_router(require_admin))
+app.include_router(loco_handover_router(require_admin, require_account))

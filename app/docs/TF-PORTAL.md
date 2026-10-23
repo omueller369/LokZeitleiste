@@ -2,7 +2,7 @@
 
 Die App öffnet nach der nativen Anmeldung das vollständige TF-Portal. Die gemeinsamen HTML-/CSS-/JavaScript-Dateien werden beim Android-Build aus `backend/lokzeitleiste/static` in die APK übernommen. Geschäftsregeln, Tabellen, Eingaben und Berechtigungen entsprechen damit dem Portalstand dieses Builds. Neue Portalversionen erfordern einen neuen APK-Build. Der Server muss mindestens zum selben Projektstand aktualisiert sein.
 
-Enthalten sind Arbeitsberichte mit Dienstarten, Pausen, Ausbleibe, Gastfahrten und optionalen Selbstzahlerbelegen; Zugfahrten und Ereignisse mit dynamischen Grundwerten; Monatslisten und Synchronisation; GPS mit Standzeiten, ZMS-Vorschlägen und Gründen; Arbeitsplan; Dokumentenverwaltung mit Upload/Download; Bahnhofsverzeichnis einschließlich Kontaktdaten, Plänen, Teilen und Zwischenablage; Konto, Passwortwechsel und die fünf vorhandenen Sprachen. Lokübergabebuch und Leuna-Übergabeprotokoll behalten wie im Browser ihren Platzhalterstatus.
+Enthalten sind Arbeitsberichte mit Dienstarten, Pausen, Ausbleibe, Gastfahrten und optionalen Selbstzahlerbelegen; Zugfahrten und Ereignisse mit dynamischen Grundwerten; Monatslisten und Synchronisation; GPS mit Standzeiten, ZMS-Vorschlägen und Gründen; Arbeitsplan; Dokumentenverwaltung mit Upload/Download; Bahnhofsverzeichnis einschließlich Kontaktdaten, Plänen, Teilen und Zwischenablage; Konto, Passwortwechsel und die fünf vorhandenen Sprachen. Das Lokübergabebuch zeigt die gemeinsame Fahrzeugliste und Fahrzeugdetails mit Status und Einschränkungen an. Übergabeprotokoll, PZB und Störungen sind noch Platzhalter; ebenso das Leuna-Übergabeprotokoll.
 
 ## Vorhandene Daten
 
