@@ -16,14 +16,14 @@ const context={console,Intl,Date,Number,Math,Promise,setTimeout,clearTimeout,set
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/train-journeys.js','utf8'),context);
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8'),context);
 
-let nativeRunning=false,nativePoints=[];
+let nativeRunning=false,nativePoints=[],opened=[];context.window.openActiveGpsReport=id=>opened.push(id);
 context.window.AndroidPortal={gps:async(method,values)=>{if(method==='start'){nativeRunning=true;if(values.reset)nativePoints=[];return {};}if(method==='stop'){nativeRunning=false;return {};}if(method==='erase'){nativePoints=[];return {};}return {running:nativeRunning,points:nativePoints.filter(point=>point.t>values.after).slice(0,1000)};}};
 (async()=>{
  const field=new Element('input'),container=new Element('div');field.value='123';
  const options={userId:5,journeyId:'00000000-0000-4000-8000-000000000001',container,numberField:field,trainNumber:()=>field.value,readonly:()=>false,stations(){},resolve:async()=>({code:'BBB'})};
  context.window.isSecureContext=false;let recorder=context.window.GpsRecorder.mount(options);await recorder.readyPromise;await recorder.start();assert(nativeRunning);assert(context.window.GpsRecorder.isActive());
  nativePoints.push({t:1792627200000,lat:52,lon:13,accuracy:5,speed:0});await recorder.nativeRead();assert.equal(recorder.record.points.length,1);
- recorder.clear();assert(nativeRunning);nativePoints.push({t:1792627205000,lat:52,lon:13,accuracy:5,speed:0});recorder=context.window.GpsRecorder.mount(options);await recorder.readyPromise;assert(context.window.GpsRecorder.isActive());assert.equal(recorder.record.points.length,2);
+ recorder.clear();assert(nativeRunning);nativePoints.push({t:1792627205000,lat:52,lon:13,accuracy:5,speed:0});recorder=context.window.GpsRecorder.mount(options);await recorder.readyPromise;assert(context.window.GpsRecorder.isActive());assert.equal(recorder.record.points.length,2);assert(opened.includes(options.journeyId));const before=opened.length;await recorder.nativeRead();assert.equal(opened.length,before);
  await recorder.stop();assert(!nativeRunning);assert(recorder.record.ended);assert.equal(body.points.length,2);const prior=recorder.record,adapter=context.window.AndroidPortal.gps;context.window.AndroidPortal.gps=async(method,values)=>{if(method==='start')throw Error('Permission denied');return adapter(method,values);};await assert.rejects(recorder.start());assert.strictEqual(recorder.record,prior);context.window.AndroidPortal.gps=adapter;await recorder.erase();assert.equal(nativePoints.length,0);
  console.log('Android GPS: native start, journal merge, WebView recovery, stop/sync and erase passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

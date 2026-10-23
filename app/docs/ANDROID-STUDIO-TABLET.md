@@ -349,6 +349,21 @@ Der Workflow hat für das Veröffentlichen im eigenen Repository `contents: writ
 
 ### 12.2 Ersten signierten Update-Build starten
 
+**Im aktuellen Arbeitsbranch zuverlässig per Push:** Nach dem Einrichten der vier Secrets auf dem Mac eine kleine Dokumentationsänderung im überwachten App-Verzeichnis pushen:
+
+```bash
+cd "$HOME/Developer/LokZeitleiste"
+git pull --ff-only origin setup/debian-testumgebung
+printf '\nTablet-Testbuild mit dauerhaftem Signierschluessel ausgeloest.\n' >> app/docs/TF-PORTAL.md
+git add app/docs/TF-PORTAL.md
+git commit -m "Signierten Android-Tablet-Testbuild starten"
+git push origin setup/debian-testumgebung
+```
+
+Die Action startet durch diesen Push. Unter **Actions → Android TF Portal APK** den neuen Lauf öffnen und auf erfolgreichen Abschluss warten.
+
+**Alternativ per Schaltfläche, sofern verfügbar:** GitHub zeigt **Run workflow** normalerweise erst zuverlässig an, wenn die Workflow-Datei auch im Standardbranch vorhanden ist. Das Repository verwendet zunächst `main`, während diese Änderungen im Arbeitsbranch liegen. Fehlt die Schaltfläche, den oben beschriebenen Push verwenden; für die Erstinstallation muss deshalb nichts ungeprüft nach `main` zusammengeführt werden.
+
 1. Auf GitHub **Actions** öffnen.
 2. Links **Android TF Portal APK** wählen.
 3. **Run workflow** anklicken.
@@ -369,7 +384,7 @@ Die APK aus **Releases**, nicht irgendeine alte unsignierte/anders signierte Tes
 ## 13. So kommen spätere Updates automatisch aufs Tablet
 
 1. App- oder Portaländerungen in den Branch **setup/debian-testumgebung** übertragen.
-2. GitHub startet die Action für Änderungen an App, Portaldateien oder relevanter Buildkonfiguration automatisch. Reine Änderungen außerhalb der überwachten Pfade lösen keinen neuen App-Build aus; bei Bedarf **Run workflow** benutzen.
+2. GitHub startet die Action für Änderungen an App, Portaldateien oder relevanter Buildkonfiguration automatisch. Reine Änderungen außerhalb der überwachten Pfade lösen keinen neuen App-Build aus; bei Bedarf einen entsprechenden App-Dokumentations-Push wie in Abschnitt 12.2 auslösen oder, sofern verfügbar, **Run workflow** benutzen.
 3. Bei erfolgreichen Prüfungen und eingerichteten Secrets veröffentlicht die Action eine neue signierte Testversion mit einem höheren Versionscode.
 4. Beim nächsten Öffnen/Fortsetzen prüft die Tablet-App den Testkanal; spätestens eine erneute Prüfung nach dem Sechs-Stunden-Intervall erkennt die neue Version. Sofortprüfung über **Update**.
 5. Die APK wird automatisch heruntergeladen und geprüft.
@@ -378,7 +393,7 @@ Die APK aus **Releases**, nicht irgendeine alte unsignierte/anders signierte Tes
 8. Im Android-Paketinstaller **Aktualisieren/Installieren** bestätigen.
 9. App erneut öffnen und den aktuellen Stand prüfen. Bei regulärem Update bleiben lokale Berichte und die Anmeldung grundsätzlich erhalten; ein serverseitig ungültig gewordenes Konto muss sich neu anmelden.
 
-Zum kontrollierten ersten Update-Test eine kleine nachvollziehbare Änderung an `app/docs/TF-PORTAL.md` committen/pushen oder die Action erneut manuell starten. Nach dem neuen erfolgreichen Release in der App **Update** drücken. Während dieses Tests keine laufende GPS-Aufzeichnung offen lassen.
+Zum kontrollierten ersten Update-Test eine kleine nachvollziehbare Änderung an `app/docs/TF-PORTAL.md` committen/pushen oder die Action erneut manuell starten, sofern die Schaltfläche verfügbar ist. Nach dem neuen erfolgreichen Release in der App **Update** drücken. Während dieses Tests keine laufende GPS-Aufzeichnung offen lassen.
 
 Wichtig: Eine neue Quellcode-Datei allein ist noch keine installierbare Version. Erst der erfolgreiche signierte Build mit den zwei Release-Dateien erzeugt ein Update. Die App installiert keine Rohdateien aus dem Repository.
 
