@@ -1,10 +1,11 @@
 """Lokübergabebuch: read-only vehicle overview, backed by the vehicle master data."""
 from pathlib import Path
 from typing import Literal
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from .db import database_session
+from .models import RailwayVehicle
 from .vehicles import find_vehicles, VEHICLE_STATUSES
 
 
@@ -25,5 +26,14 @@ def create_router(require_admin):
         return [dict(id=row.id, vehicle_number=row.vehicle_number, name=row.name, status=row.status,
                      status_label=VEHICLE_STATUSES[row.status][0], status_note=row.status_note)
                 for row in find_vehicles(db,q,status)]
+
+    @router.get('/api/v1/admin/loco-handover/vehicles/{vehicle_id}', dependencies=[Depends(require_admin)])
+    def details(vehicle_id:int, db:Session=Depends(database_session)):
+        row=db.get(RailwayVehicle,vehicle_id)
+        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+        label,color=VEHICLE_STATUSES[row.status]
+        return dict(id=row.id,vehicle_number=row.vehicle_number,name=row.name,series=row.series,
+                    status=row.status,status_label=label,status_color=color,
+                    status_note=row.status_note if row.status!='ready' else '')
 
     return router

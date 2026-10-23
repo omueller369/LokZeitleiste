@@ -1353,7 +1353,12 @@
     "App-Updates erlauben": "App-Updates erlauben",
     "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.",
     "Update ist nicht für diese Installation geeignet.": "Update ist nicht für diese Installation geeignet.",
-    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android-Paketinstallation konnte nicht geöffnet werden."
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android-Paketinstallation konnte nicht geöffnet werden.",
+    "Übergabeprotokoll": "Übergabeprotokoll",
+    "Übergabeprotokolle": "Übergabeprotokolle",
+    "PZB": "PZB",
+    "Störungen": "Störungen",
+    "Zurück zur Übersicht": "Zurück zur Übersicht"
   },
   "en": {
     "Administration": "Administration",
@@ -2709,7 +2714,12 @@
     "App-Updates erlauben": "Allow app updates",
     "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Enable “Allow from this source” for LokZeitleiste. Then return and confirm installation.",
     "Update ist nicht für diese Installation geeignet.": "The update is not suitable for this installation.",
-    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android package installer could not be opened."
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Android package installer could not be opened.",
+    "Übergabeprotokoll": "Handover report",
+    "Übergabeprotokolle": "Handover reports",
+    "PZB": "PZB",
+    "Störungen": "Faults",
+    "Zurück zur Übersicht": "Back to overview"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4065,7 +4075,12 @@
     "App-Updates erlauben": "Zezwól na aktualizacje aplikacji",
     "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Włącz opcję zezwalającą na instalowanie z tego źródła dla LokZeitleiste. Następnie wróć i potwierdź instalację.",
     "Update ist nicht für diese Installation geeignet.": "Aktualizacja nie jest zgodna z tą instalacją.",
-    "Android-Paketinstallation konnte nicht geöffnet werden.": "Nie można otworzyć instalatora pakietów Androida."
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Nie można otworzyć instalatora pakietów Androida.",
+    "Übergabeprotokoll": "Protokół przekazania",
+    "Übergabeprotokolle": "Protokoły przekazania",
+    "PZB": "PZB",
+    "Störungen": "Usterki",
+    "Zurück zur Übersicht": "Powrót do przeglądu"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5421,7 +5436,12 @@
     "App-Updates erlauben": "Разрешить обновления приложения",
     "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Разрешите установку из этого источника для LokZeitleiste. Затем вернитесь и подтвердите установку.",
     "Update ist nicht für diese Installation geeignet.": "Обновление не подходит для этой установки.",
-    "Android-Paketinstallation konnte nicht geöffnet werden.": "Не удалось открыть установщик Android."
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "Не удалось открыть установщик Android.",
+    "Übergabeprotokoll": "Протокол передачи",
+    "Übergabeprotokolle": "Протоколы передачи",
+    "PZB": "PZB",
+    "Störungen": "Неисправности",
+    "Zurück zur Übersicht": "Назад к обзору"
   },
   "es": {
     "Administration": "Administración",
@@ -6777,6 +6797,11 @@
     "App-Updates erlauben": "Permitir actualizaciones",
     "Aktivieren Sie für LokZeitleiste „Aus dieser Quelle zulassen“. Danach zurückkehren und die Installation bestätigen.": "Active «Permitir de esta fuente» para LokZeitleiste. Vuelva y confirme la instalación.",
     "Update ist nicht für diese Installation geeignet.": "La actualización no es compatible con esta instalación.",
-    "Android-Paketinstallation konnte nicht geöffnet werden.": "No se pudo abrir el instalador de Android."
+    "Android-Paketinstallation konnte nicht geöffnet werden.": "No se pudo abrir el instalador de Android.",
+    "Übergabeprotokoll": "Acta de entrega",
+    "Übergabeprotokolle": "Actas de entrega",
+    "PZB": "PZB",
+    "Störungen": "Averías",
+    "Zurück zur Übersicht": "Volver al listado"
   }
 }

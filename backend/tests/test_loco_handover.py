@@ -57,3 +57,24 @@ class LocoHandoverTest(unittest.TestCase):
         self.assertIn('<th>Status</th><th>Fahrzeugnummer</th><th>Name</th>',page.text)
         self.assertIn('vehicle-legend',page.text)
         self.assertNotIn('id="vehicleNew"',page.text)
+
+    def test_details_statuses_format_projection_and_permissions(self):
+        row=self.create(vehicle_number='00 01 0002 003-4',series='Testserie')
+        path=self.path+'/'+str(row['id'])
+        _,reader=self.active_staff({'loco_handover':1},'handover-detail-reader')
+        detail=reader.get(path);self.assertEqual(detail.status_code,200,detail.text)
+        self.assertEqual(detail.json()['vehicle_number'],'00 01 0002 003-4')
+        self.assertEqual(detail.json()['series'],'Testserie')
+        self.assertEqual(set(detail.json()),{'id','vehicle_number','name','series','status','status_label','status_color','status_note'})
+        self.assertEqual(detail.json()['status_note'],'')
+        for revision,(status,note,color) in enumerate([('limited','Nur Rangieren','#fff0b3'),('unavailable','Defekt','#ffdada'),('ready','Resttext','#d9f2df')],1):
+            updated=self.client.put('/api/v1/admin/vehicles/'+str(row['id']),json=self.data(vehicle_number=row['vehicle_number'],expected_revision=revision,status=status,status_note=note))
+            self.assertEqual(updated.status_code,200,updated.text)
+            data=reader.get(path).json();self.assertEqual(data['status'],status);self.assertEqual(data['status_color'],color);self.assertEqual(data['status_note'],note if status!='ready' else '')
+        self.assertEqual(reader.get(self.path+'/999999').status_code,404)
+        self.assertEqual(reader.put(path,json={}).status_code,405)
+        _,denied=self.active_staff({'vehicles':3},'handover-detail-denied')
+        self.assertEqual(denied.get(path).status_code,403)
+        page=self.client.get('/admin/loco-handover').text
+        for label in ('Übergabeprotokoll','PZB','Störungen','Übergabeprotokolle'):
+            self.assertIn(label,page)
