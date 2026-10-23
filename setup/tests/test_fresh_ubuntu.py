@@ -16,7 +16,7 @@ fresh=importlib.util.module_from_spec(spec);spec.loader.exec_module(fresh)
 
 class FreshUbuntuTest(unittest.TestCase):
     def test_fixed_identity_and_secure_service_configs(self):
-        self.assertEqual(fresh.DOMAIN,'ctl-software.io-goerlitz.de');self.assertEqual(fresh.IP,'212.227.86.251')
+        self.assertEqual(fresh.DOMAIN,'ctl-software.io-goerlitz.eu');self.assertEqual(fresh.IP,'212.227.86.251')
         self.assertEqual(fresh.DB_USER,'dbo_ctl');self.assertEqual(fresh.DB_NAME,'db_ctl')
         self.assertEqual(fresh.MAIL_USERS,('info','diso','vkplanung','railpool'))
         dovecot=fresh.dovecot_config();self.assertTrue(dovecot.startswith('dovecot_config_version = 2.4.0'))
@@ -109,7 +109,7 @@ class FreshUbuntuTest(unittest.TestCase):
             self.assertEqual(embedded,(ROOT/path).read_text());ast.parse(embedded)
         subprocess.run(['bash','-n',str(ROOT/'install-ctlsoftware-test.sh')],check=True)
         result=subprocess.run(['bash',str(ROOT/'install-ctlsoftware-test.sh'),'--help'],capture_output=True,text=True,check=True)
-        self.assertIn('ctl-software.io-goerlitz.de',result.stdout)
+        self.assertIn('ctl-software.io-goerlitz.eu',result.stdout)
         self.assertIn('db_ctl',result.stdout)
 
 if __name__=='__main__':unittest.main()

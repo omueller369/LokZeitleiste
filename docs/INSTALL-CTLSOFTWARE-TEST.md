@@ -6,7 +6,7 @@
 
 | Einstellung | Wert |
 | --- | --- |
-| Domain und Mailservername | `ctl-software.io-goerlitz.de` |
+| Domain und Mailservername | `ctl-software.io-goerlitz.eu` |
 | Öffentliche IPv4 | `212.227.86.251` |
 | MariaDB-Datenbank | `db_ctl` |
 | MariaDB-Benutzer | `dbo_ctl` |
@@ -36,26 +36,26 @@ Das Script fragt nur das neue Passwort für `dbo_ctl` ab. Mindestens sechs Zeich
 - Installation der Server- und Anwendungsabhängigkeiten über Ubuntu-Pakete: Apache, MariaDB, BIND, Postfix, Dovecot, OpenDKIM, PostSRSd, Certbot, UFW, Python und Hilfswerkzeuge.
 - Apache mit HTTP-ACME-Pfad, öffentlich gültigem TLS-Zertifikat und HTTPS-Weiterleitung zur CTL-Anwendung. Certbot erhält `omueller369@gmail.com` als Kontaktadresse.
 - MariaDB nur an `127.0.0.1`; Benutzer `dbo_ctl` erhält Rechte innerhalb `db_ctl`, keine globalen Administratorrechte.
-- BIND als autoritativer Nameserver für **nur diese Subdomain**, ohne öffentliche Rekursion. A-, NS-, MX-, SPF-, DKIM- und DMARC-Einträge werden angelegt. Es wird nicht die übergeordnete Zone `io-goerlitz.de` überschrieben.
+- BIND als autoritativer Nameserver für **nur diese Subdomain**, ohne öffentliche Rekursion. A-, NS-, MX-, SPF-, DKIM- und DMARC-Einträge werden angelegt. Es wird nicht die übergeordnete Zone `io-goerlitz.eu` überschrieben.
 - Postfix für SMTP-Empfang und authentifizierten Versand, Dovecot 2.4 für IMAP, Authentifizierung und lokale Zustellung. OpenDKIM signiert eigene ausgehende Nachrichten. PostSRSd verwendet die 2.x-Socketmap-Schnittstelle zur Absenderumschreibung bei Weiterleitungen.
 - Vier virtuelle Postfächer, ohne eigene Linux-Login-Konten. Passwörter stehen gehasht in einer root-/Dovecot-lesbaren Datei. Die Sieve-Regel führt sowohl `redirect` als auch ausdrücklich `keep` aus.
 - UFW-Freigaben für die Dienste. Die tatsächlich konfigurierte SSH-Portnummer wird vorher ermittelt und freigegeben; vorhandene SSH-Schlüssel werden nicht ersetzt.
 - CTL-Anwendung, Datenbanktabellen, Grundwerte, Admin mit Zufallspasswort, Dokumentverzeichnisse sowie die vorhandenen **20 Test-TF mit Bildern**.
-- SMTP-/IMAP-Standardserver in der Anwendung und SMTP-Versand über `info@ctl-software.io-goerlitz.de`.
+- SMTP-/IMAP-Standardserver in der Anwendung und SMTP-Versand über `info@ctl-software.io-goerlitz.eu`.
 
 ## Öffentliche DNS-Voraussetzungen
 
 Das Script überprüft die öffentlichen Antworten bei zwei DNS-Resolvern. Ein bestehender A-Eintrag auf die Server-IP ist **keine NS-Delegation**. Damit BIND auf dem neuen Server für die erzeugten Einträge zuständig ist, muss beim Provider die entsprechende Delegation bestehen:
 
 ```dns
-ctl-software.io-goerlitz.de.      NS  ns1.ctl-software.io-goerlitz.de.
-ns1.ctl-software.io-goerlitz.de.  A   212.227.86.251
+ctl-software.io-goerlitz.eu.      NS  ns1.ctl-software.io-goerlitz.eu.
+ns1.ctl-software.io-goerlitz.eu.  A   212.227.86.251
 ```
 
 Der Provider muss dabei den nötigen Glue-Eintrag für den unterhalb der delegierten Zone liegenden Nameserver veröffentlichen. Der **PTR-/Reverse-DNS-Eintrag** wird im Serverprovider-Panel gesetzt:
 
 ```text
-212.227.86.251 → ctl-software.io-goerlitz.de
+212.227.86.251 → ctl-software.io-goerlitz.eu
 ```
 
 Eine lokale BIND-Reverse-Zone kann diesen Provider-PTR nicht ersetzen. Die geplanten Provider-Einträge werden zusätzlich unter `/etc/ctlsoftware-test-setup/provider-dns.txt` gespeichert. Falls Delegation, sichtbarer MX/DKIM oder PTR noch fehlen, hält die Routine mit einer konkreten Fehlermeldung an. Nach DNS-Korrektur/Propagation:
@@ -70,16 +70,16 @@ Auch eine externe Provider-Firewall muss die unten genannten öffentlichen Ports
 
 | Vollständiger IMAP-/SMTP-Benutzername | Initialpasswort | Zustellung |
 | --- | --- | --- |
-| `info@ctl-software.io-goerlitz.de` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
-| `diso@ctl-software.io-goerlitz.de` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
-| `vkplanung@ctl-software.io-goerlitz.de` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
-| `railpool@ctl-software.io-goerlitz.de` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
+| `info@ctl-software.io-goerlitz.eu` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
+| `diso@ctl-software.io-goerlitz.eu` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
+| `vkplanung@ctl-software.io-goerlitz.eu` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
+| `railpool@ctl-software.io-goerlitz.eu` | `tomcom123456` | Lokal speichern und an Gmail weiterleiten |
 
 Weiterleitungsziel für alle vier: `omueller369@gmail.com`. Zusätzlich bestehen `postmaster`, `abuse` und `root` als Aliase auf `info`; diese sind keine zusätzlichen Login-Konten.
 
 | Dienst | Host | Port | Sicherheit |
 | --- | --- | --- | --- |
-| IMAP | `ctl-software.io-goerlitz.de` | 993 | TLS/SSL |
+| IMAP | `ctl-software.io-goerlitz.eu` | 993 | TLS/SSL |
 | IMAP alternativ | derselbe Host | 143 | STARTTLS, vor Anmeldung erforderlich |
 | SMTP-Versand | derselbe Host | 465 | TLS/SSL mit Anmeldung |
 | SMTP-Versand alternativ | derselbe Host | 587 | STARTTLS mit Anmeldung |
@@ -92,8 +92,8 @@ DNS benötigt zusätzlich TCP **und** UDP 53; die Website TCP 80/443. MariaDB 33
 Nach erfolgreicher Installation:
 
 ```text
-https://ctl-software.io-goerlitz.de/admin/start
-https://ctl-software.io-goerlitz.de/tf
+https://ctl-software.io-goerlitz.eu/admin/start
+https://ctl-software.io-goerlitz.eu/tf
 ```
 
 ```bash
@@ -106,7 +106,7 @@ sudo journalctl -u dovecot -u postfix -u postsrsd -n 100 --no-pager
 
 Admin-Benutzer ist `admin`. Die TF-Liste enthält die Login-TF-Nummern. TF-Initialpasswort ist `tomcom123456`, mit Passwortwechsel beim ersten Login. Die Mailkonten sind unabhängig von den TF-Benutzerkonten.
 
-Das Script prüft Dienststatus, öffentliche HTTPS-API, verschlüsselte Anmeldung aller vier Konten, ausgehende TCP-25-Erreichbarkeit zu Gmail-MX und die Ablehnung einer unauthentifizierten externen Relay-Anfrage. Dabei wird **keine Nachricht** an Gmail gesendet. Nach Abschluss selbst eine Nachricht an `info@ctl-software.io-goerlitz.de` senden und sowohl den IMAP-Eingang als auch den Gmail-Eingang prüfen. DNS/Signaturen ermöglichen Mailzustellung, können aber keine Annahme oder Posteingangsplatzierung durch Gmail erzwingen; insbesondere haben fremde Absender eigene DKIM-/DMARC-Regeln.
+Das Script prüft Dienststatus, öffentliche HTTPS-API, verschlüsselte Anmeldung aller vier Konten, ausgehende TCP-25-Erreichbarkeit zu Gmail-MX und die Ablehnung einer unauthentifizierten externen Relay-Anfrage. Dabei wird **keine Nachricht** an Gmail gesendet. Nach Abschluss selbst eine Nachricht an `info@ctl-software.io-goerlitz.eu` senden und sowohl den IMAP-Eingang als auch den Gmail-Eingang prüfen. DNS/Signaturen ermöglichen Mailzustellung, können aber keine Annahme oder Posteingangsplatzierung durch Gmail erzwingen; insbesondere haben fremde Absender eigene DKIM-/DMARC-Regeln.
 
 Konfigurationsdateien werden vor dem Ersetzen unter `/etc/ctlsoftware-test-setup/original-configs` gesichert. Anwendungskonfiguration liegt unter `/etc/ctlsoftware-test`, Benutzerdokumente unter `/var/lib/ctlsoftware-test`, Maildir-Postfächer unter `/var/vmail`. Bei Sicherungen diese Daten, Datenbank, Postfachpasswortdatei und die DKIM-/SRS-Schlüssel gemeinsam sichern.
 
@@ -128,9 +128,15 @@ Das gleiche Script installiert PHP-FPM samt MySQL-, SQLite-, XML-, mbstring-, In
 
 | Anwendung | Adresse | Anmeldung |
 | --- | --- | --- |
-| phpMyAdmin | https://ctl-software.io-goerlitz.de/phpmyadmin | `dbo_ctl` und das beim Setup eingegebene Datenbankpasswort |
-| Roundcube | https://ctl-software.io-goerlitz.de/webmailer | Vollständige Postfachadresse und `tomcom123456` |
+| phpMyAdmin | https://ctl-software.io-goerlitz.eu/phpmyadmin | `dbo_ctl` und das beim Setup eingegebene Datenbankpasswort |
+| Roundcube | https://ctl-software.io-goerlitz.eu/webmailer | Vollständige Postfachadresse und `tomcom123456` |
 
 Roundcube verwendet die vier oben genannten IMAP-/SMTP-Konten mit geprüften TLS-Verbindungen. Seine Kontakte und Einstellungen liegen in einer eigenen SQLite-Datenbank unter `/var/lib/ctl-webmail`; die Projektdatenbank bleibt getrennt. phpMyAdmin nutzt Cookie-Anmeldung, erlaubt keinen Root-Login und keine frei eingebbaren Datenbankserver. Die Apache-Routen werden vor der Weiterleitung an das Backend eingerichtet. HTTP wird auf HTTPS umgeleitet.
 
 Die Abschlussprüfung kontrolliert zusätzlich PHP-FPM und beide Anmeldeseiten. Ein Browser-Login samt E-Mail-Versand wurde hier nicht auf einem echten Server geprüft.
+
+## Korrigierte Domain und frischer Server
+
+Für die komplette Neuinstallation gilt ausschließlich `ctl-software.io-goerlitz.eu`. Die IP bleibt `212.227.86.251`. Auf dem frisch aufgesetzten Server ohne `--resume` beginnen; diese Option dient nur zum Fortsetzen eines abgebrochenen Laufs derselben Installation.
+
+Bei STRATO verlangt die Einrichtung eigener Nameserver laut Anbieter zwei Nameserver auf unterschiedlichen IP-Adressen. Dieses Script richtet nur `ns1` ein. Vor einer Delegation muss ein tatsächlich betriebener sekundärer Nameserver ergänzt und für die Zone eingerichtet werden. Alternativ müssen DNS-Verwaltung und Setup-Prüfung auf extern verwaltetes DNS umgestellt werden; ein A-Eintrag allein erfüllt die aktuelle Prüfung nicht. Die Domainkorrektur beseitigt diese Voraussetzung nicht.

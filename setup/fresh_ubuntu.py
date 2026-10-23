@@ -20,7 +20,7 @@ import sys
 import time
 import imaplib
 
-DOMAIN='ctl-software.io-goerlitz.de'
+DOMAIN='ctl-software.io-goerlitz.eu'
 IP='212.227.86.251'
 FORWARD='omueller369@gmail.com'
 MAIL_USERS=('info','diso','vkplanung','railpool')

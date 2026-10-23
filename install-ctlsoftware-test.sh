@@ -12,7 +12,7 @@ while (($#));do
   --help|-h)
    echo 'sudo bash install-ctlsoftware-test.sh [--resume] [--source /Pfad/zum/Projekt]'
    echo 'Nur frisches Ubuntu 26.04! Installiert Apache, MariaDB, BIND, Postfix/Dovecot und CTL-Testdaten.'
-   echo 'Domain: ctl-software.io-goerlitz.de | IPv4: 212.227.86.251 | DB: db_ctl | Benutzer: dbo_ctl'
+   echo 'Domain: ctl-software.io-goerlitz.eu | IPv4: 212.227.86.251 | DB: db_ctl | Benutzer: dbo_ctl'
    echo 'Das neue Datenbankpasswort wird verdeckt abgefragt.'
    exit 0 ;;
   *) echo "Unbekannte Option: $1" >&2;exit 2 ;;
@@ -403,7 +403,7 @@ import sys
 import time
 import imaplib
 
-DOMAIN='ctl-software.io-goerlitz.de'
+DOMAIN='ctl-software.io-goerlitz.eu'
 IP='212.227.86.251'
 FORWARD='omueller369@gmail.com'
 MAIL_USERS=('info','diso','vkplanung','railpool')
