@@ -191,3 +191,7 @@ Die Checkbox **Lokdaten** direkt neben dem Datei-Upload kennzeichnet, dass die a
 Neue Anhänge werden in 256-KiB-Abschnitten in `loco_handover_attachment_chunks` gespeichert, damit ein erlaubter Anhang unter 10 MB keine entsprechend große einzelne MySQL-Anweisung benötigt. Die beim Update automatisch angelegte Zusatztabelle ändert nichts an vorhandenen Anhängen: diese bleiben unverändert lesbar. Protokoll und Dateiabschnitte werden weiterhin gemeinsam transaktional gespeichert. Fehler werden direkt neben dem Upload angezeigt, auch bei nicht als JSON gelieferten Serverfehlern oder einer unterbrochenen Verbindung. Der Onlineserver muss für diese Änderung regulär aktualisiert werden.
 
 Hochgeladene JPEG- und PNG-Bilder erscheinen in den Protokolldetails direkt als responsive Bilder mit Dateinamen. Andere Dokumente bleiben Downloadlinks. Die Bildvorschau erfordert dieselbe Anmeldung wie der Dateidownload und ist auch für bisher gespeicherte Bilder verfügbar.
+
+## Neuinstallation auf vorhandenem Ubuntu mit ISPConfig
+
+`sudo bash setup-ispconfig.sh` installiert ausschließlich die Anwendung mit ihren Python-Abhängigkeiten, eigenen systemd-Diensten und den 20 Test-TF samt Bildern. Sie nutzt eine bereits in ISPConfig angelegte Website und eine leere Datenbank. Es werden keine Web-/Datenbank-/Mailserver, Docker oder ISPConfig installiert und keine fremden VirtualHosts verändert. [Vollständige Anleitung mit Prüf- und Installationsbefehlen, HTTP/HTTPS, Apache/nginx und Testzugängen](docs/SETUP-ISPCONFIG.md).
