@@ -1384,7 +1384,8 @@
     "Übergabeprotokoll nicht gefunden.": "Übergabeprotokoll nicht gefunden.",
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Bitte einen gültigen Meldungsempfänger auswählen.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximal 10 Dateien pro Übergabeprotokoll.",
-    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Dateien dürfen zusammen höchstens 30 MB groß sein."
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Dateien dürfen zusammen höchstens 30 MB groß sein.",
+    "Uhrzeit": "Uhrzeit"
   },
   "en": {
     "Administration": "Administration",
@@ -2771,7 +2772,8 @@
     "Übergabeprotokoll nicht gefunden.": "Handover protocol not found.",
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Please select a valid report recipient.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maximum 10 files per handover protocol.",
-    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Files must not exceed 30 MB in total."
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Files must not exceed 30 MB in total.",
+    "Uhrzeit": "Time"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4158,7 +4160,8 @@
     "Übergabeprotokoll nicht gefunden.": "Nie znaleziono protokołu przekazania.",
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Wybierz prawidłowego odbiorcę zgłoszenia.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Maksymalnie 10 plików na protokół przekazania.",
-    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Łączny rozmiar plików nie może przekraczać 30 MB."
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Łączny rozmiar plików nie może przekraczać 30 MB.",
+    "Uhrzeit": "Godzina"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5545,7 +5548,8 @@
     "Übergabeprotokoll nicht gefunden.": "Протокол передачи не найден.",
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Выберите действительного получателя сообщения.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Не более 10 файлов на протокол передачи.",
-    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Общий размер файлов не должен превышать 30 МБ."
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Общий размер файлов не должен превышать 30 МБ.",
+    "Uhrzeit": "Время"
   },
   "es": {
     "Administration": "Administración",
@@ -6932,6 +6936,7 @@
     "Übergabeprotokoll nicht gefunden.": "No se encontró el acta de entrega.",
     "Bitte einen gültigen Meldungsempfänger auswählen.": "Seleccione un destinatario válido.",
     "Maximal 10 Dateien pro Übergabeprotokoll.": "Máximo 10 archivos por acta de entrega.",
-    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Los archivos no pueden superar 30 MB en total."
+    "Dateien dürfen zusammen höchstens 30 MB groß sein.": "Los archivos no pueden superar 30 MB en total.",
+    "Uhrzeit": "Hora"
   }
 }
