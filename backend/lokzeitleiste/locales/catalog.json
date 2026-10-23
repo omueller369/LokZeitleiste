@@ -1338,7 +1338,11 @@
     "Menüvariante gespeichert.": "Menüvariante gespeichert.",
     "Menüeinstellung wurde geändert. Bitte neu laden.": "Menüeinstellung wurde geändert. Bitte neu laden.",
     "Menüeinstellung konnte nicht gespeichert werden.": "Menüeinstellung konnte nicht gespeichert werden.",
-    "Hauptbereiche": "Hauptbereiche"
+    "Hauptbereiche": "Hauptbereiche",
+    "GPS-Aufzeichnung (Android)": "GPS-Aufzeichnung (Android)",
+    "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.",
+    "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.",
+    "Bisherige Erfassungen": "Bisherige Erfassungen"
   },
   "en": {
     "Administration": "Administration",
@@ -2679,7 +2683,11 @@
     "Menüvariante gespeichert.": "Menu layout saved.",
     "Menüeinstellung wurde geändert. Bitte neu laden.": "Menu settings have changed. Please reload.",
     "Menüeinstellung konnte nicht gespeichert werden.": "Menu settings could not be saved.",
-    "Hauptbereiche": "Main sections"
+    "Hauptbereiche": "Main sections",
+    "GPS-Aufzeichnung (Android)": "GPS recording (Android)",
+    "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android records using a location service and a persistent notification. GPS loss or stopping the app can cause gaps.",
+    "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "GPS service stopped. Recording can be resumed.",
+    "Bisherige Erfassungen": "Previous entries"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4020,7 +4028,11 @@
     "Menüvariante gespeichert.": "Układ menu zapisany.",
     "Menüeinstellung wurde geändert. Bitte neu laden.": "Ustawienia menu uległy zmianie. Odśwież stronę.",
     "Menüeinstellung konnte nicht gespeichert werden.": "Nie udało się zapisać ustawień menu.",
-    "Hauptbereiche": "Główne obszary"
+    "Hauptbereiche": "Główne obszary",
+    "GPS-Aufzeichnung (Android)": "Rejestracja GPS (Android)",
+    "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android rejestruje za pomocą usługi lokalizacji i stałego powiadomienia. Utrata GPS lub zatrzymanie aplikacji może powodować przerwy.",
+    "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "Usługa GPS została zatrzymana. Można wznowić rejestrację.",
+    "Bisherige Erfassungen": "Dotychczasowe wpisy"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5361,7 +5373,11 @@
     "Menüvariante gespeichert.": "Вариант меню сохранён.",
     "Menüeinstellung wurde geändert. Bitte neu laden.": "Настройки меню изменены. Обновите страницу.",
     "Menüeinstellung konnte nicht gespeichert werden.": "Не удалось сохранить настройки меню.",
-    "Hauptbereiche": "Основные разделы"
+    "Hauptbereiche": "Основные разделы",
+    "GPS-Aufzeichnung (Android)": "Запись GPS (Android)",
+    "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android ведёт запись через службу геолокации с постоянным уведомлением. Потеря GPS или остановка приложения могут вызвать пропуски.",
+    "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "Служба GPS остановлена. Запись можно продолжить.",
+    "Bisherige Erfassungen": "Прежние записи"
   },
   "es": {
     "Administration": "Administración",
@@ -6702,6 +6718,10 @@
     "Menüvariante gespeichert.": "Diseño de menú guardado.",
     "Menüeinstellung wurde geändert. Bitte neu laden.": "La configuración del menú ha cambiado. Vuelva a cargar la página.",
     "Menüeinstellung konnte nicht gespeichert werden.": "No se pudo guardar la configuración del menú.",
-    "Hauptbereiche": "Secciones principales"
+    "Hauptbereiche": "Secciones principales",
+    "GPS-Aufzeichnung (Android)": "Grabación GPS (Android)",
+    "Android zeichnet mit Standortdienst und dauerhafter Benachrichtigung auf. Bei GPS-Ausfall oder Beenden der App können Lücken entstehen.": "Android graba mediante un servicio de ubicación y una notificación permanente. La pérdida de GPS o detener la aplicación puede causar lagunas.",
+    "GPS-Dienst wurde beendet. Aufzeichnung kann fortgesetzt werden.": "El servicio GPS se ha detenido. Se puede reanudar la grabación.",
+    "Bisherige Erfassungen": "Registros anteriores"
   }
 }

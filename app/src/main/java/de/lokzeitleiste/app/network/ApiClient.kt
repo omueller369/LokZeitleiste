@@ -14,7 +14,7 @@ import java.time.YearMonth
 class AuthenticationRequired : IllegalStateException("Anmeldung abgelaufen. Bitte erneut anmelden.")
 
 object ApiClient {
-    private fun base(): String = BuildConfig.API_BASE_URL.trimEnd('/').also {
+    fun base(): String = BuildConfig.API_BASE_URL.trimEnd('/').also {
         val uri = runCatching { URI(it) }.getOrNull()
         val localEmulator = BuildConfig.DEBUG && uri?.scheme == "http" &&
             uri.host == "10.0.2.2" && uri.port == 8080 && uri.rawUserInfo == null
@@ -70,6 +70,9 @@ object ApiClient {
     }
     suspend fun identity(token: String): JSONObject = withContext(Dispatchers.IO) {
         post("/api/v1/account/me", JSONObject(), token, "GET")
+    }
+    suspend fun portalIdentity(token: String): JSONObject = withContext(Dispatchers.IO) {
+        post("/api/v1/tf/portal", JSONObject(), token, "GET")
     }
     suspend fun getLanguage(token: String): JSONObject = withContext(Dispatchers.IO) {
         post("/api/v1/account/locale", JSONObject(), token, "GET")

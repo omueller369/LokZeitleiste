@@ -153,3 +153,7 @@ Unter **Startseite → Menü anpassen** kann jeder Backend-Benutzer seine Naviga
 - **Hauptbereiche + Kacheln**: Bereichsleiste am Desktop und unten auf Mobilgeräten; „Mehr“ öffnet den vollständigen Menübaum.
 
 Beim regulären Update bzw. bei der Neuinstallation wird die Tabelle `backend_menu_preferences` automatisch angelegt. Bestehende Benutzer starten ohne Datenmigration mit der Seitenleiste. Die Auswahl benötigt keine zusätzliche Modulfreigabe. TF verwenden weiterhin das TF-Portal.
+
+## Android TF-Portal 0.11
+
+Die Android-App übernimmt den aktuellen TF-Portalstand als gemeinsam gebündelte Oberfläche, ergänzt um native Dateiauswahl, Downloads und einen GPS-Standortdienst für die Bildschirmsperre. Die bisherige native Erfassung bleibt erreichbar. [Funktionen, Offline-Verhalten, Build und Installation](app/docs/TF-PORTAL.md). Eine aktualisierte Serverinstallation und eine neu gebaute APK sind erforderlich.
