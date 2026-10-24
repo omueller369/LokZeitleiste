@@ -88,7 +88,7 @@ class EndDateTest(unittest.TestCase):
         response=self.client.put(f'/api/v1/admin/tf/{self.tf}',json=update)
         self.assertEqual(response.status_code,200,response.text);self.assertTrue(response.json()['has_photo'])
         self.assertEqual(self.client.get(f'/api/v1/admin/tf/{self.tf}/photo').status_code,200)
-        create=dict(update,weekly_minutes=2400,entry_date='2020-01-01',nationality='DE',addresses=user['addresses'],username='787110',password='new-tf-secret-12345',personnel_number='P-PHOTO')
+        create=dict(update,weekly_minutes=2400,entry_date='2020-01-01',nationality='DE',addresses=user['addresses'],username='787110',password='new-tf-secret-12345',personnel_number='P-PHOTO',email='787110@example.com')
         result=self.client.post('/api/v1/admin/tf',json=create)
         self.assertEqual(result.status_code,201,result.text)
         self.assertEqual(self.client.get('/api/v1/admin/tf/'+str(result.json()['id'])+'/photo').status_code,200)

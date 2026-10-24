@@ -118,4 +118,7 @@ class LocoHandoverTest(unittest.TestCase):
         script=driver.get('/tf/portal.js')
         self.assertEqual(script.headers['cache-control'],'no-store')
         self.assertNotIn("'/tf/lokuebergabebuch':'Lokübergabebuch'",script.text)
-        self.assertEqual(self.client.get('/tf/loco-handover').status_code,403)
+        redirect=self.client.get('/tf/loco-handover',follow_redirects=False)
+        self.assertEqual(redirect.status_code,303)
+        self.assertEqual(redirect.headers['location'],'/account?area=tf')
+        self.assertEqual(self.client.get('/api/v1/tf/loco-handover/vehicles',headers={'X-CTL-Area':'backend'}).status_code,403)

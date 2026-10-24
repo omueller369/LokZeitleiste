@@ -44,7 +44,7 @@ class BahnCardTest(unittest.TestCase):
         profile = self.profile()
         for card in (0, 50, 100):
             data = dict(profile, username=str(788000+card), personnel_number=f'CARD-{card}',
-                        password='initial-secret-12345', bahncard=card, bahncard_valid_until='2027-10-01')
+                        password='initial-secret-12345', email=f'card-{card}@example.com', bahncard=card, bahncard_valid_until='2027-10-01')
             result = self.client.post('/api/v1/admin/tf', json=data)
             self.assertEqual(result.status_code, 201, result.text)
             saved = next(row for row in self.client.get('/api/v1/admin/tf').json() if row['id'] == result.json()['id'])

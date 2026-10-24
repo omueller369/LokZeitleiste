@@ -35,7 +35,10 @@ class StationDirectoryTest(unittest.TestCase):
     def test_module_page_catalog_selection_sort_and_search(self):
         page=self.driver.get('/tf/bahnhoefe');self.assertEqual(page.status_code,200)
         self.assertIn('Bahnhofsverzeichnis',page.text);self.assertIn('/tf/stations.js',page.text)
-        self.assertEqual(self.client.get('/tf/bahnhoefe').status_code,403)
+        redirect=self.client.get('/tf/bahnhoefe',follow_redirects=False)
+        self.assertEqual(redirect.status_code,303)
+        self.assertEqual(redirect.headers['location'],'/account?area=tf')
+        self.assertEqual(self.client.get('/api/v1/tf/stations',headers={'X-CTL-Area':'backend'}).status_code,403)
         self.assertEqual([r['code'] for r in self.driver.get('/api/v1/tf/stations/catalog',params={'q':'bbb'}).json()],['BBB'])
         self.assertEqual([r['code'] for r in self.driver.get('/api/v1/tf/stations/catalog',params={'q':'Berlin'}).json()],['BBB','CCC'])
         self.assertEqual(self.driver.get('/api/v1/tf/stations/catalog',params={'q':'%'}).json(),[])

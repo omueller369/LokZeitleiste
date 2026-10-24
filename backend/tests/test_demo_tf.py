@@ -42,7 +42,7 @@ class DemoTfTest(unittest.TestCase):
         self.assertEqual(self.client.get('/api/v1/admin/tf').json()[0]['gender'],'unspecified')
         _,reader=self.active_staff({'employees':1},'gender-reader')
         self.assertEqual(reader.put(f'/api/v1/admin/tf/{self.tf}',json=profile).status_code,403)
-        profile['gender']='female';profile.update(username='787765',personnel_number='00123',password='initial-secret-12345')
+        profile['gender']='female';profile.update(username='787765',personnel_number='00123',password='initial-secret-12345',email='787765@example.com')
         self.assertEqual(self.client.post('/api/v1/admin/tf',json=profile).status_code,201)
         self.assertEqual(next(row for row in self.client.get('/api/v1/admin/tf').json() if row['username']=='787765')['gender'],'female')
 
