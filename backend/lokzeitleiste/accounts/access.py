@@ -7,7 +7,7 @@ from ..models import AccountPolicy, ModulePermission, User
 MODULES = {"loco_handover":"Lokübergabebuch", "app_defaults":"App Grundwerte", "vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
            "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
            "staff":"Verwaltungsmitarbeiter und Berechtigungen", "directory":"Verwaltung: alle Mitarbeiter",
-           "shifts":"Schichtmodelle und Zuweisungen", "email":"Tf-E-Mail-Postfächer"}
+           "shifts":"Schichtmodelle und Zuweisungen", "email":"Mitarbeiter-E-Mail"}
 
 
 def password_required(db, user):
@@ -54,6 +54,9 @@ def authorize_route(db, user, request):
     if path == '/api/v1/admin/logout':
         return
     ready(db,user)
+    if path in ('/api/v1/admin/email-domains','/api/v1/admin/email-suggestion') and method=='GET':
+        if not any(permissions(db,user)[m] for m in ('employees','staff','app_defaults')):raise HTTPException(403,'Keine Freigabe')
+        return
     if path in ('/api/v1/admin/me','/api/v1/admin/modules','/api/v1/admin/start','/api/v1/admin/menu-preference'):
         return
     if path in ('/api/v1/admin/tf-metadata','/api/v1/admin/stations') and method == 'GET':

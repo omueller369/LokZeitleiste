@@ -4,14 +4,17 @@ set -Eeuo pipefail
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 script_file="$script_dir/$(basename -- "${BASH_SOURCE[0]}")"
 resume=false
+update=false
 source_dir=''
 while (($#));do
  case "$1" in
   --resume) resume=true;shift ;;
+  --update) update=true;resume=true;shift ;;
   --source) (($#>=2)) || { echo '--source benötigt einen Pfad.' >&2;exit 2; };source_dir=$2;shift 2 ;;
   --help|-h)
-   echo 'sudo bash install-ctlsoftware-test.sh [--resume] [--source /Pfad/zum/Projekt]'
-   echo 'Nur frisches Ubuntu 26.04! Installiert Apache, MariaDB, BIND, Postfix/Dovecot und CTL-Testdaten.'
+   echo 'sudo bash install-ctlsoftware-test.sh [--resume|--update] [--source /Pfad/zum/Projekt]'
+   echo 'Neuinstallation: frisches Ubuntu 26.04. --update: vorhandenen eigenen CTL-Testserver aktualisieren.'
+   echo 'Installiert Apache, MariaDB, lokales BIND, Postfix/Dovecot, Mitarbeiterpostfächer und CTL-Testdaten.'
    echo 'Domain: ctl-software.io-goerlitz.eu | IPv4: 212.227.86.251 | DB: db_ctl | Benutzer: dbo_ctl'
    echo 'Das neue Datenbankpasswort wird verdeckt abgefragt.'
    exit 0 ;;
@@ -19,7 +22,7 @@ while (($#));do
  esac
 done
 if ((EUID!=0));then
- args=();[[ $resume == false ]] || args+=(--resume);[[ -z $source_dir ]] || args+=(--source "$source_dir")
+ args=();[[ $update == false ]] || args+=(--update);[[ $resume == false ]] || args+=(--resume);[[ -z $source_dir ]] || args+=(--source "$source_dir")
  exec sudo -- bash "$script_file" "${args[@]}"
 fi
 umask 022
@@ -418,7 +421,7 @@ PACKAGES=('apache2','mariadb-server','postfix','postfix-pcre','dovecot-core','do
           'postsrsd','certbot','python3-venv','python3-pip','python3-pymysql','git','ca-certificates',
           'fonts-dejavu-core','openssl','ufw','rsyslog','curl','iproute2','openssh-server','php-fpm','php-cli','php-mysql','php-mbstring','php-xml',
           'php-curl','php-zip','php-gd','php-intl','php-sqlite3','phpmyadmin','roundcube-core',
-          'dbconfig-no-thanks')
+          'dbconfig-no-thanks','python3-cryptography')
 
 
 def run(args,**kwargs):
@@ -517,7 +520,7 @@ inet_protocols = ipv4
 mynetworks = 127.0.0.0/8
 relay_domains =
 relayhost =
-virtual_mailbox_domains = {DOMAIN}
+virtual_mailbox_domains = hash:/etc/postfix/ctl-domains
 virtual_mailbox_maps = hash:/etc/postfix/ctl-mailboxes
 virtual_alias_maps = hash:/etc/postfix/ctl-aliases
 virtual_transport = lmtp:unix:private/dovecot-lmtp
@@ -858,7 +861,9 @@ def prepare_certificate():
          '--email',FORWARD,'--agree-tos','--non-interactive','--keep-until-expiring'])
 
 
-def forward_script():return f'redirect \"{FORWARD}\";\nkeep;\n'
+def forward_script():
+    addresses=', '.join('"'+local+'@'+DOMAIN+'"' for local in MAIL_USERS)
+    return 'require ["envelope"];\nif envelope :is "to" ['+addresses+'] {\n  redirect "'+FORWARD+'";\n}\nkeep;\n'
 
 
 def prepare_mail():
@@ -891,7 +896,8 @@ def prepare_mail():
     write(master,text)
     write('/etc/postfix/ctl-mailboxes',''.join(f'{local}@{DOMAIN} 1\n' for local in MAIL_USERS))
     write('/etc/postfix/ctl-aliases',f'postmaster@{DOMAIN} info@{DOMAIN}\nabuse@{DOMAIN} info@{DOMAIN}\nroot@{DOMAIN} info@{DOMAIN}\n')
-    for table in ('ctl-mailboxes','ctl-aliases'):run(['postmap','/etc/postfix/'+table])
+    write('/etc/postfix/ctl-domains',DOMAIN+' OK\n')
+    for table in ('ctl-mailboxes','ctl-aliases','ctl-domains'):run(['postmap','/etc/postfix/'+table])
     write('/etc/opendkim.conf',MARKER+'''Syslog yes
 UMask 007
 PidFile /run/opendkim/opendkim.pid
@@ -941,13 +947,65 @@ def prepare_application(args):
         if app_state.exists():command.append('--resume')
         run(command,env=env)
     settings=json.loads((APP_CONFIG/'environment.json').read_text())
-    settings.update(SMTP_HOST=DOMAIN,SMTP_PORT='465',SMTP_SECURITY='ssl',SMTP_FROM='info@'+DOMAIN,
+    settings.update(CTL_MAIL_DOMAIN=DOMAIN,CTL_MAIL_PROVISIONING='1',SMTP_HOST=DOMAIN,SMTP_PORT='465',SMTP_SECURITY='ssl',SMTP_FROM='info@'+DOMAIN,
                     SMTP_USERNAME='info@'+DOMAIN,SMTP_PASSWORD=MAIL_PASSWORD,WORK_REPORT_RECEIPT_EMAIL=FORWARD,
                     MAILBOX_IMAP_HOST=DOMAIN,MAILBOX_IMAP_PORT='993',MAILBOX_SMTP_HOST=DOMAIN,
                     MAILBOX_SMTP_PORT='465',MAILBOX_SMTP_SECURITY='ssl')
     spec=importlib.util.spec_from_file_location('ctl_setup_engine',args.engine);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     write(APP_CONFIG/'app.env',module.env_file(settings),0o600)
     write(APP_CONFIG/'environment.json',json.dumps(settings),0o600)
+    run(['systemctl','restart','ctlsoftware-test','ctlsoftware-test-worker'])
+
+
+def update_existing_application(args):
+    if not (APP_CONFIG/'installation.json').is_file():raise ValueError('Keine bestehende CTL-Testinstallation gefunden.')
+    source=Path(args.source) if args.source else Path('/opt/ctlsoftware-test-source')
+    if not args.source:
+        run(['git','-C',str(source),'fetch','origin','setup/debian-testumgebung'])
+        run(['git','-C',str(source),'merge','--ff-only','origin/setup/debian-testumgebung'])
+    if not (source/'setup/mailbox_provisioner.py').is_file():raise ValueError('Aktueller Quelltext fehlt.')
+    backup=STATE/'backups'/time.strftime('%Y%m%dT%H%M%SZ',time.gmtime());backup.mkdir(parents=True,mode=0o700)
+    with open(backup/'database.sql','xb') as target:
+        os.chmod(backup/'database.sql',0o600)
+        run(['mariadb-dump','--user=root','--single-transaction','--routines','--triggers',DB_NAME],stdout=target)
+    shutil.copytree(APP_CONFIG,backup/'config')
+    shutil.copytree('/opt/ctlsoftware-test/backend',backup/'backend')
+    run(['apt-get','install','-y','--no-install-recommends','python3-cryptography'])
+    run(['systemctl','stop','ctlsoftware-test','ctlsoftware-test-worker'])
+    shutil.copytree(source/'backend/lokzeitleiste','/opt/ctlsoftware-test/backend/lokzeitleiste',dirs_exist_ok=True,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+    for path in Path('/opt/ctlsoftware-test/backend/lokzeitleiste').rglob('*'):path.chmod(0o755 if path.is_dir() else 0o644)
+    run(['/opt/ctlsoftware-test/venv/bin/python','-m','pip','install','-r',str(source/'backend/requirements.txt')])
+    env=json.loads((APP_CONFIG/'environment.json').read_text())
+    env.update(CTL_MAIL_DOMAIN=DOMAIN,CTL_MAIL_PROVISIONING='1')
+    write(APP_CONFIG/'environment.json',json.dumps(env),0o600)
+    # Activate the domain map without replacing existing mailbox passwords or messages.
+    if not Path('/etc/postfix/ctl-domains').exists():write('/etc/postfix/ctl-domains',DOMAIN+' OK\n')
+    run(['postmap','/etc/postfix/ctl-domains'])
+    run(['postconf','-e','virtual_mailbox_domains=hash:/etc/postfix/ctl-domains'])
+    write('/etc/dovecot/sieve/ctl-forward.sieve',forward_script());run(['sievec','/etc/dovecot/sieve/ctl-forward.sieve'])
+    os.environ['CTL_SETUP_SOURCE']=str(source)
+    configure_employee_mail()
+    repair_roundcube_php85();finish_web();verify()
+    print('Update abgeschlossen. Sicherung: '+str(backup))
+
+
+def configure_employee_mail():
+    source=Path(os.getenv('CTL_SETUP_SOURCE','/opt/ctlsoftware-test-source'))
+    script=source/'setup/mailbox_provisioner.py'
+    if not script.is_file():raise ValueError('Aktuellen Projektstand mit mailbox_provisioner.py bereitstellen.')
+    write('/usr/local/lib/ctl-mailbox-provisioner.py',script.read_text(),0o700)
+    settings=json.loads((APP_CONFIG/'environment.json').read_text())
+    settings.update(CTL_MAIL_DOMAIN=DOMAIN,CTL_MAIL_PROVISIONING='1')
+    # Keep one shared configuration format for the app and the root-only provisioner.
+    write(APP_CONFIG/'environment.json',json.dumps(settings),0o600)
+    write(APP_CONFIG/'app.env',''.join(k+'='+json.dumps(str(v),ensure_ascii=False)+'\n' for k,v in settings.items()),0o600)
+    def app_task(module):
+        run(['runuser','-u','ctlsoftware-test','--','/opt/ctlsoftware-test/venv/bin/python','-m',module],env={**os.environ,**settings},cwd='/opt/ctlsoftware-test/backend')
+    app_task('lokzeitleiste.init_db');app_task('lokzeitleiste.accounts.provision_demo_mail')
+    write('/etc/systemd/system/ctl-mailboxes.service','[Unit]\nDescription=Provision CTL employee mailboxes\nAfter=mariadb.service dovecot.service postfix.service\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 /usr/local/lib/ctl-mailbox-provisioner.py\nUMask=0077\n')
+    write('/etc/systemd/system/ctl-mailboxes.timer','[Unit]\nDescription=Process CTL mailbox requests\n[Timer]\nOnBootSec=20s\nOnUnitInactiveSec=15s\n[Install]\nWantedBy=timers.target\n')
+    run(['systemctl','daemon-reload']);run(['systemctl','enable','--now','ctl-mailboxes.timer'])
+    run(['systemctl','start','ctl-mailboxes.service'])
     run(['systemctl','restart','ctlsoftware-test','ctlsoftware-test-worker'])
 
 
@@ -999,10 +1057,13 @@ def verify():
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--resume',action='store_true');parser.add_argument('--source')
+    parser.add_argument('--resume',action='store_true');parser.add_argument('--update',action='store_true');parser.add_argument('--source')
     parser.add_argument('--engine',required=True)
     args=parser.parse_args()
     if os.geteuid()!=0:raise ValueError('Als root/sudo ausführen.')
+    if args.update:
+        update_existing_application(args);return
+    if args.source:os.environ['CTL_SETUP_SOURCE']=args.source
     state_file=STATE/'state.json'
     state=json.loads(state_file.read_text()) if state_file.exists() else {'completed':[]}
     if state.get('complete'):raise ValueError('Installation ist bereits abgeschlossen; dies ist kein Update-Script.')
@@ -1016,7 +1077,7 @@ def main():
     if IP not in [a['local'] for item in interfaces for a in item.get('addr_info',[])]:raise ValueError(IP+' ist nicht als lokale IPv4 konfiguriert.')
     stages=[('packages',prepare_packages),('hostname',prepare_hostname),('firewall',prepare_firewall),('database',prepare_database),('php-apps',prepare_php_apps),('dns-external-v2',prepare_dns),
             ('public-dns-external-v2',public_dns_check),('certificate',prepare_certificate),('mail',prepare_mail),
-            ('application',lambda:prepare_application(args)),('web',finish_web),('roundcube-php85-v1',repair_roundcube_php85),('verify',verify)]
+            ('application',lambda:prepare_application(args)),('employee-mail-v1',configure_employee_mail),('web',finish_web),('roundcube-php85-v1',repair_roundcube_php85),('verify',verify)]
     for name,action in stages:
         if name in state['completed']:continue
         print('Schritt: '+name,flush=True);action();state['completed'].append(name)
@@ -1043,5 +1104,6 @@ if __name__=='__main__':
 CTL_FRESH_SERVER
 args=(--engine "$work_dir/ispconfig_install.py")
 [[ $resume == false ]] || args+=(--resume)
+[[ $update == false ]] || args+=(--update)
 [[ -z $source_dir ]] || args+=(--source "$source_dir")
 python3 "$work_dir/fresh_ubuntu.py" "${args[@]}"

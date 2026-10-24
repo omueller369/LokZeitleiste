@@ -21,7 +21,7 @@ class TfPortalTest(unittest.TestCase):
 
     def test_six_character_creation_change_login_and_reset(self):
         profile=self.client.get('/api/v1/admin/tf').json()[0]
-        profile.update(username='787123',personnel_number='00123',password='abc123')
+        profile.update(username='787123',personnel_number='00123',password='abc123',email='787123@example.com')
         created=self.client.post('/api/v1/admin/tf',json=profile)
         self.assertEqual(created.status_code,201,created.text)
         login=self.driver.post('/api/v1/tf/login',json={'username':'787123','password':'abc123'}).json()
@@ -73,11 +73,11 @@ class TfPortalTest(unittest.TestCase):
     def test_portal_pages_roles_and_logged_out_access(self):
         for path in ('/tf','/tf/arbeitsbericht','/tf/lokuebergabebuch','/tf/leuna-uebergabeprotokoll','/tf/arbeitsplan'):
             result=self.driver.get(path);self.assertEqual(result.status_code,200);self.assertIn('TF Portal',result.text)
-            self.assertEqual(self.client.get(path,follow_redirects=False).status_code,403)
+            self.assertEqual(self.client.get(path,follow_redirects=False).status_code,303)
         self.assertEqual(self.client.get('/api/v1/tf/portal/plan/2026/10').status_code,403)
         staff=self.payload('portal-office');self.client.post('/api/v1/admin/staff',json=staff)
         self.driver.post('/api/v1/account/login',json={'username':'portal-office','password':staff['initial_password']})
-        self.assertEqual(self.driver.get('/api/v1/tf/portal').status_code,403)
+        self.assertEqual(self.driver.get('/api/v1/tf/portal',headers={'X-CTL-Area':'backend'}).status_code,403)
         self.driver.cookies.clear()
         self.assertEqual(self.driver.get('/tf',follow_redirects=False).status_code,303)
         self.assertEqual(self.driver.get('/api/v1/tf/portal/plan/2026/10').status_code,401)

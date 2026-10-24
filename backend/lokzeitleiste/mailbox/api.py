@@ -41,6 +41,8 @@ class AttachmentInput(BaseModel):
 
 class MessageInput(BaseModel):
     to: list[EmailStr] = Field(min_length=1,max_length=20)
+    cc: list[EmailStr] = Field(default_factory=list,max_length=30)
+    bcc: list[EmailStr] = Field(default_factory=list,max_length=30)
     subject: str = Field(max_length=300)
     body: str = Field(max_length=200000)
     in_reply_to: str = Field(default='',max_length=500)

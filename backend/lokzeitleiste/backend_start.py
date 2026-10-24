@@ -28,6 +28,7 @@ def start_modules(user,p):
         ('documents','Meine Dokumente','/documents','Mein Bereich',2),
         ('password','Mein Passwort ändern','/account','Mein Bereich',2),
     ]
+    if user.role=='admin':definitions.extend([('phpmyadmin','phpMyAdmin','/phpmyadmin','Administration',3),('webmailer','Webmailer','/webmailer','Administration',3)])
     if user.role=='staff':definitions.append(('own_time','Meine Arbeitszeiten','/my/worktime','Mein Bereich',2))
     return [dict(id=id,label=label,url=url,group=group,level=level) for id,label,url,group,level in definitions if level]
 

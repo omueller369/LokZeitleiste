@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..db import database_session
 from ..user_directories import directory_transaction
-from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto
+from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto, EmployeeEmail
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password, account_active
 from .access import MODULES, check_delegation, demand, password_required, permissions
@@ -14,10 +14,11 @@ from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
 
 
 def account_dependency(origin):
-    def account(request: Request, admin_session: str | None = Cookie(default=None),
+    def account(request: Request, tf_session: str | None = Cookie(default=None), admin_session: str | None = Cookie(default=None),
                 authorization: str | None = Header(default=None), db: Session = Depends(database_session)):
         bearer = authorization and authorization.startswith('Bearer ')
-        token = authorization.removeprefix('Bearer ').strip() if bearer else admin_session
+        area=request.headers.get('X-CTL-Area')
+        token = authorization.removeprefix('Bearer ').strip() if bearer else (tf_session if area=='tf' else admin_session if area=='backend' else (tf_session or admin_session) if request.url.path.startswith('/api/v1/tf/') else admin_session or tf_session)
         user = user_from_token(db,token)
         if not user:
             raise HTTPException(401,'Anmeldung erforderlich')
@@ -41,8 +42,8 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         if not user or not account_active(db,user) or not verify_password(data.password,user.password_hash):
             raise HTTPException(401,'Anmeldung fehlgeschlagen')
         token = issue_token(db,user)
-        response.set_cookie('admin_session',token,httponly=True,secure=cookie_secure,samesite='strict',path='/',max_age=365*24*3600)
-        return {'username':user.username,'role':user.role,'password_change_required':password_required(db,user)}
+        response.set_cookie('tf_session' if user.role=='tf' else 'admin_session',token,httponly=True,secure=cookie_secure,samesite='strict',path='/',max_age=365*24*3600)
+        return {'access_token':token,'username':user.username,'role':user.role,'password_change_required':password_required(db,user)}
 
     def identity(db,user):
         return {'id':user.id,'username':user.username,'role':user.role,
@@ -69,15 +70,15 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         db.add(AccountAudit(actor_id=user.id,target_id=user.id,action='password_changed'))
         db.commit()
         if not authorization or not authorization.startswith('Bearer '):
-            response.delete_cookie('admin_session',path='/')
+            response.delete_cookie('tf_session' if user.role=='tf' else 'admin_session',path='/')
         return {'changed':True,'login_required':True}
 
     @router.post('/api/v1/account/logout')
-    def logout(response: Response, admin_session: str | None = Cookie(default=None),
+    def logout(response: Response, tf_session: str | None = Cookie(default=None), admin_session: str | None = Cookie(default=None),
                authorization: str | None = Header(default=None), user: User = Depends(account),db: Session = Depends(database_session)):
-        raw = authorization.removeprefix('Bearer ').strip() if authorization and authorization.startswith('Bearer ') else admin_session
+        raw = authorization.removeprefix('Bearer ').strip() if authorization and authorization.startswith('Bearer ') else (tf_session if user.role=='tf' else admin_session)
         if raw: revoke_token(db,raw)
-        response.delete_cookie('admin_session',path='/')
+        response.delete_cookie('tf_session' if user.role=='tf' else 'admin_session',path='/')
         return {'ok':True}
 
     @router.get('/api/v1/admin/me')
@@ -93,7 +94,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         addresses = db.scalars(select(StaffAddress).where(StaffAddress.user_id == user.id).order_by(StaffAddress.id)).all()
         return {'id':user.id,'username':user.username,'active':user.active,
                 **{key:getattr(profile,key) for key in ('first_name','last_name','nationality','cost_center')},
-                'birth_date':profile.birth_date.isoformat(),'has_photo':db.get(ProfilePhoto,user.id) is not None,
+                'email':(db.get(EmployeeEmail,user.id).address if db.get(EmployeeEmail,user.id) else ''),'birth_date':profile.birth_date.isoformat(),'has_photo':db.get(ProfilePhoto,user.id) is not None,
                 'addresses':[{key:getattr(a,key) for key in ('street','house_number','postal_code','city')} for a in addresses],
                 'permissions':permissions(db,user),'password_change_required':password_required(db,user)}
 
@@ -127,6 +128,10 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
             db.flush()
             save_profile(db,user,profile,data)
             save_photo(db,user.id,image)
+            from ..employee_mail import save_email,suggest,domains
+            available=domains(db)
+            address=str(data.email) if data.email else suggest(db,data.first_name,data.last_name,data.birth_date,available[0].name,user.id) if available else None
+            if address:save_email(db,user,address,data.initial_password)
             db.add(AccountPolicy(user_id=user.id,must_change_password=True))
             db.add(AccountAudit(actor_id=actor.id,target_id=user.id,action='staff_created'))
             with directory_transaction(user,creating=True):
@@ -147,6 +152,9 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         check_delegation(db,actor,data.permissions,user)
         image=decode_photo(data.photo_base64)
         save_profile(db,user,profile,data)
+        if data.email:
+            from ..employee_mail import save_email
+            save_email(db,user,str(data.email))
         save_photo(db,user.id,image)
         # Rechteänderungen beenden alle Sitzungen; erneute Anmeldung übernimmt die Freigaben.
         db.execute(delete(SessionToken).where(SessionToken.user_id == user.id))

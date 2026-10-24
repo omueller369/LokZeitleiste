@@ -7,14 +7,17 @@ set -Eeuo pipefail
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 script_file="$script_dir/$(basename -- "${BASH_SOURCE[0]}")"
 resume=false
+update=false
 source_dir=''
 while (($#));do
  case "$1" in
   --resume) resume=true;shift ;;
+  --update) update=true;resume=true;shift ;;
   --source) (($#>=2)) || { echo '--source benötigt einen Pfad.' >&2;exit 2; };source_dir=$2;shift 2 ;;
   --help|-h)
-   echo 'sudo bash install-ctlsoftware-test.sh [--resume] [--source /Pfad/zum/Projekt]'
-   echo 'Nur frisches Ubuntu 26.04! Installiert Apache, MariaDB, BIND, Postfix/Dovecot und CTL-Testdaten.'
+   echo 'sudo bash install-ctlsoftware-test.sh [--resume|--update] [--source /Pfad/zum/Projekt]'
+   echo 'Neuinstallation: frisches Ubuntu 26.04. --update: vorhandenen eigenen CTL-Testserver aktualisieren.'
+   echo 'Installiert Apache, MariaDB, lokales BIND, Postfix/Dovecot, Mitarbeiterpostfächer und CTL-Testdaten.'
    echo 'Domain: ctl-software.io-goerlitz.eu | IPv4: 212.227.86.251 | DB: db_ctl | Benutzer: dbo_ctl'
    echo 'Das neue Datenbankpasswort wird verdeckt abgefragt.'
    exit 0 ;;
@@ -22,7 +25,7 @@ while (($#));do
  esac
 done
 if ((EUID!=0));then
- args=();[[ $resume == false ]] || args+=(--resume);[[ -z $source_dir ]] || args+=(--source "$source_dir")
+ args=();[[ $update == false ]] || args+=(--update);[[ $resume == false ]] || args+=(--resume);[[ -z $source_dir ]] || args+=(--source "$source_dir")
  exec sudo -- bash "$script_file" "${args[@]}"
 fi
 umask 022
@@ -60,6 +63,7 @@ cat > "$work_dir/ispconfig_app.py" <<'CTL_FRESH_APP_HELPER'
 text=header+(ROOT/'setup/ispconfig_app.py').read_text()+"CTL_FRESH_APP_HELPER\ncat > \"$work_dir/ispconfig_install.py\" <<'CTL_FRESH_ENGINE'\n"+(ROOT/'setup/ispconfig_install.py').read_text()+"CTL_FRESH_ENGINE\ncat > \"$work_dir/fresh_ubuntu.py\" <<'CTL_FRESH_SERVER'\n"+(ROOT/'setup/fresh_ubuntu.py').read_text()+r'''CTL_FRESH_SERVER
 args=(--engine "$work_dir/ispconfig_install.py")
 [[ $resume == false ]] || args+=(--resume)
+[[ $update == false ]] || args+=(--update)
 [[ -z $source_dir ]] || args+=(--source "$source_dir")
 python3 "$work_dir/fresh_ubuntu.py" "${args[@]}"
 '''

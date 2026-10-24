@@ -4,7 +4,7 @@ from typing import Literal
 from pathlib import Path
 from fastapi import APIRouter,Depends,HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel,Field,field_validator
+from pydantic import BaseModel,Field,field_validator,EmailStr,TypeAdapter
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -31,7 +31,9 @@ class Input(BaseModel):
     @field_validator('email','hotline_email')
     @classmethod
     def valid_email(cls,value):
-        if value and not re.fullmatch(r'[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+',value):raise ValueError('Bitte eine gültige Emailadresse eingeben.')
+        if value:
+            try:return str(TypeAdapter(EmailStr).validate_python(value))
+            except ValueError:raise ValueError('Bitte eine gültige Emailadresse eingeben.')
         return value
 
 class Update(Input):

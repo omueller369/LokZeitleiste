@@ -30,18 +30,18 @@ def create_router(require_account):
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
     @router.get('/tf/bahnhoefe')
-    def page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
-        user=user_from_token(db,admin_session)
-        if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)
-        if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
+    def page(tf_session:str|None=Cookie(default=None),admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+        user=user_from_token(db,tf_session or admin_session)
+        if not user or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
+        if user.role!='tf':return RedirectResponse('/account?area=tf',status_code=303)
         return FileResponse(STATIC/'tf-portal.html',headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/loco-handover')
     @router.get('/tf/lokuebergabebuch')
-    def handover_page(admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
-        user=user_from_token(db,admin_session)
-        if not user or password_required(db,user):return RedirectResponse('/account',status_code=303)
-        if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
+    def handover_page(tf_session:str|None=Cookie(default=None),admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+        user=user_from_token(db,tf_session or admin_session)
+        if not user or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
+        if user.role!='tf':return RedirectResponse('/account?area=tf',status_code=303)
         html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
         return HTMLResponse(html,headers={'Cache-Control':'no-store'})
 

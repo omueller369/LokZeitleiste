@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="de"><head><script src="/auth-session.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LokZeitleiste · Administration</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eef3f5;color:#193044;font:15px system-ui,sans-serif}
@@ -34,4 +34,4 @@ button{cursor:pointer;background:#17445b;color:white;border:0;border-radius:8px;
 <label>TF-Typ<select name="driver_type"><option value="route">Strecken-TF</option><option value="border">Grenz-TF</option><option value="both">Grenz- und Strecken-TF</option></select></label><div id="tfPhotoSelection" class="photo-editor"></div><p id="tfMessage"></p><button>Tf anlegen</button></form></div>
 <div id="employeeCard" class="card"><h2>Tf-Übersicht</h2><label>TF-Typ<select id="tfTypeFilter"><option value="">Alle</option><option value="border">Grenz-TF</option><option value="route">Strecken-TF</option><option value="both">Grenz- und Strecken-TF</option></select></label><table><thead><tr><th>Name</th><th>Personalnr.</th><th>TF-Nummer</th><th>TF-Typ</th><th>E-Mail-Adresse</th><th>Aktionen</th></tr></thead><tbody id="users"></tbody></table>
 <div id="months" class="muted" style="margin-top:22px">Wähle einen Tf für die Monatsdaten.</div></div></div></section></main>
-<script src="/admin/photo-ui.js"></script><script src="/admin/tf-profile-ui.js"></script><script src="/admin/overtime-ui.js?v=20261020-1"></script><script src="/admin/admin.js?v=20261020-overtime-1"></script></body></html>
+<script src="/admin/photo-ui.js"></script><script src="/admin/tf-profile-ui.js"></script><script src="/employee-mail.js"></script><script src="/admin/admin.js"></script></body></html>

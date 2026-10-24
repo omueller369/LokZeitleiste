@@ -144,3 +144,7 @@ Für die komplette Neuinstallation gilt ausschließlich `ctl-software.io-goerlit
 ## Roundcube und PHP 8.5
 
 Bei älteren Ubuntu-Roundcube-Paketen kann `Cannot redeclare function array_first()` auftreten. Eine zusätzliche, auch beim Fortsetzen ausgeführte Setup-Stufe ergänzt den upstream-Guard `function_exists`, sichert die Originaldatei unter `/etc/ctlsoftware-test-setup/original-configs/` und prüft die PHP-Syntax. Bereits korrigierte Versionen bleiben unverändert. Paketupdates können den lokalen Patch ersetzen; aktuelle kompatible Paketversionen sind dauerhaft vorzuziehen. Die Stufe setzt außerdem den globalen Apache-ServerName. Bei einem am Abschlusscheck gestoppten Setup das neue Script laden und mit `--resume` fortsetzen.
+
+## Mitarbeiterpostfächer und Update
+
+Die neuen persönlichen Demo-Postfächer, die Domainliste und das Update des bestehenden Testservers mit `--update` sind in [EMPLOYEE-MAIL-UPDATE.md](EMPLOYEE-MAIL-UPDATE.md) beschrieben. Persönliche Postfächer werden nicht an Gmail weitergeleitet. Die oben genannten vier Funktionskonten bleiben unverändert.

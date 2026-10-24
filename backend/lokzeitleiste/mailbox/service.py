@@ -127,6 +127,7 @@ def send(account, data):
     msg = EmailMessage()
     msg['From'] = account.address
     msg['To'] = ', '.join(str(a) for a in data.to)
+    if getattr(data,'cc',[]):msg['Cc'] = ', '.join(str(a) for a in data.cc)
     msg['Subject'] = data.subject
     msg['Date'] = email.utils.formatdate(localtime=True)
     msg['Message-ID'] = email.utils.make_msgid()
@@ -158,7 +159,8 @@ def send(account, data):
                 token=access_token(account)
                 client.auth('XOAUTH2',lambda challenge=None:'' if challenge else 'user='+username+'\x01auth=Bearer '+token+'\x01\x01')
             else:client.login(username,password(account))
-            refused=client.send_message(msg)
+            recipients=[str(a) for a in [*data.to,*getattr(data,'cc',[]),*getattr(data,'bcc',[])]]
+            refused=client.send_message(msg,to_addrs=recipients) if getattr(data,'cc',[]) or getattr(data,'bcc',[]) else client.send_message(msg)
             if refused:
                 raise HTTPException(502,'Mindestens ein Empfänger wurde abgelehnt. Zustellung kann teilweise erfolgt sein; Empfänger vor erneutem Senden prüfen.')
     except (smtplib.SMTPException,OSError,ValueError) as exc:

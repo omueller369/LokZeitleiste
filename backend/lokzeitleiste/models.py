@@ -634,3 +634,25 @@ class LocoHandoverAttachmentChunk(Base):
     attachment_id:Mapped[int]=mapped_column(ForeignKey('loco_handover_attachments.id',ondelete='CASCADE'),primary_key=True)
     position:Mapped[int]=mapped_column(Integer,primary_key=True)
     content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+
+
+class EmailDomain(Base):
+    __tablename__ = 'email_domains'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(253), unique=True, nullable=False)
+
+
+class EmployeeEmail(Base):
+    __tablename__ = 'employee_emails'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    address: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
+    managed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+
+class MailboxProvision(Base):
+    __tablename__ = 'mailbox_provisions'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), primary_key=True)
+    address: Mapped[str] = mapped_column(String(320), unique=True, nullable=False)
+    password_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default='pending', nullable=False)
+    error: Mapped[str] = mapped_column(String(200), default='', nullable=False)

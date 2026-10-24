@@ -34,7 +34,7 @@ class FreshUbuntuTest(unittest.TestCase):
         self.assertNotIn('ssl_cert =',dovecot);self.assertNotIn('plugin {',dovecot)
         self.assertEqual(dovecot.count('{'),dovecot.count('}'))
         postfix=fresh.postfix_config();self.assertIn('reject_unauth_destination',postfix)
-        self.assertIn('virtual_mailbox_domains = '+fresh.DOMAIN,postfix)
+        self.assertIn('virtual_mailbox_domains = hash:/etc/postfix/ctl-domains',postfix)
         self.assertIn('recipient_canonical_classes = envelope_recipient\n',postfix)
         self.assertIn('smtpd_sasl_auth_enable = no',postfix)
         submission=fresh.postfix_submission();self.assertIn('smtpd_tls_security_level=encrypt',submission)
@@ -101,7 +101,7 @@ class FreshUbuntuTest(unittest.TestCase):
             with patch.object(fresh,'STATE',state),patch.object(fresh,'output',side_effect=a_only),patch.object(fresh,'local_dkim',return_value='v=DKIM1; p=key'):
                 with self.assertRaisesRegex(ValueError,'MX muss'):fresh.public_dns_check()
     def test_resume_does_not_repeat_completed_database_stage(self):
-        names=['prepare_packages','prepare_hostname','prepare_firewall','prepare_database','prepare_php_apps','prepare_dns','public_dns_check','prepare_certificate','prepare_mail','prepare_application','finish_web','repair_roundcube_php85','verify']
+        names=['prepare_packages','prepare_hostname','prepare_firewall','prepare_database','prepare_php_apps','prepare_dns','public_dns_check','prepare_certificate','prepare_mail','prepare_application','configure_employee_mail','finish_web','repair_roundcube_php85','verify']
         with tempfile.TemporaryDirectory() as folder:
             state=Path(folder);(state/'database-password').write_text('existing-password')
             mocks={name:Mock() for name in names};mocks['public_dns_check'].side_effect=ValueError('DNS records missing')

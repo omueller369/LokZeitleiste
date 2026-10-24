@@ -39,9 +39,9 @@ def require_tf(request: Request, authorization: str | None = Header(default=None
     return user
 
 
-def require_admin(request: Request, admin_session: str | None = Cookie(default=None),
+def require_admin(request: Request, authorization: str | None = Header(default=None), admin_session: str | None = Cookie(default=None),
                   db: Session = Depends(database_session)) -> User:
-    user = user_from_token(db, admin_session)
+    user = user_from_token(db, authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else admin_session)
     if not user or user.role not in ("admin", "staff"):
         raise HTTPException(401, "Admin-Anmeldung erforderlich")
     if request.method not in ("GET", "HEAD") and PUBLIC_ORIGIN and request.headers.get("origin") != PUBLIC_ORIGIN:
@@ -75,14 +75,15 @@ def admin_login(credentials: Credentials, request: Request, response: Response, 
     token = issue_token(db, user)
     response.set_cookie("admin_session", token, httponly=True, secure=COOKIE_SECURE,
                         samesite="strict", max_age=365 * 24 * 3600, path="/")
-    return {"username": user.username, "role":user.role, "password_change_required":password_required(db,user)}
+    return {"access_token":token,"username": user.username, "role":user.role, "password_change_required":password_required(db,user)}
 
 
 @app.post("/api/v1/admin/logout")
-def admin_logout(response: Response, admin_session: str | None = Cookie(default=None),
+def admin_logout(response: Response, authorization: str | None = Header(default=None), admin_session: str | None = Cookie(default=None),
                  _: User = Depends(require_admin), db: Session = Depends(database_session)):
-    if admin_session:
-        revoke_token(db, admin_session)
+    raw=authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else admin_session
+    if raw:
+        revoke_token(db, raw)
     response.delete_cookie("admin_session", path="/")
     return {"ok": True}
 
@@ -110,6 +111,8 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
         db.add(TfDutyProfile(user_id=user.id,driver_type=data.driver_type))
         if data.bahncard and data.bahncard_valid_until is not None:
             db.add(TfBahnCardValidity(user_id=user.id, valid_until=data.bahncard_valid_until))
+        from .employee_mail import save_email
+        save_email(db,user,str(data.email),data.password)
         save_details(db,user,data)
         save_photo(db,user.id,image)
         with directory_transaction(user,creating=True):
@@ -117,7 +120,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
         return {"id": user.id, "username": user.username}
     except IntegrityError:
         db.rollback()
-        raise HTTPException(409, "TF-Nummer oder Personalnummer bereits vorhanden")
+        raise HTTPException(409, "TF-Nummer, Personalnummer oder E-Mail-Adresse bereits vorhanden")
 
 
 @app.get("/api/v1/admin/tf")
@@ -165,13 +168,15 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
             role=db.get(TfDutyProfile,tf_id)
             if not role:role=TfDutyProfile(user_id=tf_id);db.add(role)
             role.driver_type=data.driver_type
+        from .employee_mail import save_email
+        save_email(db,user,str(data.email))
         save_details(db,user,data)
         save_photo(db,tf_id,image)
         with directory_transaction(user,previous_username):
             db.commit()
         return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
     except IntegrityError as exc:
-        db.rollback();raise HTTPException(409,'TF-Nummer oder Personalnummer bereits vergeben') from exc
+        db.rollback();raise HTTPException(409,'TF-Nummer, Personalnummer oder E-Mail-Adresse bereits vergeben') from exc
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")
@@ -180,7 +185,8 @@ def update_tf_delivery(tf_id: int, data: TfDeliveryUpdate, _: User = Depends(req
     profile = db.get(TfProfile, tf_id)
     if not profile or not db.get(User, tf_id) or db.get(User, tf_id).role != "tf":
         raise HTTPException(404, "Tf nicht gefunden")
-    profile.email = str(data.email)
+    from .employee_mail import save_email
+    save_email(db,db.get(User,tf_id),str(data.email))
     profile.federal_state = data.federal_state
     db.commit()
     return {"id": tf_id, "email": profile.email, "federal_state": profile.federal_state}
@@ -645,6 +651,8 @@ from .gps import create_router as gps_router
 app.include_router(gps_router(require_account))
 
 from .app_defaults import create_router as app_defaults_router
+from .employee_mail import create_router as employee_mail_router
+app.include_router(employee_mail_router(require_admin))
 app.include_router(app_defaults_router(require_admin,require_account))
 
 from .planning.collective import create_router as collective_planning_router
@@ -672,3 +680,10 @@ app.include_router(loco_handover_defaults_router(require_admin))
 
 from .handover_protocols import create_router as handover_protocols_router
 app.include_router(handover_protocols_router(require_admin,require_account))
+
+
+@app.get("/")
+def public_landing():return FileResponse(Path(__file__).parent/"static"/"landing.html")
+
+@app.get("/auth-session.js")
+def tab_auth_script():return FileResponse(Path(__file__).parent/"static"/"auth-session.js",media_type="text/javascript",headers={"Cache-Control":"no-cache"})

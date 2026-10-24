@@ -9,7 +9,7 @@
   const form=node('form'),label=field(form,title,limit),save=node('button','Hinzufügen'),fresh=node('button','Neu'),actions=node('div');label.required=true;save.type='submit';fresh.type='button';actions.className='actions';actions.append(save,fresh);actions.hidden=level<2;let current=null;
   const fields={label};
   function reset(){current=null;form.reset();save.textContent=t('Hinzufügen');}
-  function load(row){current=row;for(const [key,input] of Object.entries(fields))input.value=row[key]||'';save.textContent=t('Speichern');}
+  function load(row){current=row;for(const [key,input] of Object.entries(fields)){input.value=row[key]||'';if(key==='email')window.employeeEmailField?.(input)?.catch(e=>message.textContent=e.message);}save.textContent=t('Speichern');}
   fresh.onclick=()=>{reset();if(kind==='category'){selectedCategory=null;draw();}};
   form.onsubmit=async event=>{event.preventDefault();if(busy||level<2||!form.reportValidity())return;if(kind==='damage'&&!selectedCategory)return;
    const data=Object.fromEntries(Object.entries(fields).map(([key,input])=>[key,input.value]));if(kind==='damage')data.parent_id=selectedCategory;if(current)data.expected_revision=current.revision;
@@ -28,6 +28,7 @@
   const current=categories.find(r=>r.id===selectedCategory);if(current){c.load(current);select.value=String(current.id);}
   if(categories.length){const damage=node('div'),d=editor(damage,'damage','Eingrenzung der Schadstelle',255);d.form.append(d.actions);if(!current){d.fields.label.disabled=true;d.actions.hidden=true;damage.append(node('p','Bitte zuerst eine vorhandene Kategorie auswählen.'));}picker(damage,rows.filter(r=>r.kind==='damage'&&r.parent_id===selectedCategory),row=>{if(row)d.load(row);},true);category.append(damage);}
   root.append(category);
+  root.querySelectorAll('input[type=email]').forEach(input=>window.employeeEmailField?.(input)?.catch(e=>message.textContent=e.message));
  }
  try{const me=await api('/api/v1/admin/me');level=me.permissions.app_defaults||0;if(!level){root.hidden=true;return;}rows=await api(base);draw();}catch(error){message.textContent=t(error.message);}
 })();

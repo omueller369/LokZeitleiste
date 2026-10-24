@@ -1,5 +1,5 @@
 from datetime import date
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import EmailStr, BaseModel, Field, field_validator, model_validator
 from .access import MODULES
 
 
@@ -18,6 +18,7 @@ class AddressIn(BaseModel):
 
 
 class StaffIn(BaseModel):
+    email: EmailStr | None = None
     photo_base64: str | None = Field(default=None,max_length=6990510)
     first_name: str = Field(min_length=1,max_length=120)
     last_name: str = Field(min_length=1,max_length=120)
