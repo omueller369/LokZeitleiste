@@ -18,6 +18,9 @@ class BackendStartTest(unittest.TestCase):
         response=self.client.get('/api/v1/admin/start');self.assertEqual(response.status_code,200,response.text)
         ids={row['id'] for row in response.json()['modules']}
         self.assertTrue({'tf','staff','directory','planning','shifts','vehicles','app_defaults','reports','documents','password'}<=ids)
+        tools=response.json()['admin_tools']
+        self.assertEqual({row['url'] for row in tools},{'/phpmyadmin','/webmailer'})
+        self.assertTrue(all(row['new_tab'] for row in tools))
         self.assertIn('no-store',response.headers['cache-control'])
         self.assertNotIn('start',self.client.get('/api/v1/admin/me').json()['permissions'])
         self.assertEqual(self.client.get('/admin/start').status_code,200)
@@ -27,7 +30,7 @@ class BackendStartTest(unittest.TestCase):
     def test_no_grants_still_has_personal_modules(self):
         _,staff=self.active_staff({},'start-empty')
         response=staff.get('/api/v1/admin/start');self.assertEqual(response.status_code,200,response.text)
-        data=response.json();self.assertEqual({r['id'] for r in data['modules']},{'documents','password','own_time'})
+        data=response.json();self.assertEqual(data['admin_tools'],[]);self.assertEqual({r['id'] for r in data['modules']},{'documents','password','own_time'})
         self.assertEqual(data['name'],'Mira Büro')
         self.assertTrue(all(row['group']=='Mein Bereich' for row in data['modules']))
 
@@ -51,3 +54,12 @@ class BackendStartTest(unittest.TestCase):
         self.assertEqual(anonymous.get('/api/v1/admin/start').status_code,401)
         self.create_staff({},'start-new');staff,_=self.staff_login('start-new')
         self.assertEqual(staff.get('/api/v1/admin/start').status_code,403)
+
+    def test_staff_with_all_permissions_is_not_administrator(self):
+        from lokzeitleiste.accounts.access import MODULES
+        _,staff=self.active_staff({key:3 for key in MODULES},'start-all-staff')
+        response=staff.get('/api/v1/admin/start')
+        self.assertEqual(response.status_code,200,response.text)
+        data=response.json()
+        self.assertEqual(data['admin_tools'],[])
+        self.assertFalse({'phpmyadmin','webmailer'} & {row['id'] for row in data['modules']})

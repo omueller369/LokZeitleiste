@@ -30,7 +30,7 @@ def start_modules(user,p):
     ]
     if user.role=='admin':definitions.extend([('phpmyadmin','phpMyAdmin','/phpmyadmin','Administration',3),('webmailer','Webmailer','/webmailer','Administration',3)])
     if user.role=='staff':definitions.append(('own_time','Meine Arbeitszeiten','/my/worktime','Mein Bereich',2))
-    return [dict(id=id,label=label,url=url,group=group,level=level) for id,label,url,group,level in definitions if level]
+    return [dict(id=id,label=label,url=url,group=group,level=level,new_tab=id in ('phpmyadmin','webmailer')) for id,label,url,group,level in definitions if level]
 
 
 def create_router(require_admin):
@@ -45,6 +45,7 @@ def create_router(require_admin):
     def data(user=Depends(require_admin),db:Session=Depends(database_session)):
         profile=db.get(StaffProfile,user.id) if user.role=='staff' else None
         name=(profile.first_name+' '+profile.last_name).strip() if profile else user.username
-        return dict(name=name,modules=start_modules(user,permissions(db,user)))
+        modules=start_modules(user,permissions(db,user))
+        return dict(name=name,modules=modules,admin_tools=[row for row in modules if row['id'] in ('phpmyadmin','webmailer')] if user.role=='admin' else [])
     return router
 
