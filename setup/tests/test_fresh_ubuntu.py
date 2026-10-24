@@ -24,6 +24,13 @@ class FreshUbuntuTest(unittest.TestCase):
         self.assertEqual(fresh.roundcube_php85_patch('<?php // no polyfill'), '<?php // no polyfill')
         with self.assertRaises(ValueError):fresh.roundcube_php85_patch('<?php function array_first($x) {}')
 
+    def test_backend_readiness_retries_startup_and_reports_persistent_failure(self):
+        replies=[SimpleNamespace(returncode=7,stdout=''),SimpleNamespace(returncode=0,stdout='{"status":"ok"}')]
+        with patch.object(fresh.subprocess,'run',side_effect=replies) as run,patch.object(fresh.time,'sleep') as sleep:
+            fresh.wait_for_backend();self.assertEqual(run.call_count,2);sleep.assert_called_once_with(1)
+        with patch.object(fresh.subprocess,'run',return_value=SimpleNamespace(returncode=7,stdout='')),patch.object(fresh.time,'sleep'):
+            with self.assertRaisesRegex(ValueError,'journalctl'):fresh.wait_for_backend()
+
     def test_fixed_identity_and_secure_service_configs(self):
         self.assertEqual(fresh.DOMAIN,'ctl-software.io-goerlitz.eu');self.assertEqual(fresh.IP,'212.227.86.251')
         self.assertEqual(fresh.DB_USER,'dbo_ctl');self.assertEqual(fresh.DB_NAME,'db_ctl')

@@ -637,7 +637,20 @@ systemctl reload apache2 postfix dovecot
     run(['systemctl','enable','--now','certbot.timer'])
 
 
+def wait_for_backend():
+    # systemctl restart returns before Uvicorn has completed importing the app.
+    for attempt in range(15):
+        result=subprocess.run(['curl','--fail','--silent','--show-error','--max-time','2','http://127.0.0.1:18080/health'],capture_output=True,text=True)
+        if result.returncode==0:
+            try:
+                if json.loads(result.stdout).get('status')=='ok':return
+            except (ValueError,AttributeError):pass
+        if attempt<14:time.sleep(1)
+    raise ValueError('Backend auf 127.0.0.1:18080 nicht bereit. Prüfen: sudo journalctl -u ctlsoftware-test -n 100 --no-pager')
+
+
 def verify():
+    wait_for_backend()
     version=(STATE/'php-version').read_text().strip()
     run(['systemctl','is-active','--quiet',f'php{version}-fpm'])
     for path,marker in (('/phpmyadmin/','phpMyAdmin'),('/webmailer/','_token')):
