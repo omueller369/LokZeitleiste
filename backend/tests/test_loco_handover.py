@@ -65,7 +65,7 @@ class LocoHandoverTest(unittest.TestCase):
         detail=reader.get(path);self.assertEqual(detail.status_code,200,detail.text)
         self.assertEqual(detail.json()['vehicle_number'],'00 01 0002 003-4')
         self.assertEqual(detail.json()['series'],'Testserie')
-        self.assertEqual(set(detail.json()),{'id','vehicle_number','name','series','status','status_label','status_color','status_note'})
+        self.assertEqual(set(detail.json()),{'id','vehicle_number','name','series','status','status_label','status_color','status_note','leasing_company','leasing_email','hotline'})
         self.assertEqual(detail.json()['status_note'],'')
         for revision,(status,note,color) in enumerate([('limited','Nur Rangieren','#fff0b3'),('unavailable','Defekt','#ffdada'),('ready','Resttext','#d9f2df')],1):
             updated=self.client.put('/api/v1/admin/vehicles/'+str(row['id']),json=self.data(vehicle_number=row['vehicle_number'],expected_revision=revision,status=status,status_note=note))

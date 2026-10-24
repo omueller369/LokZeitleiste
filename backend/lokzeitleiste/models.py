@@ -656,3 +656,27 @@ class MailboxProvision(Base):
     password_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[str] = mapped_column(String(20), default='pending', nullable=False)
     error: Mapped[str] = mapped_column(String(200), default='', nullable=False)
+
+
+class LeasingCompany(Base):
+    __tablename__='leasing_companies'
+    seed_key:Mapped[str|None]=mapped_column(String(40),unique=True,nullable=True)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    company:Mapped[str]=mapped_column(String(200),unique=True,nullable=False)
+    contact:Mapped[str]=mapped_column(String(200),default='',nullable=False)
+    street:Mapped[str]=mapped_column(String(255),default='',nullable=False)
+    postal_code:Mapped[str]=mapped_column(String(7),default='',nullable=False)
+    city:Mapped[str]=mapped_column(String(200),default='',nullable=False)
+    country:Mapped[str]=mapped_column(String(2),default='DE',nullable=False)
+    email:Mapped[str]=mapped_column(String(254),default='',nullable=False)
+    phone:Mapped[str]=mapped_column(String(60),default='',nullable=False)
+    mobile:Mapped[str]=mapped_column(String(60),default='',nullable=False)
+    hotline:Mapped[str]=mapped_column(String(60),default='',nullable=False)
+    notes:Mapped[str]=mapped_column(Text,default='',nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,default=1,nullable=False)
+
+
+class VehicleLeasing(Base):
+    __tablename__='vehicle_leasing'
+    vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),primary_key=True)
+    company_id:Mapped[int]=mapped_column(ForeignKey('leasing_companies.id'),nullable=False,index=True)

@@ -16,6 +16,8 @@ def main():
     with Session(engine()) as db:
         from .app_defaults import ensure_defaults
         ensure_defaults(db)
+        from .leasing import seed_and_migrate
+        seed_and_migrate(db)
         ensure_gender_column(db)
         migrate_existing(db)
         migrate_legacy_gender(db)

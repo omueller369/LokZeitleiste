@@ -45,7 +45,7 @@ class HandoverDefaultsTest(unittest.TestCase):
         self.assertEqual({r['parent_id'] for r in rows if r['kind']=='damage'},{a['id'],b['id']})
     def test_validation_and_grants(self):
         pzb=self.add('pzb',label='Test')
-        for kind,data in [('pzb',{'label':'x'*256}),('pzb',{'label':'  '}),('recipient',{'label':'X'}),('recipient',{'label':'X','email':'invalid'}),('category',{'label':'x'*101}),('category',{'label':'X','hotline_name':'Nur Name'}),('category',{'label':'X','hotline_name':'Hotline','hotline_email':'no'}),('damage',{'label':'X'}),('damage',{'label':'X','parent_id':999999}),('damage',{'label':'X','parent_id':pzb['id']}),('pzb',{'label':'X','parent_id':pzb['id']})]:
+        for kind,data in [('pzb',{'label':'x'*256}),('pzb',{'label':'  '}),('recipient',{'label':'X'}),('recipient',{'label':'X','email':'invalid'}),('category',{'label':'x'*101}),('category',{'label':'X','hotline_name':'Hotline','hotline_email':'no'}),('damage',{'label':'X'}),('damage',{'label':'X','parent_id':999999}),('damage',{'label':'X','parent_id':pzb['id']}),('pzb',{'label':'X','parent_id':pzb['id']})]:
             response=self.client.post(BASE+'/'+kind,json=data);self.assertEqual(response.status_code,422,(kind,data,response.text))
         _,reader=self.active_staff({'app_defaults':1},'handover-default-reader')
         self.assertEqual(reader.get(BASE).status_code,200)

@@ -45,7 +45,6 @@ def view(row):
 def apply(db,row,data):
     if row.kind=='category' and len(data.label)>100:raise HTTPException(422,'Kategorie darf maximal 100 Zeichen enthalten.')
     if row.kind=='recipient' and not data.email:raise HTTPException(422,'Emailadresse ist erforderlich.')
-    if row.kind=='category' and bool(data.hotline_name)!=bool(data.hotline_email):raise HTTPException(422,'Bitte Name Hotline und Emailadresse gemeinsam ausfüllen.')
     if row.kind=='damage':
         parent=db.scalar(select(Value).where(Value.id==data.parent_id,Value.kind=='category').with_for_update())
         if not parent:raise HTTPException(422,'Bitte zuerst eine vorhandene Kategorie auswählen.')
@@ -53,8 +52,10 @@ def apply(db,row,data):
     row.label=data.label;row.label_key=data.label.casefold()
     row.parent_id=data.parent_id if row.kind=='damage' else None;row.scope_id=row.parent_id or 0
     row.email=data.email if row.kind=='recipient' else ''
-    row.hotline_name=data.hotline_name if row.kind=='category' else ''
-    row.hotline_email=data.hotline_email if row.kind=='category' else ''
+    if row.kind=='category':
+        if 'hotline_name' in data.model_fields_set:row.hotline_name=data.hotline_name
+        if 'hotline_email' in data.model_fields_set:row.hotline_email=data.hotline_email
+    else:row.hotline_name=row.hotline_email=''
 
 def save(db,row):
     try:db.commit()

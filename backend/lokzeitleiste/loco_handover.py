@@ -8,6 +8,7 @@ from .db import database_session
 from .models import RailwayVehicle
 from .vehicles import find_vehicles, VEHICLE_STATUSES
 from .tf_portal import driver_dependency
+from .leasing import assigned_company
 
 
 def create_router(require_admin, require_account):
@@ -41,8 +42,12 @@ def create_router(require_admin, require_account):
         row=db.get(RailwayVehicle,vehicle_id)
         if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
         label,color=VEHICLE_STATUSES[row.status]
+        company=assigned_company(db,row.id)
         return dict(id=row.id,vehicle_number=row.vehicle_number,name=row.name,series=row.series,
                     status=row.status,status_label=label,status_color=color,
-                    status_note=row.status_note if row.status!='ready' else '')
+                    status_note=row.status_note if row.status!='ready' else '',
+                    leasing_company=company.company if company else row.lessor,
+                    leasing_email=company.email if company else '',
+                    hotline=company.hotline if company else row.hotline)
 
     return router

@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from ..models import AccountPolicy, ModulePermission, User
 
-MODULES = {"loco_handover":"Lokübergabebuch", "app_defaults":"App Grundwerte", "vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
+MODULES = {"leasing":"Lok-Leasing", "loco_handover":"Lokübergabebuch", "app_defaults":"App Grundwerte", "vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
            "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
            "staff":"Verwaltungsmitarbeiter und Berechtigungen", "directory":"Verwaltung: alle Mitarbeiter",
            "shifts":"Schichtmodelle und Zuweisungen", "email":"Mitarbeiter-E-Mail"}
@@ -43,6 +43,9 @@ def redact_plan(db,user,summary):
 
 def authorize_route(db, user, request):
     path, method = request.url.path.rstrip('/'), request.method
+    if path=='/api/v1/admin/leasing' or path.startswith('/api/v1/admin/leasing/'):
+        if method=='GET' and permissions(db,user).get('vehicles',0):return demand(db,user,'vehicles',1)
+        return demand(db,user,'leasing',1 if method=='GET' else 2)
     if path=='/api/v1/admin/loco-handover' or path.startswith('/api/v1/admin/loco-handover/'):
         return demand(db,user,'loco_handover',1 if method=='GET' else 2)
     if path.startswith('/api/v1/admin/planning/collective/'):

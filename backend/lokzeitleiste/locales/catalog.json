@@ -1403,7 +1403,17 @@
     "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.",
     "Hotelübergang": "Hotelübergang",
     "Ort (optional)": "Ort (optional)",
-    "DS100, Bahnhofsname oder Freitext": "DS100, Bahnhofsname oder Freitext"
+    "DS100, Bahnhofsname oder Freitext": "DS100, Bahnhofsname oder Freitext",
+    "Lok-Leasing": "Lok-Leasing",
+    "Lok-Leasing-Firma": "Lok-Leasing-Firma",
+    "Lok-Leasing-Firma · Ansprechpartner · Email": "Lok-Leasing-Firma · Ansprechpartner · Email",
+    "Neu hinzufügen": "Neu hinzufügen",
+    "Straße / Hausnummer": "Straße / Hausnummer",
+    "Zeichen verfügbar": "Zeichen verfügbar",
+    "speichern": "speichern",
+    "abbrechen": "abbrechen",
+    "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Diese Lok-Leasing-Firma ist bereits vorhanden.",
+    "Lok-Leasing-Firma nicht gefunden.": "Lok-Leasing-Firma nicht gefunden."
   },
   "en": {
     "Administration": "Administration",
@@ -2809,7 +2819,17 @@
     "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Discard the guest journey entries? Previously added journeys will be kept.",
     "Hotelübergang": "Hotel stay",
     "Ort (optional)": "Location (optional)",
-    "DS100, Bahnhofsname oder Freitext": "DS100, station name or free text"
+    "DS100, Bahnhofsname oder Freitext": "DS100, station name or free text",
+    "Lok-Leasing": "Locomotive leasing",
+    "Lok-Leasing-Firma": "Locomotive leasing company",
+    "Lok-Leasing-Firma · Ansprechpartner · Email": "Leasing company · Contact · Email",
+    "Neu hinzufügen": "Add new",
+    "Straße / Hausnummer": "Street / house number",
+    "Zeichen verfügbar": "characters remaining",
+    "speichern": "save",
+    "abbrechen": "cancel",
+    "Diese Lok-Leasing-Firma ist bereits vorhanden.": "This leasing company already exists.",
+    "Lok-Leasing-Firma nicht gefunden.": "Leasing company not found."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4023,7 +4043,7 @@
     "TFs (Liste)": "Maszyniści (lista)",
     "TF anlegen": "Dodaj maszynistę",
     "Verwaltungsmitarbeiter (Liste)": "Pracownicy administracji (lista)",
-    "anlegen": "dodaj",
+    "anlegen": "utwórz",
     "TF-Übersicht": "Przegląd maszynistów",
     "App Grundwerte (folgt später)": "Ustawienia domyślne aplikacji (później)",
     "GPS-Aufzeichnung (Browsertest)": "Rejestracja GPS (test w przeglądarce)",
@@ -4215,7 +4235,17 @@
     "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Odrzucić wprowadzone dane przejazdu? Wcześniej dodane przejazdy zostaną zachowane.",
     "Hotelübergang": "Pobyt w hotelu",
     "Ort (optional)": "Miejsce (opcjonalnie)",
-    "DS100, Bahnhofsname oder Freitext": "DS100, nazwa stacji lub dowolny tekst"
+    "DS100, Bahnhofsname oder Freitext": "DS100, nazwa stacji lub dowolny tekst",
+    "Lok-Leasing": "Leasing lokomotyw",
+    "Lok-Leasing-Firma": "Firma leasingowa lokomotyw",
+    "Lok-Leasing-Firma · Ansprechpartner · Email": "Firma leasingowa · Osoba kontaktowa · Email",
+    "Neu hinzufügen": "Dodaj nowy",
+    "Straße / Hausnummer": "Ulica / numer domu",
+    "Zeichen verfügbar": "pozostałych znaków",
+    "speichern": "zapisz",
+    "abbrechen": "anuluj",
+    "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Ta firma leasingowa już istnieje.",
+    "Lok-Leasing-Firma nicht gefunden.": "Nie znaleziono firmy leasingowej."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5429,7 +5459,7 @@
     "TFs (Liste)": "Машинисты (список)",
     "TF anlegen": "Добавить машиниста",
     "Verwaltungsmitarbeiter (Liste)": "Сотрудники администрации (список)",
-    "anlegen": "добавить",
+    "anlegen": "создать",
     "TF-Übersicht": "Обзор машинистов",
     "App Grundwerte (folgt später)": "Базовые настройки приложения (позже)",
     "GPS-Aufzeichnung (Browsertest)": "Запись GPS (тест в браузере)",
@@ -5621,7 +5651,17 @@
     "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Отменить введённые данные поездки? Ранее добавленные поездки сохранятся.",
     "Hotelübergang": "Пребывание в отеле",
     "Ort (optional)": "Место (необязательно)",
-    "DS100, Bahnhofsname oder Freitext": "DS100, название станции или произвольный текст"
+    "DS100, Bahnhofsname oder Freitext": "DS100, название станции или произвольный текст",
+    "Lok-Leasing": "Лизинг локомотивов",
+    "Lok-Leasing-Firma": "Лизинговая компания",
+    "Lok-Leasing-Firma · Ansprechpartner · Email": "Лизинговая компания · Контактное лицо · Email",
+    "Neu hinzufügen": "Добавить",
+    "Straße / Hausnummer": "Улица / номер дома",
+    "Zeichen verfügbar": "символов осталось",
+    "speichern": "сохранить",
+    "abbrechen": "отмена",
+    "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Такая лизинговая компания уже существует.",
+    "Lok-Leasing-Firma nicht gefunden.": "Лизинговая компания не найдена."
   },
   "es": {
     "Administration": "Administración",
@@ -7027,6 +7067,16 @@
     "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "¿Descartar los datos introducidos del viaje? Se conservarán los viajes ya añadidos.",
     "Hotelübergang": "Estancia en hotel",
     "Ort (optional)": "Lugar (opcional)",
-    "DS100, Bahnhofsname oder Freitext": "DS100, nombre de estación o texto libre"
+    "DS100, Bahnhofsname oder Freitext": "DS100, nombre de estación o texto libre",
+    "Lok-Leasing": "Arrendamiento de locomotoras",
+    "Lok-Leasing-Firma": "Empresa de arrendamiento de locomotoras",
+    "Lok-Leasing-Firma · Ansprechpartner · Email": "Empresa · Contacto · Email",
+    "Neu hinzufügen": "Añadir nuevo",
+    "Straße / Hausnummer": "Calle / número",
+    "Zeichen verfügbar": "caracteres disponibles",
+    "speichern": "guardar",
+    "abbrechen": "cancelar",
+    "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Esta empresa ya existe.",
+    "Lok-Leasing-Firma nicht gefunden.": "Empresa no encontrada."
   }
 }

@@ -687,3 +687,6 @@ def public_landing():return FileResponse(Path(__file__).parent/"static"/"landing
 
 @app.get("/auth-session.js")
 def tab_auth_script():return FileResponse(Path(__file__).parent/"static"/"auth-session.js",media_type="text/javascript",headers={"Cache-Control":"no-cache"})
+
+from .leasing import create_router as leasing_router
+app.include_router(leasing_router(require_admin))

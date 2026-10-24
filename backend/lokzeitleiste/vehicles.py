@@ -8,9 +8,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel,Field,field_validator,model_validator
 from sqlalchemy import select,or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,object_session
 from .db import database_session
-from .models import RailwayVehicle,now_utc
+from .models import RailwayVehicle,VehicleLeasing,LeasingCompany,now_utc
+from .leasing import assigned_company,view as company_view
 
 VEHICLE_STATUSES={
     'ready':('Einsatzbereit','#d9f2df'),
@@ -23,6 +24,7 @@ class VehicleInput(BaseModel):
     status:Literal['ready','unavailable','limited']='ready'
     status_note:str=Field(default='',max_length=1024)
     series:str=Field(default='',max_length=120)
+    leasing_company_id:int|None=Field(default=None,ge=1)
     lessor:str=Field(default='',max_length=200)
     hotline:str=Field(default='',max_length=60)
     name:str=Field(default='',max_length=120)
@@ -55,7 +57,10 @@ class VehicleUpdate(VehicleInput):
 
 
 def vehicle_view(row):
-    values={field:getattr(row,field) for field in VehicleInput.model_fields}
+    values={field:getattr(row,field) for field in VehicleInput.model_fields if field!='leasing_company_id'}
+    db=object_session(row);company=assigned_company(db,row.id) if db else None
+    values.update(leasing_company_id=company.id if company else None,leasing_company=company_view(company) if company else None)
+    if company:values.update(lessor=company.company,hotline=company.hotline,leasing_email=company.email)
     values['next_revision']=row.next_revision.isoformat() if row.next_revision else None
     label,color=VEHICLE_STATUSES[row.status]
     return dict(values,id=row.id,revision=row.revision,updated_at=row.updated_at.isoformat(),
@@ -66,7 +71,7 @@ def find_vehicles(db,q="",status=None):
     query=select(RailwayVehicle)
     if q.strip():
         text=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
-        query=query.where(or_(*[field.ilike('%'+text+'%',escape='\\') for field in [RailwayVehicle.vehicle_number,RailwayVehicle.name,RailwayVehicle.series,RailwayVehicle.lessor]]))
+        query=query.where(or_(*[field.ilike('%'+text+'%',escape='\\') for field in [RailwayVehicle.vehicle_number,RailwayVehicle.name,RailwayVehicle.series,RailwayVehicle.lessor]], RailwayVehicle.id.in_(select(VehicleLeasing.vehicle_id).join(LeasingCompany,VehicleLeasing.company_id==LeasingCompany.id).where(LeasingCompany.company.ilike('%'+text+'%',escape='\\')))))
     if status:query=query.where(RailwayVehicle.status==status)
     return db.scalars(query.order_by(RailwayVehicle.vehicle_number)).all()
 
@@ -88,6 +93,20 @@ def create_router(require_admin):
         if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
         return vehicle_view(row)
 
+    def assign(db,row,company_id):
+        company=db.get(LeasingCompany,company_id) if company_id else None
+        if company_id and not company:raise HTTPException(422,'Lok-Leasing-Firma nicht gefunden.')
+        try:db.flush()
+        except IntegrityError as exc:
+            db.rollback();raise HTTPException(409,'Fahrzeugnummer ist bereits vorhanden.') from exc
+        link=db.get(VehicleLeasing,row.id)
+        if company:
+            if link:link.company_id=company.id
+            else:db.add(VehicleLeasing(vehicle_id=row.id,company_id=company.id))
+            row.lessor=company.company;row.hotline=company.hotline
+        elif link:
+            db.delete(link);row.lessor='';row.hotline=''
+
     def commit(db,row):
         try:db.commit()
         except IntegrityError as exc:
@@ -96,7 +115,8 @@ def create_router(require_admin):
 
     @router.post('/api/v1/admin/vehicles',status_code=201,dependencies=[Depends(require_admin)])
     def create(data:VehicleInput,db:Session=Depends(database_session)):
-        row=RailwayVehicle(**data.model_dump(),revision=1,updated_at=now_utc());db.add(row)
+        row=RailwayVehicle(**data.model_dump(exclude={'leasing_company_id'}),revision=1,updated_at=now_utc());db.add(row)
+        assign(db,row,data.leasing_company_id)
         return commit(db,row)
 
     @router.put('/api/v1/admin/vehicles/{vehicle_id}',dependencies=[Depends(require_admin)])
@@ -104,6 +124,7 @@ def create_router(require_admin):
         row=db.scalar(select(RailwayVehicle).where(RailwayVehicle.id==vehicle_id).with_for_update())
         if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
         if row.revision!=data.expected_revision:raise HTTPException(409,'Triebfahrzeug wurde geändert. Bitte neu laden.')
-        for field,value in data.model_dump(exclude={'expected_revision'}).items():setattr(row,field,value)
+        for field,value in data.model_dump(exclude={'expected_revision','leasing_company_id'}).items():setattr(row,field,value)
+        if 'leasing_company_id' in data.model_fields_set:assign(db,row,data.leasing_company_id)
         row.revision+=1;row.updated_at=now_utc();return commit(db,row)
     return router
