@@ -143,6 +143,9 @@ def work_report_pdf(db,user,report):
         (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'],data['start_at'])),(t('Arbeitszeit'),clock(credited)),
         (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
         (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-')]
+    if data.get('in_hotel'):
+        lines.append((t('Im Hotel'),t('Ja')))
+        if data.get('hotel_name'):lines.append((t('Hotelname'),data['hotel_name']))
     lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
     if data.get('overrun_reason','').strip():lines.append((t('Begründung für mehr als zwölf Stunden'),data['overrun_reason']))
     transport={'train':'Zug','car':'Auto','taxi':'Taxi','public_transport':'ÖPNV','other':'Anderes Transportmittel'}

@@ -1390,7 +1390,17 @@
     "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Verbindung zum Server unterbrochen. Bitte erneut versuchen.",
     "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.",
     "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
-    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen."
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.",
+    "Im Hotel": "Im Hotel",
+    "Hotelname": "Hotelname",
+    "Hotelname (optional)": "Hotelname (optional)",
+    "Arbeits- und Ruhetagsplan": "Arbeits- und Ruhetagsplan",
+    "Plan derzeit nicht verfügbar": "Plan derzeit nicht verfügbar",
+    "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet": "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet",
+    "Empfohlene Pause:": "Empfohlene Pause:",
+    "verpflichtend sind": "verpflichtend sind",
+    "min (davon 45 min Pflicht)": "min (davon 45 min Pflicht)",
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten."
   },
   "en": {
     "Administration": "Administration",
@@ -2783,7 +2793,17 @@
     "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Connection to the server interrupted. Please try again.",
     "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "The server rejected the upload because of its size limit.",
     "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Saving failed. Please try again.",
-    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Saving failed. The protocol and files were not saved. Please try again."
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Saving failed. The protocol and files were not saved. Please try again.",
+    "Im Hotel": "Staying in a hotel",
+    "Hotelname": "Hotel name",
+    "Hotelname (optional)": "Hotel name (optional)",
+    "Arbeits- und Ruhetagsplan": "Work and rest day plan",
+    "Plan derzeit nicht verfügbar": "Plan currently unavailable",
+    "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet": "A work · R rest · U vacation · K sick · ? unplanned · Hours worked",
+    "Empfohlene Pause:": "Recommended break:",
+    "verpflichtend sind": "mandatory:",
+    "min (davon 45 min Pflicht)": "min (45 min mandatory)",
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Discard the guest journey entries? Previously added journeys will be kept."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4176,7 +4196,17 @@
     "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Połączenie z serwerem zostało przerwane. Spróbuj ponownie.",
     "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Serwer odrzucił przesyłanie z powodu limitu rozmiaru.",
     "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Zapis nie powiódł się. Spróbuj ponownie.",
-    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Zapis nie powiódł się. Protokół i pliki nie zostały zapisane. Spróbuj ponownie."
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Zapis nie powiódł się. Protokół i pliki nie zostały zapisane. Spróbuj ponownie.",
+    "Im Hotel": "W hotelu",
+    "Hotelname": "Nazwa hotelu",
+    "Hotelname (optional)": "Nazwa hotelu (opcjonalnie)",
+    "Arbeits- und Ruhetagsplan": "Plan dni pracy i odpoczynku",
+    "Plan derzeit nicht verfügbar": "Plan jest obecnie niedostępny",
+    "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet": "A praca · R odpoczynek · U urlop · K choroba · ? brak planu · Godziny przepracowane",
+    "Empfohlene Pause:": "Zalecana przerwa:",
+    "verpflichtend sind": "obowiązkowe:",
+    "min (davon 45 min Pflicht)": "min (45 min obowiązkowe)",
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Odrzucić wprowadzone dane przejazdu? Wcześniej dodane przejazdy zostaną zachowane."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5569,7 +5599,17 @@
     "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Соединение с сервером прервано. Повторите попытку.",
     "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "Сервер отклонил загрузку из-за ограничения размера.",
     "Speichern fehlgeschlagen. Bitte erneut versuchen.": "Не удалось сохранить. Повторите попытку.",
-    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Не удалось сохранить протокол и файлы. Повторите попытку."
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "Не удалось сохранить протокол и файлы. Повторите попытку.",
+    "Im Hotel": "В гостинице",
+    "Hotelname": "Название гостиницы",
+    "Hotelname (optional)": "Название гостиницы (необязательно)",
+    "Arbeits- und Ruhetagsplan": "План рабочих дней и дней отдыха",
+    "Plan derzeit nicht verfügbar": "План сейчас недоступен",
+    "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet": "A работа · R отдых · U отпуск · K болезнь · ? нет плана · Отработанные часы",
+    "Empfohlene Pause:": "Рекомендуемый перерыв:",
+    "verpflichtend sind": "обязательно:",
+    "min (davon 45 min Pflicht)": "мин (45 мин обязательно)",
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Отменить введённые данные поездки? Ранее добавленные поездки сохранятся."
   },
   "es": {
     "Administration": "Administración",
@@ -6962,6 +7002,16 @@
     "Verbindung zum Server unterbrochen. Bitte erneut versuchen.": "Se interrumpió la conexión con el servidor. Inténtelo de nuevo.",
     "Der Server hat den Upload wegen seiner Größenbegrenzung abgelehnt.": "El servidor rechazó la carga por su límite de tamaño.",
     "Speichern fehlgeschlagen. Bitte erneut versuchen.": "No se pudo guardar. Inténtelo de nuevo.",
-    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "No se guardaron el acta ni los archivos. Inténtelo de nuevo."
+    "Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.": "No se guardaron el acta ni los archivos. Inténtelo de nuevo.",
+    "Im Hotel": "En el hotel",
+    "Hotelname": "Nombre del hotel",
+    "Hotelname (optional)": "Nombre del hotel (opcional)",
+    "Arbeits- und Ruhetagsplan": "Plan de días de trabajo y descanso",
+    "Plan derzeit nicht verfügbar": "Plan no disponible actualmente",
+    "A Arbeit · R Ruhe · U Urlaub · K Krank · ? Ungeplant · Stunden: geleistet": "A trabajo · R descanso · U vacaciones · K enfermedad · ? sin plan · Horas trabajadas",
+    "Empfohlene Pause:": "Pausa recomendada:",
+    "verpflichtend sind": "obligatorios:",
+    "min (davon 45 min Pflicht)": "min (45 min obligatorios)",
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "¿Descartar los datos introducidos del viaje? Se conservarán los viajes ya añadidos."
   }
 }

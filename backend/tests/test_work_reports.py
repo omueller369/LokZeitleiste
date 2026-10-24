@@ -75,12 +75,42 @@ class WorkReportsTest(unittest.TestCase):
         self.assertEqual(self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()['trips'][0]['start_station_name'],'New catalog name')
 
     def test_pause_boundaries_and_reason(self):
-        for duration,expected in [(360,0),(361,30),(540,30),(541,45),(599,45),(600,120),(601,120),(660,120),(720,120),(721,120),(780,120)]:self.assertEqual(minimum_pause(duration),expected)
+        for duration,expected in [(360,0),(361,30),(539,30),(540,45),(541,45),(599,45),(600,45),(601,46),(660,105),(720,165),(721,166),(780,225)]:self.assertEqual(minimum_pause(duration),expected)
         data=self.payload(end='2026-10-12T22:00')
         self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
-        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],120)
+        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],225)
         for name in ('start_at','end_at'):
             invalid=dict(data);invalid[name]=invalid[name]+':10';self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=invalid).status_code,422)
+    def test_new_pause_policy_enforces_only_the_mandatory_part(self):
+        from pydantic import ValidationError
+        start=datetime(2026,10,12,9)
+        for duration,required,recommended in [(360,0,0),(361,30,30),(539,30,30),(540,45,45),(600,45,45),(601,45,46),(690,45,135),(720,45,165)]:
+            data=self.payload(start=start.isoformat(timespec='minutes'),end=(start+timedelta(minutes=duration)).isoformat(timespec='minutes'))
+            data.update(trips=[],pause_policy=2,actual_pause=required)
+            self.assertEqual(ReportIn.model_validate(data).actual_pause,required)
+            self.assertEqual(minimum_pause(duration),recommended)
+            if required:
+                with self.assertRaises(ValidationError):ReportIn.model_validate(dict(data,actual_pause=required-1))
+        data=self.payload();data.update(trips=[],pause_policy=1,actual_pause=0)
+        self.assertEqual(ReportIn.model_validate(data).pause_policy,1)
+        data.update(kind='Bereitschaft',pause_policy=2)
+        self.assertEqual(ReportIn.model_validate(data).actual_pause,0)
+
+    def test_hotel_and_performed_minutes_roundtrip_without_absence_credit(self):
+        data=self.payload(end='2026-10-12T15:00');data.update(trips=[],actual_pause=0,pause_policy=2,in_hotel=True,hotel_name='  Testhotel  ')
+        report=self.create(data)
+        self.assertTrue(report['in_hotel']);self.assertEqual(report['hotel_name'],'Testhotel')
+        self.assertEqual(self.create(data)['id'],report['id'])
+        reread=self.driver.get('/api/v1/tf/work-reports/'+str(report['id'])).json()
+        self.assertEqual(reread['hotel_name'],'Testhotel')
+        vacation=self.payload(start='2026-10-13T09:00',end='2026-10-13T10:00');vacation.update(kind='Urlaub',trips=[],actual_pause=0,pause_policy=2)
+        self.create(vacation)
+        rows=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()['days']
+        self.assertEqual(next(r for r in rows if r['date']=='2026-10-12')['performed_minutes'],360)
+        self.assertEqual(next(r for r in rows if r['date']=='2026-10-13')['performed_minutes'],0)
+        optional=dict(data,client_id=str(uuid4()),start_at='2026-10-14T09:00',end_at='2026-10-14T15:00',hotel_name='')
+        self.assertEqual(self.create(optional)['hotel_name'],'')
+
     def test_atomic_idempotent_guest_creation_and_worktime(self):
         data=self.payload();data['trips'].append(dict(start_station='LL',end_station='BHF',start_at='2026-10-12T15:00',end_at='2026-10-12T16:00',transport='other',transport_detail='Testbus'))
         first=self.create(data);second=self.create(data);self.assertEqual(first['id'],second['id'])

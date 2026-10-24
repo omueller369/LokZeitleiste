@@ -8,16 +8,18 @@ Datum und minutengenaue Uhrzeit für Dienstbeginn und Dienstende; Enddatum kann 
 
 Die vom Auftrag vorgegebene betriebliche Pausenregel wird auf diese Dienstspanne angewendet:
 
-| Dienstspanne | Berechnete Mindestpause |
-|---|---|
-| Bis einschließlich 6 Stunden | 0 Minuten |
-| Mehr als 6 bis einschließlich 9 Stunden | 30 Minuten |
-| Mehr als 9 bis unter 10 Stunden | 45 Minuten |
-| Ab 10 Stunden, einschließlich 12 Stunden und darüber | 120 Minuten |
+| Dienstspanne | Verpflichtend dokumentiert | Berechnete Empfehlung |
+|---|---|---|
+| Bis einschließlich 6 Stunden | 0 Minuten | 0 Minuten |
+| Über 6 bis unter 9 Stunden | 30 Minuten | 30 Minuten |
+| Ab 9 bis einschließlich 10 Stunden | 45 Minuten | 45 Minuten |
+| Über 10 Stunden | 45 Minuten | 45 Minuten plus Minuten über 10 Stunden |
 
-Beispiele: 9:59 h → 45 Minuten, 10:00 h → 120 Minuten, 11:00 h → 120 Minuten, 12:00 h → 120 Minuten. Über zwölf Stunden: rote, fette Dienstspanne und Pflichtbegründung bis 1.000 Zeichen, auch serverseitig geprüft. Die Mindestpause von 120 Minuten ab zehn Stunden ist die gewünschte betriebliche Regel. Die allgemeinen 30-/45-Minuten-Grenzen stehen in [§ 4 ArbZG](https://www.gesetze-im-internet.de/arbzg/__4.html); die Maske bildet keine vollständige arbeitsrechtliche Prüfung ab.
+Beispiel: 11:30 Stunden → Empfehlung 135 Minuten, mit 45 dokumentierten Minuten ist Speichern zulässig. Die neue Webmaske setzt `pause_policy=2`; sie prüft den Pflichtanteil vor dem lokalen Speichern, die API zusätzlich vor der Übernahme. Bestehende Berichte und ältere Offline-/App-Daten ohne Versionsfeld behalten `pause_policy=1`, damit historische Daten und Synchronisationswiederholungen lesbar bleiben. Über zwölf Stunden bleibt eine Begründung erforderlich.
 
-**Tatsächliche Pause** wird separat eingegeben. Der berechnete Mindestwert wird nicht automatisch als tatsächlich genommen verbucht. Pausen werden nur dokumentiert und **niemals von der Arbeitszeit abgezogen**. Tages-, Wochen-, Monats-, Jahres- und PDF-Auswertungen sowie die Offline-Berechnung der Android-App verwenden die volle Dienstspanne. Nacht-, Sonn- und Feiertagsstunden werden ebenfalls ohne Pausenabzug berechnet. Eine Unterschreitung der berechneten Mindestpause wird angezeigt, ohne die Erfassung der tatsächlich geleisteten Zeit zu verhindern.
+Das zusätzliche Minutenfeld entfällt. Neue Pausen werden als Ereignisse der Zugfahrten dokumentiert; alte zusätzlich eingegebene Pausen bleiben in bestehenden Berichten erhalten. Pausen verringern die angerechnete Dienstspanne nicht.
+
+An der bisherigen Position steht „Im Hotel“. Bei Auswahl erscheint der optionale Hotelname. Beide Werte werden mit dem Arbeitsbericht gespeichert, beim Laden wiederhergestellt und im PDF ausgegeben.
 
 ## Dienstarten
 
@@ -93,6 +95,10 @@ Zugfahrt-Webmaske: Art (CTL, DB InfraGo, Dritte Stelle, sonstiges) steht vor Gru
 
 Zeitspalten im Arbeitsbericht zeigen HH:MM. Nur bei einem Dienst über Mitternacht erscheint beim Datumswechsel gegenüber dem vorherigen Zeitwert zusätzlich TT.MM.JJJJ. Die eigene Datumsspalte der Monatsübersicht bleibt zur Tageszuordnung bestehen.
 
-Beim Einstieg bleiben die Berichtsdetails eingeklappt. Sichtbar sind die obere Aktionsleiste und Arbeitsberichte des Monats. Neuer Bericht und erfolgreiche Zeilenauswahl öffnen die Details; synchronisierte Berichte werden zur Ansicht, lokale Berichte zur Bearbeitung geladen. Gastfahrten, Belege und Monatsarbeitszeiten behalten innerhalb der Details ihre bisherigen Einblendregeln.
+Beim Einstieg bleiben die Berichtsdetails eingeklappt. Sichtbar sind die obere Aktionsleiste und Arbeitsberichte des Monats. Neuer Bericht und erfolgreiche Zeilenauswahl öffnen die Details; synchronisierte Berichte werden zur Ansicht, lokale Berichte zur Bearbeitung geladen. Die Plus-/Minus-Schaltflächen klappen die einzelnen Blöcke auf und zu. Die aktuelle Monatsleiste bleibt unabhängig von den Berichtsdetails sichtbar.
 
-Dienstzeiten, Gastfahrten, Zugfahrten und Arbeitsberichte des Monats lassen sich jeweils oben rechts mit − einklappen und mit + aufklappen. Die Überschrift bleibt sichtbar, Eingaben und Tabellenzeilen bleiben erhalten. Die Buttons sind per Tastatur bedienbar und auch in der ersten Legende eines gesperrten Dienstzeiten-Fieldsets erreichbar. Pflichtfeldfehler öffnen den zugehörigen Block; neuer Bericht und Zeilenauswahl öffnen die Blöcke wieder. Die bisherigen Regeln für das gesamte Detailformular und den optionalen Gastfahrtenbereich bleiben bestehen.
+## Aktuelle Monatsleiste und Gastfahrt abbrechen
+
+Die frühere Tabelle „Arbeitszeiten des ausgewählten Monats“ und deren Umschalter entfallen. Eine schmale Monatsleiste außerhalb der eingeklappten Berichtsdetails zeigt den gesamten aktuellen Berliner Kalendermonat in einer Zeile: Planstatus, Feiertagsmarkierung und tatsächlich geleistete Stunden. Urlaubsgutschriften zählen nicht als geleistete Stunden. Lokale, noch nicht synchronisierte Berichte werden mit einbezogen und nach der Synchronisation nicht doppelt gezählt. Die Monatswahl der Berichtsliste verändert diese Leiste nicht. Auf kleinen Displays sind die Zellen entsprechend kompakt; Anklicken zeigt Datum, Status und die minutengenaue Zeit unterhalb der Leiste.
+
+„Abbrechen“ bei einer Gastfahrt warnt bei vorhandenen Eingaben. Bestätigung leert die Eingabemaske und klappt Gastfahrten ein, ohne einen Datensatz zu übernehmen. Bereits hinzugefügte Gastfahrten bleiben erhalten; Abbruch der Bestätigung lässt die Eingaben unverändert.

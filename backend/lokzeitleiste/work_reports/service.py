@@ -9,7 +9,7 @@ from ..reports.intervals import set_end_date,period_entries,interval
 from ..reports.absence import is_rest_day
 from ..reports.daily import WORK_KINDS
 from ..worktime.service import validate_no_overlap
-from .schemas import minutes,minimum_pause,ReportIn,train_pause_minutes
+from .schemas import minutes,minimum_pause,required_pause,ReportIn,train_pause_minutes
 
 
 def report_view(db,report):
@@ -25,6 +25,7 @@ def report_view(db,report):
     payload.setdefault('train_journeys',[])
     payload.setdefault('ausbleibe',[])
     payload.setdefault('kind','Sonstige Erfassung')
+    payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('pause_policy',1)
     rest=is_rest_day(db,report.tf_user_id,start.date()) if payload['kind'] in ('Urlaub','Krank') else False
     credit=(0 if rest else 480) if payload['kind'] in ('Urlaub','Krank') else minutes(start,end)
     revision=payload.pop('_train_revision',0)
@@ -33,6 +34,7 @@ def report_view(db,report):
     return dict(id=report.id,entry_id=report.entry_id,**payload,
                 duration_minutes=minutes(datetime.fromisoformat(payload['start_at']),datetime.fromisoformat(payload['end_at'])),
                 minimum_pause_minutes=minimum_pause(minutes(start,end)) if payload['kind']=='Sonstige Erfassung' else 0,
+                required_pause_minutes=required_pause(minutes(start,end)) if payload['kind']=='Sonstige Erfassung' else 0,
                 credited_minutes=credit,is_rest_day=rest,
                 train_editable=not is_locked(db,entry.id) and interval(entry)==(start,end) and entry.pause_minutes==payload['actual_pause']+train_pause_minutes(payload['train_journeys']),
                 train_revision=revision,documented_pause_minutes=payload['actual_pause']+train_pause_minutes(payload['train_journeys']),
@@ -51,6 +53,7 @@ def save_report(db,user,data):
         def identity(payload):
             payload.setdefault('ausbleibe',[])
             payload.setdefault('kind','Sonstige Erfassung')
+            payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('pause_policy',1)
             payload.pop('train_journeys',None);payload.pop('_train_revision',None);payload.pop('_pdf_version_offset',None)
             for trip in payload['trips']:
                 trip.setdefault('self_payer',False)

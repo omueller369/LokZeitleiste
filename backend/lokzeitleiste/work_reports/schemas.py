@@ -8,7 +8,10 @@ def minutes(start,end):return int((end-start).total_seconds()//60)
 
 
 def minimum_pause(duration):
-    return 120 if duration>=600 else 45 if duration>540 else 30 if duration>360 else 0
+    return 45+max(0,duration-600) if duration>=540 else 30 if duration>360 else 0
+
+
+def required_pause(duration):return min(45,minimum_pause(duration))
 
 
 def check_time(value):
@@ -128,6 +131,9 @@ class ReportIn(BaseModel):
     start_at:datetime
     end_at:datetime
     ausbleibe:list[Literal["8h","24h","8'h","24'h"]]=Field(default_factory=list,max_length=4)
+    in_hotel:bool=False
+    hotel_name:str=Field(default='',max_length=200)
+    pause_policy:Literal[1,2]=1
     actual_pause:int=Field(default=0,ge=0,le=1440)
     overrun_reason:str=Field(default='',max_length=1000)
     trips:list[GuestIn]=Field(default_factory=list,max_length=50)
@@ -137,6 +143,7 @@ class ReportIn(BaseModel):
 
     @model_validator(mode='after')
     def validate_report(self):
+        self.hotel_name=self.hotel_name.strip() if self.in_hotel else ''
         self.ausbleibe=list(dict.fromkeys(self.ausbleibe))
         duration=minutes(self.start_at,self.end_at)
         if duration<=0:raise ValueError('Dienstende muss nach Dienstbeginn liegen.')
@@ -168,4 +175,5 @@ class ReportIn(BaseModel):
         pauses.sort()
         if any(pauses[i][0]<pauses[i-1][1] for i in range(1,len(pauses))):raise ValueError('Dokumentierte Pausen dürfen sich nicht überschneiden.')
         if self.actual_pause+sum(minutes(a,b) for a,b in pauses)>duration:raise ValueError('Dokumentierte Pausen überschreiten die Dienstzeit.')
+        if self.pause_policy==2 and self.kind=='Sonstige Erfassung' and self.actual_pause+sum(minutes(a,b) for a,b in pauses)<required_pause(duration):raise ValueError('Dokumentierte Pause: mindestens '+str(required_pause(duration))+' Minuten erforderlich.')
         return self
