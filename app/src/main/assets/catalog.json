@@ -1400,7 +1400,10 @@
     "Empfohlene Pause:": "Empfohlene Pause:",
     "verpflichtend sind": "verpflichtend sind",
     "min (davon 45 min Pflicht)": "min (davon 45 min Pflicht)",
-    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten."
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.",
+    "Hotelübergang": "Hotelübergang",
+    "Ort (optional)": "Ort (optional)",
+    "DS100, Bahnhofsname oder Freitext": "DS100, Bahnhofsname oder Freitext"
   },
   "en": {
     "Administration": "Administration",
@@ -2803,7 +2806,10 @@
     "Empfohlene Pause:": "Recommended break:",
     "verpflichtend sind": "mandatory:",
     "min (davon 45 min Pflicht)": "min (45 min mandatory)",
-    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Discard the guest journey entries? Previously added journeys will be kept."
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Discard the guest journey entries? Previously added journeys will be kept.",
+    "Hotelübergang": "Hotel stay",
+    "Ort (optional)": "Location (optional)",
+    "DS100, Bahnhofsname oder Freitext": "DS100, station name or free text"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4206,7 +4212,10 @@
     "Empfohlene Pause:": "Zalecana przerwa:",
     "verpflichtend sind": "obowiązkowe:",
     "min (davon 45 min Pflicht)": "min (45 min obowiązkowe)",
-    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Odrzucić wprowadzone dane przejazdu? Wcześniej dodane przejazdy zostaną zachowane."
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Odrzucić wprowadzone dane przejazdu? Wcześniej dodane przejazdy zostaną zachowane.",
+    "Hotelübergang": "Pobyt w hotelu",
+    "Ort (optional)": "Miejsce (opcjonalnie)",
+    "DS100, Bahnhofsname oder Freitext": "DS100, nazwa stacji lub dowolny tekst"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5609,7 +5618,10 @@
     "Empfohlene Pause:": "Рекомендуемый перерыв:",
     "verpflichtend sind": "обязательно:",
     "min (davon 45 min Pflicht)": "мин (45 мин обязательно)",
-    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Отменить введённые данные поездки? Ранее добавленные поездки сохранятся."
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "Отменить введённые данные поездки? Ранее добавленные поездки сохранятся.",
+    "Hotelübergang": "Пребывание в отеле",
+    "Ort (optional)": "Место (необязательно)",
+    "DS100, Bahnhofsname oder Freitext": "DS100, название станции или произвольный текст"
   },
   "es": {
     "Administration": "Administración",
@@ -7012,6 +7024,9 @@
     "Empfohlene Pause:": "Pausa recomendada:",
     "verpflichtend sind": "obligatorios:",
     "min (davon 45 min Pflicht)": "min (45 min obligatorios)",
-    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "¿Descartar los datos introducidos del viaje? Se conservarán los viajes ya añadidos."
+    "Eingegebene Gastfahrtdaten verwerfen? Bereits hinzugefügte Gastfahrten bleiben erhalten.": "¿Descartar los datos introducidos del viaje? Se conservarán los viajes ya añadidos.",
+    "Hotelübergang": "Estancia en hotel",
+    "Ort (optional)": "Lugar (opcional)",
+    "DS100, Bahnhofsname oder Freitext": "DS100, nombre de estación o texto libre"
   }
 }

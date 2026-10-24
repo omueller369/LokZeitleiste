@@ -144,7 +144,8 @@ def work_report_pdf(db,user,report):
         (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
         (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-')]
     if data.get('in_hotel'):
-        lines.append((t('Im Hotel'),t('Ja')))
+        lines.append((t('Hotelübergang'),t('Ja')))
+        if data.get('hotel_location'):lines.append((t('Ort'),data['hotel_location']))
         if data.get('hotel_name'):lines.append((t('Hotelname'),data['hotel_name']))
     lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
     if data.get('overrun_reason','').strip():lines.append((t('Begründung für mehr als zwölf Stunden'),data['overrun_reason']))

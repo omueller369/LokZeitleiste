@@ -97,12 +97,12 @@ class WorkReportsTest(unittest.TestCase):
         self.assertEqual(ReportIn.model_validate(data).actual_pause,0)
 
     def test_hotel_and_performed_minutes_roundtrip_without_absence_credit(self):
-        data=self.payload(end='2026-10-12T15:00');data.update(trips=[],actual_pause=0,pause_policy=2,in_hotel=True,hotel_name='  Testhotel  ')
+        data=self.payload(end='2026-10-12T15:00');data.update(trips=[],actual_pause=0,pause_policy=2,in_hotel=True,hotel_name='  Testhotel  ',hotel_location='  BHF · Testbahnhof  ')
         report=self.create(data)
         self.assertTrue(report['in_hotel']);self.assertEqual(report['hotel_name'],'Testhotel')
         self.assertEqual(self.create(data)['id'],report['id'])
         reread=self.driver.get('/api/v1/tf/work-reports/'+str(report['id'])).json()
-        self.assertEqual(reread['hotel_name'],'Testhotel')
+        self.assertEqual(reread['hotel_name'],'Testhotel');self.assertEqual(reread['hotel_location'],'BHF · Testbahnhof')
         vacation=self.payload(start='2026-10-13T09:00',end='2026-10-13T10:00');vacation.update(kind='Urlaub',trips=[],actual_pause=0,pause_policy=2)
         self.create(vacation)
         rows=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()['days']

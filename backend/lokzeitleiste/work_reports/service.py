@@ -25,7 +25,7 @@ def report_view(db,report):
     payload.setdefault('train_journeys',[])
     payload.setdefault('ausbleibe',[])
     payload.setdefault('kind','Sonstige Erfassung')
-    payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('pause_policy',1)
+    payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('hotel_location','');payload.setdefault('pause_policy',1)
     rest=is_rest_day(db,report.tf_user_id,start.date()) if payload['kind'] in ('Urlaub','Krank') else False
     credit=(0 if rest else 480) if payload['kind'] in ('Urlaub','Krank') else minutes(start,end)
     revision=payload.pop('_train_revision',0)
@@ -53,7 +53,7 @@ def save_report(db,user,data):
         def identity(payload):
             payload.setdefault('ausbleibe',[])
             payload.setdefault('kind','Sonstige Erfassung')
-            payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('pause_policy',1)
+            payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('hotel_location','');payload.setdefault('pause_policy',1)
             payload.pop('train_journeys',None);payload.pop('_train_revision',None);payload.pop('_pdf_version_offset',None)
             for trip in payload['trips']:
                 trip.setdefault('self_payer',False)

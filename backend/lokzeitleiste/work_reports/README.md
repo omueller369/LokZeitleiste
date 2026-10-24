@@ -19,7 +19,7 @@ Beispiel: 11:30 Stunden → Empfehlung 135 Minuten, mit 45 dokumentierten Minute
 
 Das zusätzliche Minutenfeld entfällt. Neue Pausen werden als Ereignisse der Zugfahrten dokumentiert; alte zusätzlich eingegebene Pausen bleiben in bestehenden Berichten erhalten. Pausen verringern die angerechnete Dienstspanne nicht.
 
-An der bisherigen Position steht „Im Hotel“. Bei Auswahl erscheint der optionale Hotelname. Beide Werte werden mit dem Arbeitsbericht gespeichert, beim Laden wiederhergestellt und im PDF ausgegeben.
+An der bisherigen Position steht „Hotelübergang“. Bei Auswahl erscheinen zuerst der optionale Ort (DS100 + Bahnhofsname mit Suche oder Freitext) und danach der optionale Hotelname. Die Werte werden mit dem Arbeitsbericht gespeichert, beim Laden wiederhergestellt und im PDF ausgegeben.
 
 ## Dienstarten
 
@@ -102,3 +102,5 @@ Beim Einstieg bleiben die Berichtsdetails eingeklappt. Sichtbar sind die obere A
 Die frühere Tabelle „Arbeitszeiten des ausgewählten Monats“ und deren Umschalter entfallen. Eine schmale Monatsleiste außerhalb der eingeklappten Berichtsdetails zeigt den gesamten aktuellen Berliner Kalendermonat in einer Zeile: Planstatus, Feiertagsmarkierung und tatsächlich geleistete Stunden. Urlaubsgutschriften zählen nicht als geleistete Stunden. Lokale, noch nicht synchronisierte Berichte werden mit einbezogen und nach der Synchronisation nicht doppelt gezählt. Die Monatswahl der Berichtsliste verändert diese Leiste nicht. Auf kleinen Displays sind die Zellen entsprechend kompakt; Anklicken zeigt Datum, Status und die minutengenaue Zeit unterhalb der Leiste.
 
 „Abbrechen“ bei einer Gastfahrt warnt bei vorhandenen Eingaben. Bestätigung leert die Eingabemaske und klappt Gastfahrten ein, ohne einen Datensatz zu übernehmen. Bereits hinzugefügte Gastfahrten bleiben erhalten; Abbruch der Bestätigung lässt die Eingaben unverändert.
+
+Gastfahrt-Zeitvorschläge: Die erste neue Gastfahrt endet zum Dienstbeginn und beginnt eine Stunde davor. Ab der zweiten neuen Gastfahrt wird Dienstende als Start und eine Stunde danach als Ende vorgeschlagen. Unveränderte Vorschläge folgen Änderungen der Dienstzeit; manuelle Eingaben und gespeicherte Gastfahrten bleiben erhalten.

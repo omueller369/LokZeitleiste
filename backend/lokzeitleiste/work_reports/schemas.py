@@ -132,6 +132,7 @@ class ReportIn(BaseModel):
     end_at:datetime
     ausbleibe:list[Literal["8h","24h","8'h","24'h"]]=Field(default_factory=list,max_length=4)
     in_hotel:bool=False
+    hotel_location:str=Field(default='',max_length=270)
     hotel_name:str=Field(default='',max_length=200)
     pause_policy:Literal[1,2]=1
     actual_pause:int=Field(default=0,ge=0,le=1440)
@@ -143,6 +144,7 @@ class ReportIn(BaseModel):
 
     @model_validator(mode='after')
     def validate_report(self):
+        self.hotel_location=self.hotel_location.strip() if self.in_hotel else ''
         self.hotel_name=self.hotel_name.strip() if self.in_hotel else ''
         self.ausbleibe=list(dict.fromkeys(self.ausbleibe))
         duration=minutes(self.start_at,self.end_at)
