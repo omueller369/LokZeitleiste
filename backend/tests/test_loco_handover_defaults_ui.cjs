@@ -16,14 +16,14 @@ const inputs=el=>el.querySelectorAll('input'),tick=()=>new Promise(r=>setTimeout
 (async()=>{
  vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/loco-handover-defaults.js','utf8'),context);await tick();
  assert.equal(root.children.length,3);
- let category=section('Kategorie Störung');assert.equal(inputs(category)[0].parentElement.textContent,'Name Hotline');assert.equal(inputs(category)[2].maxLength,100);
- assert.equal(inputs(category)[3].disabled,true);
+ let category=section('Kategorie Störung');assert.equal(inputs(category)[0].parentElement.textContent,'Kategorie Störung');assert.equal(inputs(category)[0].maxLength,100);
+ assert.equal(inputs(category)[1].disabled,true);
  category.querySelectorAll('select')[0].value='1';category.querySelectorAll('select')[0].onchange();
- category=section('Kategorie Störung');assert.equal(inputs(category)[2].value,'Bremse');assert.equal(inputs(category)[0].value,'Technik');
+ category=section('Kategorie Störung');assert.equal(inputs(category)[0].value,'Bremse');assert.equal(inputs(category).length,2);
  let list=category.querySelectorAll('select')[1];assert.equal(list.size,5);assert.deepEqual(list.children.map(o=>o.textContent),['Bitte auswählen','Vorne']);
- list.value='2';list.onchange();assert.equal(inputs(category)[3].value,'Vorne');inputs(category)[3].value='Hinten';await category.querySelectorAll('form')[1].onsubmit({preventDefault(){}});assert.equal(written.parent_id,1);assert.equal(written.expected_revision,1);
- category=section('Kategorie Störung');category.querySelectorAll('select')[0].value='3';category.querySelectorAll('select')[0].onchange();category=section('Kategorie Störung');assert.deepEqual(category.querySelectorAll('select')[1].children.map(o=>o.textContent),['Bitte auswählen','Motor']);assert.equal(inputs(category)[3].value,'');
+ list.value='2';list.onchange();assert.equal(inputs(category)[1].value,'Vorne');inputs(category)[1].value='Hinten';await category.querySelectorAll('form')[1].onsubmit({preventDefault(){}});assert.equal(written.parent_id,1);assert.equal(written.expected_revision,1);
+ category=section('Kategorie Störung');category.querySelectorAll('select')[0].value='3';category.querySelectorAll('select')[0].onchange();category=section('Kategorie Störung');assert.deepEqual(category.querySelectorAll('select')[1].children.map(o=>o.textContent),['Bitte auswählen','Motor']);assert.equal(inputs(category)[1].value,'');
  const pzb=section('PZB Gründe'),pick=pzb.querySelectorAll('select')[0];pick.value='5';pick.onchange();assert.equal(inputs(pzb)[0].value,'PZB Test');assert.equal(inputs(pzb)[0].maxLength,255);
  const recipients=section('Meldung an');recipients.querySelectorAll('tbody')[0].children[0].onclick();assert.equal(inputs(recipients)[0].value,'Empfänger');assert.equal(inputs(recipients)[1].value,'mail@example.com');assert.equal(inputs(recipients)[1].type,'email');
- console.log('Handover defaults UI: hotline order, field limits, selection/editing, category-scoped damage list and saved parent/revision passed.');
+ console.log('Handover defaults UI: field limits without legacy hotline inputs, selection/editing, category-scoped damage list and saved parent/revision passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

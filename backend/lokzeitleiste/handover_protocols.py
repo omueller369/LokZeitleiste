@@ -10,6 +10,7 @@ from sqlalchemy import select,or_,case
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from .db import database_session
+from .default_order import ordered
 from .models import (RailwayVehicle,RailwayStation,LocoHandoverDefault,LocoHandoverProtocol as Protocol,
                      LocoHandoverAttachment as Attachment,LocoHandoverAttachmentChunk as Chunk,TfProfile,StaffProfile)
 from .tf_portal import driver_dependency
@@ -57,7 +58,7 @@ def create_router(require_admin,require_account):
         sub=APIRouter(prefix=prefix)
         @sub.get('/recipients')
         def recipients(user=Depends(access),db:Session=Depends(database_session)):
-            return [dict(id=r.id,label=r.label) for r in db.scalars(select(LocoHandoverDefault).where(LocoHandoverDefault.kind=='recipient').order_by(LocoHandoverDefault.label))]
+            return [dict(id=r.id,label=r.label) for r in ordered(db,'recipient',db.scalars(select(LocoHandoverDefault).where(LocoHandoverDefault.kind=='recipient').order_by(LocoHandoverDefault.label,LocoHandoverDefault.id)))]
         @sub.get('/stations')
         def stations(q:str=Query(min_length=1,max_length=200),user=Depends(access),db:Session=Depends(database_session)):
             key=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')

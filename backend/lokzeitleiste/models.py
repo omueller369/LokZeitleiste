@@ -706,3 +706,10 @@ class PlanningNoteBackup(Base):
     day:Mapped[date]=mapped_column(Date,nullable=False)
     note:Mapped[str]=mapped_column(Text,nullable=False)
     saved_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class AppDefaultOrder(Base):
+    __tablename__='app_default_orders'
+    scope:Mapped[str]=mapped_column(String(100),primary_key=True)
+    ids_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)

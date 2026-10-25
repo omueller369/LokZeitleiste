@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .db import database_session
+from .default_order import ordered_loco
 from .models import LocoHandoverDefault as Value
 
 Kind=Literal['recipient','pzb','category','damage']
@@ -69,7 +70,7 @@ def create_router(require_admin):
     def script():return FileResponse(Path(__file__).parent/'static'/'loco-handover-defaults.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
     @router.get(BASE,dependencies=[Depends(require_admin)])
     def listing(db:Session=Depends(database_session)):
-        return [view(row) for row in db.scalars(select(Value).order_by(Value.label,Value.id))]
+        return [view(row) for row in ordered_loco(db,db.scalars(select(Value).order_by(Value.label,Value.id)))]
     @router.post(BASE+'/{kind}',status_code=201,dependencies=[Depends(require_admin)])
     def create(kind:Kind,data:Input,db:Session=Depends(database_session)):
         row=Value(kind=kind,revision=1);apply(db,row,data);db.add(row);return save(db,row)

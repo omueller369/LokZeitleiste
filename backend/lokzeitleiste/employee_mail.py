@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .db import database_session
+from .default_order import ordered
 from .models import EmailDomain, EmployeeEmail, MailboxProvision, MailboxAccount, MailboxSettings, User, TfProfile, StaffProfile
 from .accounts.access import demand
 from .mailbox import service
@@ -31,7 +32,7 @@ def domains(db):
     name=os.getenv('CTL_MAIL_DOMAIN','').strip()
     if name and not db.scalar(select(EmailDomain.id).limit(1)):
         db.add(EmailDomain(name=domain_name(name)));db.flush()
-    return list(db.scalars(select(EmailDomain).order_by(EmailDomain.name)))
+    return ordered(db,'email-domains',db.scalars(select(EmailDomain).order_by(EmailDomain.name)))
 
 
 def local_name(first,last):

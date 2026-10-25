@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from .db import database_session
 from .models import AppDefaultValue as Value,AppDefaultSeed,DutyReport,TrainGpsRecording
 from .tf_portal import driver_dependency
+from .default_order import ordered
 
 
 def historical_values(db):
@@ -96,11 +97,11 @@ def create_router(require_admin,require_account):
     @router.get('/api/v1/tf/app-defaults')
     def choices(user=Depends(driver),db:Session=Depends(database_session)):
         ensure_defaults(db)
-        return [view(row) for row in db.scalars(select(Value).order_by(Value.id))]
+        return [view(row) for category in ('reason','cause') for row in ordered(db,category,db.scalars(select(Value).where(Value.category==category).order_by(Value.id)))]
     @router.get('/api/v1/admin/app-defaults',dependencies=[Depends(require_admin)])
     def listing(db:Session=Depends(database_session)):
         ensure_defaults(db)
-        return [view(row) for row in db.scalars(select(Value).order_by(Value.id))]
+        return [view(row) for category in ('reason','cause') for row in ordered(db,category,db.scalars(select(Value).where(Value.category==category).order_by(Value.id)))]
     def commit(db,row):
         try:db.commit()
         except IntegrityError as exc:

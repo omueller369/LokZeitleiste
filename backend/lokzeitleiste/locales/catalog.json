@@ -1421,7 +1421,15 @@
     "SIM = Simulatorfahrt": "SIM = Simulatorfahrt",
     "B = Bereitschaft": "B = Bereitschaft",
     "Sollstunden (h)": "Sollstunden (h)",
-    "Geleistet (h)": "Geleistet (h)"
+    "Geleistet (h)": "Geleistet (h)",
+    "Sortieren": "Sortieren",
+    "Position": "Position",
+    "Verschieben": "Verschieben",
+    "Nach oben": "Nach oben",
+    "Nach unten": "Nach unten",
+    "Zeilen am Griff mit Maus oder Finger verschieben.": "Zeilen am Griff mit Maus oder Finger verschieben.",
+    "Liste wurde geändert. Bitte neu laden.": "Liste wurde geändert. Bitte neu laden.",
+    "Sortierung wurde geändert. Bitte neu laden.": "Sortierung wurde geändert. Bitte neu laden."
   },
   "en": {
     "Administration": "Administration",
@@ -2525,7 +2533,7 @@
     "Ausgewählte übernehmen": "Import selected",
     "Meine Freigaben": "My shares",
     "Bitte zuerst speichern oder die Bearbeitung abbrechen.": "Please save or cancel editing first.",
-    "Widerrufen": "Revoked",
+    "Widerrufen": "Undo",
     "Abgelaufen": "Expired",
     "Freigabe widerrufen? Bereits importierte Kopien bleiben erhalten.": "Revoke this share? Previously imported copies will remain.",
     "Bereits in eigener Liste": "Already in your list",
@@ -2845,7 +2853,15 @@
     "SIM = Simulatorfahrt": "SIM = Simulator session",
     "B = Bereitschaft": "B = Standby duty",
     "Sollstunden (h)": "Target hours (h)",
-    "Geleistet (h)": "Hours worked (h)"
+    "Geleistet (h)": "Hours worked (h)",
+    "Sortieren": "Sort",
+    "Position": "Position",
+    "Verschieben": "Move",
+    "Nach oben": "Move up",
+    "Nach unten": "Move down",
+    "Zeilen am Griff mit Maus oder Finger verschieben.": "Drag rows by the handle using a mouse or finger.",
+    "Liste wurde geändert. Bitte neu laden.": "The list has changed. Please reload.",
+    "Sortierung wurde geändert. Bitte neu laden.": "The order has changed. Please reload."
   },
   "pl": {
     "Administration": "Administracja",
@@ -3949,7 +3965,7 @@
     "Ausgewählte übernehmen": "Importuj wybrane",
     "Meine Freigaben": "Moje udostępnienia",
     "Bitte zuerst speichern oder die Bearbeitung abbrechen.": "Najpierw zapisz lub anuluj edycję.",
-    "Widerrufen": "Cofnięte",
+    "Widerrufen": "Cofnij",
     "Abgelaufen": "Wygasłe",
     "Freigabe widerrufen? Bereits importierte Kopien bleiben erhalten.": "Cofnąć udostępnienie? Wcześniej zaimportowane kopie pozostaną.",
     "Bereits in eigener Liste": "Już na własnej liście",
@@ -4269,7 +4285,15 @@
     "SIM = Simulatorfahrt": "SIM = Jazda na symulatorze",
     "B = Bereitschaft": "B = Gotowość",
     "Sollstunden (h)": "Godziny planowane (h)",
-    "Geleistet (h)": "Przepracowane (h)"
+    "Geleistet (h)": "Przepracowane (h)",
+    "Sortieren": "Sortuj",
+    "Position": "Pozycja",
+    "Verschieben": "Przenieś",
+    "Nach oben": "W górę",
+    "Nach unten": "W dół",
+    "Zeilen am Griff mit Maus oder Finger verschieben.": "Przeciągnij wiersze za uchwyt myszą lub palcem.",
+    "Liste wurde geändert. Bitte neu laden.": "Lista została zmieniona. Odśwież ją.",
+    "Sortierung wurde geändert. Bitte neu laden.": "Kolejność została zmieniona. Odśwież ją."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5373,7 +5397,7 @@
     "Ausgewählte übernehmen": "Импортировать выбранные",
     "Meine Freigaben": "Мои общие ссылки",
     "Bitte zuerst speichern oder die Bearbeitung abbrechen.": "Сначала сохраните или отмените редактирование.",
-    "Widerrufen": "Отозвано",
+    "Widerrufen": "Отменить изменения",
     "Abgelaufen": "Истекло",
     "Freigabe widerrufen? Bereits importierte Kopien bleiben erhalten.": "Отозвать доступ? Ранее импортированные копии сохранятся.",
     "Bereits in eigener Liste": "Уже в вашем списке",
@@ -5693,7 +5717,15 @@
     "SIM = Simulatorfahrt": "SIM = Поездка на тренажёре",
     "B = Bereitschaft": "B = Дежурство",
     "Sollstunden (h)": "Плановые часы (ч)",
-    "Geleistet (h)": "Отработано (ч)"
+    "Geleistet (h)": "Отработано (ч)",
+    "Sortieren": "Сортировать",
+    "Position": "Позиция",
+    "Verschieben": "Переместить",
+    "Nach oben": "Вверх",
+    "Nach unten": "Вниз",
+    "Zeilen am Griff mit Maus oder Finger verschieben.": "Перемещайте строки за ручку мышью или пальцем.",
+    "Liste wurde geändert. Bitte neu laden.": "Список изменён. Обновите страницу.",
+    "Sortierung wurde geändert. Bitte neu laden.": "Порядок изменён. Обновите страницу."
   },
   "es": {
     "Administration": "Administración",
@@ -6797,7 +6829,7 @@
     "Ausgewählte übernehmen": "Importar seleccionadas",
     "Meine Freigaben": "Mis enlaces compartidos",
     "Bitte zuerst speichern oder die Bearbeitung abbrechen.": "Primero guarde o cancele la edición.",
-    "Widerrufen": "Revocado",
+    "Widerrufen": "Deshacer",
     "Abgelaufen": "Caducado",
     "Freigabe widerrufen? Bereits importierte Kopien bleiben erhalten.": "¿Revocar el acceso? Las copias ya importadas se conservarán.",
     "Bereits in eigener Liste": "Ya está en su lista",
@@ -7117,6 +7149,14 @@
     "SIM = Simulatorfahrt": "SIM = Sesión de simulador",
     "B = Bereitschaft": "B = Disponibilidad",
     "Sollstunden (h)": "Horas previstas (h)",
-    "Geleistet (h)": "Horas trabajadas (h)"
+    "Geleistet (h)": "Horas trabajadas (h)",
+    "Sortieren": "Ordenar",
+    "Position": "Posición",
+    "Verschieben": "Mover",
+    "Nach oben": "Subir",
+    "Nach unten": "Bajar",
+    "Zeilen am Griff mit Maus oder Finger verschieben.": "Arrastra las filas por el asa con el ratón o el dedo.",
+    "Liste wurde geändert. Bitte neu laden.": "La lista ha cambiado. Vuelve a cargarla.",
+    "Sortierung wurde geändert. Bitte neu laden.": "El orden ha cambiado. Vuelve a cargarlo."
   }
 }

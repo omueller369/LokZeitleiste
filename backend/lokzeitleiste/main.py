@@ -700,3 +700,6 @@ def plan_colors_script():return FileResponse(Path(__file__).parent/"static"/"pla
 
 @app.get("/admin/rest-plans")
 def rest_plans_page():return FileResponse(Path(__file__).parent/"static"/"planning-overview.html")
+
+from .default_order import create_router as default_order_router
+app.include_router(default_order_router(require_admin))
