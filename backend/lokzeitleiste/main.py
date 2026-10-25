@@ -704,3 +704,6 @@ def rest_plans_page():return FileResponse(Path(__file__).parent/"static"/"planni
 
 from .default_order import create_router as default_order_router
 app.include_router(default_order_router(require_admin))
+
+from .pwa import create_router as pwa_router
+app.include_router(pwa_router())

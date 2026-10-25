@@ -1456,7 +1456,19 @@
     "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.": "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.",
     "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.": "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.",
     "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.": "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.",
-    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen."
+    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.",
+    "App installieren": "App installieren",
+    "TF-Portal installieren": "TF-Portal installieren",
+    "Verwaltung installieren": "Verwaltung installieren",
+    "Als eigene Anwendung auf dem Startbildschirm nutzen.": "Als eigene Anwendung auf dem Startbildschirm nutzen.",
+    "Als eigene Anwendung nutzen": "Als eigene Anwendung nutzen",
+    "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.": "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.",
+    "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.": "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.",
+    "Bereich öffnen": "Bereich öffnen",
+    "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.": "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.",
+    "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.": "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.",
+    "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.": "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.",
+    "Bitte die Seite über HTTPS öffnen, um die App zu installieren.": "Bitte die Seite über HTTPS öffnen, um die App zu installieren."
   },
   "en": {
     "Administration": "Administration",
@@ -2915,7 +2927,19 @@
     "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.": "Check available browser storage and storage permissions. Do not close the page before saving your input.",
     "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.": "Save the current entry or cancel editing first.",
     "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.": "Check your input and correct the stated cause. Then try again.",
-    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Complete the indicated required field in the specified format."
+    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Complete the indicated required field in the specified format.",
+    "App installieren": "Install app",
+    "TF-Portal installieren": "Install TF portal",
+    "Verwaltung installieren": "Install administration app",
+    "Als eigene Anwendung auf dem Startbildschirm nutzen.": "Use as a separate app on your home screen.",
+    "Als eigene Anwendung nutzen": "Use as a separate app",
+    "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.": "The TF portal and administration can be installed separately. Each has its own home screen icon.",
+    "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.": "Open this page via HTTPS in your mobile browser.",
+    "Bereich öffnen": "Open area",
+    "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.": "In Safari: Share → Add to Home Screen → Open as Web App → Add.",
+    "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.": "Select “Install app” or “Add to Home screen” in the browser menu.",
+    "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.": "Install the TF portal and administration from their respective entry pages.",
+    "Bitte die Seite über HTTPS öffnen, um die App zu installieren.": "Please open the page via HTTPS to install the app."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4374,7 +4398,19 @@
     "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.": "Sprawdź wolne miejsce i uprawnienia pamięci przeglądarki. Nie zamykaj strony przed zapisaniem danych.",
     "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.": "Najpierw zapisz bieżący wpis lub anuluj edycję.",
     "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.": "Sprawdź dane i usuń wskazaną przyczynę. Następnie spróbuj ponownie.",
-    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Wypełnij wskazane pole wymagane w podanym formacie."
+    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Wypełnij wskazane pole wymagane w podanym formacie.",
+    "App installieren": "Zainstaluj aplikację",
+    "TF-Portal installieren": "Zainstaluj portal maszynisty",
+    "Verwaltung installieren": "Zainstaluj aplikację administracji",
+    "Als eigene Anwendung auf dem Startbildschirm nutzen.": "Korzystaj jako z osobnej aplikacji na ekranie głównym.",
+    "Als eigene Anwendung nutzen": "Korzystaj jako z osobnej aplikacji",
+    "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.": "Portal maszynisty i administrację można instalować oddzielnie. Każdy obszar otrzyma własną ikonę na ekranie głównym.",
+    "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.": "Otwórz tę stronę przez HTTPS w przeglądarce urządzenia mobilnego.",
+    "Bereich öffnen": "Otwórz obszar",
+    "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.": "W Safari: Udostępnij → Do ekranu początkowego → Otwórz jako aplikację internetową → Dodaj.",
+    "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.": "W menu przeglądarki wybierz „Zainstaluj aplikację” lub „Dodaj do ekranu głównego”.",
+    "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.": "Zainstaluj portal maszynisty i administrację z ich własnych stron wejściowych.",
+    "Bitte die Seite über HTTPS öffnen, um die App zu installieren.": "Otwórz stronę przez HTTPS, aby zainstalować aplikację."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5833,7 +5869,19 @@
     "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.": "Проверьте свободное место и разрешение на хранение в браузере. Не закрывайте страницу до сохранения данных.",
     "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.": "Сначала сохраните текущую запись или отмените редактирование.",
     "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.": "Проверьте данные и устраните указанную причину. Затем повторите попытку.",
-    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Заполните указанное обязательное поле в требуемом формате."
+    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Заполните указанное обязательное поле в требуемом формате.",
+    "App installieren": "Установить приложение",
+    "TF-Portal installieren": "Установить портал машиниста",
+    "Verwaltung installieren": "Установить приложение управления",
+    "Als eigene Anwendung auf dem Startbildschirm nutzen.": "Используйте как отдельное приложение на главном экране.",
+    "Als eigene Anwendung nutzen": "Использовать как отдельное приложение",
+    "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.": "Портал машиниста и управление можно установить отдельно. У каждого раздела будет свой значок на главном экране.",
+    "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.": "Откройте эту страницу по HTTPS в браузере мобильного устройства.",
+    "Bereich öffnen": "Открыть раздел",
+    "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.": "В Safari: Поделиться → На экран «Домой» → Открывать как веб-приложение → Добавить.",
+    "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.": "Выберите «Установить приложение» или «Добавить на главный экран» в меню браузера.",
+    "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.": "Установите портал машиниста и управление с соответствующих стартовых страниц.",
+    "Bitte die Seite über HTTPS öffnen, um die App zu installieren.": "Откройте страницу по HTTPS для установки приложения."
   },
   "es": {
     "Administration": "Administración",
@@ -7292,6 +7340,18 @@
     "Bitte freien Browserspeicher und die Speicherfreigabe prüfen. Die Seite vor dem Sichern der Eingaben nicht schließen.": "Revise el espacio y los permisos de almacenamiento del navegador. No cierre la página antes de guardar los datos.",
     "Bitte die aktuelle Eingabe zuerst speichern oder die Bearbeitung abbrechen.": "Guarde primero la entrada actual o cancele la edición.",
     "Bitte die Eingaben prüfen und die angegebene Ursache korrigieren. Anschließend erneut versuchen.": "Revise los datos y corrija la causa indicada. Después inténtelo de nuevo.",
-    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Complete el campo obligatorio indicado con el formato especificado."
+    "Bitte das markierte Pflichtfeld vollständig und im angegebenen Format ausfüllen.": "Complete el campo obligatorio indicado con el formato especificado.",
+    "App installieren": "Instalar aplicación",
+    "TF-Portal installieren": "Instalar portal de maquinistas",
+    "Verwaltung installieren": "Instalar aplicación de administración",
+    "Als eigene Anwendung auf dem Startbildschirm nutzen.": "Utilice una aplicación independiente en la pantalla de inicio.",
+    "Als eigene Anwendung nutzen": "Utilizar como aplicación independiente",
+    "TF-Portal und Verwaltung können getrennt installiert werden. Jeder Bereich erhält ein eigenes Symbol auf dem Startbildschirm.": "El portal de maquinistas y la administración se pueden instalar por separado. Cada área tendrá su propio icono en la pantalla de inicio.",
+    "Öffnen Sie diese Seite über HTTPS im Browser Ihres Mobilgeräts.": "Abra esta página mediante HTTPS en el navegador de su dispositivo móvil.",
+    "Bereich öffnen": "Abrir área",
+    "In Safari: Teilen → Zum Home-Bildschirm → Als Web-App öffnen → Hinzufügen.": "En Safari: Compartir → Añadir a pantalla de inicio → Abrir como app web → Añadir.",
+    "Im Browsermenü „App installieren“ oder „Zum Startbildschirm hinzufügen“ wählen.": "Seleccione «Instalar aplicación» o «Añadir a pantalla de inicio» en el menú del navegador.",
+    "Installieren Sie TF-Portal und Verwaltung jeweils über deren eigene Einstiegsseite.": "Instale el portal de maquinistas y la administración desde sus respectivas páginas de entrada.",
+    "Bitte die Seite über HTTPS öffnen, um die App zu installieren.": "Abra la página mediante HTTPS para instalar la aplicación."
   }
 }
