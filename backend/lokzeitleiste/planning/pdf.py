@@ -98,7 +98,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                     code=("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
                     day=date.fromisoformat(item["date"])
-                    cells.append(Paragraph(f"<b>{day.day:02d}</b><br/>{display(WEEKDAYS[day.weekday()])[0]}<br/>{code}",styles["YearCell"]))
+                    cells.append(Paragraph(f"<b>{day.day:02d}</b><br/>{code}",styles["YearCell"]))
                     if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
                 else:

@@ -136,7 +136,7 @@ function renderYear() {
     for (const day of window.PlanColors.yearSlots(month)) {
       const td = document.createElement('td');
       if (day) {
-        const button = document.createElement('button'); for(const value of [String(Number(day.date.slice(-2))),window.PlanColors.weekdayInitial(day.date),day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day)]){const line=document.createElement('span');line.textContent=value;line.setAttribute('data-i18n-ignore','');button.append(line);} button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
+        const button = document.createElement('button'); for(const value of [String(Number(day.date.slice(-2))),day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day)]){const line=document.createElement('span');line.textContent=value;line.setAttribute('data-i18n-ignore','');button.append(line);} button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
         button.title = day.date + ' · ' + (day.is_holiday?planLabel(day)+' · 0:00 h':day.kind); button.setAttribute('aria-label', button.title);
         button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
         button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));
