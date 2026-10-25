@@ -22,6 +22,8 @@ def main():
         migrate_existing(db)
         migrate_legacy_gender(db)
         seed_stations(db)
+        from .planning.clear_legacy_notes import migrate as clear_old_notes
+        clear_old_notes(db)
         db.commit()
         sync_user_directories(db)
         from .documents.archive import backfill_documents

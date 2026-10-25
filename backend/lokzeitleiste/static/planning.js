@@ -62,6 +62,9 @@ function changeDay(day, kind, note,shift=null) {
   updateDuty(day);syncDraft(); renderCalendar(); clearPreview();
   message('Ungespeicherte Änderungen. PDFs zeigen den gespeicherten Stand.');
 }
+function openPlanDay(day){activeDay=day;el('dayTitle').textContent='Tag bearbeiten · '+day.date;el('dayKind').value=day.kind;el('dayNote').value=day.note;el('dayNote').disabled=day.kind==='Ungeplant';el('dayDialog').showModal();}
+function reviewPlanChanges(review){return new Promise(resolve=>{const dialog=el('planReviewDialog');el('planReviewRows').replaceChildren();const describe=d=>d.kind+' · Soll '+clock(d.target_minutes)+' h'+(d.note?'\nNotiz: '+d.note:'');for(const change of review.changes){const row=document.createElement('tr');for(const value of [change.name,change.date,describe(change.before),describe(change.after)]){const cell=document.createElement('td');cell.textContent=value;cell.dataset.i18nIgnore='';row.append(cell);}el('planReviewRows').append(row);}el('planReviewAgree').checked=false;el('planReviewSave').disabled=true;const finish=value=>{dialog.close();resolve(value);};el('planReviewAgree').onchange=()=>el('planReviewSave').disabled=!el('planReviewAgree').checked;el('planReviewSave').onclick=()=>{if(el('planReviewAgree').checked)finish(true);};el('planReviewCancel').onclick=()=>finish(false);dialog.oncancel=event=>{event.preventDefault();finish(false);};dialog.showModal();});}
+async function saveConfirmed(days,revisions){const body={groups:[{tf_id:Number(saved.tf),year:saved.year,days,expected_revisions:revisions}]};const review=await api('/api/v1/admin/planning/collective/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!review.changes.length){message('Keine Änderungen vorhanden.');return false;}if(!await reviewPlanChanges(review))return false;await api('/api/v1/admin/planning/collective/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,confirmation:review.confirmation,confirmed:true})});return true;}
 function renderCalendar() {
   const grid = el('calendar'); grid.replaceChildren();
   for (const name of ['Mo','Di','Mi','Do','Fr','Sa','So']) {
@@ -80,9 +83,7 @@ function renderCalendar() {
     button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
     button.onclick = () => {
       if(el('selectionMode').checked){toggleDate(day.date);return;}
-      activeDay = day; el('dayTitle').textContent = 'Tag bearbeiten · ' + day.date;
-      shiftOptions(el('dayShift'));el('dayShift').value=day.shift||'standard';el('dayShift').disabled=day.kind!=='Arbeitstag';el('dayKind').value = day.kind; el('dayNote').value = day.note;
-      el('dayNote').disabled = day.kind === 'Ungeplant'; el('dayDialog').showModal();
+      openPlanDay(day);
     };
     grid.append(button);
   }
@@ -101,15 +102,14 @@ function renderDays() {
     for (const kind of kinds) { const option = document.createElement('option'); option.textContent = kind; select.append(option); }
     select.disabled = accessLevel < 2; check.disabled = accessLevel < 2;
     select.value = day.kind; cell = document.createElement('td'); cell.append(select);if(day.is_holiday){const badge=document.createElement('span');badge.textContent=planLabel(day);badge.className='holiday-label';cell.append(badge);}row.append(cell);
-    const duty=document.createElement('select');shiftOptions(duty);duty.value=day.shift||'standard';duty.disabled=accessLevel<2||day.kind!=='Arbeitstag';duty.setAttribute('aria-label','Schicht '+day.date);cell=document.createElement('td');cell.append(duty);row.append(cell);const hours = document.createElement('td'); hours.textContent=clock(day.target_minutes);row.append(hours);
-    const note = document.createElement('input'); note.type = 'text'; note.maxLength = 500; note.value = day.note;
+    const hours=document.createElement('td');hours.textContent=clock(day.target_minutes);row.append(hours);const worked=document.createElement('td');worked.textContent=clock(day.performed_minutes||0);row.append(worked);
+    const note = document.createElement('input'); note.type = 'text';note.setAttribute('list','planningNoteChoices'); note.maxLength = 500; note.value = day.note;
     note.disabled = accessLevel < 2 || day.kind === 'Ungeplant'; note.setAttribute('aria-label', 'Notiz ' + day.date);
     cell = document.createElement('td'); cell.append(note); row.append(cell);
     select.onchange = () => {
       changeDay(day, select.value, note.value); row.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(row,day);if(day.is_holiday)row.querySelector('.holiday-label').textContent=planLabel(day); note.value = day.note;
-      note.disabled = day.kind === 'Ungeplant';duty.disabled=day.kind!=='Arbeitstag';duty.value=day.shift;hours.textContent=clock(day.target_minutes);
+      note.disabled = day.kind === 'Ungeplant';hours.textContent=clock(day.target_minutes);
     };
-    duty.onchange=()=>{changeDay(day,day.kind,note.value,duty.value);hours.textContent=clock(day.target_minutes);};
     note.oninput = () => changeDay(day, day.kind, note.value);
     body.append(row);
   }
@@ -139,7 +139,7 @@ function renderYear() {
         const button = document.createElement('button'); for(const value of [day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day)]){const line=document.createElement('span');line.textContent=value;line.setAttribute('data-i18n-ignore','');button.append(line);} const note=document.createElement('span');note.className='year-note';note.textContent=day.note||'\u00a0';note.setAttribute('data-i18n-ignore','');button.append(note);button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
         button.title = day.date + ' · ' + (day.is_holiday?planLabel(day)+' · 0:00 h':day.kind); button.title+=(day.note?' · '+day.note:'');button.setAttribute('aria-label', button.title);
         button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
-        button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));
+        button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}openPlanDay(day); }));
         td.append(button);
       }
       matrixRow.append(td);
@@ -159,14 +159,14 @@ async function load(force = false) {
   const year = Number(el('year').value), month = Number(el('month').value), tf = el('tf').value;
   if (!tf) throw Error('Zuerst einen Tf in der Verwaltung anlegen.');
   if (year < 2000 || year > 2100 || !Number.isInteger(year)) throw Error('Jahr zwischen 2000 und 2100 wählen.');
-  if(sameYear&&!force){saved.month=month;current=annual.months[month-1];el('title').textContent=names[month-1]+' '+year;el('monthPdf').href=prefix()+'/'+month+'/pdf';if(el('viewerMonthPdf'))el('viewerMonthPdf').href=el('monthPdf').href;updateMetrics();renderDays();renderCalendar();renderYear();switchView(view);return true;}
+  if(sameYear&&!force){saved.month=month;current=annual.months[month-1];el('title').textContent=names[month-1]+' '+year;updateMetrics();renderDays();renderCalendar();renderYear();switchView(view);return true;}
   const ticket = ++loadTicket, base = '/api/v1/admin/tf/' + tf + '/plan/' + year;
   const [data, yearData, history] = await Promise.all([api(base + '/' + month), api(base), api(base + '/history')]);
   if (ticket !== loadTicket) return false;
-  saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note,d.shift||'standard'])]));clearPreview();shiftOptions(el('bulkShift'));el('bulkShift').value=annual.driver_type==='border'?'border_day':'standard';
+  saved = {tf, year, month}; annual = yearData;current=annual.months[month-1];dirty = false;selection.clear();originals=new Map(annual.months.flatMap(m=>m.days).map(d=>[d.date,JSON.stringify([d.kind,d.note,d.shift||'standard'])]));clearPreview();
   el('title').textContent = names[month - 1] + ' ' + year;
   updateMetrics(); renderDays(); renderCalendar(); renderYear(); switchView(view);
-  el('monthPdf').href = base + '/' + month + '/pdf';if(el('viewerMonthPdf'))el('viewerMonthPdf').href=el('monthPdf').href; el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
+  el('yearPdf').href = base + '/pdf'; el('template').href = base + '/template.xlsx';
   el('history').replaceChildren();
   for (const item of history) {
     const line = document.createElement('p'); line.textContent = item.date + ': ' + item.previous_kind+' · '+shiftLabels[item.previous_shift||'standard'] + ' → ' + item.new_kind+' · '+shiftLabels[item.new_shift||'standard'] +
@@ -188,13 +188,13 @@ async function exclusive(fn) {
 el('load').onclick = handle(() => exclusive(async()=>{if(dirty&&!confirm('Ungespeicherte Änderungen verwerfen?'))return;await load(true);}));
 for (const id of ['tf','year','month']) el(id).onchange = handle(() => exclusive(() => load()));
 document.querySelectorAll('[data-view]').forEach(button => button.onclick = () => switchView(button.dataset.view));
-el('dayKind').onchange = () => {el('dayShift').disabled=el('dayKind').value!=='Arbeitstag';if(el('dayKind').value==='Arbeitstag'&&activeDay.kind!=='Arbeitstag')el('dayShift').value=annual.driver_type==='border'?'border_day':'standard'; el('dayNote').disabled = el('dayKind').value === 'Ungeplant'; if (el('dayNote').disabled) el('dayNote').value = ''; };
+el('dayKind').onchange=()=>{el('dayNote').disabled=el('dayKind').value==='Ungeplant';if(el('dayNote').disabled)el('dayNote').value='';};
 el('closeDay').onclick = () => el('dayDialog').close();
-el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay, el('dayKind').value, el('dayNote').value,el('dayShift').value); renderDays(); el('dayDialog').close(); };
+el('dayForm').onsubmit = event => { event.preventDefault(); changeDay(activeDay, el('dayKind').value, el('dayNote').value); renderDays(); el('dayDialog').close(); };
 el('selectAll').onchange=()=>{for(const d of scopeDays())el('selectAll').checked?selectedSet().add(d.date):selectedSet().delete(d.date);renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
 el('clearSelection').onclick=()=>{selectedSet().clear();renderCalendar();renderDays();renderYear();renderPreview();selectionStatus();};
-el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){d.kind=el('bulkKind').value;d.shift=d.kind==='Arbeitstag'?el('bulkShift').value:'standard';if(d.kind==='Ungeplant')d.note='';updateDuty(d);}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
-el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));await api(prefix()+'/bulk',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({days:days.map(({date,kind,note,shift})=>({date,kind,note,shift})),expected_revisions:Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))})});await load(true);message('Planänderungen gespeichert.');window.refreshPlanningOverview?.();}));
+el('bulk').onclick=()=>{if(!selectedSet().size){message('Bitte Tage markieren.',true);return;}const days=view==='excel'?importData?.days||[]:annual.months.flatMap(m=>m.days);for(const d of days)if(selectedSet().has(d.date)){const kind=el('bulkKind').value;d.shift=kind==='Arbeitstag'?(d.kind==='Arbeitstag'?d.shift:annual.driver_type==='border'?'border_day':'standard'):'standard';d.kind=kind;d.note=kind==='Ungeplant'?'':el('bulkNote').value.trim();updateDuty(d);}if(view==='excel')renderPreview();else{syncDraft();renderCalendar();renderDays();}message(view==='excel'?'Importvorschau angepasst.':'Markierte Tage angepasst. Bitte Änderungen speichern.');};
+el('save').onclick=handle(()=>exclusive(async()=>{const days=changedDays();if(!days.length){message('Keine Änderungen vorhanden.');return;}const months=new Set(days.map(d=>Number(d.date.slice(5,7))));if(!await saveConfirmed(days.map(({date,kind,note,shift})=>({date,kind,note,shift})),Object.fromEntries([...months].map(m=>[m,annual.months[m-1].revision]))))return;await load(true);message('Planänderungen gespeichert.');}));
 el('inspect').onclick = handle(() => exclusive(async () => {
   if (dirty) throw Error('Bitte Monatsänderungen zuerst speichern oder den Plan neu laden.');
   const file = el('excel').files[0]; if (!file) throw Error('Bitte eine XLSX-Datei auswählen.');
@@ -206,9 +206,8 @@ el('inspect').onclick = handle(() => exclusive(async () => {
 }));
 el('confirm').onclick = handle(() => exclusive(async () => {
   if (!importData) throw Error('Zuerst Import prüfen.'); if (dirty) throw Error('Ungespeicherte Monatsänderungen vorhanden.');
-  const result = await api(prefix() + '/import', {method: 'POST', headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({days: importData.days.map(({date,kind,note,shift}) => ({date,kind,note,shift})), expected_revisions: importData.expected_revisions})});
-  await load(true); message(result.changed_days + ' Tagesplanungen aus Excel übernommen.');window.refreshPlanningOverview?.();
+  if(!await saveConfirmed(importData.days.map(({date,kind,note,shift})=>({date,kind,note,shift})),importData.expected_revisions))return;
+  await load(true);message('Planänderungen gespeichert.');
 }));
 el('cancel').onclick = clearPreview;
 window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
@@ -225,7 +224,7 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
       for (const id of ['save','bulk','inspect','confirm','excel','selectAll','selectionTools']) el(id).hidden = true;
       document.querySelector('[data-view=excel]').hidden = true;
     }
-    if(new URLSearchParams(location.search).get('readonly')==='1'){document.querySelector('h1').textContent='Triebfahrzeugführer · Dienstplan';document.querySelector('nav.tabs').hidden=true;el('editor').querySelector('p.muted').hidden=true;const pdf=document.createElement('a');pdf.id='viewerMonthPdf';pdf.className='download';pdf.textContent='Monats-PDF';el('editor').querySelector('.headerline').append(pdf);}
+    if(new URLSearchParams(location.search).get('readonly')==='1'){document.querySelector('h1').textContent='Triebfahrzeugführer · Dienstplan';document.querySelector('nav.tabs').hidden=true;el('editor').querySelector('p.muted').hidden=true;}
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }

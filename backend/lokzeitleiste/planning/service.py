@@ -29,6 +29,14 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
         info=holiday_info(day)
         days.append({"date": day.isoformat(), "kind": kind, **info,
                      "note": item.note if item else "", **duty_info(day,kind,duties.get(day,"standard"),info["is_holiday"],standard_minutes)})
+    from ..reports.intervals import period_entries
+    from ..reports.daily import day_rows
+    from ..models import TfProfile
+    profile=db.get(TfProfile,tf_id)
+    actual={}
+    for row in day_rows(period_entries(db,tf_id,date(year,month,1),date(year,month,len(days))),profile.federal_state or 'BE' if profile else 'BE'):
+        actual[row.day.isoformat()]=actual.get(row.day.isoformat(),0)+row.work
+    for item in days:item['performed_minutes']=actual.get(item['date'],0)
     counts = {kind: sum(d["kind"] == kind and not d["is_holiday"] for d in days) for kind in KINDS}
     return {"year": year, "month": month,"weekly_minutes":weekly_minutes(db,tf_id),"contract_monthly_minutes":monthly_minutes(db,tf_id,year,month),"driver_type":driver_type(db,tf_id), "revision": period.revision if period else 0,
             "days": days, "holiday_days":sum(d["is_holiday"] for d in days), "holiday_state":"BE", "work_days": counts["Arbeitstag"], "vacation_days": counts["Urlaub"],

@@ -21,6 +21,7 @@ from .reports.mailer import smtp_configured
 from .reports.pdf import render_receipt_pdf
 from .reports.monthly import summarize_month
 from .reports.service import process_dispatch
+from .change_log import bind_actor
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
@@ -36,6 +37,7 @@ def require_tf(request: Request, authorization: str | None = Header(default=None
         raise HTTPException(401, "Tf-Anmeldung erforderlich")
     if request.url.path != '/api/v1/tf/logout':
         ready(db,user)
+    bind_actor(db,user,request)
     return user
 
 
@@ -47,6 +49,7 @@ def require_admin(request: Request, authorization: str | None = Header(default=N
     if request.method not in ("GET", "HEAD") and PUBLIC_ORIGIN and request.headers.get("origin") != PUBLIC_ORIGIN:
         raise HTTPException(403, "Ungültiger Ursprung")
     authorize_route(db,user,request)
+    bind_actor(db,user,request)
     return user
 
 

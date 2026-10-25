@@ -9,6 +9,7 @@ from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password, account_active
 from .access import MODULES, check_delegation, demand, password_required, permissions
+from ..change_log import bind_actor
 from .photos import decode_photo, save_photo
 from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
 
@@ -24,6 +25,7 @@ def account_dependency(origin):
             raise HTTPException(401,'Anmeldung erforderlich')
         if not bearer and request.method not in ('GET','HEAD') and origin() and request.headers.get('origin') != origin():
             raise HTTPException(403,'Ungültiger Ursprung')
+        bind_actor(db,user,request)
         return user
 
     return account

@@ -1414,7 +1414,14 @@
     "abbrechen": "abbrechen",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Diese Lok-Leasing-Firma ist bereits vorhanden.",
     "Lok-Leasing-Firma nicht gefunden.": "Lok-Leasing-Firma nicht gefunden.",
-    "Wochenende": "Wochenende"
+    "Wochenende": "Wochenende",
+    "AR = Ausfallruhe": "AR = Ausfallruhe",
+    "ZR = Zusatzruhe": "ZR = Zusatzruhe",
+    "RU = Resturlaub Vorjahr": "RU = Resturlaub Vorjahr",
+    "SIM = Simulatorfahrt": "SIM = Simulatorfahrt",
+    "B = Bereitschaft": "B = Bereitschaft",
+    "Sollstunden (h)": "Sollstunden (h)",
+    "Geleistet (h)": "Geleistet (h)"
   },
   "en": {
     "Administration": "Administration",
@@ -2831,7 +2838,14 @@
     "abbrechen": "cancel",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "This leasing company already exists.",
     "Lok-Leasing-Firma nicht gefunden.": "Leasing company not found.",
-    "Wochenende": "Weekend"
+    "Wochenende": "Weekend",
+    "AR = Ausfallruhe": "AR = Compensatory rest for cancelled duty",
+    "ZR = Zusatzruhe": "ZR = Additional rest",
+    "RU = Resturlaub Vorjahr": "RU = Leave carried over from previous year",
+    "SIM = Simulatorfahrt": "SIM = Simulator session",
+    "B = Bereitschaft": "B = Standby duty",
+    "Sollstunden (h)": "Target hours (h)",
+    "Geleistet (h)": "Hours worked (h)"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4248,7 +4262,14 @@
     "abbrechen": "anuluj",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Ta firma leasingowa już istnieje.",
     "Lok-Leasing-Firma nicht gefunden.": "Nie znaleziono firmy leasingowej.",
-    "Wochenende": "Weekend"
+    "Wochenende": "Weekend",
+    "AR = Ausfallruhe": "AR = Odpoczynek po odwołanej służbie",
+    "ZR = Zusatzruhe": "ZR = Dodatkowy odpoczynek",
+    "RU = Resturlaub Vorjahr": "RU = Urlop pozostały z poprzedniego roku",
+    "SIM = Simulatorfahrt": "SIM = Jazda na symulatorze",
+    "B = Bereitschaft": "B = Gotowość",
+    "Sollstunden (h)": "Godziny planowane (h)",
+    "Geleistet (h)": "Przepracowane (h)"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5665,7 +5686,14 @@
     "abbrechen": "отмена",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Такая лизинговая компания уже существует.",
     "Lok-Leasing-Firma nicht gefunden.": "Лизинговая компания не найдена.",
-    "Wochenende": "Выходные"
+    "Wochenende": "Выходные",
+    "AR = Ausfallruhe": "AR = Отдых при отмене смены",
+    "ZR = Zusatzruhe": "ZR = Дополнительный отдых",
+    "RU = Resturlaub Vorjahr": "RU = Остаток отпуска прошлого года",
+    "SIM = Simulatorfahrt": "SIM = Поездка на тренажёре",
+    "B = Bereitschaft": "B = Дежурство",
+    "Sollstunden (h)": "Плановые часы (ч)",
+    "Geleistet (h)": "Отработано (ч)"
   },
   "es": {
     "Administration": "Administración",
@@ -7082,6 +7110,13 @@
     "abbrechen": "cancelar",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Esta empresa ya existe.",
     "Lok-Leasing-Firma nicht gefunden.": "Empresa no encontrada.",
-    "Wochenende": "Fin de semana"
+    "Wochenende": "Fin de semana",
+    "AR = Ausfallruhe": "AR = Descanso por turno cancelado",
+    "ZR = Zusatzruhe": "ZR = Descanso adicional",
+    "RU = Resturlaub Vorjahr": "RU = Vacaciones pendientes del año anterior",
+    "SIM = Simulatorfahrt": "SIM = Sesión de simulador",
+    "B = Bereitschaft": "B = Disponibilidad",
+    "Sollstunden (h)": "Horas previstas (h)",
+    "Geleistet (h)": "Horas trabajadas (h)"
   }
 }

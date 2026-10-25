@@ -680,3 +680,29 @@ class VehicleLeasing(Base):
     __tablename__='vehicle_leasing'
     vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),primary_key=True)
     company_id:Mapped[int]=mapped_column(ForeignKey('leasing_companies.id'),nullable=False,index=True)
+
+
+class SystemChangeLog(Base):
+    __tablename__='system_change_log'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    changed_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False,index=True)
+    module:Mapped[str]=mapped_column(String(255),nullable=False)
+    employee_id:Mapped[int|None]=mapped_column(Integer,nullable=True,index=True)
+    employee:Mapped[str]=mapped_column(String(255),nullable=False)
+    change:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
+
+
+class SystemMigration(Base):
+    __tablename__='system_migrations'
+    key:Mapped[str]=mapped_column(String(100),primary_key=True)
+    applied_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class PlanningNoteBackup(Base):
+    __tablename__='planning_note_backup'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    plan_day_id:Mapped[int]=mapped_column(Integer,nullable=False)
+    tf_id:Mapped[int]=mapped_column(Integer,nullable=False)
+    day:Mapped[date]=mapped_column(Date,nullable=False)
+    note:Mapped[str]=mapped_column(Text,nullable=False)
+    saved_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
