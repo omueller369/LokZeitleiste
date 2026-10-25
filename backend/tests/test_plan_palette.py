@@ -8,4 +8,4 @@ class PlanPaletteTest(unittest.TestCase):
             day=dict(date=value,kind=kind,is_holiday=holiday)
             self.assertEqual(base_key(day),base);self.assertEqual(background_key(day),background)
         self.assertEqual(base_key(dict(date=date(2026,10,4),kind='Arbeitstag')),'Wochenende')
-        self.assertEqual([COLORS[k] for k in ('Urlaub','Arbeitstag','Wochenende','Feiertag')],['FF6B6B','E5E5E5','FFF176','FF80C0'])
+        self.assertEqual([COLORS[k] for k in ('Urlaub','Arbeitstag','Wochenende','Feiertag')],['FF7256','F5F5F5','EEDC82','FFE4E1'])
