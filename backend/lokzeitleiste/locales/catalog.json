@@ -1438,7 +1438,10 @@
     "Wieder in Betrieb nehmen": "Wieder in Betrieb nehmen",
     "Triebfahrzeug wieder in Betrieb nehmen?": "Triebfahrzeug wieder in Betrieb nehmen?",
     "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.",
-    "Kopieren": "Kopieren"
+    "Kopieren": "Kopieren",
+    "Alle lokalen Berichte des Monats synchronisieren": "Alle lokalen Berichte des Monats synchronisieren",
+    "Alle lokalen Berichte dieses Monats synchronisieren?": "Alle lokalen Berichte dieses Monats synchronisieren?",
+    "Bitte die Zugdaten vollständig eingeben.": "Bitte die Zugdaten vollständig eingeben."
   },
   "en": {
     "Administration": "Administration",
@@ -2879,7 +2882,10 @@
     "Wieder in Betrieb nehmen": "Return to service",
     "Triebfahrzeug wieder in Betrieb nehmen?": "Return this vehicle to service?",
     "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Take this vehicle out of service? Its data will be preserved.",
-    "Kopieren": "Copy"
+    "Kopieren": "Copy",
+    "Alle lokalen Berichte des Monats synchronisieren": "Synchronize all local reports for this month",
+    "Alle lokalen Berichte dieses Monats synchronisieren?": "Synchronize all local reports for this month?",
+    "Bitte die Zugdaten vollständig eingeben.": "Please complete the train journey details."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4320,7 +4326,10 @@
     "Wieder in Betrieb nehmen": "Przywróć do eksploatacji",
     "Triebfahrzeug wieder in Betrieb nehmen?": "Przywrócić ten pojazd do eksploatacji?",
     "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Wycofać ten pojazd z eksploatacji? Dane zostaną zachowane.",
-    "Kopieren": "Kopiuj"
+    "Kopieren": "Kopiuj",
+    "Alle lokalen Berichte des Monats synchronisieren": "Synchronizuj wszystkie lokalne raporty z tego miesiąca",
+    "Alle lokalen Berichte dieses Monats synchronisieren?": "Zsynchronizować wszystkie lokalne raporty z tego miesiąca?",
+    "Bitte die Zugdaten vollständig eingeben.": "Wypełnij wszystkie dane przejazdu."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5761,7 +5770,10 @@
     "Wieder in Betrieb nehmen": "Вернуть в эксплуатацию",
     "Triebfahrzeug wieder in Betrieb nehmen?": "Вернуть этот локомотив в эксплуатацию?",
     "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Вывести этот локомотив из эксплуатации? Данные сохранятся.",
-    "Kopieren": "Копировать"
+    "Kopieren": "Копировать",
+    "Alle lokalen Berichte des Monats synchronisieren": "Синхронизировать все локальные отчёты за месяц",
+    "Alle lokalen Berichte dieses Monats synchronisieren?": "Синхронизировать все локальные отчёты за этот месяц?",
+    "Bitte die Zugdaten vollständig eingeben.": "Заполните все данные поездки."
   },
   "es": {
     "Administration": "Administración",
@@ -7202,6 +7214,9 @@
     "Wieder in Betrieb nehmen": "Volver a poner en servicio",
     "Triebfahrzeug wieder in Betrieb nehmen?": "¿Volver a poner este vehículo en servicio?",
     "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "¿Retirar este vehículo del servicio? Se conservarán los datos.",
-    "Kopieren": "Copiar"
+    "Kopieren": "Copiar",
+    "Alle lokalen Berichte des Monats synchronisieren": "Sincronizar todos los informes locales del mes",
+    "Alle lokalen Berichte dieses Monats synchronisieren?": "¿Sincronizar todos los informes locales de este mes?",
+    "Bitte die Zugdaten vollständig eingeben.": "Complete los datos del trayecto."
   }
 }

@@ -1,0 +1,6 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+class E{constructor(){this.children=[];this.classList={toggle(){}};}append(...n){this.children.push(...n);}replaceChildren(){this.children=[];}setAttribute(){} }
+const window={addEventListener(){}},context={window,document:{createElement:()=>new E()},console};vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/train-journeys.js','utf8'),context);
+const editor=Object.create(window.TrainJourneyEditor.prototype);editor.o={bounds:()=>({start:'2026-10-25T09:01',end:'2026-10-25T12:03'}),minute:value=>Date.parse(value)/60000,clock:n=>String(n),readonly:()=>true};
+const item={fields:{train_number:{value:'123AB'}},tableTitle:new E(),rows:new E(),events:[{id:'e',reason:'Warten auf Zug',cause:'CTL',station:'BHF',station_name:'Bahnhof',start_at:'2026-10-25T09:02',end_at:'2026-10-25T09:19'}]};editor.table(item);assert.equal(item.tableTitle.textContent,'Zugnummer: 123AB');assert.equal(item.rows.children[0].children.length,7);assert.equal(item.rows.children[0].children[0].textContent,'CTL');editor.checkRange('2026-10-25T09:02','2026-10-25T09:19');assert.throws(()=>editor.checkRange('2026-10-25T09:00','2026-10-25T09:19'));
+console.log('Train table: train-number title, seven event columns, arbitrary minutes accepted, duty bounds retained.');

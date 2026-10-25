@@ -36,7 +36,7 @@
 @media(max-width:850px){#workReport .train-data-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.train-number{grid-area:1/1}.train-start-station{grid-area:2/1}.train-departure{grid-area:2/2}.train-end-station{grid-area:3/1}.train-arrival{grid-area:3/2}}
 @media(max-width:560px){#workReport .train-data-grid,#workReport .guest-data-grid{grid-template-columns:minmax(0,1fr)}#workReport .train-data-grid label,#workReport .guest-data-grid label,#workReport .guest-data-grid label.self-payer{grid-area:auto}.train-tab-bar #newTrainJourney{margin-left:0}.train-tabs button{min-width:0;max-width:100%}}
 
-.train-event-table tr>:first-child{display:none!important}.train-event-table{min-width:1000px}
+.train-event-table{min-width:1000px}
 
 #workReport .train-event-grid{grid-template-columns:minmax(10rem,.7fr) minmax(14rem,.85fr) minmax(16rem,1.5fr);align-items:end;gap:12px 18px}
 #workReport .train-event-grid label{min-width:0;margin:0}
@@ -66,3 +66,12 @@
 #workReport .month-plan-day{--day-color:#edf1f4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:100%;min-width:0;min-height:48px;margin:0;padding:3px 0;border:0;border-radius:2px;background:var(--day-color);color:#153746;font-size:clamp(4px,.75vw,11px);line-height:1.3;white-space:nowrap;font-variant-numeric:tabular-nums;cursor:pointer}
 #workReport .month-plan-day[data-kind=work]{--day-color:#f5f5f5}#workReport .month-plan-day[data-kind=rest]{--day-color:#66cdaa}#workReport .month-plan-day[data-kind=vacation]{--day-color:#ff7256}#workReport .month-plan-day[data-kind=sick]{--day-color:#ffd9d9}#workReport .month-plan-day.is-holiday{background:linear-gradient(135deg,#ffe4e1 0 50%,var(--day-color) 50% 100%)}#workReport .month-plan-day:focus-visible{outline:2px solid #17445b;outline-offset:1px;z-index:1}.month-plan-legend,#monthPlanDetail{font-size:.75rem;margin:8px 0 0;overflow-wrap:anywhere}
 @media(max-width:600px){#workReport .month-plan-strip{padding:6px}#workReport .month-plan-days{gap:0}#workReport .month-plan-day{min-height:34px;border-radius:0}}
+
+#reportListRows tr[data-sync-state="synced"]{background:#20b2aa;color:#102e35}
+#reportListRows tr[data-sync-state="synced"]:nth-child(even){background:#8bd8d3}
+#reportListRows tr[data-sync-state="local"]{background:#FF82AB;color:#102e35}
+#reportListRows tr[data-sync-state="local"]:nth-child(even){background:#ffc0d5}
+#reportListRows tr.selected{outline:3px solid #17445b;outline-offset:-3px}
+.train-event-table{min-width:650px}
+
+#reportListRows tr.selected td{background:transparent}

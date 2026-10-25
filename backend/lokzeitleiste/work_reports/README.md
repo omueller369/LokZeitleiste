@@ -104,3 +104,12 @@ Die frühere Tabelle „Arbeitszeiten des ausgewählten Monats“ und deren Umsc
 „Abbrechen“ bei einer Gastfahrt warnt bei vorhandenen Eingaben. Bestätigung leert die Eingabemaske und klappt Gastfahrten ein, ohne einen Datensatz zu übernehmen. Bereits hinzugefügte Gastfahrten bleiben erhalten; Abbruch der Bestätigung lässt die Eingaben unverändert.
 
 Gastfahrt-Zeitvorschläge: Die erste neue Gastfahrt endet zum Dienstbeginn und beginnt eine Stunde davor. Ab der zweiten neuen Gastfahrt wird Dienstende als Start und eine Stunde danach als Ende vorgeschlagen. Unveränderte Vorschläge folgen Änderungen der Dienstzeit; manuelle Eingaben und gespeicherte Gastfahrten bleiben erhalten.
+
+
+### Browser-Arbeitsbericht: gezielte Synchronisation und GPS-Historie
+
+Im Monatsverzeichnis synchronisiert „Synchronisieren“ in einer lokalen Zeile ausschließlich diesen Bericht einschließlich seiner Belege. „Alle lokalen Berichte des Monats synchronisieren“ überträgt nach Bestätigung die lokalen Berichte des ausgewählten Monats. Der Button im geöffneten Bericht synchronisiert nur den geöffneten Bericht. Andere lokale Entwürfe bleiben unverändert. Falls der aktuell bearbeitete Bericht mit ausgewählt ist, werden seine aktuellen gültigen Eingaben zunächst lokal gespeichert; unerledigte Ereigniseingaben verhindern die Synchronisation.
+
+Die Tabellenzeilen verwenden für Serverberichte #20B2AA / #8BD8D3 und für lokale Berichte #FF82AB / #FFC0D5. Zeitfelder akzeptieren jede Minute (60 Sekunden Schrittweite), Zugfahrtbereiche müssen weiterhin innerhalb der Dienstzeit liegen. Die Ereignistabelle hat eine erste Kopfzeile „Zugnummer: …“ und anschließend nur Art, Grund, Meldestelle/Ort, Von, Bis, Dauer und Pause.
+
+Für einen Dienstbeginn vor dem heutigen Berliner Kalendertag wird der GPS-Bereich ausgeblendet. Liegt für die betreffende Zugfahrt auf dem Server eine Aufzeichnung mit Positionen am gewählten Diensttag vor, wird sie angezeigt; als Aktion steht nur „GPS-Serverstand laden“ zur Verfügung. Lokale GPS-Daten allein schalten historische Aufzeichnungen nicht frei.
