@@ -27,3 +27,11 @@
 .station-notes label{display:block;margin-top:.8rem}.station-notes input,.station-notes textarea{width:100%;box-sizing:border-box}.station-notes textarea{min-height:8em;resize:vertical;white-space:pre-wrap}#stationSpecialRemaining{margin:.25rem 0;font-size:.9em}
 
 .station-identity label{display:block;margin:.7rem 0}.station-identity input{width:100%;box-sizing:border-box}#stationIdentityWarning{border:2px solid #b77900;background:#fff5d6;color:#493100;padding:.8rem;margin:.8rem 0}
+
+/* Compact personal plan: full month in one row, full year below it. */
+#tfMonthPlan{container-type:inline-size;display:grid;grid-template-columns:repeat(var(--plan-days,31),minmax(0,1fr));gap:1px;width:100%;min-width:0;margin-top:16px}
+#tfMonthPlan .tf-plan-day{font-size:clamp(2px,.85cqw,11px);width:100%;min-width:0;min-height:0;max-width:100%;padding:3px 0;border-radius:2px;line-height:1.15;color:#193044;overflow:hidden}
+.tf-plan-day span,.tf-plan-day small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tfMonthPlan .year-note{min-height:1.15em;font-size:inherit;border-top:1px solid #173e5530;margin-top:2px}
+.tf-plan-legend{font-size:.75rem;overflow-wrap:anywhere}.tf-plan-details{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,3fr);gap:10px}.tf-plan-details dt{font-weight:700}.tf-plan-details dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+#tfYearPlan table{font-size:clamp(2px,.85cqw,11px)}#tfYearPlan .tf-plan-day{color:#193044;border-radius:1px}#tfYearPlan th{font-size:inherit}#tfYearPlan th[scope=row]{background:white;color:#193044}#tfYearPlan .year-note{min-height:1.15em}

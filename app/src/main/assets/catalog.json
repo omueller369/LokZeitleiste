@@ -1431,7 +1431,8 @@
     "Liste wurde geändert. Bitte neu laden.": "Liste wurde geändert. Bitte neu laden.",
     "Sortierung wurde geändert. Bitte neu laden.": "Sortierung wurde geändert. Bitte neu laden.",
     "Auswahl bearbeiten": "Auswahl bearbeiten",
-    "Tage bearbeiten": "Tage bearbeiten"
+    "Tage bearbeiten": "Tage bearbeiten",
+    "Tage des ausgewählten Monats": "Tage des ausgewählten Monats"
   },
   "en": {
     "Administration": "Administration",
@@ -2865,7 +2866,8 @@
     "Liste wurde geändert. Bitte neu laden.": "The list has changed. Please reload.",
     "Sortierung wurde geändert. Bitte neu laden.": "The order has changed. Please reload.",
     "Auswahl bearbeiten": "Edit selection",
-    "Tage bearbeiten": "Edit days"
+    "Tage bearbeiten": "Edit days",
+    "Tage des ausgewählten Monats": "Days of the selected month"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4299,7 +4301,8 @@
     "Liste wurde geändert. Bitte neu laden.": "Lista została zmieniona. Odśwież ją.",
     "Sortierung wurde geändert. Bitte neu laden.": "Kolejność została zmieniona. Odśwież ją.",
     "Auswahl bearbeiten": "Edytuj zaznaczenie",
-    "Tage bearbeiten": "Edytuj dni"
+    "Tage bearbeiten": "Edytuj dni",
+    "Tage des ausgewählten Monats": "Dni wybranego miesiąca"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5733,7 +5736,8 @@
     "Liste wurde geändert. Bitte neu laden.": "Список изменён. Обновите страницу.",
     "Sortierung wurde geändert. Bitte neu laden.": "Порядок изменён. Обновите страницу.",
     "Auswahl bearbeiten": "Изменить выбранное",
-    "Tage bearbeiten": "Изменить дни"
+    "Tage bearbeiten": "Изменить дни",
+    "Tage des ausgewählten Monats": "Дни выбранного месяца"
   },
   "es": {
     "Administration": "Administración",
@@ -7167,6 +7171,7 @@
     "Liste wurde geändert. Bitte neu laden.": "La lista ha cambiado. Vuelve a cargarla.",
     "Sortierung wurde geändert. Bitte neu laden.": "El orden ha cambiado. Vuelve a cargarlo.",
     "Auswahl bearbeiten": "Editar selección",
-    "Tage bearbeiten": "Editar días"
+    "Tage bearbeiten": "Editar días",
+    "Tage des ausgewählten Monats": "Días del mes seleccionado"
   }
 }

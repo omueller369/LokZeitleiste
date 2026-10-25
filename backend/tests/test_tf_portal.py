@@ -91,3 +91,15 @@ class TfPortalTest(unittest.TestCase):
             db.get(TfEmployment,self.tf).immediate_block=True;db.commit()
         self.assertEqual(self.driver.get('/api/v1/tf/portal/plan/2026/10').status_code,401)
         self.assertEqual(self.driver.get('/tf',follow_redirects=False).status_code,303)
+
+    def test_own_year_plan_read_only_year_bounds_and_leap_days(self):
+        path='/api/v1/tf/portal/plan/2024'
+        result=self.driver.get(path);self.assertEqual(result.status_code,200,result.text)
+        year=result.json();self.assertEqual(year['year'],2024);self.assertEqual(len(year['months']),12)
+        self.assertEqual(len(year['months'][1]['days']),29)
+        self.assertEqual(year,self.client.get(f'/api/v1/admin/tf/{self.tf}/plan/2024').json())
+        self.assertEqual(self.driver.get(path+'?tf_id=999999').json(),year)
+        self.assertEqual(self.driver.post(path,json={}).status_code,405)
+        self.assertEqual(self.driver.get('/api/v1/tf/portal/plan/1999').status_code,422)
+        self.assertEqual(self.driver.get('/api/v1/tf/portal/plan/2101').status_code,422)
+        self.driver.cookies.clear();self.assertEqual(self.driver.get(path).status_code,401)

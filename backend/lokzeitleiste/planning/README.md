@@ -107,3 +107,5 @@ Die einzelnen Jahrestabellen passen ihre 31 Tages-Spalten an die verfügbare Con
 Plan-PDFs zeigen keine Ungeplant-Zählspalte und keinen Ungeplant-Legendeneintrag mehr. Der Vollständigkeitsstatus und die zugrunde liegenden Planungsdaten bleiben erhalten.
 
 Monats-/Jahres-PDFs tragen ausschließlich den fachlichen Titel im Kopf. Softwaretitel und zentrale Backendversion (`lokzeitleiste.version`) erscheinen als dezentes graues Wasserzeichen im Fußbereich jeder Seite.
+
+Im TF-Portal wird der selbst gewählte Monatsplan horizontal in einer Zeile angezeigt. Darunter steht ein Jahresplan mit eigener Jahresauswahl und 31 Tages-Spalten. Beide Darstellungen passen an die Containerbreite und besitzen keine internen horizontalen Scrollbereiche. Ein Tagesklick öffnet die vollständigen Dienst-/Stundenangaben und Notizen unterhalb der Pläne. Der Jahres-Endpunkt `/api/v1/tf/portal/plan/{year}` ist auf den angemeldeten TF beschränkt und bietet ausschließlich Lesezugriff. Monats- und Jahresauswahl bleiben unabhängig.

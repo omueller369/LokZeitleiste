@@ -7,7 +7,7 @@ from .db import database_session
 from .models import User, TfProfile
 from .security import user_from_token
 from .accounts.access import password_required
-from .planning.service import get_month
+from .planning.service import get_month,get_year
 
 STATIC=FilePath(__file__).parent/'static'
 
@@ -65,5 +65,10 @@ def create_router(require_account):
              user:User=Depends(require_driver),db:Session=Depends(database_session)):
         if not db.get(TfProfile,user.id):raise HTTPException(404,'Tf nicht gefunden')
         return get_month(db,user.id,year,month)
+
+    @router.get('/api/v1/tf/portal/plan/{year}')
+    def annual_plan(year:int=Path(ge=2000,le=2100),user:User=Depends(require_driver),db:Session=Depends(database_session)):
+        if not db.get(TfProfile,user.id):raise HTTPException(404,'Tf nicht gefunden')
+        return get_year(db,user.id,year)
 
     return router
