@@ -103,3 +103,5 @@ Die Gesamtübersicht „Ruhetagsplan aller TF“ ist ein eigenes Modul unter Per
 Markierte Tage werden über „Auswahl bearbeiten“ gemeinsam in der Tagesmaske bearbeitet. Die Auswahl bleibt über Monatsgrenzen erhalten. Die gemeinsame Änderung wird erst nach der bestehenden serverseitigen Vorschau und Bestätigung gespeichert. Tagesarten behalten unabhängig von der Sprache stabile technische Werte.
 
 Die einzelnen Jahrestabellen passen ihre 31 Tages-Spalten an die verfügbare Containerbreite an. Feste Mindestbreiten und Button-Mindesthöhen sind nur in diesen kompakten Tabellen aufgehoben. Schrift, Abstände und Notizzeilen verkleinern sich proportional; Monats-/Tagesansichten behalten ihre normalen Bedienelementgrößen. Die Tagesfelder bleiben per Klick/Tastatur bedienbar.
+
+Plan-PDFs zeigen keine Ungeplant-Zählspalte und keinen Ungeplant-Legendeneintrag mehr. Der Vollständigkeitsstatus und die zugrunde liegenden Planungsdaten bleiben erhalten.

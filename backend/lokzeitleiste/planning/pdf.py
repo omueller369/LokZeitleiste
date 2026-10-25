@@ -66,28 +66,29 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     metadata.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
     story=[metadata,Spacer(1,12)]
     sums = plan["totals"] if yearly else plan
-    summary = [["Erforderliche Arbeitstage", "Urlaubstage", "Ruhetage", "Ungeplant"],
-               [str(sums["work_days"]), str(sums["vacation_days"]), str(sums["rest_days"]), str(sums["unplanned_days"])],
-               ["Arbeitssoll", "Urlaubsgutschrift", "Soll inkl. Urlaub", "Planstatus"],
+    summary = [["Erforderliche Arbeitstage", "Urlaubstage", "Ruhetage"],
+               [str(sums["work_days"]), str(sums["vacation_days"]), str(sums["rest_days"])],
+               ["Arbeitssoll", "Urlaubsgutschrift", "Soll inkl. Urlaub"],
                [clock(sums["work_target_minutes"]) + " h", clock(sums["vacation_minutes"]) + " h",
-                clock(sums["target_minutes"]) + " h", "Vollständig" if plan["complete"] else "Unvollständig"]]
+                clock(sums["target_minutes"]) + " h"]]
     summary=[[Paragraph(str(value),styles['Normal']) for value in row] for row in summary]
-    summary_table = Table(summary, colWidths=[doc.width / 4] * 4)
+    summary_table = Table(summary, colWidths=[doc.width / 3] * 3)
     summary_table.setStyle(TableStyle([("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EEF4F8")),
                                       ("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                                       ("FONTNAME", (0, 1), (-1, 1), "PlanSans-Bold"),
                                       ("FONTNAME", (0, 3), (-1, 3), "PlanSans-Bold"),
                                       ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 8)]))
-    story += [summary_table, Spacer(1, 12)]
-    legend = [[Paragraph(f"{CODES[k]} - {k}",styles["PlanCell"]) for k in CODES]]
-    table = Table(legend, colWidths=[doc.width / len(CODES)] * len(CODES), rowHeights=34)
-    table.setStyle(TableStyle([("BACKGROUND", (i, 0), (i, 0), colors.HexColor("#" + COLORS[k])) for i, k in enumerate(CODES)] + [("FONTNAME", (0, 0), (-1, -1), "PlanSans")] +
+    story += [summary_table,Spacer(1,6),Paragraph(display("Planstatus")+": "+display("Vollständig" if plan["complete"] else "Unvollständig"),styles["Normal"]),Spacer(1,12)]
+    legend_kinds=[k for k in CODES if k!="Ungeplant"]
+    legend = [[Paragraph(f"{CODES[k]} - {k}",styles["PlanCell"]) for k in legend_kinds]]
+    table = Table(legend, colWidths=[doc.width / len(legend_kinds)] * len(legend_kinds), rowHeights=34)
+    table.setStyle(TableStyle([("BACKGROUND", (i, 0), (i, 0), colors.HexColor("#" + COLORS[k])) for i, k in enumerate(legend_kinds)] + [("FONTNAME", (0, 0), (-1, -1), "PlanSans")] +
                              [("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                               ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
     story += [table, Spacer(1, 14)]
     if yearly:
         styles.add(ParagraphStyle("YearCell",parent=styles["PlanCell"],fontSize=7,leading=8,alignment=1))
-        header = ["Monat"] + [str(i+1) for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "?", "Soll h"]
+        header = ["Monat"] + [str(i+1) for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "Soll h"]
         rows = [header]
         fills = []
         diagonal = {}
@@ -98,7 +99,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                     code=("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
                     note=' '.join(item.get('note','').split())
-                    available=(doc.width-248)/YEAR_COLUMNS-2
+                    available=(doc.width-223)/YEAR_COLUMNS-2
                     while note and pdfmetrics.stringWidth(note,'PlanSans',7)>available:
                         note=note[:-2].rstrip()+'…' if len(note)>1 else ''
                     weekday=display(('Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag')[date.fromisoformat(item['date']).weekday()])[:2]
@@ -108,10 +109,10 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 else:
                     cells.append("")
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#CDD4DA")))
-            cells += [str(month[k]) for k in ("work_days", "vacation_days", "rest_days", "unplanned_days")]
+            cells += [str(month[k]) for k in ("work_days", "vacation_days", "rest_days")]
             cells.append(clock(month["target_minutes"]))
             rows.append(cells)
-        widths = [78] + [(doc.width - 248) / YEAR_COLUMNS] * YEAR_COLUMNS + [25] * 4 + [70]
+        widths = [78] + [(doc.width - 223) / YEAR_COLUMNS] * YEAR_COLUMNS + [25] * 3 + [70]
         rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
         table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=widths, rowHeights=[26] + [34] * len(plan["months"]), repeatRows=1)
         table.setStyle(TableStyle(fills + [("LEFTPADDING",(1,0),(YEAR_COLUMNS,-1),1),("RIGHTPADDING",(1,0),(YEAR_COLUMNS,-1),1),("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK),
