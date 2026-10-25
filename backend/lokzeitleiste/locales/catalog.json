@@ -1413,7 +1413,8 @@
     "speichern": "speichern",
     "abbrechen": "abbrechen",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Diese Lok-Leasing-Firma ist bereits vorhanden.",
-    "Lok-Leasing-Firma nicht gefunden.": "Lok-Leasing-Firma nicht gefunden."
+    "Lok-Leasing-Firma nicht gefunden.": "Lok-Leasing-Firma nicht gefunden.",
+    "Wochenende": "Wochenende"
   },
   "en": {
     "Administration": "Administration",
@@ -2829,7 +2830,8 @@
     "speichern": "save",
     "abbrechen": "cancel",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "This leasing company already exists.",
-    "Lok-Leasing-Firma nicht gefunden.": "Leasing company not found."
+    "Lok-Leasing-Firma nicht gefunden.": "Leasing company not found.",
+    "Wochenende": "Weekend"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4245,7 +4247,8 @@
     "speichern": "zapisz",
     "abbrechen": "anuluj",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Ta firma leasingowa już istnieje.",
-    "Lok-Leasing-Firma nicht gefunden.": "Nie znaleziono firmy leasingowej."
+    "Lok-Leasing-Firma nicht gefunden.": "Nie znaleziono firmy leasingowej.",
+    "Wochenende": "Weekend"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5661,7 +5664,8 @@
     "speichern": "сохранить",
     "abbrechen": "отмена",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Такая лизинговая компания уже существует.",
-    "Lok-Leasing-Firma nicht gefunden.": "Лизинговая компания не найдена."
+    "Lok-Leasing-Firma nicht gefunden.": "Лизинговая компания не найдена.",
+    "Wochenende": "Выходные"
   },
   "es": {
     "Administration": "Administración",
@@ -7077,6 +7081,7 @@
     "speichern": "guardar",
     "abbrechen": "cancelar",
     "Diese Lok-Leasing-Firma ist bereits vorhanden.": "Esta empresa ya existe.",
-    "Lok-Leasing-Firma nicht gefunden.": "Empresa no encontrada."
+    "Lok-Leasing-Firma nicht gefunden.": "Empresa no encontrada.",
+    "Wochenende": "Fin de semana"
   }
 }

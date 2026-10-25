@@ -10,10 +10,10 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from .excel import COLORS
+from .palette import COLORS,base_key,background_key
 
 MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
-CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F"}
+CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F", "Wochenende":"WE"}
 DARK = colors.HexColor("#173E55")
 
 from ..pdf_locale import register_fonts, LocalizedParagraph as Paragraph
@@ -95,8 +95,8 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     item=month["days"][column-1]
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                     cells.append(("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else ""))
-                    if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=item["kind"]
-                    fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[kind])))
+                    if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
+                    fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
                 else:
                     cells.append("")
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#CDD4DA")))
@@ -124,12 +124,12 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     continue
                 item = plan["days"][day - 1]
                 kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(col,row)]=item["kind"]
+                if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(col,row)]=base_key(item)
                 status=CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
                 hours = clock(item["target_minutes"])+" h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
                 duty=("<br/>GT 09:00-21:00" if item.get("shift")=="border_day" else "<br/>GN 21:00-09:00 +1" if item.get("shift")=="border_night" else "")
                 cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}{duty}", styles["PlanCell"]))
-                fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[kind])))
+                fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[background_key(item)])))
             rows.append(cells)
         rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
         table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=[doc.width / 7] * 7, rowHeights=[25] + [60] * (len(rows) - 1))

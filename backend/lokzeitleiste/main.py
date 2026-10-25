@@ -690,3 +690,6 @@ def tab_auth_script():return FileResponse(Path(__file__).parent/"static"/"auth-s
 
 from .leasing import create_router as leasing_router
 app.include_router(leasing_router(require_admin))
+
+@app.get("/plan-colors.js")
+def plan_colors_script():return FileResponse(Path(__file__).parent/"static"/"plan-colors.js",media_type="text/javascript",headers={"Cache-Control":"no-cache"})

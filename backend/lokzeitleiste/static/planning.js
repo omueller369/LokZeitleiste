@@ -1,8 +1,7 @@
 const el = id => document.getElementById(id);
 const kinds = ['Arbeitstag', 'Urlaub', 'Ruhetag', 'Ungeplant'];
 const codes = {Arbeitstag: 'A', Urlaub: 'U', Ruhetag: 'R', Ungeplant: '?'};
-const planColors={Arbeitstag:'#dcebf9',Urlaub:'#dbf1e3',Ruhetag:'#ffe8cc'};
-function planColor(node,day){node.dataset.status=day.kind;node.style.backgroundImage=day.is_holiday&&planColors[day.kind]?'linear-gradient(135deg, #e9dff5 0%, #e9dff5 50%, '+planColors[day.kind]+' 50%, '+planColors[day.kind]+' 100%)':'';}
+function planColor(node,day){node.dataset.status=day.kind;window.PlanColors.apply(node,day);}
 const shiftLabels={standard:'Streckendienst',border_day:'Grenzdienst Tag',border_night:'Grenzdienst Nacht'};
 function dayCode(day){return day.kind==='Arbeitstag'&&day.shift==='border_day'?'GT':day.kind==='Arbeitstag'&&day.shift==='border_night'?'GN':codes[day.kind];}
 function dutyLabel(day){return day.kind==='Arbeitstag'&&day.shift!=='standard'?shiftLabels[day.shift]+' · '+(day.shift==='border_day'?'09:00–21:00':'21:00–09:00 Folgetag'):'';}

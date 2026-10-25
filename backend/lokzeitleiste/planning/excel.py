@@ -13,7 +13,7 @@ from ..i18n import translate, request_language
 
 MAX_FILE = 2 * 1024 * 1024
 MAX_UNPACKED = 20 * 1024 * 1024
-COLORS = {"Arbeitstag": "DCEBF9", "Urlaub": "DBF1E3", "Ruhetag": "FFE8CC", "Ungeplant": "EEF0F3", "Feiertag":"E9DFF5"}
+from .palette import COLORS,base_key,background_key
 
 
 def parse_excel(content: bytes, *, year: int, personnel_number: str) -> list[DayInput]:
@@ -118,8 +118,8 @@ def template(year_plan: dict, personnel_number: str) -> bytes:
             for cell in sheet[row]:
                 if item.get('is_holiday') and item['kind']!='Ungeplant':
                     from openpyxl.styles.fills import Stop
-                    cell.fill=GradientFill(type='linear',degree=45,stop=[Stop(COLORS['Feiertag'],0),Stop(COLORS['Feiertag'],0.499),Stop(COLORS[item['kind']],0.5),Stop(COLORS[item['kind']],1)])
-                else:cell.fill = PatternFill("solid", fgColor=COLORS["Feiertag" if item.get("is_holiday") else item["kind"]])
+                    cell.fill=GradientFill(type='linear',degree=45,stop=[Stop(COLORS['Feiertag'],0),Stop(COLORS['Feiertag'],0.499),Stop(COLORS[base_key(item)],0.5),Stop(COLORS[base_key(item)],1)])
+                else:cell.fill = PatternFill("solid", fgColor=COLORS[background_key(item)])
     for cell in sheet[1]:
         cell.fill = PatternFill("solid", fgColor="173E55")
         cell.font = Font(color="FFFFFF", bold=True)

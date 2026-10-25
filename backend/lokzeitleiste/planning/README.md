@@ -38,7 +38,7 @@ Alle Änderungen eines Imports erfolgen gemeinsam. Wird zwischen Vorschau und Ü
 
 - Monatsplan: farbiger Kalender auf A4, Kennzahlen und gegebenenfalls Notizen auf Folgeseiten.
 - Jahresplan: Jahresmatrix auf A3 quer, 12 Monate mit Tageskennzeichen und Monatssummen.
-- Blau = Arbeitstag, Grün = Urlaub, Orange = Ruhetag, Grau = ungeplant, Violett = Berliner Feiertag (F, 0 h Soll). Kennzeichen A/U/R/? und Legende erlauben auch einen Schwarzweiß-Ausdruck.
+- Blau = Arbeitstag, Grün = Urlaub, Orange = Ruhetag, Grau = ungeplant, Pink = Berliner Feiertag (F, 0 h Soll). Kennzeichen A/U/R/? und Legende erlauben auch einen Schwarzweiß-Ausdruck.
 
 Die Exporte zeigen den aktuellen gespeicherten Stand; noch nicht gespeicherte Änderungen erscheinen nicht im PDF. Die Pläne werden heruntergeladen, nicht automatisch per E-Mail versandt. Muster mit fiktiven Daten liegen unter `design/Plan-Monat-Muster.pdf` und `design/Plan-Jahr-Muster.pdf`.
 
@@ -82,7 +82,7 @@ Die Excel-Vorschau hat eine eigene Mehrfachauswahl. Sammeländerungen ändern zu
 
 ## Berliner Feiertagskalender ab v0.14
 
-Für alle Tf-Pläne gilt der gesetzliche Feiertagskalender Berlin (BE), unabhängig vom Bundesland der Tf-Stammdaten. Das bestehende Bundesland bleibt für die Ist-Arbeitszeit-/Feiertagsberechnung erhalten. Feiertage erhalten Namen, eigene Farbe und Kennzeichen F in Kalender, Tagesliste, Jahresmatrix, Importvorschau und PDF. Excel markiert Feiertage violett, nennt Namen und 0 Sollstunden im Datumskommentar und führt sie zusätzlich im Blatt „Feiertage Berlin“ auf. Das importierbare Blatt „Plan“ behält die bisherigen vier Spalten und ergänzt optional eine fünfte Spalte `Schicht`.
+Für alle Tf-Pläne gilt der gesetzliche Feiertagskalender Berlin (BE), unabhängig vom Bundesland der Tf-Stammdaten. Das bestehende Bundesland bleibt für die Ist-Arbeitszeit-/Feiertagsberechnung erhalten. Feiertage erhalten Namen, eigene Farbe und Kennzeichen F in Kalender, Tagesliste, Jahresmatrix, Importvorschau und PDF. Excel markiert Feiertage pink, nennt Namen und 0 Sollstunden im Datumskommentar und führt sie zusätzlich im Blatt „Feiertage Berlin“ auf. Das importierbare Blatt „Plan“ behält die bisherigen vier Spalten und ergänzt optional eine fünfte Spalte `Schicht`.
 
 An gesetzlichen Berliner Feiertagen ist das Plansoll immer 0 Minuten. Dies gilt auch bei gespeicherter oder neu importierter Tagesart Arbeitstag/Urlaub. Bestehende Tagesarten und Notizen bleiben als Planangaben erhalten; für erforderliche Arbeitstage, Urlaubs-Sollgutschrift, Ruhetage und offene Tage werden Feiertage separat gezählt. Ein ungeplanter Feiertag verhindert keinen vollständigen Plan. Mehrfachauswahl und manuelle Änderungen können die Feiertagsregel nicht aufheben. Tatsächlich geleistete/erfasste Zeiten bleiben unverändert.
 
@@ -90,4 +90,8 @@ Die API liefert je Tag `is_holiday`, `holiday_name`, `holiday_state` und das kor
 
 ## Diagonale Feiertagsdarstellung ab v0.15
 
-Ist ein Berliner gesetzlicher Feiertag zugleich als Arbeitstag, Urlaub oder Ruhetag geplant, werden beide Farben diagonal dargestellt: Violett für den Feiertag und Blau/Grün/Orange für die gespeicherte Tagesart. Dies gilt für Monatskalender, Tagesliste, Jahresmatrix, Importvorschau, Monats-/Jahres-PDFs und Excel-Export. Die Jahresmatrix und PDFs verwenden zusätzlich F/A, F/U oder F/R; Feiertage ohne Planstatus bleiben vollständig violett (F). Die zweifarbige Markierung ändert keine Berechnung: Feiertage behalten stets 0 Sollstunden. Excel verwendet einen diagonalen Farbverlauf mit engem Übergang zwischen den beiden Farbhälften.
+Ist ein Berliner gesetzlicher Feiertag zugleich als Arbeitstag, Urlaub oder Ruhetag geplant, werden beide Farben diagonal dargestellt: Pink für den Feiertag und Hellgrau/Rot/Hellgrün für die gespeicherte Tagesart. Dies gilt für Monatskalender, Tagesliste, Jahresmatrix, Importvorschau, Monats-/Jahres-PDFs und Excel-Export. Die Jahresmatrix und PDFs verwenden zusätzlich F/A, F/U oder F/R; Feiertage ohne Planstatus bleiben vollständig pink (F). Die zweifarbige Markierung ändert keine Berechnung: Feiertage behalten stets 0 Sollstunden. Excel verwendet einen diagonalen Farbverlauf mit engem Übergang zwischen den beiden Farbhälften.
+
+## Einheitliche Planfarben
+
+Arbeitstag: Hellgrau (`#E5E5E5`), Urlaub: Rot (`#FF6B6B`), Wochenende (Samstag/Sonntag): Gelb (`#FFF176`), Feiertag: Pink (`#FF80C0`). Urlaub und Ruhetage haben Vorrang vor der Wochenendfarbe. Ruhetage: Hellgrün (`#C6EFCE`), ungeplante Werktage bleiben neutral markiert. Feiertage mit Tagesstatus behalten ihre diagonale Darstellung. Die Palette gilt für Verwaltung, TF-Portal, Arbeitsbericht-Monatsstreifen, PDF und XLSX. Die Android-App verwendet dieselben Portalansichten. Berechnungen bleiben unverändert. Neu erstellte Exporte verwenden die neuen Farben; bereits heruntergeladene Dateien bleiben unverändert.

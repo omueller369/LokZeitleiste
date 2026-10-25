@@ -1,10 +1,9 @@
 const el=id=>document.getElementById(id),names=Array.from({length:12},(_,i)=>new Intl.DateTimeFormat('de-DE',{month:'long'}).format(new Date(2026,i,1)));
 let data=null,view='month',generation=0;
-const colors={Arbeitstag:'#dcebf9',Urlaub:'#dbf1e3',Ruhetag:'#ffe8cc',Ungeplant:'#eef0f3'};
 const clock=n=>n===null?'Offen':(n<0?'−':'')+Math.floor(Math.abs(n)/60)+':'+String(Math.abs(n)%60).padStart(2,'0')+' h';
 const text=(tag,value)=>{const node=document.createElement(tag);node.textContent=value;return node;};
 async function request(path){const r=await fetch(path,{credentials:'same-origin'}),body=await r.json();if(!r.ok)throw Error(typeof body.detail==='string'?body.detail:'Anfrage fehlgeschlagen');return body;}
-function color(node,d){node.style.background=colors[d.kind];if(d.is_holiday)node.style.background=d.kind==='Ungeplant'?'#e9dff5':`linear-gradient(135deg,#e9dff5 50%,${colors[d.kind]} 50%)`;}
+function color(node,d){window.PlanColors.apply(node,d);}
 function metrics(summary){el('metrics').replaceChildren();for(const [label,key] of [['Geleistet','work_minutes'],['Plansoll','target_minutes'],['Differenz Geleistet − Soll','balance_minutes'],['Gutschrift','credited_minutes']]){const box=text('div',label);box.append(text('strong',clock(summary[key])));el('metrics').append(box);}el('status').textContent=summary.complete?'Plan vollständig. Differenz bezieht sich auf geleistete Stunden; Gutschrift wird separat angezeigt.':`${summary.unplanned_days??1} ungeplante Tage · Plansoll vorläufig · Differenz offen`;}
 function openDay(d){el('date').value=d.date;el('month').value=Number(d.date.slice(5,7));view='day';render();}
 function table(headers,rows){const wrap=text('div','');wrap.className='tablewrap';const table=document.createElement('table'),head=document.createElement('tr');for(const h of headers)head.append(text('th',h));table.append(head);for(const values of rows){const row=document.createElement('tr');for(const v of values){const td=document.createElement('td');if(v instanceof Node)td.append(v);else td.textContent=v;row.append(td);}table.append(row);}wrap.append(table);return wrap;}
