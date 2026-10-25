@@ -251,3 +251,12 @@ class WorkReportsTest(unittest.TestCase):
         with patch.dict('os.environ',{'WORK_REPORT_RECEIPT_EMAIL':'','SMTP_HOST':''}):result=self.upload(report);self.assertEqual(result.status_code,202)
         with Session(self.engine) as db:row=db.get(DutyReceipt,result.json()['id']);self.assertEqual(row.status,'pending');self.assertEqual(row.attempts,0)
         process_receipt(result.json()['id']);self.assertEqual(self.send.call_count,1)
+
+    def test_error_overlay_asset_loaded_before_report_editors(self):
+        page=self.driver.get('/tf/arbeitsbericht')
+        self.assertEqual(page.status_code,200)
+        self.assertLess(page.text.index('/tf/work-report-feedback.js'),page.text.index('/tf/gps.js'))
+        script=self.driver.get('/tf/work-report-feedback.js')
+        self.assertEqual(script.status_code,200)
+        self.assertIn('window.ReportFeedback',script.text)
+        self.assertEqual(script.headers['cache-control'],'no-cache')

@@ -25,7 +25,7 @@ class PortalPolicy(base: String) {
         "/documents.js", "/documents.css", "/account.js", "/entry-form.js", "/responsive.css", "/i18n.js", "/android-portal.js" -> path.substringAfterLast('/')
         "/tf/portal.js" -> "tf-portal.js"
         "/tf/portal.css" -> "tf-portal.css"
-        "/tf/work-report.js", "/tf/work-report.css", "/tf/train-journeys.js", "/tf/gps.js", "/tf/stations.js", "/tf/station-sharing.js", "/tf/return.js" -> if(path.endsWith("return.js")) "tf-return.js" else path.substringAfterLast('/')
+        "/tf/work-report-feedback.js", "/tf/work-report.js", "/tf/work-report.css", "/tf/train-journeys.js", "/tf/gps.js", "/tf/stations.js", "/tf/station-sharing.js", "/tf/return.js" -> if(path.endsWith("return.js")) "tf-return.js" else path.substringAfterLast('/')
         else -> null
     }
 }

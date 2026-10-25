@@ -113,3 +113,8 @@ Im Monatsverzeichnis synchronisiert „Synchronisieren“ in einer lokalen Zeile
 Die Tabellenzeilen verwenden für Serverberichte #20B2AA / #8BD8D3 und für lokale Berichte #FF82AB / #FFC0D5. Zeitfelder akzeptieren jede Minute (60 Sekunden Schrittweite), Zugfahrtbereiche müssen weiterhin innerhalb der Dienstzeit liegen. Die Ereignistabelle hat eine erste Kopfzeile „Zugnummer: …“ und anschließend nur Art, Grund, Meldestelle/Ort, Von, Bis, Dauer und Pause.
 
 Für einen Dienstbeginn vor dem heutigen Berliner Kalendertag wird der GPS-Bereich ausgeblendet. Liegt für die betreffende Zugfahrt auf dem Server eine Aufzeichnung mit Positionen am gewählten Diensttag vor, wird sie angezeigt; als Aktion steht nur „GPS-Serverstand laden“ zur Verfügung. Lokale GPS-Daten allein schalten historische Aufzeichnungen nicht frei.
+
+
+### Fehler- und Hilfe-Overlay
+
+`work-report-feedback.js` zeigt Validierungs- und Vorgangsfehler im Arbeitsbericht einschließlich Zugfahrten und GPS als modale Dialoge. „Okay“ schließt den Fehlerdialog; „Hilfe“ öffnet einen zweiten Dialog mit vorläufigem Hilfetext und X zum Schließen. Passende Korrekturhinweise werden aus der Fehlerart abgeleitet. Pflichtfeldfehler zeigen das erste ungültige Feld, zu dem der Fokus beim Schließen zurückkehrt. Erfolgsmeldungen und laufende GPS-Statusmeldungen lösen keine Fehlerdialoge aus. Wiederholte identische Meldungen werden im offenen Dialog nicht mehrfach eingereiht.
