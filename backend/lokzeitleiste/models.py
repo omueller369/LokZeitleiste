@@ -713,3 +713,9 @@ class AppDefaultOrder(Base):
     scope:Mapped[str]=mapped_column(String(100),primary_key=True)
     ids_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
     revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+
+
+class VehicleRetirement(Base):
+    """Separate table allows upgrading existing databases without altering vehicle data."""
+    __tablename__='vehicle_retirements'
+    vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),primary_key=True)

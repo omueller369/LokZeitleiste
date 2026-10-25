@@ -40,9 +40,11 @@ class ProtocolInput(BaseModel):
     @classmethod
     def code(cls,value):return value.strip().upper()
 
+from .vehicles import is_retired
+
 def vehicle(db,vehicle_id):
     row=db.get(RailwayVehicle,vehicle_id)
-    if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+    if not row or is_retired(db,vehicle_id):raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
     return row
 
 def protocol(db,vehicle_id,protocol_id):

@@ -83,3 +83,23 @@ class VehicleTest(unittest.TestCase):
         _,staff=self.active_staff({},'vehicle-no-permission')
         self.assertEqual(staff.get('/api/v1/admin/me').json()['permissions']['vehicles'],0)
         self.assertEqual(staff.get('/api/v1/admin/vehicles').status_code,403)
+
+    def test_retirement_reversible_revision_permissions_and_preservation(self):
+        row=self.create();path='/api/v1/admin/vehicles/'+str(row['id'])
+        self.assertNotIn('power_kw',row)
+        _,reader=self.active_staff({'vehicles':1},'retirement-reader')
+        self.assertEqual(reader.put(path+'/retirement',json={'retired':True,'expected_revision':1}).status_code,403)
+        retired=self.client.put(path+'/retirement',json={'retired':True,'expected_revision':1})
+        self.assertEqual(retired.status_code,200,retired.text)
+        self.assertTrue(retired.json()['retired'])
+        self.assertEqual(retired.json()['revision'],2)
+        self.assertEqual(self.client.get('/api/v1/admin/loco-handover/vehicles').json(),[])
+        self.assertEqual(self.client.get('/api/v1/admin/loco-handover/vehicles/'+str(row['id'])).status_code,404)
+        self.assertEqual(len(self.client.get('/api/v1/admin/vehicles').json()),1)
+        for key in ('vehicle_number','notes','mileage','brake_g','status'):
+            self.assertEqual(retired.json()[key],row[key])
+        self.assertEqual(self.client.put(path+'/retirement',json={'retired':False,'expected_revision':1}).status_code,409)
+        restored=self.client.put(path+'/retirement',json={'retired':False,'expected_revision':2})
+        self.assertEqual(restored.status_code,200,restored.text)
+        self.assertFalse(restored.json()['retired'])
+        self.assertEqual(len(self.client.get('/api/v1/admin/loco-handover/vehicles').json()),1)

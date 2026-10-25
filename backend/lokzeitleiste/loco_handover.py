@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from .db import database_session
 from .models import RailwayVehicle
-from .vehicles import find_vehicles, VEHICLE_STATUSES
+from .vehicles import find_vehicles, VEHICLE_STATUSES, is_retired
 from .tf_portal import driver_dependency
 from .leasing import assigned_company
 
@@ -34,13 +34,13 @@ def create_router(require_admin, require_account):
                 db:Session=Depends(database_session)):
         return [dict(id=row.id, vehicle_number=row.vehicle_number, name=row.name, status=row.status,
                      status_label=VEHICLE_STATUSES[row.status][0], status_note=row.status_note)
-                for row in find_vehicles(db,q,status)]
+                for row in find_vehicles(db,q,status,include_retired=False)]
 
     @router.get('/api/v1/tf/loco-handover/vehicles/{vehicle_id}', dependencies=[Depends(require_driver)])
     @router.get('/api/v1/admin/loco-handover/vehicles/{vehicle_id}', dependencies=[Depends(require_admin)])
     def details(vehicle_id:int, db:Session=Depends(database_session)):
         row=db.get(RailwayVehicle,vehicle_id)
-        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+        if not row or is_retired(db,vehicle_id):raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
         label,color=VEHICLE_STATUSES[row.status]
         company=assigned_company(db,row.id)
         return dict(id=row.id,vehicle_number=row.vehicle_number,name=row.name,series=row.series,

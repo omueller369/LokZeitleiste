@@ -1432,7 +1432,13 @@
     "Sortierung wurde geändert. Bitte neu laden.": "Sortierung wurde geändert. Bitte neu laden.",
     "Auswahl bearbeiten": "Auswahl bearbeiten",
     "Tage bearbeiten": "Tage bearbeiten",
-    "Tage des ausgewählten Monats": "Tage des ausgewählten Monats"
+    "Tage des ausgewählten Monats": "Tage des ausgewählten Monats",
+    "Außer Betrieb": "Außer Betrieb",
+    "Außer Betrieb setzen": "Außer Betrieb setzen",
+    "Wieder in Betrieb nehmen": "Wieder in Betrieb nehmen",
+    "Triebfahrzeug wieder in Betrieb nehmen?": "Triebfahrzeug wieder in Betrieb nehmen?",
+    "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.",
+    "Kopieren": "Kopieren"
   },
   "en": {
     "Administration": "Administration",
@@ -2867,7 +2873,13 @@
     "Sortierung wurde geändert. Bitte neu laden.": "The order has changed. Please reload.",
     "Auswahl bearbeiten": "Edit selection",
     "Tage bearbeiten": "Edit days",
-    "Tage des ausgewählten Monats": "Days of the selected month"
+    "Tage des ausgewählten Monats": "Days of the selected month",
+    "Außer Betrieb": "Out of service",
+    "Außer Betrieb setzen": "Take out of service",
+    "Wieder in Betrieb nehmen": "Return to service",
+    "Triebfahrzeug wieder in Betrieb nehmen?": "Return this vehicle to service?",
+    "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Take this vehicle out of service? Its data will be preserved.",
+    "Kopieren": "Copy"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4302,7 +4314,13 @@
     "Sortierung wurde geändert. Bitte neu laden.": "Kolejność została zmieniona. Odśwież ją.",
     "Auswahl bearbeiten": "Edytuj zaznaczenie",
     "Tage bearbeiten": "Edytuj dni",
-    "Tage des ausgewählten Monats": "Dni wybranego miesiąca"
+    "Tage des ausgewählten Monats": "Dni wybranego miesiąca",
+    "Außer Betrieb": "Wycofany z eksploatacji",
+    "Außer Betrieb setzen": "Wycofaj z eksploatacji",
+    "Wieder in Betrieb nehmen": "Przywróć do eksploatacji",
+    "Triebfahrzeug wieder in Betrieb nehmen?": "Przywrócić ten pojazd do eksploatacji?",
+    "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Wycofać ten pojazd z eksploatacji? Dane zostaną zachowane.",
+    "Kopieren": "Kopiuj"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5737,7 +5755,13 @@
     "Sortierung wurde geändert. Bitte neu laden.": "Порядок изменён. Обновите страницу.",
     "Auswahl bearbeiten": "Изменить выбранное",
     "Tage bearbeiten": "Изменить дни",
-    "Tage des ausgewählten Monats": "Дни выбранного месяца"
+    "Tage des ausgewählten Monats": "Дни выбранного месяца",
+    "Außer Betrieb": "Выведен из эксплуатации",
+    "Außer Betrieb setzen": "Вывести из эксплуатации",
+    "Wieder in Betrieb nehmen": "Вернуть в эксплуатацию",
+    "Triebfahrzeug wieder in Betrieb nehmen?": "Вернуть этот локомотив в эксплуатацию?",
+    "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "Вывести этот локомотив из эксплуатации? Данные сохранятся.",
+    "Kopieren": "Копировать"
   },
   "es": {
     "Administration": "Administración",
@@ -7172,6 +7196,12 @@
     "Sortierung wurde geändert. Bitte neu laden.": "El orden ha cambiado. Vuelve a cargarlo.",
     "Auswahl bearbeiten": "Editar selección",
     "Tage bearbeiten": "Editar días",
-    "Tage des ausgewählten Monats": "Días del mes seleccionado"
+    "Tage des ausgewählten Monats": "Días del mes seleccionado",
+    "Außer Betrieb": "Fuera de servicio",
+    "Außer Betrieb setzen": "Retirar del servicio",
+    "Wieder in Betrieb nehmen": "Volver a poner en servicio",
+    "Triebfahrzeug wieder in Betrieb nehmen?": "¿Volver a poner este vehículo en servicio?",
+    "Triebfahrzeug außer Betrieb setzen? Die Daten bleiben erhalten.": "¿Retirar este vehículo del servicio? Se conservarán los datos.",
+    "Kopieren": "Copiar"
   }
 }

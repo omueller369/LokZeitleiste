@@ -10,7 +10,7 @@ from sqlalchemy import select,or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session,object_session
 from .db import database_session
-from .models import RailwayVehicle,VehicleLeasing,LeasingCompany,now_utc
+from .models import RailwayVehicle,VehicleRetirement,VehicleLeasing,LeasingCompany,now_utc
 from .leasing import assigned_company,view as company_view
 
 VEHICLE_STATUSES={
@@ -28,7 +28,6 @@ class VehicleInput(BaseModel):
     lessor:str=Field(default='',max_length=200)
     hotline:str=Field(default='',max_length=60)
     name:str=Field(default='',max_length=120)
-    power_kw:str=Field(default='',max_length=40)
     brake_r:int=Field(default=0,ge=0,le=999,strict=True)
     brake_p:int=Field(default=0,ge=0,le=999,strict=True)
     brake_g:int=Field(default=0,ge=0,le=999,strict=True)
@@ -52,13 +51,23 @@ class VehicleInput(BaseModel):
         if self.status=='ready':self.status_note=''
         return self
 
+class RetirementInput(BaseModel):
+    retired:bool
+    expected_revision:int=Field(ge=1)
+
+
 class VehicleUpdate(VehicleInput):
     expected_revision:int=Field(ge=1)
+
+
+def is_retired(db,vehicle_id):
+    return db.get(VehicleRetirement,vehicle_id) is not None
 
 
 def vehicle_view(row):
     values={field:getattr(row,field) for field in VehicleInput.model_fields if field!='leasing_company_id'}
     db=object_session(row);company=assigned_company(db,row.id) if db else None
+    values['retired']=is_retired(db,row.id) if db else False
     values.update(leasing_company_id=company.id if company else None,leasing_company=company_view(company) if company else None)
     if company:values.update(lessor=company.company,hotline=company.hotline,leasing_email=company.email)
     values['next_revision']=row.next_revision.isoformat() if row.next_revision else None
@@ -67,8 +76,9 @@ def vehicle_view(row):
                 brake_g_25=row.brake_g*75//100,status_label=label,status_color=color)
 
 
-def find_vehicles(db,q="",status=None):
+def find_vehicles(db,q="",status=None,include_retired=True):
     query=select(RailwayVehicle)
+    if not include_retired:query=query.where(~RailwayVehicle.id.in_(select(VehicleRetirement.vehicle_id)))
     if q.strip():
         text=q.strip().replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
         query=query.where(or_(*[field.ilike('%'+text+'%',escape='\\') for field in [RailwayVehicle.vehicle_number,RailwayVehicle.name,RailwayVehicle.series,RailwayVehicle.lessor]], RailwayVehicle.id.in_(select(VehicleLeasing.vehicle_id).join(LeasingCompany,VehicleLeasing.company_id==LeasingCompany.id).where(LeasingCompany.company.ilike('%'+text+'%',escape='\\')))))
@@ -127,4 +137,14 @@ def create_router(require_admin):
         for field,value in data.model_dump(exclude={'expected_revision','leasing_company_id'}).items():setattr(row,field,value)
         if 'leasing_company_id' in data.model_fields_set:assign(db,row,data.leasing_company_id)
         row.revision+=1;row.updated_at=now_utc();return commit(db,row)
+    @router.put('/api/v1/admin/vehicles/{vehicle_id}/retirement',dependencies=[Depends(require_admin)])
+    def retirement(vehicle_id:int,data:RetirementInput,db:Session=Depends(database_session)):
+        row=db.scalar(select(RailwayVehicle).where(RailwayVehicle.id==vehicle_id).with_for_update())
+        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+        if row.revision!=data.expected_revision:raise HTTPException(409,'Triebfahrzeug wurde geändert. Bitte neu laden.')
+        retired=db.get(VehicleRetirement,vehicle_id)
+        if data.retired and not retired:db.add(VehicleRetirement(vehicle_id=vehicle_id))
+        elif not data.retired and retired:db.delete(retired)
+        row.revision+=1;row.updated_at=now_utc()
+        return commit(db,row)
     return router
