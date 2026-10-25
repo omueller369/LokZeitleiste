@@ -70,3 +70,15 @@ class CollectivePlanningTest(unittest.TestCase):
         self.assertEqual(reader.post(BASE+'/preview',json=data).status_code,403)
         self.assertEqual(reader.post(BASE+'/apply',json={**data,'confirmation':review['confirmation'],'confirmed':True}).status_code,403)
         data['groups']*=2;self.assertEqual(self.client.post(BASE+'/preview',json=data).status_code,422)
+
+    def test_standalone_module_and_legacy_link(self):
+        page=self.client.get('/admin/rest-plans');self.assertEqual(page.status_code,200)
+        self.assertIn('id="collectiveOverview"',page.text);self.assertNotIn('id="tf"',page.text)
+        self.assertNotIn('/admin/planning.js',page.text)
+        single=self.client.get('/admin/planning');self.assertNotIn('id="collectiveOverview"',single.text)
+        self.assertNotIn('/admin/planning-overview.js',single.text)
+        old=self.client.get('/admin/planning?overview=all',follow_redirects=False)
+        self.assertEqual(old.status_code,303);self.assertEqual(old.headers['location'],'/admin/rest-plans')
+        modules=self.client.get('/api/v1/admin/start').json()['modules']
+        item=next(row for row in modules if row['id']=='overview')
+        self.assertEqual(item['url'],'/admin/rest-plans');self.assertEqual(item['label'],'Ruhetagsplan aller TF')

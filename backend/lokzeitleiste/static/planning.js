@@ -229,11 +229,8 @@ window.addEventListener('beforeunload', event => { if (dirty) { event.preventDef
     const users = await api('/api/v1/admin/tf');
     for (const user of users) { const option = document.createElement('option'); option.value = user.id;
       option.textContent = user.first_name + ' ' + user.last_name + ' · ' + user.personnel_number; el('tf').append(option); }
-    window.startPlanningOverview(users);
-    if(new URLSearchParams(location.search).get('overview')==='all'){el('collectiveOverview').scrollIntoView({behavior:'smooth',block:'start'});el('overviewMonthView').focus();}
     const selected = new URLSearchParams(location.search).get('tf'); if (users.some(u => String(u.id) === selected)) el('tf').value = selected;
     if (users.length) await exclusive(() => load()); else message('Zuerst einen Tf in der Verwaltung anlegen.');
   } catch (error) { message(error.message, true); }
 })();
 
-window.refreshSinglePlanningAfterBulk=async()=>{if(current&&!dirty&&!busy)await exclusive(()=>load(true));};

@@ -15,7 +15,7 @@ def start_modules(user,p):
         ('staff','Verwaltungsmitarbeiter (Liste)','/admin/staff','Verwaltung',p.get('staff',0)),
         ('directory','Alle Mitarbeiter','/admin/directory','Verwaltung',p.get('directory',0)),
         ('planning','Arbeitszeitplanung','/admin/planning','Personalplanung',p.get('planning',0)),
-        ('overview','TF-Übersicht','/admin/planning?overview=all','Personalplanung',p.get('planning',0)),
+        ('overview','Ruhetagsplan aller TF','/admin/rest-plans','Personalplanung',p.get('planning',0)),
         ('shifts','Schichtplan','/admin/shifts','Personalplanung',p.get('shifts',0)),
         ('loco_handover','Lokübergabebuch','/admin/loco-handover','Sonstiges',p.get('loco_handover',0)),
         ('leasing','Lok-Leasing','/admin/leasing','Stammdaten',p.get('leasing',0)),

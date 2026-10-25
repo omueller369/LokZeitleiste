@@ -1,6 +1,11 @@
 (()=>{
 const element=id=>document.getElementById(id),translate=value=>window.I18n?.t(value)||value;
 const node=(tag,value)=>{const result=document.createElement(tag);if(value!==undefined)result.textContent=value;return result;};
+let accessLevel=0;
+const shiftLabels={standard:'Streckendienst',border_day:'Grenzdienst Tag',border_night:'Grenzdienst Nacht'};
+function dayCode(day){return day.kind==='Arbeitstag'&&day.shift==='border_day'?'GT':day.kind==='Arbeitstag'&&day.shift==='border_night'?'GN':({Arbeitstag:'A',Urlaub:'U',Ruhetag:'R',Ungeplant:'?'})[day.kind];}
+function planColor(node,day){window.PlanColors.apply(node,day);}
+async function api(path,options={}){const response=await fetch(path,{credentials:'same-origin',...options});if(response.status===401){location.href='/account?area=backend';throw Error('Anmeldung erforderlich');}const data=await response.json().catch(()=>({}));if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen ('+response.status+')');return data;}
 let mode='month',snapshot=null,ticket=0,pending=false,review=null,anchor=null;
 const selected=new Map(),visible=new Map();
 const key=(id,date)=>id+':'+date;
@@ -73,10 +78,10 @@ async function apply(){
  if(pending||!review||!element('overviewAgree').checked)return;pending=true;controls();let saved;
  try{saved=await api('/api/v1/admin/planning/collective/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...review.body,confirmation:review.result.confirmation,confirmed:true})});}
  catch(error){invalidate();say(error.message);return;}finally{pending=false;controls();}
- selected.clear();invalidate();await load(mode,null,true);say(translate('Planänderungen gespeichert.')+' '+translate('Ausgewählte Felder')+': '+saved.changed_days);try{await window.refreshSinglePlanningAfterBulk?.();}catch(error){console.error(error);}
+ selected.clear();invalidate();await load(mode,null,true);say(translate('Planänderungen gespeichert.')+' '+translate('Ausgewählte Felder')+': '+saved.changed_days);
 }
 window.refreshPlanningOverview=()=>load(mode);
-window.startPlanningOverview=users=>{
+function start(users){
  element('collectiveOverview').hidden=false;const now=new Intl.DateTimeFormat('en-CA',{year:'numeric',month:'2-digit',timeZone:'Europe/Berlin'}).formatToParts(new Date());element('overviewYear').value=now.find(part=>part.type==='year').value;
  for(let m=1;m<=12;m++){const option=node('option',new Intl.DateTimeFormat(locale(),{month:'long',timeZone:'UTC'}).format(new Date(Date.UTC(2026,m-1,1))));option.value=String(m);element('overviewMonth').append(option);}element('overviewMonth').value=String(Number(now.find(part=>part.type==='month').value));
  element('overviewMonthView').onclick=()=>load('month');element('overviewYearView').onclick=()=>load('year');element('overviewReload').onclick=()=>load(mode);element('overviewYear').onchange=()=>load(mode);element('overviewMonth').onchange=()=>load(mode);
@@ -84,5 +89,6 @@ window.startPlanningOverview=users=>{
  for(const id of ['overviewKind','overviewShift','overviewReplaceNote','overviewNote'])element(id).addEventListener('input',()=>{invalidate();element('overviewNote').disabled=!element('overviewReplaceNote').checked;element('overviewShift').disabled=element('overviewKind').value!=='Arbeitstag';controls();});
  element('overviewShift').disabled=true;element('overviewPreview').onclick=preview;element('overviewApply').onclick=apply;element('overviewCancel').onclick=invalidate;element('overviewAgree').onchange=controls;
  window.addEventListener('languagechange',()=>{invalidate();for(const option of element('overviewMonth').children)option.textContent=new Intl.DateTimeFormat(locale(),{month:'long',timeZone:'UTC'}).format(new Date(Date.UTC(2026,Number(option.value)-1,1)));render();});load('month',users);
-};
+}
+(async()=>{try{const account=await api('/api/v1/account/me');if(account.password_change_required){location.href='/account';return;}accessLevel=account.permissions?.planning||0;if(!accessLevel)throw Error('Keine Freigabe für das Planungsmodul.');start(await api('/api/v1/admin/tf'));}catch(error){element('overviewAccessMessage').textContent=translate(error.message);}})();
 })();

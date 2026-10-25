@@ -5,7 +5,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 from fastapi import BackgroundTasks, Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -405,7 +405,8 @@ app.include_router(create_router(require_admin))
 
 
 @app.get("/admin/planning")
-def planning_page():
+def planning_page(overview:str|None=None):
+    if overview=='all':return RedirectResponse('/admin/rest-plans',status_code=303)
     return FileResponse(Path(__file__).parent / "static" / "planning.html")
 
 
@@ -693,3 +694,6 @@ app.include_router(leasing_router(require_admin))
 
 @app.get("/plan-colors.js")
 def plan_colors_script():return FileResponse(Path(__file__).parent/"static"/"plan-colors.js",media_type="text/javascript",headers={"Cache-Control":"no-cache"})
+
+@app.get("/admin/rest-plans")
+def rest_plans_page():return FileResponse(Path(__file__).parent/"static"/"planning-overview.html")
