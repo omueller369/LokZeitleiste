@@ -119,7 +119,7 @@ function renderYear() {
   el('yearRows').replaceChildren();
   const table = document.createElement('table'); table.className = 'yearmatrix';
   const head = document.createElement('tr');
-  for (const value of ['Monat', ...Array.from({length: 31}, (_, i) => i + 1), 'Soll h']) {
+  for (const value of ['Monat', ...Array.from({length: 37}, (_, i) => window.PlanColors.weekdayInitial('2026-10-'+String(5+i%7).padStart(2,'0'))), 'Soll h']) {
     const th = document.createElement('th'); th.textContent = value; head.append(th);
   }
   table.append(head);
@@ -133,10 +133,10 @@ function renderYear() {
     el('yearRows').append(row);
     const matrixRow = document.createElement('tr'), label = document.createElement('td');
     label.textContent = names[month.month - 1]; matrixRow.append(label);
-    for (let i = 0; i < 31; i++) {
-      const td = document.createElement('td'), day = month.days[i];
+    for (const day of window.PlanColors.yearSlots(month)) {
+      const td = document.createElement('td');
       if (day) {
-        const button = document.createElement('button'); button.textContent = day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day); button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
+        const button = document.createElement('button'); for(const value of [String(Number(day.date.slice(-2))),window.PlanColors.weekdayInitial(day.date),day.is_holiday?'F'+(day.kind!=='Ungeplant'?'/'+dayCode(day):''):dayCode(day)]){const line=document.createElement('span');line.textContent=value;line.setAttribute('data-i18n-ignore','');button.append(line);} button.dataset.kind = day.is_holiday?'Feiertag':day.kind;planColor(button,day);
         button.title = day.date + ' · ' + (day.is_holiday?planLabel(day)+' · 0:00 h':day.kind); button.setAttribute('aria-label', button.title);
         button.classList.toggle('selected-day',selection.has(day.date));button.setAttribute('aria-pressed',String(selection.has(day.date)));
         button.onclick = handle(() => exclusive(async () => { if(accessLevel>=2&&el('selectionMode').checked){toggleDate(day.date);return;}el('month').value = month.month; if (await load()) switchView('calendar'); }));

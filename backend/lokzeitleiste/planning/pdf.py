@@ -11,6 +11,8 @@ from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from .palette import COLORS,base_key,background_key
+from .calendar_layout import YEAR_COLUMNS,WEEKDAYS,year_slots
+from datetime import date
 
 MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
 CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F", "Wochenende":"WE"}
@@ -84,17 +86,19 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                               ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
     story += [table, Spacer(1, 14)]
     if yearly:
-        header = ["Monat"] + [str(i) for i in range(1, 32)] + ["A", "U", "R", "?", "Soll h"]
+        styles.add(ParagraphStyle("YearCell",parent=styles["PlanCell"],fontSize=7,leading=8,alignment=1))
+        header = ["Monat"] + [display(WEEKDAYS[i%7])[0] for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "?", "Soll h"]
         rows = [header]
         fills = []
         diagonal = {}
         for row, month in enumerate(plan["months"], start=1):
             cells = [MONTHS[month["month"]]]
-            for column in range(1, 32):
-                if column <= len(month["days"]):
-                    item=month["days"][column-1]
+            for column,item in enumerate(year_slots(month),start=1):
+                if item:
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                    cells.append(("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else ""))
+                    code=("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
+                    day=date.fromisoformat(item["date"])
+                    cells.append(Paragraph(f"<b>{day.day:02d}</b><br/>{display(WEEKDAYS[day.weekday()])[0]}<br/>{code}",styles["YearCell"]))
                     if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
                 else:
@@ -103,10 +107,10 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
             cells += [str(month[k]) for k in ("work_days", "vacation_days", "rest_days", "unplanned_days")]
             cells.append(clock(month["target_minutes"]))
             rows.append(cells)
-        widths = [78] + [(doc.width - 248) / 31] * 31 + [25] * 4 + [70]
+        widths = [78] + [(doc.width - 248) / YEAR_COLUMNS] * YEAR_COLUMNS + [25] * 4 + [70]
         rows=[[Paragraph(str(value),styles['PlanHeader'] if r==0 else styles['PlanCell']) if isinstance(value,str) else value for value in row] for r,row in enumerate(rows)]
-        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=widths, rowHeights=[26] + [30] * 12, repeatRows=1)
-        table.setStyle(TableStyle(fills + [("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK),
+        table = DiagonalTable(rows,diagonal_cells=diagonal,colWidths=widths, rowHeights=[26] + [34] * len(plan["months"]), repeatRows=1)
+        table.setStyle(TableStyle(fills + [("LEFTPADDING",(1,0),(YEAR_COLUMNS,-1),1),("RIGHTPADDING",(1,0),(YEAR_COLUMNS,-1),1),("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, 0), DARK),
                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white), ("TEXTCOLOR", (0, 1), (-1, -1), DARK),
                    ("FONTNAME", (0, 0), (-1, 0), "PlanSans-Bold"), ("FONTSIZE", (0, 0), (-1, -1), 9),
                    ("ALIGN", (1, 0), (-1, -1), "CENTER"), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
