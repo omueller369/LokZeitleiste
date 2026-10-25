@@ -1429,7 +1429,9 @@
     "Nach unten": "Nach unten",
     "Zeilen am Griff mit Maus oder Finger verschieben.": "Zeilen am Griff mit Maus oder Finger verschieben.",
     "Liste wurde geändert. Bitte neu laden.": "Liste wurde geändert. Bitte neu laden.",
-    "Sortierung wurde geändert. Bitte neu laden.": "Sortierung wurde geändert. Bitte neu laden."
+    "Sortierung wurde geändert. Bitte neu laden.": "Sortierung wurde geändert. Bitte neu laden.",
+    "Auswahl bearbeiten": "Auswahl bearbeiten",
+    "Tage bearbeiten": "Tage bearbeiten"
   },
   "en": {
     "Administration": "Administration",
@@ -2861,7 +2863,9 @@
     "Nach unten": "Move down",
     "Zeilen am Griff mit Maus oder Finger verschieben.": "Drag rows by the handle using a mouse or finger.",
     "Liste wurde geändert. Bitte neu laden.": "The list has changed. Please reload.",
-    "Sortierung wurde geändert. Bitte neu laden.": "The order has changed. Please reload."
+    "Sortierung wurde geändert. Bitte neu laden.": "The order has changed. Please reload.",
+    "Auswahl bearbeiten": "Edit selection",
+    "Tage bearbeiten": "Edit days"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4293,7 +4297,9 @@
     "Nach unten": "W dół",
     "Zeilen am Griff mit Maus oder Finger verschieben.": "Przeciągnij wiersze za uchwyt myszą lub palcem.",
     "Liste wurde geändert. Bitte neu laden.": "Lista została zmieniona. Odśwież ją.",
-    "Sortierung wurde geändert. Bitte neu laden.": "Kolejność została zmieniona. Odśwież ją."
+    "Sortierung wurde geändert. Bitte neu laden.": "Kolejność została zmieniona. Odśwież ją.",
+    "Auswahl bearbeiten": "Edytuj zaznaczenie",
+    "Tage bearbeiten": "Edytuj dni"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -5725,7 +5731,9 @@
     "Nach unten": "Вниз",
     "Zeilen am Griff mit Maus oder Finger verschieben.": "Перемещайте строки за ручку мышью или пальцем.",
     "Liste wurde geändert. Bitte neu laden.": "Список изменён. Обновите страницу.",
-    "Sortierung wurde geändert. Bitte neu laden.": "Порядок изменён. Обновите страницу."
+    "Sortierung wurde geändert. Bitte neu laden.": "Порядок изменён. Обновите страницу.",
+    "Auswahl bearbeiten": "Изменить выбранное",
+    "Tage bearbeiten": "Изменить дни"
   },
   "es": {
     "Administration": "Administración",
@@ -7157,6 +7165,8 @@
     "Nach unten": "Bajar",
     "Zeilen am Griff mit Maus oder Finger verschieben.": "Arrastra las filas por el asa con el ratón o el dedo.",
     "Liste wurde geändert. Bitte neu laden.": "La lista ha cambiado. Vuelve a cargarla.",
-    "Sortierung wurde geändert. Bitte neu laden.": "El orden ha cambiado. Vuelve a cargarlo."
+    "Sortierung wurde geändert. Bitte neu laden.": "El orden ha cambiado. Vuelve a cargarlo.",
+    "Auswahl bearbeiten": "Editar selección",
+    "Tage bearbeiten": "Editar días"
   }
 }
