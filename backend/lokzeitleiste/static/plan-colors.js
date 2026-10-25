@@ -4,5 +4,5 @@ function weekend(day){return [0,6].includes(new Date(day.date+'T00:00:00Z').getU
 function base(day){return colors[['Urlaub','Ruhetag'].includes(day.kind)?day.kind:weekend(day)?'Wochenende':day.kind]||colors.Ungeplant;}
 function apply(node,day){const color=base(day);node.dataset.weekend=String(weekend(day));node.style.backgroundColor=day.is_holiday?colors.Feiertag:color;node.style.backgroundImage=day.is_holiday&&day.kind!=='Ungeplant'?`linear-gradient(135deg,${colors.Feiertag} 0 50%,${color} 50% 100%)`:'none';}
 function yearSlots(month){return Array.from({length:31},(_,i)=>month.days[i]||null);}
-function weekdayInitial(date){return new Intl.DateTimeFormat(window.I18n?.locale||'de-DE',{weekday:'long',timeZone:'UTC'}).format(new Date(date+'T00:00:00Z')).slice(0,1);}
+function weekdayInitial(date){return new Intl.DateTimeFormat(window.I18n?.locale||'de-DE',{weekday:'long',timeZone:'UTC'}).format(new Date(date+'T00:00:00Z')).slice(0,2);}
 window.PlanColors={colors,weekend,base,apply,yearSlots,weekdayInitial};})();

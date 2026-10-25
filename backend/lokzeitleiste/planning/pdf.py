@@ -101,7 +101,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     available=(doc.width-248)/YEAR_COLUMNS-2
                     while note and pdfmetrics.stringWidth(note,'PlanSans',7)>available:
                         note=note[:-2].rstrip()+'…' if len(note)>1 else ''
-                    weekday=display(('Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag')[date.fromisoformat(item['date']).weekday()])[0]
+                    weekday=display(('Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag')[date.fromisoformat(item['date']).weekday()])[:2]
                     cells.append(Paragraph(code+'<br/>'+escape(weekday)+'<br/>'+escape(note or '______'),styles["YearCell"]))
                     if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
