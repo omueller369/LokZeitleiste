@@ -19,3 +19,14 @@ html{max-width:100%;overflow-x:clip}body{max-width:100%;overflow-x:clip}main,sec
 .backend-menu .menu-group-row>a+.menu-submenu-toggle{justify-content:center;flex:none}
 .backend-menu .menu-submenu-toggle:hover{background:#dce8ef}
 .backend-menu .menu-tree>li>ul{margin-top:6px}
+
+/* Full year: size all 31 days to the container, including an open sidebar. */
+.tablewrap.year-fit{container-type:inline-size;max-width:100%;min-width:0;overflow:visible}
+.year-fit table{table-layout:fixed;width:100%;min-width:0!important;max-width:100%;border-collapse:collapse;font-size:clamp(3px,.7vw,10px);font-size:clamp(2px,.85cqw,11px)}
+.year-fit table th,.year-fit table td{min-width:0!important;padding:2px 0!important;text-align:center;font-size:inherit!important;line-height:1.15;overflow-wrap:normal;white-space:nowrap;overflow:hidden}
+.year-fit table th:first-child,.year-fit table td:first-child{width:8%;overflow:hidden;text-overflow:ellipsis}
+.year-fit .yearmatrix th:last-child,.year-fit .yearmatrix td:last-child{width:8%}
+.year-fit table td button{display:block;box-sizing:border-box;width:100%;max-width:100%;min-width:0!important;min-height:0!important;padding:2px 0!important;font:inherit!important;line-height:1.15;overflow:hidden}
+.year-fit table td button span{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.year-fit table .year-note{font-size:inherit!important;min-height:1.15em;margin-top:1px;max-width:100%;border-top:1px solid #173e5530}
+.year-fit table button:focus-visible{outline:2px solid #17445b;outline-offset:-2px}
