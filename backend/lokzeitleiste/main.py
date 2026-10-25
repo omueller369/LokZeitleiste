@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
+from .version import SOFTWARE_TITLE, SOFTWARE_VERSION
 from .db import database_session
 from .user_directories import directory_transaction
 from .models import ReportDispatch, TfProfile, TfBahnCardValidity, User, WorkEntry, WorkMonth, WorkTimeChange, AccountPolicy, WorkEntryLock, ProfilePhoto, now_utc
@@ -25,7 +26,7 @@ from .change_log import bind_actor
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title="LokZeitleiste API", version="0.25")
+app = FastAPI(title=SOFTWARE_TITLE+" API", version=SOFTWARE_VERSION)
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 

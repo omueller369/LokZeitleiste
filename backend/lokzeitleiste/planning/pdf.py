@@ -11,6 +11,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from ..version import SOFTWARE_TITLE, SOFTWARE_VERSION
 from .palette import COLORS,base_key,background_key
 from .calendar_layout import YEAR_COLUMNS,year_slots
 
@@ -53,7 +54,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     buffer = BytesIO()
     page = landscape(A3) if yearly else A4
     doc = SimpleDocTemplate(buffer, pagesize=page, rightMargin=30, leftMargin=30,
-                            topMargin=30, bottomMargin=30, title="LokZeitleiste Arbeitszeitplan")
+                            topMargin=30, bottomMargin=42, title="Arbeitszeitplan")
     styles = getSampleStyleSheet()
     for style in styles.byName.values():
         if hasattr(style, "fontName"):
@@ -61,7 +62,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     styles.add(ParagraphStyle("PlanHeader", fontName="PlanSans-Bold", fontSize=8, leading=11, textColor=colors.white))
     styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=8, leading=10, textColor=DARK))
     title = f"Jahresplan {plan['year']}" if yearly else f"Monatsplan {MONTHS[plan['month']]} {plan['year']}"
-    metadata=Table([[Paragraph('LokZeitleiste · '+title,styles['Heading2'])],
+    metadata=Table([[Paragraph(title,styles['Heading2'])],
                     [Paragraph(f'Tf {escape(name)} · Personalnummer {escape(personnel_number)}',styles['Normal'])]],colWidths=[doc.width])
     metadata.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
     story=[metadata,Spacer(1,12)]
@@ -158,6 +159,11 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     info.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(0,-1),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
     story += [Spacer(1,12),info]
     def footer(canvas, document):
+        canvas.saveState()
+        canvas.setFont("PlanSans",8)
+        canvas.setFillColor(colors.HexColor('#A0A0A0'))
+        canvas.drawCentredString(page[0]/2,29,SOFTWARE_TITLE+' · '+display('Version')+' '+SOFTWARE_VERSION)
+        canvas.restoreState()
         canvas.setFont("PlanSans", 8)
         canvas.setFillColor(DARK)
         canvas.drawString(30, 16, display("Administrativer Plan · aktueller gespeicherter Stand"))
