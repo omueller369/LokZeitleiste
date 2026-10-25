@@ -1,4 +1,4 @@
-from fastapi import APIRouter,BackgroundTasks,Depends,HTTPException,UploadFile,File,Query
+from fastapi import APIRouter,BackgroundTasks,Depends,HTTPException,UploadFile,File,Query,Header
 from fastapi.responses import Response,FileResponse
 from pathlib import Path
 from sqlalchemy import select,func,or_,case
@@ -72,8 +72,14 @@ def create_router(require_account):
         return result
 
     @router.post('/api/v1/tf/work-reports',status_code=201)
-    def create(data:ReportIn,user:User=Depends(driver),db:Session=Depends(database_session)):
-        return report_view(db,save_report(db,user,data))
+    def create(data:ReportIn,tasks:BackgroundTasks,draft_revision:int|None=Header(default=None,alias='X-CTL-Draft-Revision'),user:User=Depends(driver),db:Session=Depends(database_session)):
+        from .drafts import before_finalize,finalize_files
+        draft=before_finalize(db,user,data.client_id,draft_revision)
+        report=save_report(db,user,data,commit=False)
+        receipt_ids=finalize_files(db,draft,report)
+        db.commit()
+        for receipt_id in receipt_ids:tasks.add_task(process_receipt,receipt_id)
+        return report_view(db,report)
 
     @router.get('/api/v1/tf/work-reports/month/{year}/{month}')
     def month_view(year:int,month:int,user:User=Depends(driver),db:Session=Depends(database_session)):

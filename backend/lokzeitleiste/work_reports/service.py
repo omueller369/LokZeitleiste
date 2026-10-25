@@ -42,7 +42,7 @@ def report_view(db,report):
                 locked=is_locked(db,entry.id))
 
 
-def save_report(db,user,data):
+def save_report(db,user,data,commit=True):
     from ..app_defaults import ensure_defaults
     ensure_defaults(db)
     db.scalar(select(User).where(User.id==user.id).with_for_update())
@@ -94,7 +94,9 @@ def save_report(db,user,data):
     db.add(WorkEntryAudit(entry_id=entry.id,actor_id=user.id,action='work_report_created'))
     from ..documents.archive import archive_report
     archive_report(db,user,report,queue_email=True)
-    try:db.commit()
+    try:
+        if commit:db.commit()
+        else:db.flush()
     except IntegrityError as exc:db.rollback();raise HTTPException(409,'Arbeitsbericht wurde inzwischen gespeichert. Bitte erneut laden.') from exc
     return report
 

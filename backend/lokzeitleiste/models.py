@@ -719,3 +719,28 @@ class VehicleRetirement(Base):
     """Separate table allows upgrading existing databases without altering vehicle data."""
     __tablename__='vehicle_retirements'
     vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),primary_key=True)
+
+
+class DutyReportDraft(Base):
+    __tablename__='duty_report_drafts'
+    __table_args__=(UniqueConstraint('owner_id','client_id'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    client_id:Mapped[str]=mapped_column(String(36),nullable=False)
+    payload_json:Mapped[str]=mapped_column(Text().with_variant(MEDIUMTEXT(),'mysql'),nullable=False)
+    receipt_keys_json:Mapped[str]=mapped_column(Text,nullable=False,default='[]')
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+    finalized_report_id:Mapped[int|None]=mapped_column(ForeignKey('duty_reports.id'),nullable=True)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False)
+
+
+class DutyReportDraftFile(Base):
+    __tablename__='duty_report_draft_files'
+    __table_args__=(UniqueConstraint('draft_id','file_key'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    draft_id:Mapped[int]=mapped_column(ForeignKey('duty_report_drafts.id'),nullable=False,index=True)
+    file_key:Mapped[str]=mapped_column(String(36),nullable=False)
+    filename:Mapped[str]=mapped_column(String(120),nullable=False)
+    mime_type:Mapped[str]=mapped_column(String(40),nullable=False)
+    content_hash:Mapped[str]=mapped_column(String(64),nullable=False)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)

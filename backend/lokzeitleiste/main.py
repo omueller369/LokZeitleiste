@@ -707,3 +707,6 @@ app.include_router(default_order_router(require_admin))
 
 from .pwa import create_router as pwa_router
 app.include_router(pwa_router())
+
+from .work_reports.drafts import create_router as work_report_drafts_router
+app.include_router(work_report_drafts_router(require_account))
