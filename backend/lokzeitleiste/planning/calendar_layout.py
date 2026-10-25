@@ -1,8 +1,4 @@
-"""Monday-aligned month rows: all Saturdays/Sundays share fixed year columns."""
-from datetime import date
-YEAR_COLUMNS=37
-WEEKDAYS=('Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag')
+"""Original year grid: one month per row, calendar days 1-31 in fixed columns."""
+YEAR_COLUMNS=31
 def year_slots(month):
-    days=month['days']
-    offset=date.fromisoformat(days[0]['date']).weekday() if days else 0
-    return [None]*offset+days+[None]*(YEAR_COLUMNS-offset-len(days))
+    return month['days']+[None]*(YEAR_COLUMNS-len(month['days']))

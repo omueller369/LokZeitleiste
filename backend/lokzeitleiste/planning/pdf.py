@@ -11,8 +11,7 @@ from reportlab.lib.pagesizes import A4, A3, landscape
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from .palette import COLORS,base_key,background_key
-from .calendar_layout import YEAR_COLUMNS,WEEKDAYS,year_slots
-from datetime import date
+from .calendar_layout import YEAR_COLUMNS,year_slots
 
 MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
 CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F", "Wochenende":"WE"}
@@ -87,7 +86,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     story += [table, Spacer(1, 14)]
     if yearly:
         styles.add(ParagraphStyle("YearCell",parent=styles["PlanCell"],fontSize=7,leading=8,alignment=1))
-        header = ["Monat"] + [display(WEEKDAYS[i%7])[0] for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "?", "Soll h"]
+        header = ["Monat"] + [str(i+1) for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "?", "Soll h"]
         rows = [header]
         fills = []
         diagonal = {}
@@ -97,8 +96,11 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                 if item:
                     kind = "Feiertag" if item.get("is_holiday") else item["kind"]
                     code=("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
-                    day=date.fromisoformat(item["date"])
-                    cells.append(Paragraph(f"<b>{day.day:02d}</b><br/>{code}",styles["YearCell"]))
+                    note=' '.join(item.get('note','').split())
+                    available=(doc.width-248)/YEAR_COLUMNS-2
+                    while note and pdfmetrics.stringWidth(note,'PlanSans',7)>available:
+                        note=note[:-2].rstrip()+'…' if len(note)>1 else ''
+                    cells.append(Paragraph(code+'<br/>'+escape(note or '______'),styles["YearCell"]))
                     if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
                 else:
