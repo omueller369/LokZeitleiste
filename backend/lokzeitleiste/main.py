@@ -710,3 +710,6 @@ app.include_router(pwa_router())
 
 from .work_reports.drafts import create_router as work_report_drafts_router
 app.include_router(work_report_drafts_router(require_account))
+
+from .tf_messages import create_router as tf_messages_router
+app.include_router(tf_messages_router(require_account))

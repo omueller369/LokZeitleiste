@@ -26,7 +26,7 @@ def bind_actor(db,user,request):
     if '/plan/' in path or '/planning/' in path:module='Arbeitszeitplanung'
     elif '/work-reports' in path:module='Arbeitsbericht'
     else:
-        labels=[('app-defaults','App Grundwerte'),('loco-handover','Lokübergabebuch'),('vehicles','Triebfahrzeuge'),('leasing','Lok-Leasing'),('documents','Dokumentenverwaltung'),('stations','Bahnhöfe'),('email','Email'),('worktime','Arbeitszeit'),('shifts','Schichtplan'),('account','Benutzerkonto'),('/admin/staff','Verwaltungsmitarbeiter'),('/admin/tf','TF-Stammdaten')]
+        labels=[('tf/messages','Nachrichten'),('app-defaults','App Grundwerte'),('loco-handover','Lokübergabebuch'),('vehicles','Triebfahrzeuge'),('leasing','Lok-Leasing'),('documents','Dokumentenverwaltung'),('stations','Bahnhöfe'),('email','Email'),('worktime','Arbeitszeit'),('shifts','Schichtplan'),('account','Benutzerkonto'),('/admin/staff','Verwaltungsmitarbeiter'),('/admin/tf','TF-Stammdaten')]
         module=next((label for key,label in labels if key in path),path.removeprefix('/api/v1/')[:255])
     db.info['change_actor']={'employee_id':user.id,'employee':name,'module':module,'username':user.username}
 

@@ -6,7 +6,7 @@ from datetime import timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .models import SessionToken, User, now_utc
+from .models import SessionToken, User, AccountLoginStamp, now_utc
 
 
 ITERATIONS = 600_000
@@ -33,6 +33,9 @@ def verify_password(password: str, stored: str) -> bool:
 
 
 def issue_token(session: Session, user: User) -> str:
+    stamp=session.get(AccountLoginStamp,user.id)
+    if stamp:stamp.previous_login_at=stamp.last_login_at;stamp.last_login_at=now_utc()
+    else:session.add(AccountLoginStamp(user_id=user.id,last_login_at=now_utc()))
     token = secrets.token_urlsafe(32)
     session.add(SessionToken(user_id=user.id, token_hash=hashlib.sha256(token.encode()).hexdigest(),
                              expires_at=now_utc() + TOKEN_LIFETIME))

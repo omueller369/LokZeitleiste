@@ -14,6 +14,13 @@ class PortalPolicy(base: String) {
     }.getOrDefault(false)
     fun asset(path: String): String? = when(path) {
         "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
+        "/tf/nachrichten" -> "tf-messages.html"
+        "/tf/me" -> "tf-profile.html"
+        "/tf/shell.js" -> "tf-shell.js"
+        "/tf/shell.css" -> "tf-shell.css"
+        "/tf/profile.js" -> "tf-profile.js"
+        "/tf/messages.js" -> "tf-messages.js"
+        "/tf/ctl-logistics-logo.jpg" -> "ctl-logistics-logo.jpg"
         "/tf/lokuebergabebuch", "/tf/loco-handover" -> "loco-handover.html"
         "/tf/handover-protocols.js" -> "handover-protocols.js"
         "/tf/loco-handover.js" -> "loco-handover.js"

@@ -744,3 +744,39 @@ class DutyReportDraftFile(Base):
     mime_type:Mapped[str]=mapped_column(String(40),nullable=False)
     content_hash:Mapped[str]=mapped_column(String(64),nullable=False)
     content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+
+
+class AccountLoginStamp(Base):
+    __tablename__='account_login_stamps'
+    user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),primary_key=True)
+    last_login_at:Mapped[datetime]=mapped_column(DateTime,nullable=False)
+    previous_login_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
+
+
+class TfMessageAttachment(Base):
+    __tablename__='tf_message_attachments'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    filename:Mapped[str]=mapped_column(String(200),nullable=False)
+    mime_type:Mapped[str]=mapped_column(String(80),nullable=False)
+    content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+
+
+class TfMessage(Base):
+    __tablename__='tf_messages'
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    sender_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    sender_name:Mapped[str]=mapped_column(String(250),nullable=False)
+    subject:Mapped[str]=mapped_column(String(200),nullable=False)
+    body:Mapped[str]=mapped_column(Text,nullable=False)
+    attachment_id:Mapped[int|None]=mapped_column(ForeignKey('tf_message_attachments.id'),nullable=True)
+    created_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,nullable=False,index=True)
+
+
+class TfMessageDelivery(Base):
+    __tablename__='tf_message_deliveries'
+    __table_args__=(UniqueConstraint('message_id','recipient_id'),)
+    id:Mapped[int]=mapped_column(Integer,primary_key=True)
+    message_id:Mapped[int]=mapped_column(ForeignKey('tf_messages.id'),nullable=False,index=True)
+    recipient_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    read_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
+    deleted_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)

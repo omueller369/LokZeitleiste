@@ -47,7 +47,7 @@ dependencies {
 val portalAssets = layout.buildDirectory.dir("generated/portalAssets")
 val prepareTfPortal by tasks.registering(Sync::class) {
     from(rootProject.file("backend/lokzeitleiste/static")) {
-        include("handover-protocols.js", "loco-handover.*", "tf-portal.*", "work-report.*", "work-report-feedback.js", "train-journeys.js", "gps.js", "stations.js",
+        include("tf-shell.*", "tf-messages.*", "tf-profile.*", "ctl-logistics-logo.jpg", "handover-protocols.js", "loco-handover.*", "tf-portal.*", "work-report.*", "work-report-feedback.js", "train-journeys.js", "gps.js", "stations.js",
             "station-sharing.js", "tf-return.js", "documents.*", "account.*", "my-worktime.*",
             "entry-form.js", "portal.css", "responsive.css", "i18n.js", "android-portal.js")
     }
