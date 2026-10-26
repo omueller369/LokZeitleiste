@@ -29,6 +29,7 @@ class Drawing:
     def line(self,x1,y1,x2,y2,width=.5):
         if self.image:self.d.line([(round(x1*4),round(y1*4)),(round(x2*4),round(y2*4))],fill='black',width=max(1,round(width*4)))
         else:self.c.setLineWidth(width);self.c.line(x1,595-y1,x2,595-y2)
+    def strike(self,x,y,w,h):self.line(x+2,y+h-2,x+w-2,y+2,.6)
     def text(self,x,y,text,size=7,bold=False,maxwidth=None):
         text=fmt(text)
         if not text:return
@@ -63,6 +64,7 @@ def render(sheet,result,creator,image=False):
             col=i//5;row=i%5;x=17+col*97
             d.text(x,50+row*6.4,t.number+' / '+t.station,5.8,maxwidth=92)
     d.line(left,85,right,85,1)
+    if len(trains)<3:d.strike(12,51+len(trains)*10,278,34-len(trains)*10);d.strike(290,51+len(trains)*10,118,34-len(trains)*10)
     top=90
     for x in xs:
         if x in (320,364):
@@ -90,15 +92,19 @@ def render(sheet,result,creator,image=False):
     for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,8,maxwidth=36)
     if isinstance(result['missing'],int) and result['missing']<0:d.text(401,pos[6][0]+5,'*)',5)
     y4=pos[4][0];y6=pos[6][0]+pos[6][1]
-    for x1,x2 in [(278,320),(320,364)]:d.line(x1,y4,x2,y6);d.line(x1,y6,x2,y4)
+    for x1,x2 in [(278,320),(320,364)]:d.line(x1,y6,x2,y4)
     last=sheet.last_vehicle
     if last:last=f'{last[:2]} {last[2:4]} {last[4:8]} {last[8:11]}-{last[11]}'
     d.text(282,pos[7][0]+5,last,7,maxwidth=122)
-    for n,value in [(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7)
+    if not last:d.strike(278,pos[7][0],130,pos[7][1])
+    d.strike(278,pos[8][0],42,pos[8][1]);d.strike(320,pos[8][0],88,pos[8][1])
+    for n in [9,10,11,12,14,15]:d.strike(320,pos[n][0],88,pos[n][1])
+    for n,value in [(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
         d.text(x,yy+3,'ja' if s.lower else 'nein',7)
         if s.lower:d.text(x,yy+16,str(s.value)+' km/h',6.4,maxwidth=36)
+        else:d.strike([278,320,364][i],yy+13,[42,44,44][i],17)
     travel_top=end;travel_end=travel_top+117
     for x in xs:d.line(x,travel_top,x,travel_end)
     labels=[(21,'NBÜ/ep-Bremsen an allen Fahrzeugen vorhanden'),(22,'Notbremsüberbrückung wirksam'),(23,'Kennbuchstaben h, z oder ee'),(24,'Kennbuchstaben n oder y'),(25,'TB 0'),(26,''),(27,'o. Zub'),(28,'Kennbuchstaben a'),(29,'')]
@@ -118,6 +124,7 @@ def render(sheet,result,creator,image=False):
         else:
             text=sheet.extra_text if sheet.extra else ''
             # Wrap optional note in two lines, fail visibly rather than truncate.
+            if not text:d.strike(82,yy,196,h)
             words=text.split();lines=['']
             for word in words:
                 candidate=(lines[-1]+' '+word).strip()

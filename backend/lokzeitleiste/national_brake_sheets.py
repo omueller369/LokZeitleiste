@@ -42,7 +42,7 @@ class Speed(BaseModel):
         return self
 class Sheet(BaseModel):
     departure_date:date|None=None
-    trains:list[Train]=Field(default_factory=lambda:[Train(),Train()],min_length=2,max_length=20)
+    trains:list[Train]=Field(default_factory=lambda:[Train()],min_length=1,max_length=20)
     locos:list[Vehicle]=Field(default_factory=list,max_length=2)
     brake_mode:Literal['G','P','R']='G'
     wagon_weight:Decimal|None=Field(default=None,gt=0,le=99999,decimal_places=3,allow_inf_nan=False)
@@ -77,7 +77,7 @@ class Revision(BaseModel):
     expected_revision:int=Field(ge=1)
 
 def calculate(db,sheet):
-    source=international_calculate(db,InternationalSheet(brake_mode=sheet.brake_mode,locos=[Loco(**v.model_dump()) for v in sheet.locos]))
+    source=international_calculate(db,InternationalSheet(brake_mode='G+P' if sheet.brake_mode=='G' else sheet.brake_mode,locos=[Loco(**v.model_dump()) for v in sheet.locos]))
     lines=source['lines'];a=source['a']
     axles=sum(v['axle_count'] for v in lines) if lines and all(v['axle_count'] is not None for v in lines) else None
     loco=dict(weight=a['weight'],brake=a['brake'],axles=axles,length=a['length'])

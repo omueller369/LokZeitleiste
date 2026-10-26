@@ -16,9 +16,9 @@ class NationalBrakeTest(unittest.TestCase):
         return dict(dict(departure_date='2026-10-26',trains=[dict(number='00123',station=' b '),dict(number='98765',station='BHBF')],locos=[dict(vehicle_id=self.vehicle['id'],vehicle_revision=1)],brake_mode='G',wagon_weight=1000,wagon_brake=700,wagon_axles=13,required_percent=80,wagon_length=200,braked_axles=13,last_vehicle='318012345678',brakes_multi=20,brakes_d=10,brakes_k=10,brakes_matrossow=1),**changes)
     def test_formulas_positions_and_limits(self):
         r=self.driver.post(self.base+'/calculate',json=self.sheet());self.assertEqual(r.status_code,200,r.text);r=r.json()
-        for section,key,value in [('total','weight','1084.5'),('total','brake','801'),('loco','length','19'),('total','length','219')]:self.assertEqual(str(r[section][key]),value)
-        self.assertEqual(r['total']['axles'],17);self.assertEqual(r['required_axles'],11);self.assertEqual(r['available'],73);self.assertEqual(r['missing'],-7);self.assertEqual(r['preview_missing'],[])
-        for mode,weight in [('G','101'),('P','111'),('R','123')]:self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(brake_mode=mode)).json()['loco']['brake'],int(weight))
+        for section,key,value in [('total','weight','1084.5'),('total','brake','775'),('loco','length','19'),('total','length','219')]:self.assertEqual(str(r[section][key]),value)
+        self.assertEqual(r['total']['axles'],17);self.assertEqual(r['required_axles'],11);self.assertEqual(r['available'],71);self.assertEqual(r['missing'],-9);self.assertEqual(r['preview_missing'],[])
+        for mode,weight in [('G','75'),('P','111'),('R','123')]:self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(brake_mode=mode)).json()['loco']['brake'],int(weight))
         self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(required_percent=50)).json()['missing'],'/')
         for key in ['brakes_multi','brakes_d','brakes_k','brakes_matrossow','braked_axles']:
             for n in [0,51]:self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(**{key:n})).status_code,422)
@@ -57,3 +57,17 @@ class NationalBrakeTest(unittest.TestCase):
         for suffix in ['/preview','/archive']:self.assertEqual(other.post(path+suffix,json={'expected_revision':1}).status_code,404)
         self.assertEqual(other.get(path).status_code,404);self.assertEqual(other.put(path,json={'expected_revision':1,'sheet':self.sheet()}).status_code,404)
         self.assertEqual(self.client.get(path).status_code,403)
+
+    def test_single_train_and_empty_pdf_fields_struck(self):
+        from lokzeitleiste.national_brake_sheets import Sheet,calculate
+        from lokzeitleiste.national_brake_image import Drawing,render
+        from sqlalchemy.orm import Session
+        sheet=Sheet(**self.sheet(trains=[dict(number='00123',station='B')],last_vehicle='',brakes_d=None))
+        with Session(self.engine) as db:result=calculate(db,sheet)
+        with patch.object(Drawing,'strike',autospec=True) as struck:
+            render(sheet,result,'Test TF')
+            boxes=[tuple(c.args[1:]) for c in struck.call_args_list]
+        self.assertIn((278,226,130,17),boxes)
+        self.assertIn((278,271,42,14),boxes)
+        self.assertIn((82,534,196,22),boxes)
+        self.assertNotIn((278,126,42,15),boxes)
