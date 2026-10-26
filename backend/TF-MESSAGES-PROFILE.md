@@ -20,7 +20,7 @@ Der gemeinsame Portalrahmen enthält links das bereitgestellte Logo der CTL Logi
 
 Bei ungelesenen Nachrichten von anderen TF erscheint die Glocke mit Anzahl und Link zum Nachrichtenmodul. Der Zähler wird nach Lesen/Löschen sowie regelmäßig und beim erneuten Fokussieren aktualisiert. Eigene Nachrichten lösen keine Glockenbenachrichtigung aus.
 
-Im Footer stehen Softwaretitel und der zentral hinterlegte Versionsstand. **Mein Konto / Passwort** ist in den Footer verschoben und verweist auf **Meine Daten**. **Meine Dokumente** entfällt als Headerlink; die Dokumentenverwaltung bleibt über ihre Dashboard-Kachel erreichbar. Die bestehenden Rückkehrbuttons zum TF-Portal bleiben bestehen.
+Im Footer stehen Softwaretitel und der zentral hinterlegte Versionsstand. **Mein Konto / Passwort** ist als eigene Dashboard-Kachel verfügbar und verweist auf **Meine Daten**. Der Footer enthält ausschließlich Softwaretitel und Versionsstand. Das separate Modul **Meine Arbeitszeiten** entfällt für TF; alte Direktaufrufe werden zum TF-Portal umgeleitet. Die Zeiterfassung der Verwaltung und der TF-Arbeitsbericht bleiben verfügbar. **Meine Dokumente** entfällt als Headerlink; die Dokumentenverwaltung bleibt über ihre Dashboard-Kachel erreichbar. Die bestehenden Rückkehrbuttons zum TF-Portal bleiben bestehen.
 
 ## Persönliche Übersicht
 

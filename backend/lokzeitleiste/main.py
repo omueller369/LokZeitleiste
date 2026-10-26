@@ -442,11 +442,11 @@ app.include_router(records_router(require_account,require_admin,entry_dict,month
 
 @app.get('/my/worktime')
 def own_worktime_page():
-    return FileResponse(Path(__file__).parent/'static'/'my-worktime.html')
+    return FileResponse(Path(__file__).parent/'static'/'my-worktime.html',headers={'Cache-Control':'no-store'})
 
 @app.get('/my/worktime.js')
 def own_worktime_script():
-    return FileResponse(Path(__file__).parent/'static'/'my-worktime.js',media_type='text/javascript')
+    return FileResponse(Path(__file__).parent/'static'/'my-worktime.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
 
 @app.get('/admin/tf/new')
 @app.get('/admin/tf')

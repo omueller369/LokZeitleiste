@@ -4,7 +4,7 @@ function message(text,error=false){el('message').textContent=text;el('message').
 async function api(path,options={}){const response=await fetch(path,{credentials:'same-origin',...options});
  const body=await response.json().catch(()=>({})); if(!response.ok)throw Error(typeof body.detail==='string'?body.detail:'Anfrage fehlgeschlagen ('+response.status+')');return body;}
 async function show(afterLogin=false){user=await api('/api/v1/account/me');if(afterLogin&&!user.password_change_required){location.href=user.role==='tf'?'/tf':'/admin/start';return;}el('tfPortal').hidden=user.password_change_required||user.role!=='tf';el('loginForm').hidden=true;el('passwordForm').hidden=false;el('logout').hidden=false;
- el('ownWorktime').hidden=user.password_change_required||!['tf','staff'].includes(user.role);el('identity').textContent='Konto: '+user.username;el('mandatory').hidden=!user.password_change_required;el('back').hidden=user.password_change_required||user.role==='tf';}
+ el('ownWorktime').hidden=user.password_change_required||user.role!=='staff';el('identity').textContent='Konto: '+user.username;el('mandatory').hidden=!user.password_change_required;el('back').hidden=user.password_change_required||user.role==='tf';}
 async function submit(form,fn){form.querySelector('button').disabled=true;try{await fn();}catch(error){message(error.message,true);}finally{form.querySelector('button').disabled=false;}}
 el('loginForm').onsubmit=event=>{event.preventDefault();submit(event.target,async()=>{
  await api('/api/v1/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(event.target)))});
