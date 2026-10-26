@@ -47,3 +47,6 @@ Diagonale nur von der unteren linken Ecke des Zeilennummernfeldes 29 zur oberen 
 
 ## Weitere Zellverbindungen
 Spalten 5/6 über Zeilen 8–12 als eine leere Zelle sowie über Zeilen 14–15 als eine weitere leere Zelle. Trennlinien innerhalb dieser Bereiche entfallen, Wagenzugfelder bleiben getrennt. Reisezug-Diagonale endet jetzt an der oberen rechten Ecke von Spalte 4 in Zeile 21.
+
+## Zentrierte Zahlen und Zugdaten
+Numerische Datenzellen, Zeilen-/Spaltennummern, letzte Fahrzeugnummer, Geschwindigkeitswerte sowie Zugnummer/Betriebsstelle werden in PDF und PNG horizontal und vertikal innerhalb ihrer Zellen zentriert. PDF nutzt Schriftmetriken, PNG die tatsächlichen Glyphengrenzen. Bei mehreren Zugnummern wird der Datenbereich gleichmäßig in zentrierte Zeilen aufgeteilt. Farben und Streichungen bleiben erhalten.

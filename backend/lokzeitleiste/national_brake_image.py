@@ -21,6 +21,8 @@ def fmt(v):
 class Drawing:
     def __init__(self,image):
         self.image=image;self.buffer=io.BytesIO();self.scale=4
+        for name,bold in [('National',False),('NationalBold',True)]:
+            if name not in pdfmetrics.getRegisteredFontNames():pdfmetrics.registerFont(TTFont(name,font_path(bold)))
         if image:self.im=Image.new('RGB',(1680,2380),'white');self.d=ImageDraw.Draw(self.im)
         else:
             for name,bold in [('National',False),('NationalBold',True)]:
@@ -42,6 +44,21 @@ class Drawing:
             if size<4.5:raise ValueError('Text ist für den Bremszettel zu lang. Bitte Eingabe kürzen.')
         if self.image:self.d.text((round(x*4),round(y*4)),text,fill=color,font=font,anchor='lt')
         else:self.c.setFillColor(color);self.c.setFont('NationalBold' if bold else 'National',size);self.c.drawString(x,595-y-size*.8,text)
+    def centered(self,x,y,w,h,value,size=7,bold=False,color="black"):
+        text=fmt(value)
+        if not text:return
+        name='NationalBold' if bold else 'National'
+        while pdfmetrics.stringWidth(text,name,size)>w-4:
+            size-=.25
+            if size<4.5:raise ValueError('Text ist für den Bremszettel zu lang. Bitte Eingabe kürzen.')
+        if self.image:
+            font=ImageFont.truetype(font_path(bold),round(size*4))
+            box=self.d.textbbox((0,0),text,font=font,anchor='lt')
+            self.d.text(((x+w/2)*4-(box[0]+box[2])/2,(y+h/2)*4-(box[1]+box[3])/2),text,font=font,fill=color,anchor='lt')
+        else:
+            ascent,descent=pdfmetrics.getAscentDescent(name,size)
+            self.c.setFillColor(color);self.c.setFont(name,size)
+            self.c.drawCentredString(x+w/2,595-(y+h/2)-(ascent+descent)/2,text)
     def finish(self):
         if self.image:self.im.save(self.buffer,format='PNG',dpi=(288,288))
         else:self.c.showPage();self.c.save()
@@ -54,15 +71,16 @@ def render(sheet,result,creator,image=False):
     trains=[t for t in sheet.trains if t.number]
     d.line(left,36,right,36)
     if len(trains)<=3:
-        d.text(25,40,'Zugnummer(n)',7,True);d.text(301,40,'ab Betriebsstelle',7,True);d.line(290,36,290,85)
+        d.centered(12,36,278,13,'Zugnummer(n)',7,True);d.centered(290,36,118,13,'ab Betriebsstelle',7,True);d.line(290,36,290,85)
     else:d.text(17,40,'Zugnummer / ab Betriebsstelle (DS100)',7,True)
     # Keep each DS100 paired with its train; up to 20 pairs fit as four compact columns.
     if len(trains)<=3:
-        for i,t in enumerate(trains):d.text(22,51+i*10,t.number,7);d.text(301,51+i*10,t.station,7,maxwidth=100)
+        for i,t in enumerate(trains):
+            height=34/max(1,len(trains));d.centered(12,51+i*height,278,height,t.number);d.centered(290,51+i*height,118,height,t.station)
     else:
         for i,t in enumerate(trains):
             col=i//5;row=i%5;x=17+col*97
-            d.text(x,50+row*6.4,t.number+' / '+t.station,7,maxwidth=92)
+            d.centered(x,49+row*7,93,7,t.number+' / '+t.station)
     d.line(left,85,right,85,1)
     top=90
     for x in xs:
@@ -72,13 +90,13 @@ def render(sheet,result,creator,image=False):
             else:d.line(x,313,x,329);d.line(x,367,x,397)
         else:d.line(x,top,x,397)
     d.line(left,top,right,top,1);d.line(left,126,right,126,1)
-    for i,x in enumerate(xs[:-1]):d.text(x+3,93,str(i+1),6,True)
+    for i,x in enumerate(xs[:-1]):d.centered(x,90,xs[i+1]-x,12,str(i+1),6,True)
     d.text(64,108,'Zeile',6.5,True);d.text(148,108,'Bezeichnung',8,True)
     d.text(282,108,'Wagenzug',6.2,True);d.text(324,103,'arbeitende',6,True);d.text(326,112,'Tfz',7,True);d.text(369,108,'Gesamtzug',6.1,True)
     rows=[(1,15,'Gewicht (t)'),(2,15,'Bremsgewicht (t)'),(3,15,'Zahl der Achsen'),(4,16,'Mindestbremshundertstel'),(5,23,'Vorhandene Bremshundertstel'),(6,16,'Fehlende Bremshundertstel'),(7,17,'Nummer des letzten Fahrzeuges'),(8,14,'Zahl der einlösigen Bremsen'),(9,14,'Zahl der mehrlösigen Bremsen'),(10,14,'Zahl der Bremsen mit D'),(11,14,'Zahl der Bremsen mit K, L und LL'),(12,14,'Zahl der Matrossow-Bremsen'),(13,16,'Länge (m)'),(14,16,'Zahl der gebremsten Achsen'),(15,22,'Zahl der erforderlich gebremsten Achsen'),(16,30,'Zulässige Geschwindigkeit niedriger')]
     pos={};y=126
     for n,h,title in rows:
-        pos[n]=(y,h);d.text(68,y+5,n,7);d.text(85,y+4,title,6.8,maxwidth=190)
+        pos[n]=(y,h);d.centered(62,y,20,h,n);d.text(85,y+4,title,6.8,maxwidth=190)
         if n==5:d.text(86,y+14,'Zeile 2, Sp. 6 × 100 / Zeile 1, Sp. 6',5.7)
         if n==15:d.text(86,y+14,'Zeile 3, Sp. 4 × 9 / 10',6)
         if n==16:d.text(86,y+14,'als gemäß Fahrplanangaben',6.8)
@@ -87,26 +105,26 @@ def render(sheet,result,creator,image=False):
     d.line(left,end,right,end,1);d.text(16,139,'Angaben für',6.6,True,maxwidth=43);d.text(16,149,'Reise- und',6.6,True);d.text(16,159,'Güterzüge',6.6,True)
     for n,key in [(1,'weight'),(2,'brake'),(3,'axles'),(13,'length')]:
         yy,h=pos[n]
-        for x,col in [(282,'wagon'),(324,'loco'),(368,'total')]:d.text(x,yy+5,result[col][key],7,maxwidth=36)
-    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,7,maxwidth=36,color='#c40000' if n==6 and isinstance(v,(int,float,Decimal)) else 'black')
+        for x,w,col in [(278,42,'wagon'),(320,44,'loco'),(364,44,'total')]:d.centered(x,yy,w,h,result[col][key])
+    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.centered(364,pos[n][0],44,pos[n][1],v,color='#c40000' if n==6 and isinstance(v,(int,float,Decimal)) else 'black')
     if isinstance(result['missing'],int) and result['missing']<0:d.text(401,pos[6][0]+5,'*)',5)
     y4=pos[4][0];y6=pos[6][0]+pos[6][1]
     for x1,x2 in [(278,320),(320,364)]:d.line(x1,y6,x2,y4)
     last=sheet.last_vehicle
     if last:last=f'{last[:2]} {last[2:4]} {last[4:8]} {last[8:11]}-{last[11]}'
-    d.text(282,pos[7][0]+5,last,7,maxwidth=122)
+    d.centered(278,pos[7][0],130,pos[7][1],last)
     if not last:d.strike(278,pos[7][0],130,pos[7][1])
-    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
+    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.centered(278,pos[n][0],42,pos[n][1],value) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
         d.text(x,yy+3,'ja' if s.lower else 'nein',7)
-        if s.lower:d.text(x,yy+16,str(s.value)+' km/h',7,maxwidth=36)
+        if s.lower:d.centered([278,320,364][i],yy+13,[42,44,44][i],17,str(s.value)+' km/h')
         else:d.strike([278,320,364][i],yy+13,[42,44,44][i],17)
     travel_top=end;travel_end=travel_top+117
     for x in [12,62,82,278,320,408]:d.line(x,travel_top,x,travel_end)
     labels=[(21,'NBÜ/ep-Bremsen an allen Fahrzeugen vorhanden'),(22,'Notbremsüberbrückung wirksam'),(23,'Kennbuchstaben h, z oder ee'),(24,'Kennbuchstaben n oder y'),(25,'TB 0'),(26,''),(27,'o. Zub'),(28,'Kennbuchstaben a'),(29,'')]
     for i,(n,title) in enumerate(labels):
-        yy=travel_top+i*13;d.text(67,yy+3,n,6.5);d.text(86,yy+3,title,6,maxwidth=188);d.text(281,yy+3,'nein / ja',6.5,maxwidth=36);d.line(62,yy+13,320,yy+13)
+        yy=travel_top+i*13;d.centered(62,yy,20,13,n,6.5);d.text(86,yy+3,title,6,maxwidth=188);d.text(281,yy+3,'nein / ja',6.5,maxwidth=36);d.line(62,yy+13,320,yy+13)
     d.text(16,travel_top+7,'Angaben für',6.4,True);d.text(16,travel_top+17,'Reisezüge',6.4,True)
     # Strike only row-number/description cells: lower-left of 29 to upper-right of 21.
     d.line(62,travel_end,320,travel_top,1.2)
@@ -115,7 +133,7 @@ def render(sheet,result,creator,image=False):
     yy=travel_end
     for n,h in [(31,20),(32,22)]:
         for x in [12,62,82,278,408]:d.line(x,yy,x,yy+h)
-        d.text(67,yy+5,n,7)
+        d.centered(62,yy,20,h,n)
         if n==31:
             d.text(85,yy+4,'Im Wagenzug sind Fahrzeuge mit',6.5);d.text(85,yy+12,'gefährlichen Gütern',6.5);d.text(284,yy+7,'ja' if sheet.dangerous else 'nein',7)
         elif sheet.extra:

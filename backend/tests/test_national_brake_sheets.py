@@ -93,19 +93,20 @@ class NationalBrakeTest(unittest.TestCase):
         for value in [0,5000]:self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(speeds=[dict(lower=True,value=value),{},{}])).status_code,200)
         sheet=Sheet(**self.sheet())
         with Session(self.engine) as db:result=calculate(db,sheet)
-        with patch.object(Drawing,'text',autospec=True) as text:
+        with patch.object(Drawing,'centered',autospec=True) as cells:
             render(sheet,result,'Test TF')
-        highlighted=[c for c in text.call_args_list if c.kwargs.get('color')=='#0645ad']
-        self.assertEqual(len(highlighted),0)
-        red=[c for c in text.call_args_list if c.kwargs.get('color')=='#c40000']
-        self.assertEqual(len(red),1)
-        self.assertEqual(red[0].args[3],result['missing'])
-        with patch.object(Drawing,'text',autospec=True) as normal:
+        self.assertFalse(any(c.kwargs.get('color')=='#0645ad' for c in cells.call_args_list))
+        red=[c for c in cells.call_args_list if c.kwargs.get('color')=='#c40000']
+        self.assertEqual(len(red),1);self.assertEqual(red[0].args[5],result['missing'])
+        with patch.object(Drawing,'centered',autospec=True) as normal:
             render(sheet,dict(result,missing='/'),'Test TF')
         self.assertFalse(any(c.kwargs.get('color')=='#c40000' for c in normal.call_args_list))
-        numeric_results=[c for c in text.call_args_list if len(c.args)>3 and c.args[3] in (result['available'],result['missing'],result['required_axles'])]
-        self.assertTrue(numeric_results)
-        self.assertTrue(all(c.args[4]==7 and not c.kwargs.get('bold',False) for c in numeric_results))
+        entries=[tuple(c.args[1:6]) for c in cells.call_args_list]
+        self.assertIn((278,126,42,15,1000),entries)
+        self.assertIn((364,187,44,23,result['available']),entries)
+        self.assertIn((278,345,42,22,result['required_axles']),entries)
+        self.assertIn((12,51,278,17,'00123'),entries)
+        self.assertIn((290,51,118,17,'B'),entries)
 
     def test_row32_false_has_no_data_or_strike_true_keeps_text(self):
         from lokzeitleiste.national_brake_sheets import Sheet,calculate
