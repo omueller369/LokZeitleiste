@@ -30,7 +30,7 @@ class Drawing:
         if self.image:self.d.line([(round(x1*4),round(y1*4)),(round(x2*4),round(y2*4))],fill='black',width=max(1,round(width*4)))
         else:self.c.setLineWidth(width);self.c.line(x1,595-y1,x2,595-y2)
     def strike(self,x,y,w,h):self.line(x+2,y+h-2,x+w-2,y+2,.6)
-    def text(self,x,y,text,size=7,bold=False,maxwidth=None):
+    def text(self,x,y,text,size=7,bold=False,maxwidth=None,color="black"):
         text=fmt(text)
         if not text:return
         while True:
@@ -40,8 +40,8 @@ class Drawing:
             if maxwidth is None or width<=maxwidth:break
             size-=.25
             if size<4.5:raise ValueError('Text ist für den Bremszettel zu lang. Bitte Eingabe kürzen.')
-        if self.image:self.d.text((round(x*4),round(y*4)),text,fill='black',font=font,anchor='lt')
-        else:self.c.setFont('NationalBold' if bold else 'National',size);self.c.drawString(x,595-y-size*.8,text)
+        if self.image:self.d.text((round(x*4),round(y*4)),text,fill=color,font=font,anchor='lt')
+        else:self.c.setFillColor(color);self.c.setFont('NationalBold' if bold else 'National',size);self.c.drawString(x,595-y-size*.8,text)
     def finish(self):
         if self.image:self.im.save(self.buffer,format='PNG',dpi=(288,288))
         else:self.c.showPage();self.c.save()
@@ -89,7 +89,7 @@ def render(sheet,result,creator,image=False):
     for n,key in [(1,'weight'),(2,'brake'),(3,'axles'),(13,'length')]:
         yy,h=pos[n]
         for x,col in [(282,'wagon'),(324,'loco'),(368,'total')]:d.text(x,yy+5,result[col][key],7,maxwidth=36)
-    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,8,maxwidth=36)
+    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,10 if n in (5,6) else 8,bold=n in (5,6),maxwidth=36,color='#0645ad' if n in (5,6) else 'black')
     if isinstance(result['missing'],int) and result['missing']<0:d.text(401,pos[6][0]+5,'*)',5)
     y4=pos[4][0];y6=pos[6][0]+pos[6][1]
     for x1,x2 in [(278,320),(320,364)]:d.line(x1,y6,x2,y4)
@@ -99,7 +99,7 @@ def render(sheet,result,creator,image=False):
     if not last:d.strike(278,pos[7][0],130,pos[7][1])
     d.strike(320,pos[8][0],88,pos[8][1])
     for n in [9,10,11,12,14,15]:d.strike(320,pos[n][0],88,pos[n][1])
-    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
+    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,10 if n==15 else 7,bold=n==15,color='#0645ad' if n==15 else 'black') if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
         d.text(x,yy+3,'ja' if s.lower else 'nein',7)

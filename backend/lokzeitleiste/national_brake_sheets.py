@@ -8,7 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter,Depends,HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse,Response
-from pydantic import BaseModel,Field,field_validator,model_validator
+from pydantic import BaseModel,Field,ValidationError,field_validator,model_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from .db import database_session
@@ -35,7 +35,7 @@ class Vehicle(BaseModel):
     vehicle_revision:int=Field(ge=1)
 class Speed(BaseModel):
     lower:bool=False
-    value:int|None=Field(default=None,ge=0,le=999,strict=True)
+    value:int|None=Field(default=None,ge=0,le=5000,strict=True)
     @model_validator(mode='after')
     def disabled(self):
         if not self.lower:self.value=None
@@ -45,18 +45,18 @@ class Sheet(BaseModel):
     trains:list[Train]=Field(default_factory=lambda:[Train()],min_length=1,max_length=20)
     locos:list[Vehicle]=Field(default_factory=list,max_length=2)
     brake_mode:Literal['G','P','R']='G'
-    wagon_weight:Decimal|None=Field(default=None,gt=0,le=99999,decimal_places=3,allow_inf_nan=False)
-    wagon_brake:Decimal|None=Field(default=None,ge=0,le=99999,decimal_places=3,allow_inf_nan=False)
-    wagon_axles:int|None=Field(default=None,ge=1,le=9999,strict=True)
-    required_percent:int|None=Field(default=None,ge=0,le=999,strict=True)
+    wagon_weight:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    wagon_brake:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    wagon_axles:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    required_percent:int|None=Field(default=None,ge=0,le=5000,strict=True)
     last_vehicle:str=''
-    brakes_single:int|None=Field(default=None,ge=0,le=300,strict=True)
-    brakes_multi:int|None=Field(default=None,ge=0,le=300,strict=True)
-    brakes_d:int|None=Field(default=None,ge=0,le=300,strict=True)
-    brakes_k:int|None=Field(default=None,ge=0,le=300,strict=True)
-    brakes_matrossow:int|None=Field(default=None,ge=0,le=300,strict=True)
-    wagon_length:Decimal|None=Field(default=None,ge=0,le=9999,decimal_places=3,allow_inf_nan=False)
-    braked_axles:int|None=Field(default=None,ge=1,le=50,strict=True)
+    brakes_single:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    brakes_multi:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    brakes_d:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    brakes_k:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    brakes_matrossow:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    wagon_length:int|None=Field(default=None,ge=0,le=5000,strict=True)
+    braked_axles:int|None=Field(default=None,ge=0,le=5000,strict=True)
     speeds:list[Speed]=Field(default_factory=lambda:[Speed(),Speed(),Speed()],min_length=3,max_length=3)
     dangerous:bool=True
     extra:bool=False
@@ -134,7 +134,9 @@ def create_router(require_account):
     def ready(db,user,id,data):
         row=owned(db,user,id)
         if row.revision!=data.expected_revision:raise HTTPException(409,'Entwurf wurde geändert. Bitte neu laden.')
-        sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
+        try:sheet=Sheet.model_validate_json(row.payload_json)
+        except ValidationError as exc:raise HTTPException(422,'Bitte den Entwurf laden und die Zugparameter als ganze Zahlen von 0 bis 5000 korrigieren.') from exc
+        result=calculate(db,sheet)
         if result['preview_missing']:raise HTTPException(422,'Bitte ergänzen: '+', '.join(result['preview_missing']))
         return row,sheet,result
     @router.post(base+'/{id}/preview')

@@ -26,3 +26,6 @@ Bei gemeinsamer Bremsstellung G wird für jedes Tfz der Stammdatenwert G−25 % 
 
 ## Bremsenzahlen 0–300
 Zeilen 8–12 sind optionale Ganzzahlen von 0 bis 300 einschließlich. Zeile 8 ist wieder eingebbar. Null wird gedruckt, nur fehlende Werte werden gestrichen. Feld-11-Vorschläge nutzen ebenfalls den Bereich 0–300; Zeile 14 bleibt unverändert 1–50.
+
+## Einheitliche Mengenfelder und Hervorhebung
+Alle numerischen Eingabefelder der Zugparameter, einschließlich bedingter Geschwindigkeiten, erlauben ganze Zahlen 0–5000. Zug-/Fahrzeugnummern bleiben Kennungen mit ihrem bisherigen Format. Automatisch berechnete technische Gewichte werden weiterhin exakt aus den Stammdaten abgeleitet und nicht still gerundet. Fehlende Pflichtfelder und Format-/Bereichsfehler werden mit rotem 3px-Rahmen und aria-invalid markiert; unvollständige Entwürfe bleiben speicherbar, ungültige Werte nicht. Zeilen 5, 6 und 15 werden in Maske, Vorschau und PDF fett und blau hervorgehoben. Maske/Bedienelemente sind größer; die mobile Anordnung bricht weiter um.
