@@ -38,3 +38,6 @@ Zugnummer/Betriebsstelle sowie Zeilen 8–12 und 14–15 in Spalten 5/6 bleiben 
 
 ## Verdichtete Eingabemaske
 Tfz- und Zugdaten am Desktop nebeneinander; Datum/Zugnummer/DS100 in einer Zeile. Mengenfelder auf 9 Zeichen Breite begrenzt. Parametertabelle und Detailfelder nebeneinander auf breiten Bildschirmen, darunter letzte Fahrzeugnummer und Geschwindigkeiten. Güterzugangaben und Erstellung nebeneinander. Kleinere Innenabstände und Schaltflächen; auf mobilen Displays automatische Umbrüche sowie 16px-Schrift und mindestens 40px-Höhe für Eingaben. Berechnungen/PDF bleiben unverändert.
+
+## Tfz-Namen und kompakte Feldgruppen
+Tfz-Auswahl zeigt nur den Namen, technische Auswahl erfolgt weiterhin eindeutig per ID. Felder 4/14 bilden die erste Zweiergruppe, die übrigen Detailfelder folgen darunter. Feld 15 ist nur in der Eingabemaske verborgen, Berechnung/PDF bleiben erhalten. Feld 7 und die halbe Breite belegende Abfrage 16 nebeneinander (mobil darunter). Feld 16 zeigt Wagen 1–3 ohne die Überschriften Arbeitende Tfz/Gesamtzug; die drei gespeicherten Ja/Nein-Geschwindigkeitsangaben bleiben erhalten.
