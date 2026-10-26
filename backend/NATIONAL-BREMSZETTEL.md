@@ -29,3 +29,6 @@ Zeilen 8–12 sind optionale Ganzzahlen von 0 bis 300 einschließlich. Zeile 8 i
 
 ## Einheitliche Mengenfelder und Hervorhebung
 Alle numerischen Eingabefelder der Zugparameter, einschließlich bedingter Geschwindigkeiten, erlauben ganze Zahlen 0–5000. Zug-/Fahrzeugnummern bleiben Kennungen mit ihrem bisherigen Format. Automatisch berechnete technische Gewichte werden weiterhin exakt aus den Stammdaten abgeleitet und nicht still gerundet. Fehlende Pflichtfelder und Format-/Bereichsfehler werden mit rotem 3px-Rahmen und aria-invalid markiert; unvollständige Entwürfe bleiben speicherbar, ungültige Werte nicht. Zeilen 5, 6 und 15 werden in Maske, Vorschau und PDF fett und blau hervorgehoben. Maske/Bedienelemente sind größer; die mobile Anordnung bricht weiter um.
+
+## Kompakte Maske, Ergebnisfarben nur am Bildschirm
+Zeilen 5/15 nur in der Maske blau und fett. Zeile 6: Zahl rot, sonst schwarz. PDF/PNG-Vorschau zeigen die berechneten Werte einheitlich mit 7pt ohne besondere Fettschrift; Zeilen 5/15 schwarz, Zeile 6 bei einer Zahl rot und sonst schwarz. Eingetragene Zugnummern, Betriebsstellen und übrige Standardwerte ebenfalls 7pt. Maske wieder kompakt (15px, kleinere Abstände); mobile Eingaben bleiben mindestens 16px und 40px hoch. Rote Validierungsrahmen bleiben erhalten.

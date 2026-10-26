@@ -84,7 +84,7 @@ class NationalBrakeTest(unittest.TestCase):
         boxes=[tuple(c.args[1:]) for c in struck.call_args_list]
         for y in [243,257,271,285,299]:self.assertNotIn((278,y,42,14),boxes)
 
-    def test_speeds_and_blue_results(self):
+    def test_speeds_and_uniform_results_with_red_deficit(self):
         from lokzeitleiste.national_brake_sheets import Sheet,calculate
         from lokzeitleiste.national_brake_image import Drawing,render
         from sqlalchemy.orm import Session
@@ -94,5 +94,13 @@ class NationalBrakeTest(unittest.TestCase):
         with patch.object(Drawing,'text',autospec=True) as text:
             render(sheet,result,'Test TF')
         highlighted=[c for c in text.call_args_list if c.kwargs.get('color')=='#0645ad']
-        self.assertEqual(len(highlighted),3)
-        self.assertTrue(all(c.kwargs['bold'] for c in highlighted))
+        self.assertEqual(len(highlighted),0)
+        red=[c for c in text.call_args_list if c.kwargs.get('color')=='#c40000']
+        self.assertEqual(len(red),1)
+        self.assertEqual(red[0].args[3],result['missing'])
+        with patch.object(Drawing,'text',autospec=True) as normal:
+            render(sheet,dict(result,missing='/'),'Test TF')
+        self.assertFalse(any(c.kwargs.get('color')=='#c40000' for c in normal.call_args_list))
+        numeric_results=[c for c in text.call_args_list if len(c.args)>3 and c.args[3] in (result['available'],result['missing'],result['required_axles'])]
+        self.assertTrue(numeric_results)
+        self.assertTrue(all(c.args[4]==7 and not c.kwargs.get('bold',False) for c in numeric_results))

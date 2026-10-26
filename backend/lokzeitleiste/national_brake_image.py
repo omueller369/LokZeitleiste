@@ -50,7 +50,7 @@ class Drawing:
 def render(sheet,result,creator,image=False):
     d=Drawing(image);left,right=12,408;xs=[12,62,82,278,320,364,408]
     d.line(left,10,right,10,1);d.line(left,10,left,85,1);d.line(right,10,right,85,1)
-    d.text(17,17,'Bremszettel',14,True);d.text(183,20,'Datum: '+sheet.departure_date.strftime('%d.%m.%Y'),9)
+    d.text(17,17,'Bremszettel',14,True);d.text(183,20,'Datum: '+sheet.departure_date.strftime('%d.%m.%Y'),7)
     trains=[t for t in sheet.trains if t.number]
     d.line(left,36,right,36)
     if len(trains)<=3:
@@ -58,11 +58,11 @@ def render(sheet,result,creator,image=False):
     else:d.text(17,40,'Zugnummer / ab Betriebsstelle (DS100)',7,True)
     # Keep each DS100 paired with its train; up to 20 pairs fit as four compact columns.
     if len(trains)<=3:
-        for i,t in enumerate(trains):d.text(22,51+i*10,t.number,9);d.text(301,51+i*10,t.station,8,maxwidth=100)
+        for i,t in enumerate(trains):d.text(22,51+i*10,t.number,7);d.text(301,51+i*10,t.station,7,maxwidth=100)
     else:
         for i,t in enumerate(trains):
             col=i//5;row=i%5;x=17+col*97
-            d.text(x,50+row*6.4,t.number+' / '+t.station,5.8,maxwidth=92)
+            d.text(x,50+row*6.4,t.number+' / '+t.station,7,maxwidth=92)
     d.line(left,85,right,85,1)
     if len(trains)<3:d.strike(12,51+len(trains)*10,278,34-len(trains)*10);d.strike(290,51+len(trains)*10,118,34-len(trains)*10)
     top=90
@@ -89,7 +89,7 @@ def render(sheet,result,creator,image=False):
     for n,key in [(1,'weight'),(2,'brake'),(3,'axles'),(13,'length')]:
         yy,h=pos[n]
         for x,col in [(282,'wagon'),(324,'loco'),(368,'total')]:d.text(x,yy+5,result[col][key],7,maxwidth=36)
-    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,10 if n in (5,6) else 8,bold=n in (5,6),maxwidth=36,color='#0645ad' if n in (5,6) else 'black')
+    for n,v in [(4,sheet.required_percent),(5,result['available']),(6,result['missing'])]:d.text(368,pos[n][0]+5,v,7,maxwidth=36,color='#c40000' if n==6 and isinstance(v,(int,float,Decimal)) else 'black')
     if isinstance(result['missing'],int) and result['missing']<0:d.text(401,pos[6][0]+5,'*)',5)
     y4=pos[4][0];y6=pos[6][0]+pos[6][1]
     for x1,x2 in [(278,320),(320,364)]:d.line(x1,y6,x2,y4)
@@ -99,11 +99,11 @@ def render(sheet,result,creator,image=False):
     if not last:d.strike(278,pos[7][0],130,pos[7][1])
     d.strike(320,pos[8][0],88,pos[8][1])
     for n in [9,10,11,12,14,15]:d.strike(320,pos[n][0],88,pos[n][1])
-    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,10 if n==15 else 7,bold=n==15,color='#0645ad' if n==15 else 'black') if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
+    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
         d.text(x,yy+3,'ja' if s.lower else 'nein',7)
-        if s.lower:d.text(x,yy+16,str(s.value)+' km/h',6.4,maxwidth=36)
+        if s.lower:d.text(x,yy+16,str(s.value)+' km/h',7,maxwidth=36)
         else:d.strike([278,320,364][i],yy+13,[42,44,44][i],17)
     travel_top=end;travel_end=travel_top+117
     for x in xs:d.line(x,travel_top,x,travel_end)
@@ -120,7 +120,7 @@ def render(sheet,result,creator,image=False):
         for x in [12,62,82,278,408]:d.line(x,yy,x,yy+h)
         d.text(67,yy+5,n,7)
         if n==31:
-            d.text(85,yy+4,'Im Wagenzug sind Fahrzeuge mit',6.5);d.text(85,yy+12,'gefährlichen Gütern',6.5);d.text(284,yy+7,'ja' if sheet.dangerous else 'nein',8)
+            d.text(85,yy+4,'Im Wagenzug sind Fahrzeuge mit',6.5);d.text(85,yy+12,'gefährlichen Gütern',6.5);d.text(284,yy+7,'ja' if sheet.dangerous else 'nein',7)
         else:
             text=sheet.extra_text if sheet.extra else ''
             # Wrap optional note in two lines, fail visibly rather than truncate.
@@ -132,11 +132,11 @@ def render(sheet,result,creator,image=False):
                 else:lines[-1]=candidate
             if len(lines)>4:raise ValueError('Angabe in Zeile 32 bitte für vier Druckzeilen kürzen.')
             for i,line in enumerate(lines):d.text(85,yy+2+i*5,line,5,maxwidth=187)
-            d.text(284,yy+7,'ja' if sheet.extra else 'nein',8)
+            d.text(284,yy+7,'ja' if sheet.extra else 'nein',7)
         d.line(62 if n==31 else left,yy+h,right,yy+h);yy+=h
     d.text(16,travel_end+6,'Angaben für',6.3,True);d.text(16,travel_end+16,'Güterzüge',6.3,True)
     d.line(left,yy+4,right,yy+4,1);d.line(left,yy+4,left,yy+27);d.line(right,yy+4,right,yy+27);d.line(left,yy+27,right,yy+27,1)
-    d.text(17,yy+8,'Bremszettel ausgefertigt (Name)',7,True);d.text(17,yy+18,creator,8,maxwidth=254)
+    d.text(17,yy+8,'Bremszettel ausgefertigt (Name)',7,True);d.text(17,yy+18,creator,7,maxwidth=254)
     d.line(278,yy+4,278,yy+27)
     for i,line in enumerate(['*) betriebsleitende Stelle','des EVU verständigen']):d.text(283,yy+9+i*8,line,6.1,maxwidth=120)
     return d.finish()
