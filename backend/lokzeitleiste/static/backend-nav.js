@@ -29,6 +29,7 @@ const modules=[
  ['roster','Dienstplan','/admin/planning?readonly=1',!!p.planning],
  ['hours','Dienstzeit','/admin/tf/hours',!!p.planning&&!!(p.worktime||p.reports)],
  ['worktime','Arbeitszeiterfassung und Korrekturen','/admin/worktime',!!p.worktime],
+ ['messages','Kurznachrichten','/admin/messages',true],
  ['email','Email','/admin/email',!!p.email],
  ['documents','Meine Dokumente','/documents',true],
  ['password','Mein Passwort ändern','/account',true]
@@ -42,7 +43,7 @@ const management=group('Verwaltung'),employees=group('Mitarbeiter',management);
 const drivers=group('TFs',employees,'/admin/tf',hasEmployees);moduleLink(drivers,'tfNew','anlegen');
 const office=group('Verwaltung',employees,'/admin/staff',!!p.staff);moduleLink(office,'staffNew','anlegen');
 const planning=group('Personalplanung');for(const id of ['planning','shifts','overview'])moduleLink(planning,id);
-const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(master,'leasing');moduleLink(master,'vehicles');moduleLink(master,'app_defaults');
+const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(other,'messages');moduleLink(master,'leasing');moduleLink(master,'vehicles');moduleLink(master,'app_defaults');
 for(const id of ['loco_handover','directory','roster','hours','worktime','email','documents','password',...(me.role==='staff'?['ownTime']:[])])moduleLink(other,id);
 const logoutItem=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent='Abmelden';logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error('Abmelden fehlgeschlagen');location.href='/admin';}catch(error){logout.disabled=false;alert(error.message);}};logoutItem.className='menu-logout';logoutItem.append(logout);list.append(logoutItem);
 const stylesheet=document.querySelector('link[href^="/responsive.css"]');if(stylesheet)stylesheet.href='/responsive.css?v=20261025-year-fit-14';

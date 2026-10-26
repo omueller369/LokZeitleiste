@@ -8,9 +8,9 @@ from sqlalchemy import select,func
 from sqlalchemy.orm import Session
 from PIL import Image
 from .db import database_session
-from .models import User,TfProfile,TfMessage as Message,TfMessageDelivery as Delivery,TfMessageAttachment as Attachment,now_utc
+from .models import StaffProfile,User,TfProfile,TfMessage as Message,TfMessageDelivery as Delivery,TfMessageAttachment as Attachment,now_utc
 from .security import account_active
-from .tf_portal import driver_dependency
+from .accounts.access import ready
 
 MAX_FILE=10*1024*1024
 class Recipients(BaseModel):
@@ -30,11 +30,19 @@ class ReadIn(BaseModel):read:bool
 def name(profile):
     if not profile:raise HTTPException(404,'Tf nicht gefunden')
     return (profile.first_name+' '+profile.last_name).strip()
-def recipients(db):return [(u,p) for u,p in db.execute(select(User,TfProfile).join(TfProfile,User.id==TfProfile.user_id).where(User.role=='tf',User.active==True).order_by(TfProfile.last_name,TfProfile.first_name,User.id)) if account_active(db,u)]
+def identity(db,user):
+    profile=db.get(TfProfile if user.role=='tf' else StaffProfile,user.id)
+    return name(profile) if profile else 'Administration'
+def recipients(db):
+    rows=[]
+    for u in db.scalars(select(User).where(User.role.in_(['tf','staff','admin']),User.active==True)):
+        if account_active(db,u):rows.append((u,identity(db,u)))
+    return sorted(rows,key=lambda row:(row[0].role=='tf',row[1].casefold(),row[0].id))
+
 def targets(db,data):
-    active={u.id for u,p in recipients(db)};selected=active if data.all_tf else set(data.recipients)
-    if not selected:raise HTTPException(422,'Bitte mindestens einen TF auswählen.')
-    if not selected<=active:raise HTTPException(422,'Ein ausgewählter TF ist nicht mehr verfügbar. Bitte die Empfängerliste aktualisieren.')
+    active={u.id for u,p in recipients(db)};selected={u.id for u,p in recipients(db) if u.role=='tf'} if data.all_tf else set(data.recipients)
+    if not selected:raise HTTPException(422,'Bitte mindestens einen Empfänger auswählen.')
+    if not selected<=active:raise HTTPException(422,'Ein ausgewählter Empfänger ist nicht mehr verfügbar. Bitte die Empfängerliste aktualisieren.')
     return selected
 
 def owned(db,user,message_id):
@@ -55,7 +63,7 @@ def sent_owned(db,user,message_id):
     return message
 
 def sent_view(db,message,detail=False):
-    names=[name(p) for p in db.scalars(select(TfProfile).join(Delivery,Delivery.recipient_id==TfProfile.user_id).where(Delivery.message_id==message.id).order_by(TfProfile.last_name,TfProfile.first_name,TfProfile.user_id))]
+    names=[identity(db,u) for u in db.scalars(select(User).join(Delivery,Delivery.recipient_id==User.id).where(Delivery.message_id==message.id).order_by(User.id))]
     result=dict(id=message.id,subject=message.subject,sender_name=message.sender_name,recipient_names=names,created_at=message.created_at.isoformat()+'Z',has_attachment=message.attachment_id is not None)
     if detail:
         file=db.get(Attachment,message.attachment_id) if message.attachment_id else None
@@ -63,11 +71,21 @@ def sent_view(db,message,detail=False):
     return result
 
 def create_router(require_account):
-    router=APIRouter();driver=driver_dependency(require_account)
+    router=APIRouter()
+    def driver(user=Depends(require_account),db:Session=Depends(database_session)):
+        if user.role not in ('tf','staff','admin'):raise HTTPException(403,'Keine Freigabe.')
+        ready(db,user)
+        return user
+    @router.get('/admin/messages')
+    def backend_page():
+        content=(Path(__file__).parent/'static'/'tf-messages.html').read_text()
+        content=content.replace('TF-Portal','Verwaltung').replace('<header><h1>Verwaltung</h1></header>','<header><a href="/admin/start">Verwaltung</a></header>').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
+        from fastapi.responses import HTMLResponse
+        return HTMLResponse(content,headers={'Cache-Control':'no-store'})
     @router.get('/tf/messages.js')
     def script():return FileResponse(Path(__file__).parent/'static'/'tf-messages.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
     @router.get('/api/v1/tf/messages/recipients')
-    def choices(user=Depends(driver),db:Session=Depends(database_session)):return [dict(id=u.id,name=name(p)) for u,p in recipients(db)]
+    def choices(user=Depends(driver),db:Session=Depends(database_session)):return [dict(id=u.id,name=p,group='TF' if u.role=='tf' else 'Sachbearbeiter') for u,p in recipients(db)]
     @router.get('/api/v1/tf/messages/unread')
     def unread(user=Depends(driver),db:Session=Depends(database_session)):
         return dict(count=db.scalar(select(func.count()).select_from(Delivery).join(Message,Message.id==Delivery.message_id).where(Delivery.recipient_id==user.id,Message.sender_id!=user.id,Delivery.read_at.is_(None),Delivery.deleted_at.is_(None))))
@@ -112,9 +130,16 @@ def create_router(require_account):
             if content.startswith(b'%PDF-'):mime='application/pdf'
             attachment=Attachment(filename=filename,mime_type=mime,content=content);db.add(attachment);db.flush()
         profile=db.get(TfProfile,user.id)
-        message=Message(sender_id=user.id,sender_name=name(profile),subject=data.subject,body=data.body,attachment_id=attachment.id if attachment else None);db.add(message);db.flush()
+        message=Message(sender_id=user.id,sender_name=identity(db,user),subject=data.subject,body=data.body,attachment_id=attachment.id if attachment else None);db.add(message);db.flush()
         for target in selected:db.add(Delivery(message_id=message.id,recipient_id=target))
         db.commit();return dict(id=message.id,sent=len(selected))
+    @router.post('/api/v1/tf/messages/{message_id}/reply',status_code=201)
+    async def reply(message_id:int,payload:str=Form(max_length=50000),file:UploadFile|None=File(default=None),user=Depends(driver),db:Session=Depends(database_session)):
+        delivery,original=owned(db,user,message_id)
+        try:data=MessageIn.model_validate_json(payload)
+        except ValidationError as exc:raise HTTPException(422,'Bitte Betreff und Nachricht prüfen.') from exc
+        data.recipients=[original.sender_id];data.all_tf=False
+        return await send(data.model_dump_json(),file,user,db)
     @router.get('/api/v1/tf/messages/{message_id}')
     def detail(message_id:int,user=Depends(driver),db:Session=Depends(database_session)):
         delivery,message=owned(db,user,message_id)
@@ -130,7 +155,7 @@ def create_router(require_account):
     def forward(message_id:int,data:Recipients,user=Depends(driver),db:Session=Depends(database_session)):
         delivery,original=owned(db,user,message_id);selected=targets(db,data)
         profile=db.get(TfProfile,user.id)
-        message=Message(sender_id=user.id,sender_name=name(profile),subject=('WG: '+original.subject)[:200],body=original.body,attachment_id=original.attachment_id);db.add(message);db.flush()
+        message=Message(sender_id=user.id,sender_name=identity(db,user),subject=('WG: '+original.subject)[:200],body=original.body,attachment_id=original.attachment_id);db.add(message);db.flush()
         for target in selected:db.add(Delivery(message_id=message.id,recipient_id=target))
         db.commit();return dict(id=message.id,sent=len(selected))
     @router.get('/api/v1/tf/messages/{message_id}/attachment')

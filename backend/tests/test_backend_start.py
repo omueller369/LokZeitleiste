@@ -30,21 +30,21 @@ class BackendStartTest(unittest.TestCase):
     def test_no_grants_still_has_personal_modules(self):
         _,staff=self.active_staff({},'start-empty')
         response=staff.get('/api/v1/admin/start');self.assertEqual(response.status_code,200,response.text)
-        data=response.json();self.assertEqual(data['admin_tools'],[]);self.assertEqual({r['id'] for r in data['modules']},{'documents','password','own_time'})
+        data=response.json();self.assertEqual(data['admin_tools'],[]);self.assertEqual({r['id'] for r in data['modules']},{'messages','documents','password','own_time'})
         self.assertEqual(data['name'],'Mira Büro')
         self.assertTrue(all(row['group']=='Mein Bereich' for row in data['modules']))
 
     def test_planning_reader_does_not_receive_staff_or_stammdaten(self):
         _,staff=self.active_staff({'planning':1},'start-planning')
         rows=staff.get('/api/v1/admin/start').json()['modules'];ids={r['id'] for r in rows}
-        self.assertEqual(ids,{'tf','planning','overview','roster','documents','password','own_time'})
+        self.assertEqual(ids,{'tf','planning','overview','roster','messages','documents','password','own_time'})
         self.assertTrue(all(row['level']==1 for row in rows if row['group']!='Mein Bereich'))
         self.assertEqual(staff.get('/api/v1/admin/app-defaults').status_code,403)
 
     def test_specific_permissions_show_only_the_matching_tiles(self):
         _,staff=self.active_staff({'vehicles':1,'app_defaults':2},'start-data')
         rows=staff.get('/api/v1/admin/start').json()['modules'];levels={r['id']:r['level'] for r in rows}
-        self.assertEqual(set(levels),{'vehicles','app_defaults','documents','password','own_time'})
+        self.assertEqual(set(levels),{'vehicles','app_defaults','messages','documents','password','own_time'})
         self.assertEqual(levels['vehicles'],1);self.assertEqual(levels['app_defaults'],2)
 
     def test_anonymous_tf_and_initial_password_gates(self):

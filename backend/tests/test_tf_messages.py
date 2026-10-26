@@ -8,6 +8,11 @@ from lokzeitleiste.main import app
 from lokzeitleiste.models import AccountLoginStamp,User
 
 class TfMessagesTest(unittest.TestCase):
+    payload=test_accounts.AccountsTest.payload
+    create_staff=test_accounts.AccountsTest.create_staff
+    staff_login=test_accounts.AccountsTest.staff_login
+    change=test_accounts.AccountsTest.change
+    active_staff=test_accounts.AccountsTest.active_staff
     tearDown=test_accounts.AccountsTest.tearDown
     def setUp(self):
         test_accounts.AccountsTest.setUp(self)
@@ -22,7 +27,7 @@ class TfMessagesTest(unittest.TestCase):
         self.assertEqual(result.status_code,201,result.text);return result.json()['id']
     def test_private_recipient_names_and_inbox_read_delete(self):
         choices=self.sender.get('/api/v1/tf/messages/recipients').json()
-        self.assertTrue(all(set(r)=={'id','name'} for r in choices));self.assertNotIn('787222',json.dumps(choices));self.assertNotIn('787100',json.dumps(choices))
+        self.assertTrue(all(set(r)=={'id','name','group'} for r in choices));self.assertNotIn('787222',json.dumps(choices));self.assertNotIn('787100',json.dumps(choices))
         mid=self.send();base='/api/v1/tf/messages/'+str(mid)
         self.assertEqual(self.sender.get(base).status_code,404)
         self.assertEqual(self.other.get('/api/v1/tf/messages/unread').json()['count'],1)
@@ -53,12 +58,29 @@ class TfMessagesTest(unittest.TestCase):
         new=self.other.post(path+'/forward',json={'recipients':[self.tf]}).json()['id'];self.other.delete(path)
         self.assertEqual(self.sender.get(f'/api/v1/tf/messages/{new}/attachment').content,content)
         too_large=self.sender.post('/api/v1/tf/messages',data={'payload':json.dumps(payload)},files={'file':('big.dat',b'x'*(10*1024*1024+1),'application/octet-stream')});self.assertEqual(too_large.status_code,413)
+    def test_staff_exchange_reply_and_privacy(self):
+        base='/api/v1/tf/messages'
+        admin_id,staff=self.active_staff({},'messages-office')
+        choices=self.sender.get(base+'/recipients').json()
+        self.assertTrue(any(row['id']==admin_id and row['group']=='Sachbearbeiter' for row in choices))
+        mid=self.send(recipients=[admin_id])
+        self.assertEqual(staff.get(base+'/'+str(mid)).status_code,200)
+        self.assertEqual(self.other.post(base+'/'+str(mid)+'/reply',data={'payload':json.dumps(dict(subject='AW',body='Unbefugt'))}).status_code,404)
+        reply=staff.post(base+'/'+str(mid)+'/reply',data={'payload':json.dumps(dict(subject='AW',body='Antwort',recipients=[self.other_id]))},files={'file':('test.txt',b'test','text/plain')})
+        self.assertEqual(reply.status_code,201,reply.text)
+        rid=reply.json()['id']
+        self.assertEqual(self.sender.get(base+'/'+str(rid)).json()['body'],'Antwort')
+        self.assertEqual(self.other.get(base+'/'+str(rid)).status_code,404)
+        self.assertEqual(self.sender.get(base+'/'+str(rid)+'/attachment').content,b'test')
+        self.assertIn('Mira',staff.get(base+'/sent').json()['messages'][0]['sender_name'])
+        self.assertEqual(self.client.get('/admin/messages').status_code,200)
+
     def test_validation_and_roles(self):
         for body in [dict(recipients=[],subject='Test',body='Text'),dict(recipients=[self.other_id],subject=' ',body='Text'),dict(recipients=[self.other_id],subject='Test',body='x'*1001),dict(recipients=[999999],subject='Test',body='Text')]:
             self.assertEqual(self.sender.post('/api/v1/tf/messages',data={'payload':json.dumps(body)}).status_code,422)
         anonymous=TestClient(app,base_url='https://testserver');self.staff_clients.append(anonymous)
         self.assertEqual(anonymous.get('/api/v1/tf/messages').status_code,401)
-        self.assertEqual(self.client.get('/api/v1/tf/messages').status_code,403)
+        self.assertEqual(self.client.get('/api/v1/tf/messages').status_code,200)
         with Session(self.engine) as db:db.get(User,self.other_id).active=False;db.commit()
         self.assertEqual(self.sender.post('/api/v1/tf/messages',data={'payload':json.dumps(dict(recipients=[self.other_id],subject='Test',body='Text'))}).status_code,422)
     def test_own_profile_shell_login_and_page_assets(self):

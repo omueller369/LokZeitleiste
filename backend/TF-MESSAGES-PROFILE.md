@@ -1,6 +1,6 @@
 # TF-Nachrichten, persönliche Daten und Portalrahmen
 
-Nach dem normalen Update ist die zusätzliche Dashboard-Kachel **Nachrichten** verfügbar:
+Nach dem normalen Update ist die zusätzliche Dashboard-Kachel **Kurznachrichten** verfügbar:
 
 ```bash
 sudo bash install-ctlsoftware-test.sh --update
@@ -33,3 +33,7 @@ Im Footer stehen Softwaretitel und der zentral hinterlegte Versionsstand. **Mein
 `init_db` legt `account_login_stamps`, `tf_messages`, `tf_message_deliveries` und `tf_message_attachments` automatisch an. Der Zugriff auf Nachricht, Lesestatus und Anhang ist an die eigene Zustellung gebunden. Die TF-Nummer wird ausschließlich im eigenen Portalrahmen und in der eigenen Datenübersicht ausgegeben, nicht in Empfängerlisten oder Nachrichten-Metadaten.
 
 Die unverändert im Repository abgelegte Datei `static/ctl-logistics-logo.jpg` stammt aus dem vom Benutzer bereitgestellten Upload. Das TF-Web-App-Symbol wird daraus mit weißem Rand erzeugt. Die Manifest-URLs enthalten eine neue Symbolversion, sodass unterstützende Browser eine Aktualisierung erkennen können; bereits installierte Web-App-Symbole werden nach den Regeln des jeweiligen Betriebssystems aktualisiert.
+
+## Kurznachrichten zwischen TF und Verwaltung
+
+Das Backend bietet `/admin/messages` über Dashboard und Menü Sonstiges. Alle angemeldeten Sachbearbeiter und Administratoren mit geändertem Initialpasswort können ihr eigenes Postfach nutzen. Die Empfänger sind in TF und Sachbearbeiter gegliedert; angezeigt werden nur Namen. „Alle TF's“ umfasst weiterhin ausschließlich TF. Antworten gehen ausschließlich an den ursprünglichen Absender und unterstützen optionale Anhänge bis 10 MB. Posteingang, Gesendete, Weiterleiten und Löschen funktionieren in beiden Bereichen gleich. Vorhandene Nachrichten bleiben erhalten; es ist keine Datenmigration nötig.

@@ -26,6 +26,7 @@ def start_modules(user,p):
         ('roster','Dienstplan','/admin/planning?readonly=1','Personalplanung',min(1,p.get('planning',0))),
         ('hours','Dienstzeit','/admin/tf/hours','Personalplanung',1 if p.get('planning',0) and (p.get('worktime',0) or p.get('reports',0)) else 0),
         ('email','Email','/admin/email','Sonstiges',p.get('email',0)),
+        ('messages','Kurznachrichten','/admin/messages','Mein Bereich',2),
         ('documents','Meine Dokumente','/documents','Mein Bereich',2),
         ('password','Mein Passwort ändern','/account','Mein Bereich',2),
     ]

@@ -1523,7 +1523,9 @@
     "Mein Foto": "Mein Foto",
     "Personaldaten konnten nicht geladen werden.": "Personaldaten konnten nicht geladen werden.",
     "Gesendete": "Gesendete",
-    "Posteingang": "Posteingang"
+    "Posteingang": "Posteingang",
+    "Kurznachrichten": "Kurznachrichten",
+    "Sachbearbeiter": "Sachbearbeiter"
   },
   "en": {
     "Administration": "Administration",
@@ -3049,7 +3051,9 @@
     "Mein Foto": "My photo",
     "Personaldaten konnten nicht geladen werden.": "Personnel details could not be loaded.",
     "Gesendete": "Sent",
-    "Posteingang": "Inbox"
+    "Posteingang": "Inbox",
+    "Kurznachrichten": "Short messages",
+    "Sachbearbeiter": "Office staff"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4575,7 +4579,9 @@
     "Mein Foto": "Moje zdjęcie",
     "Personaldaten konnten nicht geladen werden.": "Nie udało się wczytać danych osobowych.",
     "Gesendete": "Wysłane",
-    "Posteingang": "Skrzynka odbiorcza"
+    "Posteingang": "Skrzynka odbiorcza",
+    "Kurznachrichten": "Krótkie wiadomości",
+    "Sachbearbeiter": "Pracownicy administracyjni"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6101,7 +6107,9 @@
     "Mein Foto": "Моя фотография",
     "Personaldaten konnten nicht geladen werden.": "Не удалось загрузить личные данные.",
     "Gesendete": "Отправленные",
-    "Posteingang": "Входящие"
+    "Posteingang": "Входящие",
+    "Kurznachrichten": "Короткие сообщения",
+    "Sachbearbeiter": "Административные сотрудники"
   },
   "es": {
     "Administration": "Administración",
@@ -7627,6 +7635,8 @@
     "Mein Foto": "Mi foto",
     "Personaldaten konnten nicht geladen werden.": "No se pudieron cargar los datos personales.",
     "Gesendete": "Enviados",
-    "Posteingang": "Bandeja de entrada"
+    "Posteingang": "Bandeja de entrada",
+    "Kurznachrichten": "Mensajes cortos",
+    "Sachbearbeiter": "Personal administrativo"
   }
 }
