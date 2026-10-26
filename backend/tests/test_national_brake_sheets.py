@@ -70,7 +70,9 @@ class NationalBrakeTest(unittest.TestCase):
             boxes=[tuple(c.args[1:]) for c in struck.call_args_list]
         self.assertIn((278,226,130,17),boxes)
         self.assertIn((278,271,42,14),boxes)
-        self.assertIn((82,534,196,22),boxes)
+        self.assertNotIn((82,534,196,22),boxes)
+        self.assertFalse(any(x==320 and y in [243,257,271,285,299,329,345] for x,y,w,h in boxes))
+        self.assertFalse(any(y<90 for x,y,w,h in boxes))
         self.assertNotIn((278,126,42,15),boxes)
 
     def test_zero_is_printed_not_struck(self):
@@ -104,3 +106,17 @@ class NationalBrakeTest(unittest.TestCase):
         numeric_results=[c for c in text.call_args_list if len(c.args)>3 and c.args[3] in (result['available'],result['missing'],result['required_axles'])]
         self.assertTrue(numeric_results)
         self.assertTrue(all(c.args[4]==7 and not c.kwargs.get('bold',False) for c in numeric_results))
+
+    def test_row32_false_has_no_data_or_strike_true_keeps_text(self):
+        from lokzeitleiste.national_brake_sheets import Sheet,calculate
+        from lokzeitleiste.national_brake_image import Drawing,render
+        from sqlalchemy.orm import Session
+        for enabled in [False,True]:
+            sheet=Sheet(**self.sheet(extra=enabled,extra_text='Besonderer Hinweis'))
+            with Session(self.engine) as db:result=calculate(db,sheet)
+            with patch.object(Drawing,'text',autospec=True) as text,patch.object(Drawing,'strike',autospec=True) as strike:
+                render(sheet,result,'Test TF')
+            values=[c.args[3] for c in text.call_args_list if 534<c.args[2]<556 and c.args[1]>=82]
+            self.assertEqual(bool(values),enabled)
+            if enabled:self.assertIn('Besonderer Hinweis',values);self.assertIn('ja',values)
+            self.assertFalse(any(tuple(c.args[1:])==(82,534,196,22) for c in strike.call_args_list))

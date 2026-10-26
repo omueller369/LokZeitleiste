@@ -64,7 +64,6 @@ def render(sheet,result,creator,image=False):
             col=i//5;row=i%5;x=17+col*97
             d.text(x,50+row*6.4,t.number+' / '+t.station,7,maxwidth=92)
     d.line(left,85,right,85,1)
-    if len(trains)<3:d.strike(12,51+len(trains)*10,278,34-len(trains)*10);d.strike(290,51+len(trains)*10,118,34-len(trains)*10)
     top=90
     for x in xs:
         if x in (320,364):
@@ -97,8 +96,6 @@ def render(sheet,result,creator,image=False):
     if last:last=f'{last[:2]} {last[2:4]} {last[4:8]} {last[8:11]}-{last[11]}'
     d.text(282,pos[7][0]+5,last,7,maxwidth=122)
     if not last:d.strike(278,pos[7][0],130,pos[7][1])
-    d.strike(320,pos[8][0],88,pos[8][1])
-    for n in [9,10,11,12,14,15]:d.strike(320,pos[n][0],88,pos[n][1])
     for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
@@ -121,8 +118,8 @@ def render(sheet,result,creator,image=False):
         d.text(67,yy+5,n,7)
         if n==31:
             d.text(85,yy+4,'Im Wagenzug sind Fahrzeuge mit',6.5);d.text(85,yy+12,'gefährlichen Gütern',6.5);d.text(284,yy+7,'ja' if sheet.dangerous else 'nein',7)
-        else:
-            text=sheet.extra_text if sheet.extra else ''
+        elif sheet.extra:
+            text=sheet.extra_text
             # Wrap optional note in two lines, fail visibly rather than truncate.
             if not text:d.strike(82,yy,196,h)
             words=text.split();lines=['']

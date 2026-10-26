@@ -32,3 +32,6 @@ Alle numerischen Eingabefelder der Zugparameter, einschließlich bedingter Gesch
 
 ## Kompakte Maske, Ergebnisfarben nur am Bildschirm
 Zeilen 5/15 nur in der Maske blau und fett. Zeile 6: Zahl rot, sonst schwarz. PDF/PNG-Vorschau zeigen die berechneten Werte einheitlich mit 7pt ohne besondere Fettschrift; Zeilen 5/15 schwarz, Zeile 6 bei einer Zahl rot und sonst schwarz. Eingetragene Zugnummern, Betriebsstellen und übrige Standardwerte ebenfalls 7pt. Maske wieder kompakt (15px, kleinere Abstände); mobile Eingaben bleiben mindestens 16px und 40px hoch. Rote Validierungsrahmen bleiben erhalten.
+
+## Ausnahmen für leere PDF-Felder
+Zugnummer/Betriebsstelle sowie Zeilen 8–12 und 14–15 in Spalten 5/6 bleiben ohne diagonale Streichung. Zeile 32 bei Nein: kein Text, kein Nein-Vermerk und keine Streichung im Datenbereich. Bei Ja bleiben Text und Ja-Vermerk erhalten. Gilt gleichermaßen für PDF und Bildvorschau.
