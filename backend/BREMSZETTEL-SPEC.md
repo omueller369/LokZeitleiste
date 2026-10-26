@@ -90,3 +90,6 @@ Die Grunddaten stehen am Desktop in vier Spalten, darunter zwei schmalere Bahnho
 Vorschau: **Speichern** ruft den geschützten Endpunkt `/api/v1/tf/brake-sheets/{id}/archive` auf und legt nur die PDF ab (keine Mail-Dispatch-Zeile, kein Postfach erforderlich, kein SMTP). **Speichern & senden** nutzt weiterhin den expliziten Maildialog; erst dessen Senden-Schaltfläche sendet. Beide Ablagen verwenden denselben Dokumentquellschlüssel. Hauptaktionen auch unterhalb der Erstellung. Bei schmalen Bildschirmen werden die Felder in zwei bzw. eine Spalte umgebrochen.
 
 TF-Dashboard: kompakte Kacheln in vier Spalten, bei kleiner Breite drei, auf Mobilgeräten zwei und auf sehr schmalen Geräten eine Spalte.
+
+## Fettschrift für internationale Formularwerte
+Alle eingetragenen und berechneten Werte werden in Bildvorschau und PDF fett ausgegeben (DejaVu Sans Bold, Ersatzschrift Vera Bold). Vorlagenbeschriftung und Feldgeometrie bleiben erhalten. Der gemeinsame Renderer passt die Texte weiterhin an die vorhandenen Felder an.

@@ -11,8 +11,8 @@ TEMPLATE=Path(__file__).parent/'assets'/'brake-sheet-template.png'
 @lru_cache(maxsize=48)
 def font(size):
     root=Path(os.getenv('LOKZEITLEISTE_FONT_DIR','/usr/share/fonts/truetype/dejavu'))
-    path=root/'DejaVuSans.ttf'
-    if not path.exists():path=Path(reportlab.__file__).parent/'fonts'/'Vera.ttf'
+    path=root/'DejaVuSans-Bold.ttf'
+    if not path.exists():path=Path(reportlab.__file__).parent/'fonts'/'VeraBd.ttf'
     return ImageFont.truetype(str(path),size)
 
 def formatted(value):
