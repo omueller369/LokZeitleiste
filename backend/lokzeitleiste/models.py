@@ -825,3 +825,16 @@ class BrakeSheetDispatch(Base):
     warning:Mapped[str]=mapped_column(String(1000),nullable=False,default='')
     created_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
     sent_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
+
+
+class NationalBrakeSheetDraft(Base):
+    __tablename__='national_brake_sheet_drafts'
+    id:Mapped[str]=mapped_column(String(36),primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    payload_json:Mapped[str]=mapped_column(Text,nullable=False)
+    calculation_json:Mapped[str]=mapped_column(Text,nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+    created_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
+    created_by_name:Mapped[str]=mapped_column(String(241),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
+

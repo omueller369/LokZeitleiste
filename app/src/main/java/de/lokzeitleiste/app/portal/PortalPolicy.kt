@@ -15,6 +15,9 @@ class PortalPolicy(base: String) {
     fun asset(path: String): String? = when(path) {
         "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
         "/tf/bremszettel" -> "brake-sheet.html"
+        "/tf/bremszettel-de" -> "national-brake-sheet.html"
+        "/tf/national-brake-sheet.js" -> "national-brake-sheet.js"
+        "/tf/national-brake-sheet.css" -> "national-brake-sheet.css"
         "/tf/brake-sheet.js" -> "brake-sheet.js"
         "/tf/brake-sheet.css" -> "brake-sheet.css"
         "/tf/nachrichten" -> "tf-messages.html"

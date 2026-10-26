@@ -719,3 +719,6 @@ app.include_router(brake_sheets_router(require_account))
 
 from .brake_sheet_mail import create_router as brake_sheet_mail_router
 app.include_router(brake_sheet_mail_router(require_account))
+
+from .national_brake_sheets import create_router as national_brake_sheets_router
+app.include_router(national_brake_sheets_router(require_account))
