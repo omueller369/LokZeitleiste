@@ -1596,7 +1596,16 @@
     "Felder 19b bis 23b bleiben vorerst leer.": "Felder 19b bis 23b bleiben vorerst leer.",
     "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.": "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.",
     "Bremszettel erfassen und als Entwurf speichern.": "Bremszettel erfassen und als Entwurf speichern.",
-    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t."
+    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.",
+    "ETCS und der zweite Abschnitt bleiben leer.": "ETCS und der zweite Abschnitt bleiben leer.",
+    "Für die Vorschau fehlen noch: ": "Für die Vorschau fehlen noch: ",
+    "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.": "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.",
+    "Vorschau konnte nicht erstellt werden.": "Vorschau konnte nicht erstellt werden.",
+    "Bitte Pflichtangaben ergänzen: ": "Bitte Pflichtangaben ergänzen: ",
+    "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.",
+    "Ausgefüllter Bremszettel": "Ausgefüllter Bremszettel",
+    "Erstes Fahrzeug": "Erstes Fahrzeug",
+    "Letztes Fahrzeug": "Letztes Fahrzeug"
   },
   "en": {
     "Administration": "Administration",
@@ -3195,7 +3204,16 @@
     "Felder 19b bis 23b bleiben vorerst leer.": "Fields 19b to 23b remain blank for now.",
     "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.": "The second validity section remains blank for now.",
     "Bremszettel erfassen und als Entwurf speichern.": "Enter a brake sheet and save it as a draft.",
-    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "The second section remains blank for now. Total weights in t."
+    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "The second section remains blank for now. Total weights in t.",
+    "ETCS und der zweite Abschnitt bleiben leer.": "ETCS and the second section remain blank.",
+    "Für die Vorschau fehlen noch: ": "Still needed for the preview: ",
+    "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.": "Preview becomes available once all required data is complete.",
+    "Vorschau konnte nicht erstellt werden.": "Preview could not be generated.",
+    "Bitte Pflichtangaben ergänzen: ": "Please complete the required data: ",
+    "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "The text does not fit in the form field. Please shorten it.",
+    "Ausgefüllter Bremszettel": "Completed brake sheet",
+    "Erstes Fahrzeug": "First vehicle",
+    "Letztes Fahrzeug": "Last vehicle"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4794,7 +4812,16 @@
     "Felder 19b bis 23b bleiben vorerst leer.": "Pola od 19b do 23b pozostają na razie puste.",
     "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.": "Drugi odcinek ważności pozostaje na razie pusty.",
     "Bremszettel erfassen und als Entwurf speichern.": "Wprowadź kartę hamowania i zapisz wersję roboczą.",
-    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Drugi odcinek pozostaje na razie pusty. Masy całkowite w t."
+    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Drugi odcinek pozostaje na razie pusty. Masy całkowite w t.",
+    "ETCS und der zweite Abschnitt bleiben leer.": "ETCS i drugi odcinek pozostają puste.",
+    "Für die Vorschau fehlen noch: ": "Do podglądu brakuje jeszcze: ",
+    "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.": "Podgląd będzie dostępny po uzupełnieniu wymaganych danych.",
+    "Vorschau konnte nicht erstellt werden.": "Nie udało się wygenerować podglądu.",
+    "Bitte Pflichtangaben ergänzen: ": "Uzupełnij wymagane dane: ",
+    "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Tekst nie mieści się w polu formularza. Skróć go.",
+    "Ausgefüllter Bremszettel": "Wypełniona karta hamowania",
+    "Erstes Fahrzeug": "Pierwszy pojazd",
+    "Letztes Fahrzeug": "Ostatni pojazd"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6393,7 +6420,16 @@
     "Felder 19b bis 23b bleiben vorerst leer.": "Поля с 19b по 23b пока остаются пустыми.",
     "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.": "Второй участок действия пока остаётся пустым.",
     "Bremszettel erfassen und als Entwurf speichern.": "Заполните тормозной лист и сохраните черновик.",
-    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Второй участок пока остаётся пустым. Общая масса в т."
+    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "Второй участок пока остаётся пустым. Общая масса в т.",
+    "ETCS und der zweite Abschnitt bleiben leer.": "ETCS и второй участок остаются пустыми.",
+    "Für die Vorschau fehlen noch: ": "Для предпросмотра ещё необходимо: ",
+    "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.": "Предпросмотр доступен после заполнения обязательных данных.",
+    "Vorschau konnte nicht erstellt werden.": "Не удалось создать предпросмотр.",
+    "Bitte Pflichtangaben ergänzen: ": "Заполните обязательные данные: ",
+    "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Текст не помещается в поле бланка. Сократите его.",
+    "Ausgefüllter Bremszettel": "Заполненный тормозной лист",
+    "Erstes Fahrzeug": "Первое транспортное средство",
+    "Letztes Fahrzeug": "Последнее транспортное средство"
   },
   "es": {
     "Administration": "Administración",
@@ -7992,6 +8028,15 @@
     "Felder 19b bis 23b bleiben vorerst leer.": "Los campos 19b a 23b permanecen vacíos por ahora.",
     "Der zweite Gültigkeitsabschnitt bleibt vorerst leer.": "El segundo tramo de validez permanece vacío por ahora.",
     "Bremszettel erfassen und als Entwurf speichern.": "Rellene una hoja de frenado y guárdela como borrador.",
-    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "El segundo tramo permanece vacío por ahora. Pesos totales en t."
+    "Zweiter Abschnitt bleibt vorerst leer. Gesamtgewichte in t.": "El segundo tramo permanece vacío por ahora. Pesos totales en t.",
+    "ETCS und der zweite Abschnitt bleiben leer.": "ETCS y el segundo tramo permanecen vacíos.",
+    "Für die Vorschau fehlen noch: ": "Para la vista previa faltan: ",
+    "Vorschau verfügbar, sobald alle Pflichtangaben vollständig sind.": "La vista previa estará disponible al completar los datos obligatorios.",
+    "Vorschau konnte nicht erstellt werden.": "No se pudo generar la vista previa.",
+    "Bitte Pflichtangaben ergänzen: ": "Complete los datos obligatorios: ",
+    "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "El texto no cabe en el campo. Acórtelo.",
+    "Ausgefüllter Bremszettel": "Hoja de frenado rellenada",
+    "Erstes Fahrzeug": "Primer vehículo",
+    "Letztes Fahrzeug": "Último vehículo"
   }
 }

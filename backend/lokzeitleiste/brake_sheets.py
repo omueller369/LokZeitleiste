@@ -1,12 +1,12 @@
 """Private brake-sheet drafts and calculations according to the agreed DE/PL form rules."""
 import json,re
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal,ROUND_CEILING
 from pathlib import Path
 from typing import Literal
 from uuid import UUID
 from fastapi import APIRouter,Depends,HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse,Response
 from pydantic import BaseModel,Field,field_validator,model_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -26,7 +26,7 @@ class Loco(BaseModel):
     note:str=Field(default='',max_length=20)
     manual_brake:Decimal|None=Field(default=None,ge=0,le=9999,decimal_places=3,allow_inf_nan=False)
 class WagonValues(BaseModel):
-    count:int|None=Field(default=None,ge=100,le=5000,strict=True)
+    count:int|None=Field(default=None,ge=1,le=50,strict=True)
     length:Decimal|None=Field(default=None,ge=10,le=720,decimal_places=3,allow_inf_nan=False)
     holding:Decimal|None=Field(default=None,ge=0,max_digits=15,decimal_places=3,allow_inf_nan=False)
     brake:Decimal|None=Field(default=None,ge=100,le=5000,decimal_places=3,allow_inf_nan=False)
@@ -101,12 +101,37 @@ def calculate(db,data):
         if not lines or any(v[key] is None for v in lines):return None
         return sum((Decimal(str(v[key])) for v in lines),Decimal(0))/scale
     a=dict(count=len(lines),length=total('length_m'),holding=data.holding_loco,brake=total('brake_weight'),weight=total('weight_kg',1000))
+    if a['length'] is not None:a['length']=a['length'].to_integral_value(rounding=ROUND_CEILING)
     b=data.wagon.model_dump();summed={key:(value+Decimal(b[key] or 0) if value is not None else None) for key,value in a.items()}
     if data.holding_loco is None and b['holding'] is not None:summed['holding']=Decimal(b['holding'])
     if not data.holding_unit:summed['holding']=None
     available=int(summed['brake']*100/summed['weight']) if summed['brake'] is not None and summed['weight'] is not None and summed['weight']>0 else None
     difference=available-data.required_percent if available is not None and data.required_percent is not None else None
-    return dict(lines=lines,a=a,b=b,total=summed,available=available,required=data.required_percent,missing=difference if difference is not None and difference<0 else '/' if difference is not None else None,cast_iron='/')
+    result=dict(lines=lines,a=a,b=b,total=summed,available=available,required=data.required_percent,missing=difference if difference is not None and difference<0 else '/' if difference is not None else None,cast_iron='/')
+
+    result['preview_missing']=preview_missing(data,result)
+    return result
+
+def preview_missing(data,result):
+    missing=[]
+    for key,label in [('issuer','1. Aussteller-EVU'),('departure_date','3. Abfahrtsdatum'),('station_from','4a. Gültig ab Bahnhof'),('station_to','4b. Gültig bis Bahnhof'),('class_de','14. Streckenklasse DE'),('class_pl','14. Streckenklasse PL'),('first_vehicle','Erstes Fahrzeug'),('last_vehicle','Letztes Fahrzeug'),('required_percent','25. Erforderliche Bremshundertstel')]:
+        value=getattr(data,key)
+        if value is None or isinstance(value,str) and not value.strip():missing.append(label)
+    if not data.train_numbers[0]:missing.append('DE-Zugnummer')
+    for i,c in enumerate(data.countries):
+        if i<2 or c.country or c.category:
+            if not c.country or not c.category:missing.append('Ländercode / Zugkategorie '+str(i+1))
+    if not result['lines']:missing.append('Triebfahrzeug')
+    for i,line in enumerate(result['lines']):
+        for key,label in [('series','Baureihe'),('length_m','LüP'),('weight_kg','Gesamtgewicht'),('axle_count','Anzahl Radsätze'),('brake_shoe','Bremssohlenart'),('brake_weight','Bremsgewicht')]:
+            if line[key] is None or line[key]=='':missing.append('Tfz '+str(i+1)+': '+label)
+    for key,label in [('count','19b'),('length','20b'),('brake','22b'),('weight','23b')]:
+        if getattr(data.wagon,key) is None:missing.append(label)
+    if (data.holding_loco is not None or data.wagon.holding is not None) and not data.holding_unit:missing.append('Einheit Festhaltekraft')
+    return missing
+
+class PreviewRequest(BaseModel):
+    expected_revision:int=Field(ge=1)
 
 def create_router(require_account):
     router=APIRouter();driver=driver_dependency(require_account);static=Path(__file__).parent/'static'
@@ -131,6 +156,16 @@ def create_router(require_account):
     def detail(id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
         return dict(id=row.id,revision=row.revision,sheet=json.loads(row.payload_json),calculation=json.loads(row.calculation_json),**creation(row))
+    @router.post('/api/v1/tf/brake-sheets/{id}/preview')
+    def image_preview(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
+        row=owned(db,user,id)
+        if row.revision!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
+        if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
+        from .brake_sheet_image import render
+        try:content=render(sheet,result,row.created_at,row.created_by_name)
+        except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+        return Response(content,media_type='image/png',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Disposition':'inline; filename="bremszettel-vorschau.png"'})
     @router.put('/api/v1/tf/brake-sheets/{id}')
     def save(id:UUID,data:Save,user=Depends(driver),db:Session=Depends(database_session)):
         from fastapi.encoders import jsonable_encoder

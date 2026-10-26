@@ -23,7 +23,7 @@ class BrakeSheetTest(unittest.TestCase):
         return dict(data,**changes)
     def test_calculation_unit_conversion_floor_and_negative_only(self):
         response=self.driver.post(self.base+'/calculate',json=self.sheet());self.assertEqual(response.status_code,200,response.text)
-        r=response.json();self.assertEqual(Decimal(str(r['a']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['length'])),Decimal('18.95'));self.assertEqual(r['total']['count'],1)
+        r=response.json();self.assertEqual(Decimal(str(r['a']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['length'])),Decimal('19'));self.assertEqual(r['total']['count'],1)
         expected=int(Decimal(10100)/Decimal('84.5'));self.assertEqual(r['available'],expected);self.assertEqual(r['missing'],expected-130)
         result=self.driver.post(self.base+'/calculate',json=self.sheet(required_percent=50)).json();self.assertEqual(result['missing'],'/');self.assertEqual(result['cast_iron'],'/')
         result=self.driver.post(self.base+'/calculate',json=self.sheet(required_percent=expected)).json();self.assertEqual(result['missing'],'/')
@@ -34,17 +34,49 @@ class BrakeSheetTest(unittest.TestCase):
             line=response.json()['lines'][0];self.assertEqual(line['position'],position);self.assertEqual(Decimal(str(line['brake_weight'])),weight);self.assertEqual(len(line['note']),20);self.assertEqual(line['spring_unit'],'kN');self.assertEqual(line['spring_brake'],55)
         response=self.driver.post(self.base+'/calculate',json=self.sheet(brake_mode='LL+P'));self.assertIsNone(response.json()['available'])
     def test_wagon_ranges_and_combined_totals(self):
-        wagon=dict(count=100,length=720,holding='5.5',brake=700,weight=1000)
+        wagon=dict(count=20,length=720,holding='5.5',brake=700,weight=1000)
         response=self.driver.post(self.base+'/calculate',json=self.sheet(wagon=wagon,holding_loco='12.5',holding_unit='t',required_percent=80))
         self.assertEqual(response.status_code,200,response.text);r=response.json()
-        self.assertEqual(r['total']['count'],101);self.assertEqual(Decimal(str(r['total']['length'])),Decimal('738.95'))
+        self.assertEqual(r['total']['count'],21);self.assertEqual(Decimal(str(r['total']['length'])),Decimal('739'))
         self.assertEqual(Decimal(str(r['total']['weight'])),Decimal('1084.5'));self.assertEqual(r['total']['brake'],801)
         self.assertEqual(r['total']['holding'],18);self.assertEqual(r['available'],73);self.assertEqual(r['missing'],-7)
-        for key,low,high in [('count',100,5000),('length',10,720),('brake',100,5000),('weight',100,5000)]:
+        for key,low,high in [('count',1,50),('length',10,720),('brake',100,5000),('weight',100,5000)]:
             for value in [low,high]:
                 self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(wagon={key:value})).status_code,200)
             for value in [low-1,high+1]:
                 self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(wagon={key:value})).status_code,422)
+
+    def test_image_preview_completeness_private_access_and_blank_regions(self):
+        import io
+        from PIL import Image,ImageChops
+        from lokzeitleiste.brake_sheet_image import TEMPLATE
+        sheet=self.sheet(departure_date='2026-10-26',first_vehicle='918061850012',last_vehicle='918061850053',countries=[dict(country='DE',category='G'),dict(country='PL',category='P'),{},{}],wagon=dict(count=20,length=200,brake=700,weight=1000),remarks='Łódź – Überprüfung')
+        id=str(uuid4());path=self.base+'/'+id
+        saved=self.driver.put(path,json=dict(expected_revision=0,sheet=sheet));self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(saved.json()['calculation']['preview_missing'],[])
+        result=self.driver.post(path+'/preview',json={'expected_revision':1});self.assertEqual(result.status_code,200,result.text[:100] if result.status_code!=200 else '')
+        self.assertTrue(result.headers['content-type'].startswith('image/png'));self.assertIn('no-store',result.headers['cache-control'])
+        with Image.open(io.BytesIO(result.content)) as image,Image.open(TEMPLATE) as source:
+            image=image.convert('RGB');source=source.convert('RGB');self.assertEqual(image.size,source.size)
+            def crop(rect):
+                a,b,c,d=rect;return (round(a*image.width/1335),round(b*image.height/1888),round(c*image.width/1335),round(d*image.height/1888))
+            for rect in [(1213,102,1299,232),(842,605,1299,1322),(15,1776,1299,1818)]:
+                self.assertIsNone(ImageChops.difference(image.crop(crop(rect)),source.crop(crop(rect))).getbbox(),rect)
+            self.assertIsNotNone(ImageChops.difference(image.crop(crop((210,157,380,183))),source.crop(crop((210,157,380,183)))).getbbox())
+        self.assertEqual(self.client.post(path+'/preview',json={'expected_revision':1}).status_code,403)
+        self.assertEqual(self.driver.post(path+'/preview',json={'expected_revision':2}).status_code,409)
+        with Session(self.engine) as db:db.get(BrakeSheetDraft,id).owner_id=999;db.commit()
+        self.assertEqual(self.driver.post(path+'/preview',json={'expected_revision':1}).status_code,404)
+        missing=str(uuid4());saved=self.driver.put(self.base+'/'+missing,json=dict(expected_revision=0,sheet=self.sheet()))
+        self.assertTrue(saved.json()['calculation']['preview_missing'])
+        self.assertEqual(self.driver.post(self.base+'/'+missing+'/preview',json={'expected_revision':1}).status_code,422)
+
+    def test_length_is_rounded_once_after_adding_locomotives(self):
+        second=self.create(vehicle_number='91 80 6185 002-3',length_m='20.001',weight_kg=80000,axle_count=4,brake_shoe='K')
+        locos=[dict(vehicle_id=r['id'],vehicle_revision=r['revision']) for r in [self.vehicle,second]]
+        result=self.driver.post(self.base+'/calculate',json=self.sheet(locos=locos,wagon=dict(length=10))).json()
+        self.assertEqual(result['a']['length'],39);self.assertEqual(result['total']['length'],49)
+        self.assertEqual(result['lines'][0]['length_m'],18.95);self.assertEqual(result['lines'][1]['length_m'],20.001)
 
     def test_five_locomotives_and_sixth_is_rejected(self):
         rows=[self.vehicle]
@@ -52,7 +84,7 @@ class BrakeSheetTest(unittest.TestCase):
         locos=[dict(vehicle_id=r['id'],vehicle_revision=r['revision']) for r in rows]
         result=self.driver.post(self.base+'/calculate',json=self.sheet(locos=locos,holding_loco='12.5',holding_unit='t'))
         self.assertEqual(result.status_code,200,result.text);data=result.json()
-        self.assertEqual(data['a']['count'],5);self.assertEqual(Decimal(str(data['a']['length'])),Decimal('98.95'))
+        self.assertEqual(data['a']['count'],5);self.assertEqual(Decimal(str(data['a']['length'])),Decimal('99'))
         self.assertEqual(Decimal(str(data['a']['weight'])),Decimal('484.5'));self.assertEqual(data['a']['brake'],505)
         self.assertEqual(data['total']['holding'],12.5)
         self.assertEqual(self.driver.post(self.base+'/calculate',json=self.sheet(locos=locos+[locos[0]])).status_code,422)
