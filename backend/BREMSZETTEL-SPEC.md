@@ -82,3 +82,11 @@ Jeder Mailentwurf erhält eine unveränderliche PDF-/Bildkopie. Doppelte Sendekl
 Die frische Testinstallation enthält `dispo` als Alias des bisherigen Postfachs `diso`. Das aktualisierte Installationsskript ergänzt den Alias auf bestehenden Testservern nur, wenn noch kein eigenes `dispo`-Postfach bzw. Alias vorhanden ist und `diso` existiert. Dazu die neue Installationsdatei vor `--update` herunterladen.
 
 Der Blindempfänger wird serverseitig ergänzt, auch bei älteren Browserständen. Versand über das Admin-Postfach nutzt dessen eigene SMTP-/OAuth-Einstellungen; der Server-SMTP-Fallback nutzt die vorhandene SMTP-Konfiguration und explizite Envelope-Empfänger, damit BCC nicht in den sichtbaren Kopfzeilen erscheint. Keine Zugangsdaten werden an den TF-Browser ausgegeben. Kein sonstiges Mailmodul wird auf den Administratorabsender umgestellt.
+
+
+## Kompakte Maske und getrennte Ablage (26.10.2026)
+Die Grunddaten stehen am Desktop in vier Spalten, darunter zwei schmalere Bahnhofsfelder. Tfz-Auswahl folgt unmittelbar; abgeleitete, unveränderliche Tfz-Werte werden in der Maske ausgeblendet, im PDF weiter ausgegeben. Spalten 3/4 sind anfangs eingeklappt und über +/− gemeinsam umschaltbar. Gespeicherte optionale Länder-/Kategoriewerte oder abweichende Vmax öffnen die Spalten automatisch; Einklappen löscht keine Werte. Hinweiszeilen zum leeren ETCS/zweiten Abschnitt sind ausgeblendet, die PDF-Felder bleiben unverändert leer.
+
+Vorschau: **Speichern** ruft den geschützten Endpunkt `/api/v1/tf/brake-sheets/{id}/archive` auf und legt nur die PDF ab (keine Mail-Dispatch-Zeile, kein Postfach erforderlich, kein SMTP). **Speichern & senden** nutzt weiterhin den expliziten Maildialog; erst dessen Senden-Schaltfläche sendet. Beide Ablagen verwenden denselben Dokumentquellschlüssel. Hauptaktionen auch unterhalb der Erstellung. Bei schmalen Bildschirmen werden die Felder in zwei bzw. eine Spalte umgebrochen.
+
+TF-Dashboard: kompakte Kacheln in vier Spalten, bei kleiner Breite drei, auf Mobilgeräten zwei und auf sehr schmalen Geräten eine Spalte.

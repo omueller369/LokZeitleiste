@@ -82,3 +82,13 @@ class BrakeSheetMailTest(unittest.TestCase):
             _send_message(msg,recipients=['dispo@example.com','omueller369@gmail.com'])
             self.assertEqual(len(msg.get_all('From')),1);self.assertIsNone(msg['Bcc'])
             self.assertEqual(smtp.send_message.call_args.kwargs['to_addrs'],['dispo@example.com','omueller369@gmail.com'])
+    def test_archive_only_creates_no_dispatch_and_needs_no_mailbox(self):
+        sheet=self.sheet(departure_date='2026-10-26',first_vehicle='918061850012',last_vehicle='918061850053',countries=[dict(country='DE',category='G'),dict(country='PL',category='P'),{},{}],wagon=dict(count=20,length=200,brake=700,weight=1000))
+        path=self.base+'/'+str(uuid4());self.assertEqual(self.driver.put(path,json={'expected_revision':0,'sheet':sheet}).status_code,200)
+        with patch.dict('os.environ',{'SMTP_HOST':''}),patch('lokzeitleiste.brake_sheet_mail.service.send_prepared') as smtp:
+            r=self.driver.post(path+'/archive',json={'expected_revision':1});self.assertEqual(r.status_code,200,r.text);smtp.assert_not_called()
+            self.assertEqual(self.driver.post(path+'/archive',json={'expected_revision':1}).json()['document_path'],r.json()['document_path'])
+            pdf=self.driver.get(r.json()['download_url']);self.assertEqual(pdf.status_code,200);self.assertEqual(len(PdfReader(io.BytesIO(pdf.content)).pages),1)
+        with Session(self.engine) as db:self.assertEqual(list(db.scalars(select(BrakeSheetDispatch))),[])
+        self.assertEqual(self.driver.post(path+'/archive',json={'expected_revision':2}).status_code,409)
+        self.assertEqual(self.client.post(path+'/archive',json={'expected_revision':1}).status_code,403)

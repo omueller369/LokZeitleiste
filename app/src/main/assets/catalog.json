@@ -1654,7 +1654,13 @@
     "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.": "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.",
     "Tfz wurde doppelt ausgewählt.": "Tfz wurde doppelt ausgewählt.",
     "Vorlage des deutschen Bremszettels": "Vorlage des deutschen Bremszettels",
-    "Vorschau des deutschen Bremszettels": "Vorschau des deutschen Bremszettels"
+    "Vorschau des deutschen Bremszettels": "Vorschau des deutschen Bremszettels",
+    "Speichern & senden": "Speichern & senden",
+    "Spalten 3 und 4": "Spalten 3 und 4",
+    "Spalten 3 und 4 einblenden": "Spalten 3 und 4 einblenden",
+    "Spalten 3 und 4 ausblenden": "Spalten 3 und 4 ausblenden",
+    "Zugangaben": "Zugangaben",
+    "Gesamtgewichte in t.": "Gesamtgewichte in t."
   },
   "en": {
     "Administration": "Administration",
@@ -3311,7 +3317,13 @@
     "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.": "Draft changed on another device. Please reload.",
     "Tfz wurde doppelt ausgewählt.": "Locomotive selected twice.",
     "Vorlage des deutschen Bremszettels": "German brake-sheet template",
-    "Vorschau des deutschen Bremszettels": "German brake-sheet preview"
+    "Vorschau des deutschen Bremszettels": "German brake-sheet preview",
+    "Speichern & senden": "Save & send",
+    "Spalten 3 und 4": "Columns 3 and 4",
+    "Spalten 3 und 4 einblenden": "Show columns 3 and 4",
+    "Spalten 3 und 4 ausblenden": "Hide columns 3 and 4",
+    "Zugangaben": "Train details",
+    "Gesamtgewichte in t.": "Total weights in t."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4968,7 +4980,13 @@
     "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.": "Szkic zmieniono na innym urządzeniu. Wczytaj ponownie.",
     "Tfz wurde doppelt ausgewählt.": "Lokomotywę wybrano dwukrotnie.",
     "Vorlage des deutschen Bremszettels": "Wzór niemieckiej karty hamowania",
-    "Vorschau des deutschen Bremszettels": "Podgląd niemieckiej karty hamowania"
+    "Vorschau des deutschen Bremszettels": "Podgląd niemieckiej karty hamowania",
+    "Speichern & senden": "Zapisz i wyślij",
+    "Spalten 3 und 4": "Kolumny 3 i 4",
+    "Spalten 3 und 4 einblenden": "Pokaż kolumny 3 i 4",
+    "Spalten 3 und 4 ausblenden": "Ukryj kolumny 3 i 4",
+    "Zugangaben": "Dane pociągu",
+    "Gesamtgewichte in t.": "Masy całkowite w t."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6625,7 +6643,13 @@
     "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.": "Черновик изменён на другом устройстве. Загрузите заново.",
     "Tfz wurde doppelt ausgewählt.": "Локомотив выбран дважды.",
     "Vorlage des deutschen Bremszettels": "Шаблон немецкого тормозного листа",
-    "Vorschau des deutschen Bremszettels": "Предпросмотр немецкого тормозного листа"
+    "Vorschau des deutschen Bremszettels": "Предпросмотр немецкого тормозного листа",
+    "Speichern & senden": "Сохранить и отправить",
+    "Spalten 3 und 4": "Столбцы 3 и 4",
+    "Spalten 3 und 4 einblenden": "Показать столбцы 3 и 4",
+    "Spalten 3 und 4 ausblenden": "Скрыть столбцы 3 и 4",
+    "Zugangaben": "Сведения о поезде",
+    "Gesamtgewichte in t.": "Общий вес в т."
   },
   "es": {
     "Administration": "Administración",
@@ -8282,6 +8306,12 @@
     "Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.": "El borrador cambió en otro dispositivo. Vuelva a cargarlo.",
     "Tfz wurde doppelt ausgewählt.": "Locomotora seleccionada dos veces.",
     "Vorlage des deutschen Bremszettels": "Plantilla alemana de frenado",
-    "Vorschau des deutschen Bremszettels": "Vista previa de la hoja alemana de frenado"
+    "Vorschau des deutschen Bremszettels": "Vista previa de la hoja alemana de frenado",
+    "Speichern & senden": "Guardar y enviar",
+    "Spalten 3 und 4": "Columnas 3 y 4",
+    "Spalten 3 und 4 einblenden": "Mostrar columnas 3 y 4",
+    "Spalten 3 und 4 ausblenden": "Ocultar columnas 3 y 4",
+    "Zugangaben": "Datos del tren",
+    "Gesamtgewichte in t.": "Pesos totales en t."
   }
 }

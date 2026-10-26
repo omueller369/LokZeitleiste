@@ -166,6 +166,22 @@ def create_router(require_account):
         try:content=render(sheet,result,row.created_at,row.created_by_name)
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         return Response(content,media_type='image/png',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Disposition':'inline; filename="bremszettel-vorschau.png"'})
+    @router.post('/api/v1/tf/brake-sheets/{id}/archive')
+    def archive(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
+        row=owned(db,user,id)
+        if row.revision!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
+        if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
+        from .brake_sheet_image import render_pdf
+        from .documents.storage import generated
+        from urllib.parse import quote
+        try:content=render_pdf(sheet,result,row.created_at,row.created_by_name)
+        except ValueError as exc:raise HTTPException(422,str(exc)) from exc
+        number=sheet.train_numbers[0];day=sheet.departure_date
+        filename=f'Bremszettel-{number}-{day.isoformat()}.PDF'
+        document=generated(db,user,f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}',content,'brake-sheet:'+row.id)
+        db.commit()
+        return dict(filename=document.display_name,document_path=document.relative_path,download_url='/api/v1/documents/download?path='+quote(document.relative_path,safe=''))
     @router.put('/api/v1/tf/brake-sheets/{id}')
     def save(id:UUID,data:Save,user=Depends(driver),db:Session=Depends(database_session)):
         from fastapi.encoders import jsonable_encoder
