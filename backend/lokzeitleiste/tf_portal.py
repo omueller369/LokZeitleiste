@@ -81,13 +81,15 @@ def create_router(require_account):
         from .models import AccountLoginStamp,SessionToken
         from sqlalchemy import select,func
         from .security import TOKEN_LIFETIME
-        from .version import SOFTWARE_TITLE,SOFTWARE_VERSION
+        from .version import SOFTWARE_TITLE,SOFTWARE_VERSION,COPYRIGHT_HOLDER
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
         profile=db.get(TfProfile,user.id)
         if not profile:raise HTTPException(404,'Tf nicht gefunden')
         stamp=db.get(AccountLoginStamp,user.id)
         last_login=stamp.last_login_at if stamp else db.scalar(select(func.max(SessionToken.expires_at)).where(SessionToken.user_id==user.id))
         if last_login and not stamp:last_login-=TOKEN_LIFETIME
-        return dict(first_name=profile.first_name,last_name=profile.last_name,tf_number=user.username,last_login_at=last_login.isoformat()+'Z' if last_login else None,software=SOFTWARE_TITLE,version=SOFTWARE_VERSION)
+        return dict(first_name=profile.first_name,last_name=profile.last_name,tf_number=user.username,last_login_at=last_login.isoformat()+'Z' if last_login else None,software=SOFTWARE_TITLE,version=SOFTWARE_VERSION,copyright_holder=COPYRIGHT_HOLDER,copyright_year=datetime.now(ZoneInfo('Europe/Berlin')).year)
 
     @router.get('/api/v1/tf/me')
     def personal(user:User=Depends(require_driver),db:Session=Depends(database_session)):

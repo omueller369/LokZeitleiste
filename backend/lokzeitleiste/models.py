@@ -780,3 +780,9 @@ class TfMessageDelivery(Base):
     recipient_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
     read_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
     deleted_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)
+
+
+class StaffPersonnelNumber(Base):
+    __tablename__ = 'staff_personnel_numbers'
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'),primary_key=True)
+    number: Mapped[str] = mapped_column(String(30),nullable=False)

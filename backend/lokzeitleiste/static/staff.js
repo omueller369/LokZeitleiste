@@ -14,7 +14,7 @@ function addAddress(data={}){if(el('addresses').children.length>=10){message('H�
 function discard(){return !dirty||confirm('Ungespeicherte Änderungen verwerfen?');}
 function edit(user=null,viewOnly=false){if(!discard())return;current=user;dirty=false;const form=el('staffForm');form.reset();el('editor').hidden=false;el('editorTitle').textContent=user?'Konto · '+user.username:'Verwaltungsmitarbeiter anlegen';
  selectedPhoto?.close();selectedPhoto=null;const writable=!viewOnly&&me.permissions.staff>=2&&(!user||manageable(user));if(writable)selectedPhoto=photoSelection(el('staffPhotoSelection'),user?'/api/v1/admin/staff/'+user.id+'/photo':null,!!user?.has_photo,()=>dirty=true);else{el('staffPhotoSelection').replaceChildren();if(user)profilePhoto(el('staffPhotoSelection'),'staff',user.id,false,user.has_photo,()=>{});}
- for(const key of ['first_name','last_name','username','nationality','birth_date','cost_center','email'])form.elements[key].value=user?.[key]||'';
+ for(const key of ['personnel_number','first_name','last_name','username','nationality','birth_date','cost_center','email'])form.elements[key].value=user?.[key]||'';
  window.employeeEmailField(form.elements.email,{personal:true,userId:user?.id||null}).catch(e=>message(e.message,true));
  form.elements.username.disabled=!!user||!writable;form.elements.initial_password.required=!user;el('initial').hidden=!!user;
  el('addresses').replaceChildren();for(const address of user?.addresses||[{}])addAddress(address);

@@ -18,6 +18,7 @@ class AddressIn(BaseModel):
 
 
 class StaffIn(BaseModel):
+    personnel_number: str | None = Field(default=None,max_length=30)
     email: EmailStr | None = None
     photo_base64: str | None = Field(default=None,max_length=6990510)
     first_name: str = Field(min_length=1,max_length=120)

@@ -28,7 +28,7 @@ def start_modules(user,p):
         ('email','Email','/admin/email','Sonstiges',p.get('email',0)),
         ('messages','Kurznachrichten','/admin/messages','Mein Bereich',2),
         ('documents','Meine Dokumente','/documents','Mein Bereich',2),
-        ('password','Mein Passwort ändern','/account','Mein Bereich',2),
+        ('password','Mein Konto / Passwort','/admin/me','Mein Bereich',2),
     ]
     if user.role=='admin':definitions.extend([('phpmyadmin','phpMyAdmin','/phpmyadmin','Administration',3),('webmailer','Webmailer','/webmailer','Administration',3)])
     if user.role=='staff':definitions.append(('own_time','Meine Arbeitszeiten','/my/worktime','Mein Bereich',2))

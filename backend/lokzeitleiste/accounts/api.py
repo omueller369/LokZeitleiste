@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..db import database_session
 from ..user_directories import directory_transaction
-from ..models import AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto, EmployeeEmail
+from ..models import StaffPersonnelNumber, AccountAudit, AccountPolicy, ModulePermission, SessionToken, StaffAddress, StaffProfile, User, ProfilePhoto, EmployeeEmail
 from ..schemas import Credentials
 from ..security import hash_password, issue_token, revoke_token, user_from_token, verify_password, account_active
 from .access import MODULES, check_delegation, demand, password_required, permissions
@@ -55,6 +55,46 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     def me(user: User = Depends(account),db: Session = Depends(database_session)):
         return identity(db,user)
 
+    def backend_user(user,db):
+        if user.role not in ('staff','admin'):raise HTTPException(403,'Nur für die Verwaltung.')
+        from .access import ready
+        ready(db,user)
+
+    @router.get('/api/v1/account/shell')
+    def shell(user:User=Depends(account),db:Session=Depends(database_session)):
+        backend_user(user,db)
+        from ..models import AccountLoginStamp
+        from ..version import SOFTWARE_TITLE,SOFTWARE_VERSION,COPYRIGHT_HOLDER
+        from datetime import datetime
+        from zoneinfo import ZoneInfo
+        profile=db.get(StaffProfile,user.id);number=db.get(StaffPersonnelNumber,user.id);stamp=db.get(AccountLoginStamp,user.id)
+        return dict(first_name=profile.first_name if profile else user.username,last_name=profile.last_name if profile else '',personnel_number=number.number if number else '',last_login_at=stamp.last_login_at.isoformat()+'Z' if stamp else None,software=SOFTWARE_TITLE,version=SOFTWARE_VERSION,copyright_holder=COPYRIGHT_HOLDER,copyright_year=datetime.now(ZoneInfo('Europe/Berlin')).year)
+
+    @router.get('/api/v1/account/profile')
+    def own_profile(user:User=Depends(account),db:Session=Depends(database_session)):
+        backend_user(user,db)
+        profile=db.get(StaffProfile,user.id);number=db.get(StaffPersonnelNumber,user.id);email=db.get(EmployeeEmail,user.id)
+        values=dict(username=user.username,role=user.role,active=user.active,personnel_number=number.number if number else '',email=email.address if email else '',addresses=[])
+        if profile:
+            values.update({key:getattr(profile,key) for key in ('first_name','last_name','nationality','birth_date','cost_center')})
+            values['addresses']=[dict(street=a.street,house_number=a.house_number,postal_code=a.postal_code,city=a.city,federal_state='') for a in db.scalars(select(StaffAddress).where(StaffAddress.user_id==user.id).order_by(StaffAddress.id))]
+        return dict(data=values,has_photo=db.get(ProfilePhoto,user.id) is not None)
+
+    @router.get('/api/v1/account/profile/photo')
+    def own_photo(user:User=Depends(account),db:Session=Depends(database_session)):
+        backend_user(user,db)
+        photo=db.get(ProfilePhoto,user.id)
+        if not photo:raise HTTPException(404,'Kein Foto vorhanden')
+        from fastapi.responses import Response as BinaryResponse
+        return BinaryResponse(photo.image_data,media_type='image/jpeg')
+
+    @router.get('/admin/me')
+    def profile_page():
+        from pathlib import Path
+        from fastapi.responses import HTMLResponse
+        content=(Path(__file__).parent.parent/'static'/'tf-profile.html').read_text().replace('TF-Portal','App-Verwaltung').replace('/account?area=tf','/account?area=backend').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
+        return HTMLResponse(content,headers={'Cache-Control':'no-store'})
+
     @router.post('/api/v1/account/password')
     def change(data: PasswordChange, response: Response, authorization: str | None = Header(default=None),
                user: User = Depends(account),db: Session = Depends(database_session)):
@@ -94,13 +134,20 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
 
     def staff_dict(db,user,profile):
         addresses = db.scalars(select(StaffAddress).where(StaffAddress.user_id == user.id).order_by(StaffAddress.id)).all()
-        return {'id':user.id,'username':user.username,'active':user.active,
+        return {'id':user.id,'username':user.username,'active':user.active,'personnel_number':(db.get(StaffPersonnelNumber,user.id).number if db.get(StaffPersonnelNumber,user.id) else ''),
                 **{key:getattr(profile,key) for key in ('first_name','last_name','nationality','cost_center')},
                 'email':(db.get(EmployeeEmail,user.id).address if db.get(EmployeeEmail,user.id) else ''),'birth_date':profile.birth_date.isoformat(),'has_photo':db.get(ProfilePhoto,user.id) is not None,
                 'addresses':[{key:getattr(a,key) for key in ('street','house_number','postal_code','city')} for a in addresses],
                 'permissions':permissions(db,user),'password_change_required':password_required(db,user)}
 
     def save_profile(db,user,profile,data):
+        if 'personnel_number' in data.model_fields_set:
+            number=(data.personnel_number or '').strip()
+            row=db.get(StaffPersonnelNumber,user.id)
+            if number:
+                if row:row.number=number
+                else:db.add(StaffPersonnelNumber(user_id=user.id,number=number))
+            elif row:db.delete(row)
         for key in ('first_name','last_name','nationality','birth_date','cost_center'):
             setattr(profile,key,getattr(data,key))
         db.execute(delete(StaffAddress).where(StaffAddress.user_id == user.id))

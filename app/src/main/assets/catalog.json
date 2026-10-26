@@ -1525,7 +1525,8 @@
     "Gesendete": "Gesendete",
     "Posteingang": "Posteingang",
     "Kurznachrichten": "Kurznachrichten",
-    "Sachbearbeiter": "Sachbearbeiter"
+    "Sachbearbeiter": "Sachbearbeiter",
+    "App-Verwaltung": "App-Verwaltung"
   },
   "en": {
     "Administration": "Administration",
@@ -1570,7 +1571,7 @@
     "Hausnummer": "House number",
     "Postleitzahl (PLZ)": "Postal code",
     "Ort": "City",
-    "Kostenstelle": "Cost centre",
+    "Kostenstelle": "Cost center",
     "Personalnummer": "Employee number",
     "Personalnr.": "Employee no.",
     "Personalnummer / Kostenstelle": "Employee number / cost centre",
@@ -3053,7 +3054,8 @@
     "Gesendete": "Sent",
     "Posteingang": "Inbox",
     "Kurznachrichten": "Short messages",
-    "Sachbearbeiter": "Office staff"
+    "Sachbearbeiter": "Office staff",
+    "App-Verwaltung": "App administration"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4581,7 +4583,8 @@
     "Gesendete": "Wysłane",
     "Posteingang": "Skrzynka odbiorcza",
     "Kurznachrichten": "Krótkie wiadomości",
-    "Sachbearbeiter": "Pracownicy administracyjni"
+    "Sachbearbeiter": "Pracownicy administracyjni",
+    "App-Verwaltung": "Administracja aplikacji"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6109,7 +6112,8 @@
     "Gesendete": "Отправленные",
     "Posteingang": "Входящие",
     "Kurznachrichten": "Короткие сообщения",
-    "Sachbearbeiter": "Административные сотрудники"
+    "Sachbearbeiter": "Административные сотрудники",
+    "App-Verwaltung": "Управление приложением"
   },
   "es": {
     "Administration": "Administración",
@@ -7637,6 +7641,7 @@
     "Gesendete": "Enviados",
     "Posteingang": "Bandeja de entrada",
     "Kurznachrichten": "Mensajes cortos",
-    "Sachbearbeiter": "Personal administrativo"
+    "Sachbearbeiter": "Personal administrativo",
+    "App-Verwaltung": "Administración de la aplicación"
   }
 }

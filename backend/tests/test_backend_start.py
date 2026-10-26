@@ -27,6 +27,28 @@ class BackendStartTest(unittest.TestCase):
         self.assertIn('no-cache',self.client.get('/admin/start').headers['cache-control'])
         self.assertEqual(self.client.get('/admin/menu-designs').status_code,200)
 
+    def test_own_profile_shell_and_staff_personnel_number(self):
+        payload=self.payload('own-profile-office',{})
+        payload['personnel_number']='00123'
+        response=self.client.post('/api/v1/admin/staff',json=payload)
+        self.assertEqual(response.status_code,201,response.text)
+        staff,_=self.staff_login('own-profile-office')
+        self.assertEqual(staff.get('/api/v1/account/profile').status_code,403)
+        self.assertEqual(self.change(staff).status_code,200)
+        staff.post('/api/v1/admin/login',json={'username':'own-profile-office','password':'personal-secret-67890'})
+        meta=staff.get('/api/v1/account/shell').json()
+        self.assertEqual(meta['personnel_number'],'00123')
+        self.assertEqual(meta['first_name'],'Mira')
+        self.assertTrue(meta['last_login_at'].endswith('Z'))
+        data=staff.get('/api/v1/account/profile?user_id=999').json()
+        self.assertEqual(data['data']['personnel_number'],'00123')
+        self.assertEqual(data['data']['username'],'own-profile-office')
+        self.assertNotIn('password',str(data))
+        self.assertEqual(len(data['data']['addresses']),2)
+        self.assertEqual(staff.get('/admin/me').status_code,200)
+        admin=self.client.get('/api/v1/account/profile').json()
+        self.assertEqual(admin['data']['role'],'admin')
+
     def test_no_grants_still_has_personal_modules(self):
         _,staff=self.active_staff({},'start-empty')
         response=staff.get('/api/v1/admin/start');self.assertEqual(response.status_code,200,response.text)
