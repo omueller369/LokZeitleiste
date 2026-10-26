@@ -786,3 +786,12 @@ class StaffPersonnelNumber(Base):
     __tablename__ = 'staff_personnel_numbers'
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'),primary_key=True)
     number: Mapped[str] = mapped_column(String(30),nullable=False)
+
+
+class VehicleTechnicalData(Base):
+    __tablename__='vehicle_technical_data'
+    vehicle_id:Mapped[int]=mapped_column(ForeignKey('railway_vehicles.id'),primary_key=True)
+    length_mm:Mapped[int|None]=mapped_column(Integer,nullable=True)
+    weight_kg:Mapped[int|None]=mapped_column(Integer,nullable=True)
+    axle_count:Mapped[int|None]=mapped_column(Integer,nullable=True)
+    brake_shoe:Mapped[str|None]=mapped_column(String(1),nullable=True)

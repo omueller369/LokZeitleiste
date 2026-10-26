@@ -1529,7 +1529,14 @@
     "App-Verwaltung": "App-Verwaltung",
     "Auch als Pause Hinzuf.": "Auch als Pause Hinzuf.",
     "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.",
-    "Bremszettel": "Bremszettel"
+    "Bremszettel": "Bremszettel",
+    "Technische Daten": "Technische Daten",
+    "Länge über Puffer (LüP), m": "Länge über Puffer (LüP), m",
+    "Gesamtgewicht, t": "Gesamtgewicht, t",
+    "Speicherung in kg": "Speicherung in kg",
+    "Anzahl Radsätze": "Anzahl Radsätze",
+    "Bremssohlenart": "Bremssohlenart",
+    "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben.": "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben."
   },
   "en": {
     "Administration": "Administration",
@@ -3061,7 +3068,14 @@
     "App-Verwaltung": "App administration",
     "Auch als Pause Hinzuf.": "Also add as break",
     "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "An additional break requires another reason and a duration longer than 15 minutes.",
-    "Bremszettel": "Brake sheet"
+    "Bremszettel": "Brake sheet",
+    "Technische Daten": "Technical data",
+    "Länge über Puffer (LüP), m": "Length over buffers, m",
+    "Gesamtgewicht, t": "Total weight, t",
+    "Speicherung in kg": "Stored in kg",
+    "Anzahl Radsätze": "Number of wheelsets",
+    "Bremssohlenart": "Brake shoe type",
+    "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben.": "Enter total weight with no more than three decimal places."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4593,7 +4607,14 @@
     "App-Verwaltung": "Administracja aplikacji",
     "Auch als Pause Hinzuf.": "Dodaj także jako przerwę",
     "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Dodatkowa przerwa wymaga innego powodu i czasu dłuższego niż 15 minut.",
-    "Bremszettel": "Karta hamowania"
+    "Bremszettel": "Karta hamowania",
+    "Technische Daten": "Dane techniczne",
+    "Länge über Puffer (LüP), m": "Długość ze zderzakami, m",
+    "Gesamtgewicht, t": "Masa całkowita, t",
+    "Speicherung in kg": "Zapis w kg",
+    "Anzahl Radsätze": "Liczba zestawów kołowych",
+    "Bremssohlenart": "Rodzaj klocków hamulcowych",
+    "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben.": "Podaj masę całkowitą z maksymalnie trzema miejscami po przecinku."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6125,7 +6146,14 @@
     "App-Verwaltung": "Управление приложением",
     "Auch als Pause Hinzuf.": "Также добавить как перерыв",
     "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Дополнительный перерыв возможен при другой причине и длительности более 15 минут.",
-    "Bremszettel": "Тормозной лист"
+    "Bremszettel": "Тормозной лист",
+    "Technische Daten": "Технические данные",
+    "Länge über Puffer (LüP), m": "Длина по буферам, м",
+    "Gesamtgewicht, t": "Общая масса, т",
+    "Speicherung in kg": "Хранится в кг",
+    "Anzahl Radsätze": "Количество колёсных пар",
+    "Bremssohlenart": "Тип тормозных колодок",
+    "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben.": "Введите общую массу не более чем с тремя знаками после запятой."
   },
   "es": {
     "Administration": "Administración",
@@ -7657,6 +7685,13 @@
     "App-Verwaltung": "Administración de la aplicación",
     "Auch als Pause Hinzuf.": "Añadir también como pausa",
     "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "La pausa adicional requiere otro motivo y una duración superior a 15 minutos.",
-    "Bremszettel": "Hoja de frenado"
+    "Bremszettel": "Hoja de frenado",
+    "Technische Daten": "Datos técnicos",
+    "Länge über Puffer (LüP), m": "Longitud entre topes, m",
+    "Gesamtgewicht, t": "Peso total, t",
+    "Speicherung in kg": "Guardado en kg",
+    "Anzahl Radsätze": "Número de ejes",
+    "Bremssohlenart": "Tipo de zapata de freno",
+    "Gesamtgewicht bitte mit höchstens drei Nachkommastellen eingeben.": "Introduzca el peso total con un máximo de tres decimales."
   }
 }

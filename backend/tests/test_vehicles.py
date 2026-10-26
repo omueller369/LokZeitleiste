@@ -35,6 +35,21 @@ class VehicleTest(unittest.TestCase):
         self.assertEqual(self.client.put(path,json=self.data(expected_revision=1)).status_code,409)
         self.assertEqual(self.client.get(path).json()['revision'],4)
 
+    def test_technical_data_roundtrip_preservation_and_validation(self):
+        from lokzeitleiste.models import VehicleTechnicalData
+        row=self.create(length_m='18.950',weight_kg=84500,axle_count=4,brake_shoe='D')
+        self.assertEqual(row['length_m'],18.95);self.assertEqual(row['weight_kg'],84500)
+        self.assertEqual(row['axle_count'],4);self.assertEqual(row['brake_shoe'],'D')
+        with Session(self.engine) as db:
+            saved=db.get(VehicleTechnicalData,row['id']);self.assertEqual(saved.length_mm,18950);self.assertEqual(saved.weight_kg,84500)
+        path='/api/v1/admin/vehicles/'+str(row['id'])
+        updated=self.client.put(path,json=self.data(expected_revision=1,name='Legacy update'))
+        self.assertEqual(updated.status_code,200,updated.text);self.assertEqual(updated.json()['weight_kg'],84500)
+        for changes in [dict(length_m='18.0001'),dict(length_m='NaN'),dict(length_m=-1),dict(weight_kg=84500.5),dict(weight_kg=True),dict(axle_count=10),dict(axle_count=0),dict(brake_shoe='X')]:
+            result=self.client.put(path,json=self.data(expected_revision=2,**changes));self.assertEqual(result.status_code,422,(changes,result.text))
+        cleared=self.client.put(path,json=self.data(expected_revision=2,length_m=None,weight_kg=None,axle_count=None,brake_shoe=None))
+        self.assertEqual(cleared.status_code,200,cleared.text);self.assertIsNone(cleared.json()['length_m'])
+
     def test_vehicle_number_normalization_duplicate_and_leading_zeros(self):
         row=self.create(vehicle_number='00 01 0002 003-4');self.assertEqual(row['vehicle_number'],'00 01 0002 003-4')
         self.assertEqual(self.client.post('/api/v1/admin/vehicles',json=self.data(vehicle_number='000100020034')).status_code,409)
