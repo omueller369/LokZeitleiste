@@ -10,6 +10,8 @@ sudo bash install-ctlsoftware-test.sh --update
 
 `/tf/nachrichten` bietet ein privates systeminternes Postfach. **neue Nachricht schreiben** öffnet ein Overlay mit Mehrfachauswahl der TF, „Alle TF's“, Betreff, Nachricht (maximal 1000 Zeichen mit Restzähler) und optional einem Dateianhang bis 10 MB. Die Empfängerliste zeigt ausschließlich Namen. Bei „Alle TF's“ erhalten alle aktuell aktiven TF einschließlich des Absenders eine Zustellung. Ausgeschiedene oder gesperrte TF stehen nicht zur Auswahl.
 
+**Gesendete** wechselt zur eigenen Versandliste mit Datum, Uhrzeit, Empfängernamen und Betreff. Ein Zeilenklick öffnet Text und Anhang schreibgeschützt. **Posteingang** wechselt zurück. Die Versandansicht verändert keine Lesestatus der Empfänger; das Löschen einer Empfängerkopie entfernt die Nachricht nicht aus der Versandansicht.
+
 Nachrichten sind nach Datum/Uhrzeit absteigend sortiert; bei mehr als 50 Einträgen kann geblättert werden. Ein Zeilenklick öffnet die Nachricht schreibgeschützt und markiert sie als gelesen. Die Icons erlauben Löschen und Wechsel zwischen gelesen/ungelesen. Ungelesene Nachrichten tragen zusätzlich eine Neu-Markierung. Löschen entfernt nur die eigene Zustellung, nicht die Nachricht aus anderen Postfächern. Das Weiterleitungs-Overlay unterstützt wiederum mehrere TF oder alle TF und übernimmt Text und Anhang. Es versendet keine SMTP-E-Mail.
 
 Bilder werden als anklickbare Speichervorschau angezeigt. PDFs erhalten eine eingebettete Vorschau mit zusätzlichem Speicherlink. Andere Dateitypen erscheinen als speicherbare Dateikarte. Die Dateivorschau wird als authentifiziert geladenes Blob erzeugt; Namen und Text werden ausschließlich als Text dargestellt.

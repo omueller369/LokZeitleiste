@@ -72,3 +72,28 @@ class TfMessagesTest(unittest.TestCase):
         for path in ['/tf/me','/tf/nachrichten','/tf/messages.js','/tf/shell.js','/tf/shell.css','/tf/profile.js','/tf/ctl-logistics-logo.jpg']:
             self.assertEqual(self.sender.get(path).status_code,200,path)
         landing=self.sender.get('/tf').text;self.assertIn('href="/tf/nachrichten"',landing);header=landing.split('<header>')[1].split('</header>')[0];self.assertNotIn('Meine Dokumente',header);self.assertNotIn('/account',header)
+
+    def test_sent_listing_detail_recipients_and_unread_isolation(self):
+        first=self.send(subject='Erste Nachricht');second=self.send(subject='Zweite Nachricht',all_tf=True)
+        sent=self.sender.get('/api/v1/tf/messages/sent');self.assertEqual(sent.status_code,200,sent.text)
+        data=sent.json();self.assertEqual(data['total'],2);self.assertEqual([m['id'] for m in data['messages']],[second,first])
+        self.assertTrue(data['messages'][0]['recipient_names']);self.assertNotIn('787222',json.dumps(data));self.assertNotIn('recipient_id',json.dumps(data))
+        self.assertEqual(self.other.get('/api/v1/tf/messages/sent').json()['total'],0)
+        path=f'/api/v1/tf/messages/sent/{first}'
+        self.assertEqual(self.other.get(path).status_code,404)
+        before=self.other.get('/api/v1/tf/messages/unread').json()['count']
+        detail=self.sender.get(path);self.assertEqual(detail.status_code,200);self.assertEqual(detail.json()['body'],'Zeile 1\nZeile 2')
+        self.assertEqual(self.other.get('/api/v1/tf/messages/unread').json()['count'],before)
+        self.other.delete(f'/api/v1/tf/messages/{first}')
+        self.assertEqual(self.sender.get(path).status_code,200)
+        page=self.sender.get('/api/v1/tf/messages/sent',params={'offset':1,'limit':1}).json();self.assertEqual([m['id'] for m in page['messages']],[first])
+
+    def test_sent_attachment_is_only_accessible_to_sender(self):
+        payload=dict(recipients=[self.other_id],subject='Gesendeter Anhang',body='Text')
+        response=self.sender.post('/api/v1/tf/messages',data={'payload':json.dumps(payload)},files={'file':('Text.txt',b'Originalinhalt','text/plain')})
+        self.assertEqual(response.status_code,201,response.text);mid=response.json()['id'];path=f'/api/v1/tf/messages/sent/{mid}'
+        detail=self.sender.get(path).json();self.assertEqual(detail['attachment']['url'],path+'/attachment')
+        self.assertEqual(self.sender.get(path+'/attachment').content,b'Originalinhalt')
+        self.assertEqual(self.other.get(path+'/attachment').status_code,404)
+        self.other.delete(f'/api/v1/tf/messages/{mid}')
+        self.assertEqual(self.sender.get(path+'/attachment').content,b'Originalinhalt')

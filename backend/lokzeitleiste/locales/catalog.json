@@ -1521,7 +1521,9 @@
     "Meine Daten": "Meine Daten",
     "Gespeicherte Personaldaten": "Gespeicherte Personaldaten",
     "Mein Foto": "Mein Foto",
-    "Personaldaten konnten nicht geladen werden.": "Personaldaten konnten nicht geladen werden."
+    "Personaldaten konnten nicht geladen werden.": "Personaldaten konnten nicht geladen werden.",
+    "Gesendete": "Gesendete",
+    "Posteingang": "Posteingang"
   },
   "en": {
     "Administration": "Administration",
@@ -3045,7 +3047,9 @@
     "Meine Daten": "My details",
     "Gespeicherte Personaldaten": "Stored personnel details",
     "Mein Foto": "My photo",
-    "Personaldaten konnten nicht geladen werden.": "Personnel details could not be loaded."
+    "Personaldaten konnten nicht geladen werden.": "Personnel details could not be loaded.",
+    "Gesendete": "Sent",
+    "Posteingang": "Inbox"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4569,7 +4573,9 @@
     "Meine Daten": "Moje dane",
     "Gespeicherte Personaldaten": "Zapisane dane osobowe",
     "Mein Foto": "Moje zdjęcie",
-    "Personaldaten konnten nicht geladen werden.": "Nie udało się wczytać danych osobowych."
+    "Personaldaten konnten nicht geladen werden.": "Nie udało się wczytać danych osobowych.",
+    "Gesendete": "Wysłane",
+    "Posteingang": "Skrzynka odbiorcza"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6093,7 +6099,9 @@
     "Meine Daten": "Мои данные",
     "Gespeicherte Personaldaten": "Сохранённые личные данные",
     "Mein Foto": "Моя фотография",
-    "Personaldaten konnten nicht geladen werden.": "Не удалось загрузить личные данные."
+    "Personaldaten konnten nicht geladen werden.": "Не удалось загрузить личные данные.",
+    "Gesendete": "Отправленные",
+    "Posteingang": "Входящие"
   },
   "es": {
     "Administration": "Administración",
@@ -7617,6 +7625,8 @@
     "Meine Daten": "Mis datos",
     "Gespeicherte Personaldaten": "Datos personales guardados",
     "Mein Foto": "Mi foto",
-    "Personaldaten konnten nicht geladen werden.": "No se pudieron cargar los datos personales."
+    "Personaldaten konnten nicht geladen werden.": "No se pudieron cargar los datos personales.",
+    "Gesendete": "Enviados",
+    "Posteingang": "Bandeja de entrada"
   }
 }

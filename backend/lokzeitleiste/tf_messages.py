@@ -48,6 +48,20 @@ def view(db,message,delivery,detail=False):
     if detail:result.update(body=message.body,attachment=dict(filename=file.filename,mime_type=file.mime_type,size=len(file.content),url=f'/api/v1/tf/messages/{message.id}/attachment') if file else None)
     return result
 
+
+def sent_owned(db,user,message_id):
+    message=db.scalar(select(Message).where(Message.id==message_id,Message.sender_id==user.id))
+    if not message:raise HTTPException(404,'Nachricht nicht gefunden.')
+    return message
+
+def sent_view(db,message,detail=False):
+    names=[name(p) for p in db.scalars(select(TfProfile).join(Delivery,Delivery.recipient_id==TfProfile.user_id).where(Delivery.message_id==message.id).order_by(TfProfile.last_name,TfProfile.first_name,TfProfile.user_id))]
+    result=dict(id=message.id,subject=message.subject,sender_name=message.sender_name,recipient_names=names,created_at=message.created_at.isoformat()+'Z',has_attachment=message.attachment_id is not None)
+    if detail:
+        file=db.get(Attachment,message.attachment_id) if message.attachment_id else None
+        result.update(body=message.body,attachment=dict(filename=file.filename,mime_type=file.mime_type,size=len(file.content),url=f'/api/v1/tf/messages/sent/{message.id}/attachment') if file else None)
+    return result
+
 def create_router(require_account):
     router=APIRouter();driver=driver_dependency(require_account)
     @router.get('/tf/messages.js')
@@ -63,6 +77,21 @@ def create_router(require_account):
         total=db.scalar(select(func.count()).select_from(query.subquery()))
         rows=db.execute(query.order_by(Message.created_at.desc(),Message.id.desc()).offset(offset).limit(limit)).all()
         return dict(total=total,messages=[view(db,m,d) for d,m in rows])
+    @router.get('/api/v1/tf/messages/sent')
+    def sent_listing(offset:int=Query(default=0,ge=0),limit:int=Query(default=50,ge=1,le=100),user=Depends(driver),db:Session=Depends(database_session)):
+        query=select(Message).where(Message.sender_id==user.id)
+        total=db.scalar(select(func.count()).select_from(query.subquery()))
+        rows=db.scalars(query.order_by(Message.created_at.desc(),Message.id.desc()).offset(offset).limit(limit)).all()
+        return dict(total=total,messages=[sent_view(db,m) for m in rows])
+    @router.get('/api/v1/tf/messages/sent/{message_id}')
+    def sent_detail(message_id:int,user=Depends(driver),db:Session=Depends(database_session)):
+        return sent_view(db,sent_owned(db,user,message_id),True)
+    @router.get('/api/v1/tf/messages/sent/{message_id}/attachment')
+    def sent_attachment(message_id:int,user=Depends(driver),db:Session=Depends(database_session)):
+        message=sent_owned(db,user,message_id);file=db.get(Attachment,message.attachment_id) if message.attachment_id else None
+        if not file:raise HTTPException(404,'Dateianhang nicht gefunden.')
+        from urllib.parse import quote
+        return Response(file.content,media_type=file.mime_type,headers={'Content-Disposition':"attachment; filename*=UTF-8''"+quote(file.filename),'X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"})
     @router.post('/api/v1/tf/messages',status_code=201)
     async def send(payload:str=Form(max_length=50000),file:UploadFile|None=File(default=None),user=Depends(driver),db:Session=Depends(database_session)):
         try:data=MessageIn.model_validate_json(payload)
