@@ -100,7 +100,9 @@ def render(sheet,result,creator,image=False):
         if n==5:d.text(86,y+14,'Zeile 2, Sp. 6 × 100 / Zeile 1, Sp. 6',5.7)
         if n==15:d.text(86,y+14,'Zeile 3, Sp. 4 × 9 / 10',6)
         if n==16:d.text(86,y+14,'als gemäß Fahrplanangaben',6.8)
-        y+=h;d.line(62,y,320 if n in (8,9,10,11,14) else right,y)
+        y+=h
+        if n in (4,5):d.line(62,y,278,y);d.line(364,y,right,y)
+        else:d.line(62,y,320 if n in (8,9,10,11,14) else right,y)
     end=y
     d.line(left,end,right,end,1);d.text(16,139,'Angaben für',6.6,True,maxwidth=43);d.text(16,149,'Reise- und',6.6,True);d.text(16,159,'Güterzüge',6.6,True)
     for n,key in [(1,'weight'),(2,'brake'),(3,'axles'),(13,'length')]:
