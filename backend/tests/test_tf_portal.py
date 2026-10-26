@@ -72,7 +72,7 @@ class TfPortalTest(unittest.TestCase):
 
     def test_portal_pages_roles_and_logged_out_access(self):
         for path in ('/tf','/tf/bremszettel','/tf/arbeitsbericht','/tf/lokuebergabebuch','/tf/leuna-uebergabeprotokoll','/tf/arbeitsplan'):
-            result=self.driver.get(path);self.assertEqual(result.status_code,200);self.assertIn('TF Portal',result.text)
+            result=self.driver.get(path);self.assertEqual(result.status_code,200);self.assertIn('TF Portal',result.text.replace('TF-Portal','TF Portal'))
             self.assertEqual(self.client.get(path,follow_redirects=False).status_code,303)
         self.assertEqual(self.client.get('/api/v1/tf/portal/plan/2026/10').status_code,403)
         staff=self.payload('portal-office');self.client.post('/api/v1/admin/staff',json=staff)

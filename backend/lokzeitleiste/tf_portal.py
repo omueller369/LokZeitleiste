@@ -27,7 +27,6 @@ def create_router(require_account):
 
     @router.get('/tf')
     @router.get('/tf/arbeitsbericht')
-    @router.get('/tf/bremszettel')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
     @router.get('/tf/bahnhoefe')
@@ -36,6 +35,12 @@ def create_router(require_account):
         if not user or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
         if user.role!='tf':return RedirectResponse('/account?area=tf',status_code=303)
         return FileResponse(STATIC/'tf-portal.html',headers={'Cache-Control':'no-store'})
+
+    @router.get('/tf/bremszettel')
+    def brake_sheet_page(tf_session:str|None=Cookie(default=None),admin_session:str|None=Cookie(default=None),db:Session=Depends(database_session)):
+        user=user_from_token(db,tf_session or admin_session)
+        if not user or user.role!='tf' or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
+        return FileResponse(STATIC/'brake-sheet.html',headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/loco-handover')
     @router.get('/tf/lokuebergabebuch')

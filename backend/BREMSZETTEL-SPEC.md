@@ -1,6 +1,6 @@
 # Internationaler Bremszettel DE/PL – abgestimmte Eingabefelder
 
-Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. Noch kein fertiger PDF-Export und keine freigegebene Bremsberechnung; die folgenden Anforderungen werden schrittweise abgestimmt.
+Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. PDF-Export und zweiter Berechnungsabschnitt folgen nach Abstimmung. Die Eingabemaske und die bestätigten Berechnungen des ersten Abschnitts sind als Entwurf umgesetzt.
 
 ## Kopf und Zugdaten
 
@@ -15,8 +15,8 @@ Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler B
 10–13. Checkboxen Gefahrgut, außergewöhnliche Sendung, zusätzliche Einschränkungsdokumente, Abfalltransporte. Nur Gefahrgut voreingestellt.
 14. DE-Auswahl D3 – 22,5 t / D4 – 22,5 t; PL-Auswahl C – 20,5 t / D – 22,5 t. DE D4 setzt PL auf D.
 15. Radiobuttons G / P / G+P / LL+P / R, Default G.
-16a/b. Übernahme aus 4a/b. 16c/d optional, gleiche Bahnhofssuche mit Freitext wie 4a/b.
-17/18. Fahrzeugnummer des ersten/letzten Fahrzeugs: zwei Paare, erstes Paar Pflicht, zweites optional. Manuelle Eingabe in fünf Blöcken 2–2–4–3–1 Ziffern wie Tfz-Verwaltung, keine Defaultwerte. Benutzernummerierung der Teilfelder weicht teilweise von PDF ab; Zuordnung visuell vor Export prüfen.
+16a/b. Übernahme aus 4a/b. 16c/d bleiben nach letzter Vorgabe leer.
+17/18. Fahrzeugnummer des ersten/letzten Fahrzeugs: erstes Paar Pflicht; zweites Paar bleibt nach letzter Vorgabe leer. Manuelle Eingabe in fünf Blöcken 2–2–4–3–1 Ziffern wie Tfz-Verwaltung, keine Defaultwerte. Benutzernummerierung der Teilfelder weicht teilweise von PDF ab; Zuordnung visuell vor Export prüfen.
 
 ## Triebfahrzeuge, bis zu fünf Zeilen
 
@@ -28,9 +28,9 @@ Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler B
 33. Gesamtgewicht in kg aus Tfz; Stammdateneingabe in t, Speicherung als ganze kg.
 34. Bremssohlenart D/K aus Tfz.
 35. Bremsstellung G/P/R, Default G.
-36. Bei Feld 15 G: Tfz-Bremsgewicht G. Bei G+P: Tfz G−25 %, ganzzahlig abgeschnitten. Andere Zuordnungen und Verhältnis zur zeilenweisen Bremsstellung 35 noch bestätigen.
+36. Bei Feld 15 G: Tfz-Bremsgewicht G. Bei G+P: Tfz G−25 %, ganzzahlig abgeschnitten. Bei P: Tfz-Wert P und Stellung P; bei R: Tfz-Wert R und Stellung R. LL+P: eigene Bremsgewichtsangabe, Stellung G/P/R auswählbar. Die Optionen bleiben G+P und LL+P; G+R/LL+R waren ausdrücklich korrigierte Tippfehler. Bei G+P steht in Spalte 35 G und in Spalte 36 der reduzierte G-Wert.
 36a. Tfz-Federspeicherwert und dessen Einheit t oder kN übernehmen.
-37. Bemerkung: noch nicht abgestimmt.
+37. Bemerkung pro Zeile: Freitext maximal 20 Zeichen.
 
 ## Summen erster Abschnitt
 
@@ -38,23 +38,27 @@ Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler B
 20a = Summe Spalte 32, Meter.
 21a = optional manuelle Festhaltekraft; Einheit noch bestätigen.
 22a = Summe Spalte 36, Bremsgewicht t.
-23a = Summe Spalte 33; Einheit in Summenzeile noch bestätigen (Vorlage t, Quellspalte kg).
-19b–23b = manuelle Zahlenwerte, höchstens vier Stellen; Nachkommastellen und Einheiten noch bestätigen.
-19a+b–23a+b = jeweilige Summen a+b, nur mit gleichen Einheiten berechnen.
+23a = Summe Spalte 33 geteilt durch 1000, Tonnen. 23b wird ebenfalls in Tonnen eingegeben (100–5000).
+19b: optionale ganze Fahrzeuganzahl 100–5000. 22b, 23b: Zahlenwerte 100–5000; 20b: 10–720 (Maße/Gewichte bis drei Nachkommastellen). 21b: optional frei eingebbarer nichtnegativer Zahlenwert ohne Vorgabe. Dies überschreibt die zwischenzeitliche Vorgabe leerer b-Felder.
+19a+b–23a+b = die jeweiligen Summen aus a+b. Noch leere optionale b-Werte erhöhen die Summe nicht.
 24 = 22(a+b) × 100 / 23(a+b), Nachkommastellen abschneiden, nicht runden; Gewichte zuvor auf gleiche Einheit bringen.
 25 = Zahl 50–150.
-26 = Benutzerangabe: wenn 25 < 24 Differenz, andernfalls „/“. Vor Umsetzung bestätigen: Feldtitel lautet „Fehlende Bremshundertstel“, daher Differenzrichtung unklar.
+26 = 24 minus 25; nur negative Differenzen anzeigen, bei null oder positiven Werten ausstreichen (Anzeige „/“).
 27 = „/“.
 
 ## Noch abzustimmen
 
 - Alleinige Pflicht zur ersten Tfz-Zeile sowie Duplikate/weitere Zugnummernbezeichnungen.
-- Verhältnis Feld 15 und zeilenweiser Bremsstellung 35; Gewichte für P, R, LL+P.
 - Gewichts-, Festhaltekraft- und Dezimalvorgaben der Summenzeilen.
-- Berechnung und Eingabe des zweiten Abschnitts c/d/c+d.
-- ETCS-Spalte, Spalte 37 sowie Felder 38–44 (Erstellung und Überprüfung).
+- Der gesamte zweite Abschnitt c/d/c+d, einschließlich 24–27 c+d, bleibt nach Vorgabe leer.
+- ETCS-Spalte.
+- Felder 38/39/40 sind bestätigt und umgesetzt: Erstelldatum, Uhrzeit und TF-Name beim ersten Speichern serverseitig setzen und unverändert erhalten. 41–44 bleiben leer.
 - Speichern/Versionieren, PDF-Zuordnung und Ausgabe im Originalformular.
 
 ## Bereits implementierte Grundlage
 
 Tf-Portal-Kachel und geschützter Modulplatzhalter vorhanden. Tfz-Verwaltung ergänzt um optionale LüP (bis drei Nachkommastellen), Gewichtseingabe in t mit exakter Speicherung kg, Radsätze 1–9 und D/K. Separate Tabelle vehicle_technical_data wird bei init_db auf Neuinstallation und Update angelegt. Bestehende technische Daten fehlen explizit (NULL), keine Schätzwerte. Nicht mitgelieferte technische Felder bleiben bei Legacy-Updates erhalten. Kopieren eines Tfz übernimmt die ergänzten technischen Daten.
+
+## Umsetzung der Eingabemaske
+
+Eigenes Formular `/tf/bremszettel`, TF-authentifizierte APIs `/api/v1/tf/brake-sheets`, `/vehicles`, `/calculate`. Bis zu fünf unterschiedliche Tfz, erste Zugnummer und weitere fünfstellige Nummern mit führenden Nullen. Vorläufige unvollständige Entwürfe sind erlaubt; kein endgültiger PDF-Export. Tfz-Revisionen werden serverseitig geprüft; Stammdatenänderungen erfordern die bewusste Aktualisierung der Fahrzeugauswahl. Fehlende Maße/Gewichte werden nicht als 0 geschätzt. Berechnung mittels Decimal, 24 ganzzahlig abschneiden. Private Entwürfe mit Versionsprüfung verhindern das Überschreiben auf einem anderen Gerät. Erstellerdaten unveränderlich; keine Überprüfungsdaten 41–44. Android-Routen und mitgelieferte Web-Assets aktualisiert; keine APK gebaut.

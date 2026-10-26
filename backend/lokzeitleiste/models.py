@@ -795,3 +795,15 @@ class VehicleTechnicalData(Base):
     weight_kg:Mapped[int|None]=mapped_column(Integer,nullable=True)
     axle_count:Mapped[int|None]=mapped_column(Integer,nullable=True)
     brake_shoe:Mapped[str|None]=mapped_column(String(1),nullable=True)
+
+
+class BrakeSheetDraft(Base):
+    __tablename__='brake_sheet_drafts'
+    id:Mapped[str]=mapped_column(String(36),primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    payload_json:Mapped[str]=mapped_column(Text,nullable=False)
+    calculation_json:Mapped[str]=mapped_column(Text,nullable=False)
+    revision:Mapped[int]=mapped_column(Integer,nullable=False,default=1)
+    created_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
+    created_by_name:Mapped[str]=mapped_column(String(241),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)

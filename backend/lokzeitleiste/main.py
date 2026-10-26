@@ -713,3 +713,6 @@ app.include_router(work_report_drafts_router(require_account))
 
 from .tf_messages import create_router as tf_messages_router
 app.include_router(tf_messages_router(require_account))
+
+from .brake_sheets import create_router as brake_sheets_router
+app.include_router(brake_sheets_router(require_account))
