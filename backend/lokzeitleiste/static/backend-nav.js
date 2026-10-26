@@ -76,5 +76,5 @@ on(window,'languagechange',()=>{toggle.setAttribute('aria-label',t('Backend-Men√
 if(media.addEventListener){media.addEventListener('change',layout);cleanups.push(()=>media.removeEventListener('change',layout));}else{media.addListener(layout);cleanups.push(()=>media.removeListener(layout));}
 window.BackendNavigation={destroy(){release();for(const cleanup of cleanups)cleanup();control.remove();sidebar.remove();overlay.remove();bar.remove();document.body.classList.remove('backend-sidebar-desktop','backend-sections-layout');if(window.BackendNavigation===this)delete window.BackendNavigation;}};
 layout();
-if(!window.AppShellReady){const shell=document.createElement('script');shell.src='/tf/shell.js?v=20261026-admin-shell-1';document.head.append(shell);}
+if(!window.AppShellReady){const shell=document.createElement('script');shell.src='/tf/shell.js?v=20261026-message-poll-1';document.head.append(shell);}
 }catch(e){console.error('Backend-Men√º konnte nicht geladen werden',e);}})();

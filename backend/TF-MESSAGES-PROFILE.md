@@ -37,3 +37,7 @@ Die unverändert im Repository abgelegte Datei `static/ctl-logistics-logo.jpg` s
 ## Kurznachrichten zwischen TF und Verwaltung
 
 Das Backend bietet `/admin/messages` über Dashboard und Menü Sonstiges. Alle angemeldeten Sachbearbeiter und Administratoren mit geändertem Initialpasswort können ihr eigenes Postfach nutzen. Die Empfänger sind in TF und Sachbearbeiter gegliedert; angezeigt werden nur Namen. „Alle TF's“ umfasst weiterhin ausschließlich TF. Antworten gehen ausschließlich an den ursprünglichen Absender und unterstützen optionale Anhänge bis 10 MB. Posteingang, Gesendete, Weiterleiten und Löschen funktionieren in beiden Bereichen gleich. Vorhandene Nachrichten bleiben erhalten; es ist keine Datenmigration nötig.
+
+## Automatische Prüfung
+
+TF-Portal und App-Verwaltung prüfen bei geöffneter Anwendung und bestehender Internetverbindung alle 60 Sekunden auf ungelesene Kurznachrichten und aktualisieren Glocke und Zähler. Offline pausiert die Prüfung; beim Wiederverbinden und beim Fokussieren wird sofort geprüft. Nach Netzfehlern bleibt der letzte bekannte Zähler erhalten. Gleichzeitige Prüfungen werden zusammengefasst. Browser können Timer in inaktiven oder suspendierten Tabs verzögern; bei geschlossener Anwendung findet keine Prüfung statt.

@@ -1,0 +1,14 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+class E{constructor(tag){this.tag=tag;this.children=[];}append(...n){this.children.push(...n);}prepend(n){this.children.unshift(n);}setAttribute(){}replaceWith(n){this.replacement=n;}querySelector(){return null;}}
+async function scenario(path){const old=new E('header'),footer=new E('footer'),events={},intervals=new Map(),navigator={onLine:true};let next=0,calls=0,count=0,fail=false,release;
+ const window={addEventListener:(k,f)=>events[k]=f},location={pathname:path};
+ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/tf-shell.js','utf8'),{window,location,navigator,sessionStorage:{getItem:()=> 'backend'},Intl,Date,document:{head:new E('head'),body:new E('body'),createElement:tag=>new E(tag),querySelector:q=>q==='header'?old:footer},setInterval:(fn,ms)=>{assert.equal(ms,60000);intervals.set(++next,fn);return next;},clearInterval:id=>intervals.delete(id),fetch:async url=>{if(url.endsWith('/unread')){calls++;if(release)await new Promise(resolve=>release=resolve);if(fail)throw Error('offline');return {ok:true,json:async()=>({count})};}return {ok:true,json:async()=>({first_name:'Mira',last_name:'Büro',tf_number:'787100',personnel_number:'00123',software:'LokZeitleiste',version:'0.25'})};}});
+ const settle=()=>new Promise(setImmediate);await settle();const bell=path.startsWith('/admin')?old.replacement.children[2].children[0]:old.replacement.children[2];assert.equal(calls,1);assert.equal(intervals.size,1);assert.equal(bell.hidden,true);
+ count=2;await [...intervals.values()][0]();assert.equal(bell.hidden,false);assert.equal(bell.children[1].textContent,'2');
+ navigator.onLine=false;events.offline();assert.equal(intervals.size,0);const before=calls;await window.TfShell.refreshUnread();events.focus();await settle();assert.equal(calls,before);
+ navigator.onLine=true;count=3;events.online();await settle();assert.equal(calls,before+1);assert.equal(bell.children[1].textContent,'3');assert.equal(intervals.size,1);
+ fail=true;await [...intervals.values()][0]();assert.equal(bell.children[1].textContent,'3');fail=false;count=0;await [...intervals.values()][0]();assert.equal(bell.hidden,true);
+ release=true;const running=window.TfShell.refreshUnread();await settle();const pending=calls;const duplicate=window.TfShell.refreshUnread();await settle();assert.equal(calls,pending);release();release=null;await Promise.all([running,duplicate]);
+ events.pagehide();assert.equal(intervals.size,0);events.pageshow();await settle();assert.equal(intervals.size,1);events.pageshow();await settle();assert.equal(intervals.size,1);
+}
+(async()=>{await scenario('/tf');await scenario('/admin/start');console.log('Both portals: 60s polling, offline pause/reconnect, bell updates, network failure recovery, single-flight requests and page restoration passed.');})().catch(e=>{console.error(e);process.exitCode=1;});
