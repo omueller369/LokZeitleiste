@@ -41,3 +41,6 @@ Tfz- und Zugdaten am Desktop nebeneinander; Datum/Zugnummer/DS100 in einer Zeile
 
 ## Tfz-Namen und kompakte Feldgruppen
 Tfz-Auswahl zeigt nur den Namen, technische Auswahl erfolgt weiterhin eindeutig per ID. Felder 4/14 bilden die erste Zweiergruppe, die übrigen Detailfelder folgen darunter. Feld 15 ist nur in der Eingabemaske verborgen, Berechnung/PDF bleiben erhalten. Feld 7 und die halbe Breite belegende Abfrage 16 nebeneinander (mobil darunter). Feld 16 zeigt Wagen 1–3 ohne die Überschriften Arbeitende Tfz/Gesamtzug; die drei gespeicherten Ja/Nein-Geschwindigkeitsangaben bleiben erhalten.
+
+## Reisezugabschnitt der PDF
+Diagonale nur von der unteren linken Ecke des Zeilennummernfeldes 29 zur oberen rechten Ecke der Beschreibung in Zeile 21. Spalte 4 enthält in Zeilen 21–29 festes „nein / ja“, ohne Auswahl. Spalten 5/6 sind in diesem Abschnitt zu einer einzigen leeren Zelle über alle neun Zeilen verbunden. Gilt auch für Bildvorschau.

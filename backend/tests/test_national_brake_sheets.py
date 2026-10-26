@@ -120,3 +120,19 @@ class NationalBrakeTest(unittest.TestCase):
             self.assertEqual(bool(values),enabled)
             if enabled:self.assertIn('Besonderer Hinweis',values);self.assertIn('ja',values)
             self.assertFalse(any(tuple(c.args[1:])==(82,534,196,22) for c in strike.call_args_list))
+
+    def test_passenger_section_diagonal_labels_and_merged_cell(self):
+        from lokzeitleiste.national_brake_sheets import Sheet,calculate
+        from lokzeitleiste.national_brake_image import Drawing,render
+        from sqlalchemy.orm import Session
+        sheet=Sheet(**self.sheet())
+        with Session(self.engine) as db:result=calculate(db,sheet)
+        with patch.object(Drawing,'line',autospec=True) as line,patch.object(Drawing,'text',autospec=True) as text:
+            render(sheet,result,'Test TF')
+        segments=[tuple(c.args[1:5]) for c in line.call_args_list]
+        self.assertIn((62,514,278,397),segments)
+        self.assertNotIn((12,514,408,397),segments)
+        self.assertNotIn((364,397,364,514),segments)
+        for y in range(410,514,13):self.assertNotIn((62,y,408,y),segments);self.assertIn((62,y,320,y),segments)
+        fixed=[c for c in text.call_args_list if c.args[3]=='nein / ja' and 397<=c.args[2]<514]
+        self.assertEqual(len(fixed),9)

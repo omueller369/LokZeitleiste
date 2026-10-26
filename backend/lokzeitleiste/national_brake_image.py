@@ -103,13 +103,13 @@ def render(sheet,result,creator,image=False):
         if s.lower:d.text(x,yy+16,str(s.value)+' km/h',7,maxwidth=36)
         else:d.strike([278,320,364][i],yy+13,[42,44,44][i],17)
     travel_top=end;travel_end=travel_top+117
-    for x in xs:d.line(x,travel_top,x,travel_end)
+    for x in [12,62,82,278,320,408]:d.line(x,travel_top,x,travel_end)
     labels=[(21,'NBÜ/ep-Bremsen an allen Fahrzeugen vorhanden'),(22,'Notbremsüberbrückung wirksam'),(23,'Kennbuchstaben h, z oder ee'),(24,'Kennbuchstaben n oder y'),(25,'TB 0'),(26,''),(27,'o. Zub'),(28,'Kennbuchstaben a'),(29,'')]
     for i,(n,title) in enumerate(labels):
-        yy=travel_top+i*13;d.text(67,yy+3,n,6.5);d.text(86,yy+3,title,6,maxwidth=188);d.line(62,yy+13,right,yy+13)
+        yy=travel_top+i*13;d.text(67,yy+3,n,6.5);d.text(86,yy+3,title,6,maxwidth=188);d.text(281,yy+3,'nein / ja',6.5,maxwidth=36);d.line(62,yy+13,320,yy+13)
     d.text(16,travel_top+7,'Angaben für',6.4,True);d.text(16,travel_top+17,'Reisezüge',6.4,True)
-    # The entire passenger section is struck from bottom-left to top-right.
-    d.line(left,travel_end,right,travel_top,1.2)
+    # Strike only row-number/description cells: lower-left of 29 to upper-right of 21.
+    d.line(62,travel_end,278,travel_top,1.2)
     d.line(left,travel_top,left,travel_end);d.line(right,travel_top,right,travel_end)
     d.line(left,travel_end,right,travel_end,1)
     yy=travel_end
