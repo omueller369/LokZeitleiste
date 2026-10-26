@@ -23,3 +23,6 @@ Update auf dem bestehenden Testserver: `sudo bash install-ctlsoftware-test.sh --
 
 ## Anpassung 26.10.2026
 Bei gemeinsamer Bremsstellung G wird für jedes Tfz der Stammdatenwert G−25 % (abgeschnittene Ganzzahl) benutzt, P/R unverändert. Die Maske beginnt mit genau einer Zugnummer/Betriebsstelle; weitere Paare bleiben optional ergänzbar. Bestehende ausgefüllte Paare werden weiter geladen, keine Datenlöschung. Feld 11 erhält Achszahl/4 als Vorschlag, sofern ganzzahlig und im Bereich 1–50. Manuelle Änderungen werden nicht überschrieben; gespeicherte Werte haben Vorrang. Leere Datenfelder werden in Vorschau und PDF von links unten nach rechts oben durchgestrichen, ausgefüllte Werte (auch Nein) bleiben erhalten.
+
+## Bremsenzahlen 0–300
+Zeilen 8–12 sind optionale Ganzzahlen von 0 bis 300 einschließlich. Zeile 8 ist wieder eingebbar. Null wird gedruckt, nur fehlende Werte werden gestrichen. Feld-11-Vorschläge nutzen ebenfalls den Bereich 0–300; Zeile 14 bleibt unverändert 1–50.

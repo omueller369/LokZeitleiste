@@ -97,9 +97,9 @@ def render(sheet,result,creator,image=False):
     if last:last=f'{last[:2]} {last[2:4]} {last[4:8]} {last[8:11]}-{last[11]}'
     d.text(282,pos[7][0]+5,last,7,maxwidth=122)
     if not last:d.strike(278,pos[7][0],130,pos[7][1])
-    d.strike(278,pos[8][0],42,pos[8][1]);d.strike(320,pos[8][0],88,pos[8][1])
+    d.strike(320,pos[8][0],88,pos[8][1])
     for n in [9,10,11,12,14,15]:d.strike(320,pos[n][0],88,pos[n][1])
-    for n,value in [(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
+    for n,value in [(8,sheet.brakes_single),(9,sheet.brakes_multi),(10,sheet.brakes_d),(11,sheet.brakes_k),(12,sheet.brakes_matrossow),(14,sheet.braked_axles),(15,result['required_axles'])]:d.text(282,pos[n][0]+4,value,7) if value is not None else d.strike(278,pos[n][0],42,pos[n][1])
     for i,s in enumerate(sheet.speeds):
         x=[282,324,368][i];yy=pos[16][0]
         d.text(x,yy+3,'ja' if s.lower else 'nein',7)
