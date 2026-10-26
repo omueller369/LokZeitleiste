@@ -32,14 +32,15 @@ def send_time_change(*, recipient: str, body: str, lang="de"):
     _send_message(message)
 
 
-def _send_message(message: EmailMessage):
+def _send_message(message: EmailMessage, *, recipients=None):
     if not smtp_configured():
         raise RuntimeError("SMTP_HOST, SMTP_FROM und SMTP_SECURITY müssen gesetzt sein")
     host = os.environ["SMTP_HOST"]
     security = os.getenv("SMTP_SECURITY", "ssl")
     port = int(os.getenv("SMTP_PORT", "465" if security == "ssl" else "587"))
     sender = os.environ["SMTP_FROM"]
-    message["From"] = sender
+    if "From" in message:message.replace_header("From",sender)
+    else:message["From"] = sender
     context = ssl.create_default_context()
     if security == "ssl":
         connection = smtplib.SMTP_SSL(host, port, timeout=20, context=context)
@@ -52,4 +53,5 @@ def _send_message(message: EmailMessage):
         password = os.getenv("SMTP_PASSWORD")
         if username and password:
             smtp.login(username, password)
-        smtp.send_message(message)
+        if recipients is None:smtp.send_message(message)
+        else:smtp.send_message(message,to_addrs=recipients)

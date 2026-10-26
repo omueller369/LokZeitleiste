@@ -1614,7 +1614,8 @@
     "PDF gespeichert und E-Mail gesendet.": "PDF gespeichert und E-Mail gesendet.",
     "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.",
     "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.",
-    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen."
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.",
+    "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert."
   },
   "en": {
     "Administration": "Administration",
@@ -3231,7 +3232,8 @@
     "PDF gespeichert und E-Mail gesendet.": "PDF saved and email sent.",
     "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "The driver mailbox is not ready to send. The PDF has been saved.",
     "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Sending has already started. Check sent mail before sending again.",
-    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Email sending failed. Check sent mail before sending again."
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Email sending failed. Check sent mail before sending again.",
+    "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "The administrator mailbox is not ready to send. The PDF has been saved."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4848,7 +4850,8 @@
     "PDF gespeichert und E-Mail gesendet.": "PDF zapisany i e-mail wysłany.",
     "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Skrzynka maszynisty nie jest gotowa do wysyłki. PDF został zapisany.",
     "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Wysyłka została rozpoczęta. Sprawdź pocztę wysłaną przed ponowną wysyłką.",
-    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Wysyłka nie powiodła się. Przed ponowną wysyłką sprawdź pocztę wysłaną."
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Wysyłka nie powiodła się. Przed ponowną wysyłką sprawdź pocztę wysłaną.",
+    "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Skrzynka administratora nie jest gotowa do wysyłki. PDF został zapisany."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6465,7 +6468,8 @@
     "PDF gespeichert und E-Mail gesendet.": "PDF сохранён, письмо отправлено.",
     "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Почтовый ящик машиниста не готов к отправке. PDF сохранён.",
     "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Отправка уже началась. Проверьте исходящие перед повторной отправкой.",
-    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Не удалось отправить письмо. Проверьте исходящие перед повторной отправкой."
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Не удалось отправить письмо. Проверьте исходящие перед повторной отправкой.",
+    "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Почтовый ящик администратора не готов к отправке. PDF сохранён."
   },
   "es": {
     "Administration": "Administración",
@@ -8082,6 +8086,7 @@
     "PDF gespeichert und E-Mail gesendet.": "PDF guardado y correo enviado.",
     "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "El buzón del maquinista no está listo para enviar. El PDF se ha guardado.",
     "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "El envío ya se ha iniciado. Revise los enviados antes de repetirlo.",
-    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Falló el envío del correo. Revise los enviados antes de repetirlo."
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Falló el envío del correo. Revise los enviados antes de repetirlo.",
+    "Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "El buzón del administrador no está listo para enviar. El PDF se ha guardado."
   }
 }

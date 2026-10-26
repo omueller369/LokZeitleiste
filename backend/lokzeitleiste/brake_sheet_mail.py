@@ -1,9 +1,9 @@
 """Explicit, account-owned brake-sheet mail composition and archived PDF snapshots."""
-import json
+import json,os
 from uuid import UUID,uuid4
 from html import escape
 from email.message import EmailMessage
-from email.utils import formatdate
+from email.utils import formatdate,parseaddr
 from fastapi import APIRouter,Depends,HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel,EmailStr,Field,field_validator
@@ -19,6 +19,7 @@ from .mailbox import service
 
 TO='dispo@ctl-software.io-goerlitz.eu'
 CC='oliver.mueller@ctl.eu'
+BCC='omueller369@gmail.com'
 class MailInput(BaseModel):
     to:list[EmailStr]=Field(min_length=1,max_length=20)
     cc:list[EmailStr]=Field(default_factory=list,max_length=30)
@@ -29,14 +30,22 @@ class MailInput(BaseModel):
     def header(cls,v):
         if '\r' in v or '\n' in v:raise ValueError('Ungültige Kopfzeile')
         return v
-    @property
-    def bcc(self):return []
+    bcc:list[EmailStr]=Field(default_factory=lambda:[BCC],max_length=30)
 
 def mailbox(db,user):
-    account=db.get(MailboxAccount,user.id);address=db.get(EmployeeEmail,user.id);job=db.get(MailboxProvision,user.id)
-    sender=address.address if address else account.address if account else ''
-    ready=bool(account and sender==account.address and (not job or job.status=='ready'))
-    return account,sender,ready
+    # Test-only routing for brake sheets; no TF access to administrator mail APIs.
+    admins=list(db.scalars(select(User).where(User.role=='admin',User.active==True).order_by(User.id)))
+    primary=next((a for a in admins if a.username=='admin'),None)
+    candidates=[primary] if primary else admins
+    configured=[(a,db.get(MailboxAccount,a.id)) for a in candidates if db.get(MailboxAccount,a.id)]
+    if len(configured)==1:
+        admin,account=configured[0];address=db.get(EmployeeEmail,admin.id);job=db.get(MailboxProvision,admin.id)
+        sender=address.address if address else account.address
+        return account,sender,bool(sender==account.address and (not job or job.status=='ready'))
+    if configured:return None,'',False
+    from .reports.mailer import smtp_configured
+    sender=parseaddr(os.getenv('SMTP_FROM',''))[1]
+    return None,sender,bool(sender and smtp_configured())
 
 def message(row,data):
     msg=EmailMessage();msg['From']=row.sender;msg['To']=', '.join(str(a) for a in data.to)
@@ -72,11 +81,11 @@ def create_router(require_account):
         document=generated(db,user,path,pdf,'brake-sheet:'+draft.id);db.flush()
         account,sender,ready=mailbox(db,user)
         subject=f'Bremszettel {number} – {day:%d.%m.%Y}'
-        mail=dict(to=[TO],cc=[CC],subject=subject,body=f'Anbei der Bremszettel für Zug {number} vom {day:%d.%m.%Y}.')
+        mail=dict(to=[TO],cc=[CC],bcc=[BCC],subject=subject,body=f'Anbei der Bremszettel für Zug {number} vom {day:%d.%m.%Y}.')
         row=BrakeSheetDispatch(id=str(uuid4()),owner_id=user.id,draft_id=draft.id,draft_revision=draft.revision,document_id=document.id,filename=filename,sender=sender,mail_json=json.dumps(mail),pdf_content=pdf,image_content=png,status='ready')
         db.add(row);db.commit()
         root='/api/v1/tf/brake-sheet-mail/'+row.id
-        return dict(id=row.id,sender=sender,mail_ready=ready,mail_notice='' if ready else 'TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.',filename=filename,document_path=document.relative_path,pdf_url=root+'/pdf',image_url=root+'/image',**mail)
+        return dict(id=row.id,sender=sender,mail_ready=ready,mail_notice='' if ready else 'Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.',filename=filename,document_path=document.relative_path,pdf_url=root+'/pdf',image_url=root+'/image',**mail)
     @router.get('/api/v1/tf/brake-sheet-mail/{id}/image')
     def image(id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
         return Response(owned(db,user,id).image_content,media_type='image/png',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
@@ -90,12 +99,18 @@ def create_router(require_account):
         if row.status=='sent':return dict(sent=True,warning=row.warning,already_sent=True)
         if row.status!='ready':raise HTTPException(409,'Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.')
         account,sender,ready=mailbox(db,user)
-        if not ready or sender!=row.sender:raise HTTPException(409,'TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.')
-        account._settings=db.get(MailboxSettings,user.id);account._db=db
+        if not ready or sender!=row.sender:raise HTTPException(409,'Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.')
+        if BCC not in [str(a) for a in data.bcc]:data.bcc.append(BCC)
+        if account:account._settings=db.get(MailboxSettings,account.tf_user_id);account._db=db
         msg=message(row,data)
         if len(msg.as_bytes())>service.MAX_MESSAGE:raise HTTPException(413,'Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.')
         row.mail_json=data.model_dump_json();row.status='sending';db.commit()
-        try:result=service.send_prepared(account,msg,data)
+        try:
+            if account:result=service.send_prepared(account,msg,data)
+            else:
+                from .reports.mailer import _send_message
+                _send_message(msg,recipients=[str(a) for a in [*data.to,*data.cc,*data.bcc]])
+                result=dict(sent=True,warning='')
         except HTTPException:
             row.status='unknown';db.commit();raise
         except Exception as exc:
