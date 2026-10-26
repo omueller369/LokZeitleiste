@@ -78,6 +78,20 @@ class BrakeSheetTest(unittest.TestCase):
         self.assertEqual(result['a']['length'],39);self.assertEqual(result['total']['length'],49)
         self.assertEqual(result['lines'][0]['length_m'],18.95);self.assertEqual(result['lines'][1]['length_m'],20.001)
 
+    def test_clean_template_has_vector_lines_embedded_fonts_and_polish_text(self):
+        from pypdf import PdfReader
+        from lokzeitleiste.brake_sheet_image import TEMPLATE
+        reader=PdfReader(TEMPLATE.with_suffix('.pdf'))
+        self.assertEqual(len(reader.pages),1)
+        self.assertEqual(len(reader.pages[0].images),0)
+        content=reader.pages[0].extract_text()
+        for label in ['Międzynarodowa','Ländercode','Bremssohlenart','Überprüfungsdatum','zderzakach']:
+            self.assertIn(label,content)
+        self.assertAlmostEqual(float(reader.pages[0].mediabox.width),595.276,places=2)
+        resources=reader.pages[0]['/Resources']['/Font']
+        embedded=[f.get_object().get('/FontDescriptor') for f in resources.values()]
+        self.assertTrue(any(d and d.get_object().get('/FontFile2') for d in embedded))
+
     def test_five_locomotives_and_sixth_is_rejected(self):
         rows=[self.vehicle]
         for n in range(2,6):rows.append(self.create(vehicle_number=f'91 80 6185 {n:03d}-0',length_m='20',weight_kg=100000,axle_count=4,brake_shoe='K'))

@@ -1,4 +1,4 @@
-"""Deterministic raster preview on the supplied scanned international form."""
+"""Deterministic raster preview on the clean bilingual international form template."""
 import io,os
 from decimal import Decimal
 from functools import lru_cache

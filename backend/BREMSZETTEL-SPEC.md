@@ -65,4 +65,8 @@ Eigenes Formular `/tf/bremszettel`, TF-authentifizierte APIs `/api/v1/tf/brake-s
 
 ## Bildvorschau
 
-„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine aus dem Original-PDF extrahierte Rastervorlage positionsgenau. ETCS, der zweite Abschnitt und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; noch kein PDF-Export.
+„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine sauber vektorbasiert nachgezeichnete Vorlage positionsgenau. Die Geometrie entspricht dem hochgeladenen Original. ETCS, der zweite Abschnitt und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; noch kein PDF-Export.
+
+## Qualität der Vorlage
+
+Saubere Vorlage `assets/brake-sheet-template.pdf`: eingebettete Unicode-Schriften, vektorbasierte Tabellen, ohne Scanbild. Produktionsvorschau nutzt die daraus gerenderte PNG-Vorlage (2481 × 3507 Pixel), ohne zusätzliche Laufzeitabhängigkeit. Deutsch-polnische Feldbeschriftungen und bestehende Befüllpositionen bleiben erhalten. Reproduzierbarer Generator `backend/tools/build_brake_template.py`; ReportLab und DejaVu Sans sowie pdftoppm werden nur zum erneuten Erzeugen der Assets benötigt. Das vom Benutzer hochgeladene Original wird nicht überschrieben.
