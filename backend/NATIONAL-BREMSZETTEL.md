@@ -52,3 +52,5 @@ Spalten 5/6 über Zeilen 8–12 als eine leere Zelle sowie über Zeilen 14–15 
 Numerische Datenzellen, Zeilen-/Spaltennummern, letzte Fahrzeugnummer, Geschwindigkeitswerte sowie Zugnummer/Betriebsstelle werden in PDF und PNG horizontal und vertikal innerhalb ihrer Zellen zentriert. PDF nutzt Schriftmetriken, PNG die tatsächlichen Glyphengrenzen. Bei mehreren Zugnummern wird der Datenbereich gleichmäßig in zentrierte Zeilen aufgeteilt. Farben und Streichungen bleiben erhalten.
 
 Zeilen 4–6 sind in Spalte 4 sowie getrennt davon in Spalte 5 jeweils vertikal verbunden. Die vorhandenen Diagonalen durchziehen die zwei verbundenen Zellen; Spalte 6 behält separate zentrierte Werte.
+
+Feld 9 übernimmt ab 27.10.2026 stets Feld 11 (auch 0 oder leer), ist in der Maske schreibgeschützt und wird serverseitig gleichgesetzt. Beim Laden abweichender älterer Entwürfe wird die Anpassung vor dem nächsten PDF-Speichern gesichert.

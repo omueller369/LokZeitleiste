@@ -68,6 +68,7 @@ class Sheet(BaseModel):
         return v
     @model_validator(mode='after')
     def unique(self):
+        self.brakes_multi=self.brakes_k
         if len({v.vehicle_id for v in self.locos})!=len(self.locos):raise ValueError('Tfz wurde doppelt ausgewählt.')
         if not self.extra:self.extra_text=''
         return self

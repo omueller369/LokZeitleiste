@@ -147,3 +147,14 @@ class NationalBrakeTest(unittest.TestCase):
         for y in range(410,514,13):self.assertNotIn((62,y,408,y),segments);self.assertIn((62,y,320,y),segments)
         fixed=[c for c in text.call_args_list if c.args[3]=='nein / ja' and 397<=c.args[2]<514]
         self.assertEqual(len(fixed),9)
+
+    def test_field9_always_matches_field11(self):
+        from lokzeitleiste.national_brake_sheets import Sheet
+        for v in [None,0,7,5000]:
+            sheet=Sheet(brakes_multi=123,brakes_k=v)
+            self.assertEqual(sheet.brakes_multi,v)
+        path=self.base+'/'+str(uuid4())
+        saved=self.driver.put(path,json={'expected_revision':0,'sheet':self.sheet(brakes_multi=20,brakes_k=5)})
+        self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(saved.json()['sheet']['brakes_multi'],5)
+        self.assertEqual(self.driver.get(path).json()['sheet']['brakes_multi'],5)
