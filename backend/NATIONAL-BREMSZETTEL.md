@@ -35,3 +35,6 @@ Zeilen 5/15 nur in der Maske blau und fett. Zeile 6: Zahl rot, sonst schwarz. PD
 
 ## Ausnahmen für leere PDF-Felder
 Zugnummer/Betriebsstelle sowie Zeilen 8–12 und 14–15 in Spalten 5/6 bleiben ohne diagonale Streichung. Zeile 32 bei Nein: kein Text, kein Nein-Vermerk und keine Streichung im Datenbereich. Bei Ja bleiben Text und Ja-Vermerk erhalten. Gilt gleichermaßen für PDF und Bildvorschau.
+
+## Verdichtete Eingabemaske
+Tfz- und Zugdaten am Desktop nebeneinander; Datum/Zugnummer/DS100 in einer Zeile. Mengenfelder auf 9 Zeichen Breite begrenzt. Parametertabelle und Detailfelder nebeneinander auf breiten Bildschirmen, darunter letzte Fahrzeugnummer und Geschwindigkeiten. Güterzugangaben und Erstellung nebeneinander. Kleinere Innenabstände und Schaltflächen; auf mobilen Displays automatische Umbrüche sowie 16px-Schrift und mindestens 40px-Höhe für Eingaben. Berechnungen/PDF bleiben unverändert.
