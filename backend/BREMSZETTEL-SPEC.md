@@ -1,6 +1,6 @@
 # Internationaler Bremszettel DE/PL – abgestimmte Eingabefelder
 
-Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. Bildvorschau auf Originalvorlage vorhanden. PDF-Export ist noch nicht enthalten; zweiter Abschnitt und ETCS bleiben leer. Die Eingabemaske und die bestätigten Berechnungen des ersten Abschnitts sind als Entwurf umgesetzt.
+Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. Bildvorschau auf Originalvorlage vorhanden. Ausgefüllte PDF-Ausgabe und explizites E-Mail-Overlay sind vorhanden; zweiter Abschnitt und ETCS bleiben leer. Die Eingabemaske und die bestätigten Berechnungen des ersten Abschnitts sind als Entwurf umgesetzt.
 
 ## Kopf und Zugdaten
 
@@ -65,8 +65,18 @@ Eigenes Formular `/tf/bremszettel`, TF-authentifizierte APIs `/api/v1/tf/brake-s
 
 ## Bildvorschau
 
-„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine sauber vektorbasiert nachgezeichnete Vorlage positionsgenau. Die Geometrie entspricht dem hochgeladenen Original. ETCS, der zweite Abschnitt und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; noch kein PDF-Export.
+„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine sauber vektorbasiert nachgezeichnete Vorlage positionsgenau. Die Geometrie entspricht dem hochgeladenen Original. ETCS, der zweite Abschnitt und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; PDF-Speicherung und E-Mail-Versand siehe unten.
 
 ## Qualität der Vorlage
 
 Saubere Vorlage `assets/brake-sheet-template.pdf`: eingebettete Unicode-Schriften, vektorbasierte Tabellen, ohne Scanbild. Produktionsvorschau nutzt die daraus gerenderte PNG-Vorlage (2481 × 3507 Pixel), ohne zusätzliche Laufzeitabhängigkeit. Deutsch-polnische Feldbeschriftungen und bestehende Befüllpositionen bleiben erhalten. Reproduzierbarer Generator `backend/tools/build_brake_template.py`; ReportLab und DejaVu Sans sowie pdftoppm werden nur zum erneuten Erzeugen der Assets benötigt. Das vom Benutzer hochgeladene Original wird nicht überschrieben.
+
+## PDF speichern und E-Mail bestätigen
+
+In der Bildvorschau öffnet „Speichern“ ein E-Mail-Overlay und archiviert die ausgefüllte PDF unter `Dokumente/Zugfahrten/Jahr/Monat/Tag/erste-Zugnummer`. Datum ist das Abfahrtsdatum. Dateiname `Bremszettel-Zugnummer-JJJJ-MM-TT.PDF`, Betreff `Bremszettel Zugnummer – TT.MM.JJJJ`. Die erste Zugnummer dient der Ablage; weitere Zugnummern stehen im Dokument. Vektorvorlage plus transparenter befüllter Ebene erhalten scharfe Beschriftungen.
+
+Absender ist ausschließlich das eigene TF-Postfach; Empfänger und CC sind vorbelegt mit `dispo@ctl-software.io-goerlitz.eu` und `oliver.mueller@ctl.eu`, vor „Senden“ änderbar. Die Nachricht enthält die PDF als application/pdf sowie eine CID-Bildvorschau im HTML-Text. Die normale Mailbox-SMTP-/OAuth-/IMAP-Anbindung wird genutzt; keine automatische Sendung beim Speichern oder Abbrechen. Abbrechen behält die archivierte PDF. Fehlendes Postfach blockiert nur den Versand. Anhänge und Mail-Snapshots sind nur für den Eigentümer abrufbar.
+
+Jeder Mailentwurf erhält eine unveränderliche PDF-/Bildkopie. Doppelte Sendeklicks werden serverseitig abgefangen. Nach mehrdeutigen SMTP-Fehlern oder abgebrochener Übertragung erfolgt kein automatischer Wiederholungsversand. Die Ablage verwendet die bestehende sichere Dokumentenverwaltung; vom System erzeugte PDFs sind nicht als eigener Upload löschbar. Namenskollisionen verschiedener Bremszettel werden ohne Überschreiben fremder Dokumente behandelt.
+
+Die frische Testinstallation enthält `dispo` als Alias des bisherigen Postfachs `diso`. Das aktualisierte Installationsskript ergänzt den Alias auf bestehenden Testservern nur, wenn noch kein eigenes `dispo`-Postfach bzw. Alias vorhanden ist und `diso` existiert. Dazu die neue Installationsdatei vor `--update` herunterladen.

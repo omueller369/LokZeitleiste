@@ -1,0 +1,63 @@
+import io,unittest
+from uuid import uuid4
+from unittest.mock import patch
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+from pypdf import PdfReader
+import test_brake_sheets
+from lokzeitleiste.models import User,MailboxAccount,EmployeeEmail,DocumentFile,BrakeSheetDispatch
+from lokzeitleiste.user_directories import user_path
+
+class BrakeSheetMailTest(unittest.TestCase):
+    setUp=test_brake_sheets.BrakeSheetTest.setUp
+    tearDown=test_brake_sheets.BrakeSheetTest.tearDown
+    data=test_brake_sheets.BrakeSheetTest.data
+    create=test_brake_sheets.BrakeSheetTest.create
+    sheet=test_brake_sheets.BrakeSheetTest.sheet
+    base='/api/v1/tf/brake-sheets'
+    def prepare(self,mailbox=True):
+        if mailbox:
+            with Session(self.engine) as db:
+                user=db.scalar(select(User).where(User.username=='787100'))
+                db.add(MailboxAccount(tf_user_id=user.id,address='test.tf@ctl-software.io-goerlitz.eu',username='test.tf@ctl-software.io-goerlitz.eu',password_encrypted='encrypted'))
+                address=db.get(EmployeeEmail,user.id)
+                if address:address.address='test.tf@ctl-software.io-goerlitz.eu'
+                else:db.add(EmployeeEmail(user_id=user.id,address='test.tf@ctl-software.io-goerlitz.eu',managed=True))
+                db.commit()
+        sheet=self.sheet(departure_date='2026-10-26',first_vehicle='918061850012',last_vehicle='918061850053',countries=[dict(country='DE',category='G'),dict(country='PL',category='P'),{},{}],wagon=dict(count=20,length=200,brake=700,weight=1000))
+        id=str(uuid4());saved=self.driver.put(self.base+'/'+id,json={'expected_revision':0,'sheet':sheet});self.assertEqual(saved.status_code,200,saved.text)
+        result=self.driver.post(self.base+'/'+id+'/mail',json={'expected_revision':1});self.assertEqual(result.status_code,200,result.text)
+        return result.json()
+    def payload(self,prepared):return {k:prepared[k] for k in ['to','cc','subject','body']}
+    def test_prepare_archives_pdf_but_does_not_send_and_explicit_send_is_idempotent(self):
+        with patch('lokzeitleiste.brake_sheet_mail.service.send_prepared',return_value={'sent':True,'warning':''}) as smtp:
+            r=self.prepare();self.assertFalse(smtp.called);self.assertTrue(r['mail_ready'])
+            self.assertEqual(r['to'],['dispo@ctl-software.io-goerlitz.eu']);self.assertEqual(r['cc'],['oliver.mueller@ctl.eu'])
+            self.assertEqual(r['sender'],'test.tf@ctl-software.io-goerlitz.eu');self.assertEqual(r['filename'],'Bremszettel-00123-2026-10-26.PDF')
+            self.assertEqual(r['document_path'],'Dokumente/Zugfahrten/2026/10/26/00123/'+r['filename'])
+            with Session(self.engine) as db:
+                user=db.scalar(select(User).where(User.username=='787100'));document=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.relative_path==r['document_path']))
+                self.assertIsNotNone(document);self.assertIsNone(document.uploader_id);self.assertTrue((user_path(user.username,user.role)/r['document_path']).is_file());archived=(user_path(user.username,user.role)/r['document_path']).read_bytes()
+            pdf=self.driver.get(r['pdf_url']);self.assertEqual(pdf.status_code,200);self.assertEqual(len(PdfReader(io.BytesIO(pdf.content)).pages),1);self.assertEqual(archived,pdf.content)
+            self.assertTrue(self.driver.get(r['image_url']).content.startswith(b'\x89PNG'))
+            endpoint='/api/v1/tf/brake-sheet-mail/'+r['id']+'/send';body=self.payload(r);body['body']='<script>Test</script>';body['sender']='spoof@example.com'
+            sent=self.driver.post(endpoint,json=body);self.assertEqual(sent.status_code,200,sent.text);self.assertEqual(smtp.call_count,1)
+            msg=smtp.call_args.args[1];self.assertEqual(msg['From'],r['sender']);self.assertEqual(str(msg['Cc']),'oliver.mueller@ctl.eu')
+            self.assertIn('cid:brake-sheet-preview',msg.get_body(preferencelist=('html',)).get_content());self.assertIn('&lt;script&gt;',msg.get_body(preferencelist=('html',)).get_content())
+            attached=[p for p in msg.walk() if p.get_content_type()=='application/pdf'];self.assertEqual(len(attached),1);self.assertEqual(attached[0].get_filename(),r['filename']);self.assertEqual(attached[0].get_payload(decode=True),pdf.content)
+            inline=[p for p in msg.walk() if p.get_content_type()=='image/png'];self.assertIn(inline[0]['Content-ID'][1:-1],msg.get_body(preferencelist=('html',)).get_content())
+            self.assertEqual(self.driver.post(endpoint,json=body).status_code,200);self.assertEqual(smtp.call_count,1)
+    def test_mail_failure_keeps_archive_and_blocks_ambiguous_retry(self):
+        r=self.prepare();endpoint='/api/v1/tf/brake-sheet-mail/'+r['id']+'/send'
+        with patch('lokzeitleiste.brake_sheet_mail.service.send_prepared',side_effect=HTTPException(502,'SMTP fehlgeschlagen')) as smtp:
+            self.assertEqual(self.driver.post(endpoint,json=self.payload(r)).status_code,502)
+            self.assertEqual(self.driver.post(endpoint,json=self.payload(r)).status_code,409);self.assertEqual(smtp.call_count,1)
+        self.assertEqual(self.driver.get(r['pdf_url']).status_code,200)
+        with Session(self.engine) as db:self.assertEqual(db.get(BrakeSheetDispatch,r['id']).status,'unknown')
+    def test_private_attachments_unconfigured_mailbox_and_no_spoofing(self):
+        r=self.prepare(mailbox=False);self.assertFalse(r['mail_ready']);self.assertEqual(self.client.get(r['pdf_url']).status_code,403)
+        with patch('lokzeitleiste.brake_sheet_mail.service.send_prepared') as smtp:
+            self.assertEqual(self.driver.post('/api/v1/tf/brake-sheet-mail/'+r['id']+'/send',json=self.payload(r)).status_code,409);self.assertFalse(smtp.called)
+        with Session(self.engine) as db:db.get(BrakeSheetDispatch,r['id']).owner_id=999;db.commit()
+        self.assertEqual(self.driver.get(r['pdf_url']).status_code,404);self.assertEqual(self.driver.get(r['image_url']).status_code,404)

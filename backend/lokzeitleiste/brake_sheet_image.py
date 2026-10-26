@@ -20,8 +20,9 @@ def formatted(value):
     if isinstance(value,str):return value
     return format(Decimal(str(value)).normalize(),'f').replace('.',',')
 
-def render(sheet,result,created_at,created_by):
-    with Image.open(TEMPLATE) as source:image=source.convert('RGB')
+def render(sheet,result,created_at,created_by,transparent=False):
+    with Image.open(TEMPLATE) as source:
+        image=Image.new('RGBA',source.size,(255,255,255,0)) if transparent else source.convert('RGB')
     draw=ImageDraw.Draw(image);sx=image.width/1335;sy=image.height/1888
     def box(rect,value,size=18,align='center',minimum=6,valign='center'):
         text=formatted(value)
@@ -96,3 +97,18 @@ def render(sheet,result,created_at,created_by):
     box((269,1751,493,1771),local.strftime('%H:%M'),14)
     box((502,1751,885,1771),created_by,14)
     output=io.BytesIO();image.save(output,format='PNG',optimize=True);return output.getvalue()
+
+
+def render_pdf(sheet,result,created_at,created_by):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from pypdf import PdfReader,PdfWriter
+    overlay=io.BytesIO();document=canvas.Canvas(overlay,pagesize=A4,invariant=1,pageCompression=1)
+    pixels=render(sheet,result,created_at,created_by,transparent=True)
+    document.drawImage(ImageReader(io.BytesIO(pixels)),0,0,width=A4[0],height=A4[1],mask='auto')
+    document.showPage();document.save();overlay.seek(0)
+    source=PdfReader(TEMPLATE.with_suffix('.pdf'));writer=PdfWriter();writer.clone_document_from_reader(source)
+    writer.pages[0].merge_page(PdfReader(overlay).pages[0])
+    writer.add_metadata({'/Title':'Bremszettel '+sheet.train_numbers[0],'/Author':created_by,'/CreationDate':created_at.strftime('D:%Y%m%d%H%M%SZ')})
+    output=io.BytesIO();writer.write(output);return output.getvalue()

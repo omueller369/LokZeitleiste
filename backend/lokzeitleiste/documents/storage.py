@@ -26,7 +26,7 @@ def prepare_tree(user):
     if user.role == 'tf':
         folders = ['Arbeitsberichte/'+today().strftime('%Y/%m/%d'),
                    'Monatsabrechnung/'+today().strftime('%Y/%m'),
-                   'Fahrpläne/Trassen', 'Fahrpläne/FPLO', 'Fahrpläne/Sonstiges']
+                   'Zugfahrten', 'Fahrpläne/Trassen', 'Fahrpläne/FPLO', 'Fahrpläne/Sonstiges']
     else:
         folders = ['Protokolle', 'Sonstiges']
     for folder in ['Dokumente']+['Dokumente/'+p for p in folders]:

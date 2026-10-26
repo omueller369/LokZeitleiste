@@ -807,3 +807,21 @@ class BrakeSheetDraft(Base):
     created_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
     created_by_name:Mapped[str]=mapped_column(String(241),nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
+
+
+class BrakeSheetDispatch(Base):
+    __tablename__='brake_sheet_dispatches'
+    id:Mapped[str]=mapped_column(String(36),primary_key=True)
+    owner_id:Mapped[int]=mapped_column(ForeignKey('users.id'),nullable=False,index=True)
+    draft_id:Mapped[str]=mapped_column(ForeignKey('brake_sheet_drafts.id'),nullable=False)
+    draft_revision:Mapped[int]=mapped_column(Integer,nullable=False)
+    document_id:Mapped[int]=mapped_column(ForeignKey('document_files.id'),nullable=False)
+    filename:Mapped[str]=mapped_column(String(200),nullable=False)
+    sender:Mapped[str]=mapped_column(String(320),nullable=False)
+    mail_json:Mapped[str]=mapped_column(Text,nullable=False)
+    pdf_content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+    image_content:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+    status:Mapped[str]=mapped_column(String(20),nullable=False,default='ready')
+    warning:Mapped[str]=mapped_column(String(1000),nullable=False,default='')
+    created_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
+    sent_at:Mapped[datetime|None]=mapped_column(DateTime,nullable=True)

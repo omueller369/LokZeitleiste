@@ -895,7 +895,7 @@ def prepare_mail():
     text=text.split('# CTL authenticated submission;')[0].rstrip()+postfix_submission()
     write(master,text)
     write('/etc/postfix/ctl-mailboxes',''.join(f'{local}@{DOMAIN} 1\n' for local in MAIL_USERS))
-    write('/etc/postfix/ctl-aliases',f'postmaster@{DOMAIN} info@{DOMAIN}\nabuse@{DOMAIN} info@{DOMAIN}\nroot@{DOMAIN} info@{DOMAIN}\n')
+    write('/etc/postfix/ctl-aliases',f'postmaster@{DOMAIN} info@{DOMAIN}\nabuse@{DOMAIN} info@{DOMAIN}\nroot@{DOMAIN} info@{DOMAIN}\ndispo@{DOMAIN} diso@{DOMAIN}\n')
     write('/etc/postfix/ctl-domains',DOMAIN+' OK\n')
     for table in ('ctl-mailboxes','ctl-aliases','ctl-domains'):run(['postmap','/etc/postfix/'+table])
     write('/etc/opendkim.conf',MARKER+'''Syslog yes
@@ -989,7 +989,19 @@ def update_existing_application(args):
     print('Update abgeschlossen. Sicherung: '+str(backup))
 
 
+def ensure_dispo_alias():
+    aliases=Path('/etc/postfix/ctl-aliases');mailboxes=Path('/etc/postfix/ctl-mailboxes')
+    if not aliases.exists() or not mailboxes.exists():return
+    address='dispo@'+DOMAIN;target='diso@'+DOMAIN
+    existing={line.split()[0] for line in aliases.read_text().splitlines() if line.strip() and not line.lstrip().startswith('#')}
+    boxes={line.split()[0] for line in mailboxes.read_text().splitlines() if line.strip() and not line.lstrip().startswith('#')}
+    if address in existing or address in boxes or target not in boxes:return
+    write(aliases,aliases.read_text().rstrip()+'\n'+address+' '+target+'\n')
+    run(['postmap',str(aliases)]);run(['postfix','reload'])
+
+
 def configure_employee_mail():
+    ensure_dispo_alias()
     source=Path(os.getenv('CTL_SETUP_SOURCE','/opt/ctlsoftware-test-source'))
     script=source/'setup/mailbox_provisioner.py'
     if not script.is_file():raise ValueError('Aktuellen Projektstand mit mailbox_provisioner.py bereitstellen.')

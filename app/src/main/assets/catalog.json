@@ -1605,7 +1605,16 @@
     "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.",
     "Ausgefüllter Bremszettel": "Ausgefüllter Bremszettel",
     "Erstes Fahrzeug": "Erstes Fahrzeug",
-    "Letztes Fahrzeug": "Letztes Fahrzeug"
+    "Letztes Fahrzeug": "Letztes Fahrzeug",
+    "Bremszettel per E-Mail senden": "Bremszettel per E-Mail senden",
+    "Vorschaubild im Nachrichtentext": "Vorschaubild im Nachrichtentext",
+    "PDF gespeichert. E-Mail nicht gesendet.": "PDF gespeichert. E-Mail nicht gesendet.",
+    "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.": "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.",
+    "PDF gespeichert.": "PDF gespeichert.",
+    "PDF gespeichert und E-Mail gesendet.": "PDF gespeichert und E-Mail gesendet.",
+    "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.",
+    "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.",
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen."
   },
   "en": {
     "Administration": "Administration",
@@ -3213,7 +3222,16 @@
     "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "The text does not fit in the form field. Please shorten it.",
     "Ausgefüllter Bremszettel": "Completed brake sheet",
     "Erstes Fahrzeug": "First vehicle",
-    "Letztes Fahrzeug": "Last vehicle"
+    "Letztes Fahrzeug": "Last vehicle",
+    "Bremszettel per E-Mail senden": "Send brake sheet by email",
+    "Vorschaubild im Nachrichtentext": "Preview image in the message body",
+    "PDF gespeichert. E-Mail nicht gesendet.": "PDF saved. Email not sent.",
+    "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.": "PDF saved. Please confirm sending the email.",
+    "PDF gespeichert.": "PDF saved.",
+    "PDF gespeichert und E-Mail gesendet.": "PDF saved and email sent.",
+    "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "The driver mailbox is not ready to send. The PDF has been saved.",
+    "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Sending has already started. Check sent mail before sending again.",
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Email sending failed. Check sent mail before sending again."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4821,7 +4839,16 @@
     "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Tekst nie mieści się w polu formularza. Skróć go.",
     "Ausgefüllter Bremszettel": "Wypełniona karta hamowania",
     "Erstes Fahrzeug": "Pierwszy pojazd",
-    "Letztes Fahrzeug": "Ostatni pojazd"
+    "Letztes Fahrzeug": "Ostatni pojazd",
+    "Bremszettel per E-Mail senden": "Wyślij kartę hamowania e-mailem",
+    "Vorschaubild im Nachrichtentext": "Podgląd w treści wiadomości",
+    "PDF gespeichert. E-Mail nicht gesendet.": "PDF zapisany. E-mail nie został wysłany.",
+    "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.": "PDF zapisany. Potwierdź wysłanie e-maila.",
+    "PDF gespeichert.": "PDF zapisany.",
+    "PDF gespeichert und E-Mail gesendet.": "PDF zapisany i e-mail wysłany.",
+    "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Skrzynka maszynisty nie jest gotowa do wysyłki. PDF został zapisany.",
+    "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Wysyłka została rozpoczęta. Sprawdź pocztę wysłaną przed ponowną wysyłką.",
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Wysyłka nie powiodła się. Przed ponowną wysyłką sprawdź pocztę wysłaną."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6429,7 +6456,16 @@
     "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "Текст не помещается в поле бланка. Сократите его.",
     "Ausgefüllter Bremszettel": "Заполненный тормозной лист",
     "Erstes Fahrzeug": "Первое транспортное средство",
-    "Letztes Fahrzeug": "Последнее транспортное средство"
+    "Letztes Fahrzeug": "Последнее транспортное средство",
+    "Bremszettel per E-Mail senden": "Отправить тормозной лист по электронной почте",
+    "Vorschaubild im Nachrichtentext": "Изображение в тексте сообщения",
+    "PDF gespeichert. E-Mail nicht gesendet.": "PDF сохранён. Письмо не отправлено.",
+    "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.": "PDF сохранён. Подтвердите отправку письма.",
+    "PDF gespeichert.": "PDF сохранён.",
+    "PDF gespeichert und E-Mail gesendet.": "PDF сохранён, письмо отправлено.",
+    "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "Почтовый ящик машиниста не готов к отправке. PDF сохранён.",
+    "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "Отправка уже началась. Проверьте исходящие перед повторной отправкой.",
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Не удалось отправить письмо. Проверьте исходящие перед повторной отправкой."
   },
   "es": {
     "Administration": "Administración",
@@ -8037,6 +8073,15 @@
     "Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.": "El texto no cabe en el campo. Acórtelo.",
     "Ausgefüllter Bremszettel": "Hoja de frenado rellenada",
     "Erstes Fahrzeug": "Primer vehículo",
-    "Letztes Fahrzeug": "Último vehículo"
+    "Letztes Fahrzeug": "Último vehículo",
+    "Bremszettel per E-Mail senden": "Enviar hoja de frenado por correo",
+    "Vorschaubild im Nachrichtentext": "Vista previa en el cuerpo del mensaje",
+    "PDF gespeichert. E-Mail nicht gesendet.": "PDF guardado. Correo no enviado.",
+    "PDF gespeichert. Bitte den E-Mail-Versand bestätigen.": "PDF guardado. Confirme el envío del correo.",
+    "PDF gespeichert.": "PDF guardado.",
+    "PDF gespeichert und E-Mail gesendet.": "PDF guardado y correo enviado.",
+    "TF-Postfach ist noch nicht versandbereit. Die PDF wurde gespeichert.": "El buzón del maquinista no está listo para enviar. El PDF se ha guardado.",
+    "Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.": "El envío ya se ha iniciado. Revise los enviados antes de repetirlo.",
+    "E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.": "Falló el envío del correo. Revise los enviados antes de repetirlo."
   }
 }

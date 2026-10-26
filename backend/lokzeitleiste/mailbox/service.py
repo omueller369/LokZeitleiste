@@ -142,6 +142,10 @@ def send(account, data):
         except ValueError as exc:
             raise HTTPException(422,'Ungültiger Anhang') from exc
         msg.add_attachment(content, maintype='application', subtype='octet-stream', filename=item.name)
+    return send_prepared(account,msg,data)
+
+
+def send_prepared(account,msg,data):
     if len(msg.as_bytes()) > MAX_MESSAGE:
         raise HTTPException(413,'Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.')
     try:
