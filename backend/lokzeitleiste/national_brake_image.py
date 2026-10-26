@@ -82,7 +82,7 @@ def render(sheet,result,creator,image=False):
         if n==5:d.text(86,y+14,'Zeile 2, Sp. 6 × 100 / Zeile 1, Sp. 6',5.7)
         if n==15:d.text(86,y+14,'Zeile 3, Sp. 4 × 9 / 10',6)
         if n==16:d.text(86,y+14,'als gemäß Fahrplanangaben',6.8)
-        y+=h;d.line(62,y,right,y)
+        y+=h;d.line(62,y,320 if n in (8,9,10,11,14) else right,y)
     end=y
     d.line(left,end,right,end,1);d.text(16,139,'Angaben für',6.6,True,maxwidth=43);d.text(16,149,'Reise- und',6.6,True);d.text(16,159,'Güterzüge',6.6,True)
     for n,key in [(1,'weight'),(2,'brake'),(3,'axles'),(13,'length')]:
@@ -109,7 +109,7 @@ def render(sheet,result,creator,image=False):
         yy=travel_top+i*13;d.text(67,yy+3,n,6.5);d.text(86,yy+3,title,6,maxwidth=188);d.text(281,yy+3,'nein / ja',6.5,maxwidth=36);d.line(62,yy+13,320,yy+13)
     d.text(16,travel_top+7,'Angaben für',6.4,True);d.text(16,travel_top+17,'Reisezüge',6.4,True)
     # Strike only row-number/description cells: lower-left of 29 to upper-right of 21.
-    d.line(62,travel_end,278,travel_top,1.2)
+    d.line(62,travel_end,320,travel_top,1.2)
     d.line(left,travel_top,left,travel_end);d.line(right,travel_top,right,travel_end)
     d.line(left,travel_end,right,travel_end,1)
     yy=travel_end

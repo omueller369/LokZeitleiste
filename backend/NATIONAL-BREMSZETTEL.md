@@ -44,3 +44,6 @@ Tfz-Auswahl zeigt nur den Namen, technische Auswahl erfolgt weiterhin eindeutig 
 
 ## Reisezugabschnitt der PDF
 Diagonale nur von der unteren linken Ecke des Zeilennummernfeldes 29 zur oberen rechten Ecke der Beschreibung in Zeile 21. Spalte 4 enthält in Zeilen 21–29 festes „nein / ja“, ohne Auswahl. Spalten 5/6 sind in diesem Abschnitt zu einer einzigen leeren Zelle über alle neun Zeilen verbunden. Gilt auch für Bildvorschau.
+
+## Weitere Zellverbindungen
+Spalten 5/6 über Zeilen 8–12 als eine leere Zelle sowie über Zeilen 14–15 als eine weitere leere Zelle. Trennlinien innerhalb dieser Bereiche entfallen, Wagenzugfelder bleiben getrennt. Reisezug-Diagonale endet jetzt an der oberen rechten Ecke von Spalte 4 in Zeile 21.

@@ -130,7 +130,12 @@ class NationalBrakeTest(unittest.TestCase):
         with patch.object(Drawing,'line',autospec=True) as line,patch.object(Drawing,'text',autospec=True) as text:
             render(sheet,result,'Test TF')
         segments=[tuple(c.args[1:5]) for c in line.call_args_list]
-        self.assertIn((62,514,278,397),segments)
+        self.assertIn((62,514,320,397),segments)
+        self.assertNotIn((62,514,278,397),segments)
+        for y in [257,271,285,299,345]:
+            self.assertIn((62,y,320,y),segments)
+            self.assertNotIn((62,y,408,y),segments)
+        for y in [243,313,329,367]:self.assertIn((62,y,408,y),segments)
         self.assertNotIn((12,514,408,397),segments)
         self.assertNotIn((364,397,364,514),segments)
         for y in range(410,514,13):self.assertNotIn((62,y,408,y),segments);self.assertIn((62,y,320,y),segments)
