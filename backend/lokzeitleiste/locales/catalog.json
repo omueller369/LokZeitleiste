@@ -1526,7 +1526,9 @@
     "Posteingang": "Posteingang",
     "Kurznachrichten": "Kurznachrichten",
     "Sachbearbeiter": "Sachbearbeiter",
-    "App-Verwaltung": "App-Verwaltung"
+    "App-Verwaltung": "App-Verwaltung",
+    "Auch als Pause Hinzuf.": "Auch als Pause Hinzuf.",
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich."
   },
   "en": {
     "Administration": "Administration",
@@ -3055,7 +3057,9 @@
     "Posteingang": "Inbox",
     "Kurznachrichten": "Short messages",
     "Sachbearbeiter": "Office staff",
-    "App-Verwaltung": "App administration"
+    "App-Verwaltung": "App administration",
+    "Auch als Pause Hinzuf.": "Also add as break",
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "An additional break requires another reason and a duration longer than 15 minutes."
   },
   "pl": {
     "Administration": "Administracja",
@@ -4584,7 +4588,9 @@
     "Posteingang": "Skrzynka odbiorcza",
     "Kurznachrichten": "Krótkie wiadomości",
     "Sachbearbeiter": "Pracownicy administracyjni",
-    "App-Verwaltung": "Administracja aplikacji"
+    "App-Verwaltung": "Administracja aplikacji",
+    "Auch als Pause Hinzuf.": "Dodaj także jako przerwę",
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Dodatkowa przerwa wymaga innego powodu i czasu dłuższego niż 15 minut."
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6113,7 +6119,9 @@
     "Posteingang": "Входящие",
     "Kurznachrichten": "Короткие сообщения",
     "Sachbearbeiter": "Административные сотрудники",
-    "App-Verwaltung": "Управление приложением"
+    "App-Verwaltung": "Управление приложением",
+    "Auch als Pause Hinzuf.": "Также добавить как перерыв",
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Дополнительный перерыв возможен при другой причине и длительности более 15 минут."
   },
   "es": {
     "Administration": "Administración",
@@ -7642,6 +7650,8 @@
     "Posteingang": "Bandeja de entrada",
     "Kurznachrichten": "Mensajes cortos",
     "Sachbearbeiter": "Personal administrativo",
-    "App-Verwaltung": "Administración de la aplicación"
+    "App-Verwaltung": "Administración de la aplicación",
+    "Auch als Pause Hinzuf.": "Añadir también como pausa",
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "La pausa adicional requiere otro motivo y una duración superior a 15 minutos."
   }
 }

@@ -27,3 +27,7 @@ sudo bash install-ctlsoftware-test.sh --update
 ```
 
 `init_db` legt `duty_report_drafts` und `duty_report_draft_files` automatisch an. Die bestehenden Tabellen müssen nicht geändert werden. Zugriff ausschließlich über den angemeldeten, freigeschalteten TF; Entwürfe und Belege anderer TF sind nicht abrufbar. Die Entwurfs-API verwendet Eigentümerfilter, Benutzerzeilensperren und Revisionsprüfungen. Die endgültige Übernahme von Bericht und Belegen erfolgt gemeinsam in einer Datenbanktransaktion. Alte Clients ohne Entwurfssicherung bleiben für Berichte ohne Serverentwurf kompatibel; ein bereits gesicherter Entwurf erfordert die passende Revision beim Abschluss.
+
+## Unvollständige Mindestpause
+
+Zwischenspeichern erlaubt eine noch fehlende Mindestpause sowohl lokal als auch im privaten Serverentwurf. Die Pausenregel bleibt unverändert gespeichert. Die endgültige Synchronisation prüft die Mindestpause weiterhin; der Client kann diese Prüfung nicht abschalten. Sonstige Datenprüfungen bleiben erhalten.

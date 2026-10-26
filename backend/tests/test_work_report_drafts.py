@@ -32,6 +32,19 @@ class DraftTest(unittest.TestCase):
         result=self.driver.get(self.base).json();self.assertEqual(result['drafts'],[]);self.assertEqual(result['finalized'][0]['report_id'],final.json()['id'])
         self.assertEqual(self.save(changed,2).status_code,409)
         self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=changed,headers={'X-CTL-Draft-Revision':'2'}).status_code,201)
+    def test_incomplete_pause_is_allowed_only_for_draft(self):
+        data=self.payload();data.update(pause_policy=2,actual_pause=0)
+        saved=self.save(data);self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(saved.json()['report']['actual_pause'],0)
+        self.assertEqual(self.driver.get(self.base).json()['drafts'][0]['report']['pause_policy'],2)
+        final=self.driver.post('/api/v1/tf/work-reports',json={**data,'check_required_pause':False},headers={'X-CTL-Draft-Revision':'1'})
+        self.assertEqual(final.status_code,422,final.text)
+        with Session(self.engine) as db:self.assertEqual(db.scalar(select(func.count()).select_from(DutyReport)),0)
+        data['actual_pause']=30
+        self.assertEqual(self.save(data,1).status_code,200)
+        final=self.driver.post('/api/v1/tf/work-reports',json=data,headers={'X-CTL-Draft-Revision':'2'})
+        self.assertEqual(final.status_code,201,final.text)
+
     def test_private_access_and_receipt_handoff(self):
         data=self.payload();file_key=str(uuid4());self.assertEqual(self.save(data,keys=[file_key]).status_code,200)
         path=self.base+'/'+data['client_id']

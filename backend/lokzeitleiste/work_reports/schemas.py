@@ -1,5 +1,5 @@
 from datetime import datetime,time
-from typing import Literal
+from typing import Literal,ClassVar
 from uuid import UUID
 from pydantic import BaseModel,Field,field_validator,model_validator
 
@@ -126,6 +126,7 @@ class TrainJourneysUpdate(BaseModel):
 
 
 class ReportIn(BaseModel):
+    check_required_pause:ClassVar[bool]=True
     kind:Literal['Sonstige Erfassung','Bereitschaft','Rufbereitschaft','Ausfallschicht','Urlaub','Krank']='Sonstige Erfassung'
     client_id:UUID
     start_at:datetime
@@ -177,5 +178,11 @@ class ReportIn(BaseModel):
         pauses.sort()
         if any(pauses[i][0]<pauses[i-1][1] for i in range(1,len(pauses))):raise ValueError('Dokumentierte Pausen dürfen sich nicht überschneiden.')
         if self.actual_pause+sum(minutes(a,b) for a,b in pauses)>duration:raise ValueError('Dokumentierte Pausen überschreiten die Dienstzeit.')
-        if self.pause_policy==2 and self.kind=='Sonstige Erfassung' and self.actual_pause+sum(minutes(a,b) for a,b in pauses)<required_pause(duration):raise ValueError('Dokumentierte Pause: mindestens '+str(required_pause(duration))+' Minuten erforderlich.')
+        if self.check_required_pause and self.pause_policy==2 and self.kind=='Sonstige Erfassung' and self.actual_pause+sum(minutes(a,b) for a,b in pauses)<required_pause(duration):raise ValueError('Dokumentierte Pause: mindestens '+str(required_pause(duration))+' Minuten erforderlich.')
         return self
+
+
+class DraftReportIn(ReportIn):
+    # Only the draft endpoint relaxes minimum-pause completion. Final reports
+    # always use ReportIn; clients cannot disable this check through payloads.
+    check_required_pause:ClassVar[bool]=False

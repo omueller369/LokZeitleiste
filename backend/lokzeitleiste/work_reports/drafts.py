@@ -10,12 +10,12 @@ from sqlalchemy.exc import IntegrityError
 from ..db import database_session
 from ..models import DutyReportDraft as Draft,DutyReportDraftFile as DraftFile,DutyReport,DutyReceipt,User,now_utc
 from ..tf_portal import driver_dependency
-from .schemas import ReportIn
+from .schemas import DraftReportIn
 from .receipts import MAX_FILE,validate_receipt,recipient
 
 class DraftInput(BaseModel):
     expected_revision:int=Field(ge=0)
-    report:ReportIn
+    report:DraftReportIn
     receipt_keys:list[UUID]=Field(default_factory=list,max_length=20)
 
 def find(db,user,client_id):
