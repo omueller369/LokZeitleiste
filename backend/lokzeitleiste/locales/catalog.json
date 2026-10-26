@@ -1528,7 +1528,8 @@
     "Sachbearbeiter": "Sachbearbeiter",
     "App-Verwaltung": "App-Verwaltung",
     "Auch als Pause Hinzuf.": "Auch als Pause Hinzuf.",
-    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich."
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.",
+    "Bremszettel": "Bremszettel"
   },
   "en": {
     "Administration": "Administration",
@@ -3059,7 +3060,8 @@
     "Sachbearbeiter": "Office staff",
     "App-Verwaltung": "App administration",
     "Auch als Pause Hinzuf.": "Also add as break",
-    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "An additional break requires another reason and a duration longer than 15 minutes."
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "An additional break requires another reason and a duration longer than 15 minutes.",
+    "Bremszettel": "Brake sheet"
   },
   "pl": {
     "Administration": "Administracja",
@@ -4590,7 +4592,8 @@
     "Sachbearbeiter": "Pracownicy administracyjni",
     "App-Verwaltung": "Administracja aplikacji",
     "Auch als Pause Hinzuf.": "Dodaj także jako przerwę",
-    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Dodatkowa przerwa wymaga innego powodu i czasu dłuższego niż 15 minut."
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Dodatkowa przerwa wymaga innego powodu i czasu dłuższego niż 15 minut.",
+    "Bremszettel": "Karta hamowania"
   },
   "ru": {
     "Administration": "Администрирование",
@@ -6121,7 +6124,8 @@
     "Sachbearbeiter": "Административные сотрудники",
     "App-Verwaltung": "Управление приложением",
     "Auch als Pause Hinzuf.": "Также добавить как перерыв",
-    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Дополнительный перерыв возможен при другой причине и длительности более 15 минут."
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "Дополнительный перерыв возможен при другой причине и длительности более 15 минут.",
+    "Bremszettel": "Тормозной лист"
   },
   "es": {
     "Administration": "Administración",
@@ -7652,6 +7656,7 @@
     "Sachbearbeiter": "Personal administrativo",
     "App-Verwaltung": "Administración de la aplicación",
     "Auch als Pause Hinzuf.": "Añadir también como pausa",
-    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "La pausa adicional requiere otro motivo y una duración superior a 15 minutos."
+    "Zusätzliche Pause nur bei einem anderen Grund und mehr als 15 Minuten möglich.": "La pausa adicional requiere otro motivo y una duración superior a 15 minutos.",
+    "Bremszettel": "Hoja de frenado"
   }
 }

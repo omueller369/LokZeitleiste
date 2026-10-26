@@ -27,6 +27,7 @@ def create_router(require_account):
 
     @router.get('/tf')
     @router.get('/tf/arbeitsbericht')
+    @router.get('/tf/bremszettel')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
     @router.get('/tf/bahnhoefe')

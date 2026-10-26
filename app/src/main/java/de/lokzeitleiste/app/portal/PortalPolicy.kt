@@ -13,7 +13,7 @@ class PortalPolicy(base: String) {
         uri.rawUserInfo == null && uri.scheme == root.scheme && uri.host.equals(root.host, true) && port(uri) == port(root)
     }.getOrDefault(false)
     fun asset(path: String): String? = when(path) {
-        "/tf", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
+        "/tf", "/tf/bremszettel", "/tf/arbeitsbericht", "/tf/arbeitsplan", "/tf/bahnhoefe", "/tf/leuna-uebergabeprotokoll" -> "tf-portal.html"
         "/tf/nachrichten" -> "tf-messages.html"
         "/tf/me" -> "tf-profile.html"
         "/tf/shell.js" -> "tf-shell.js"

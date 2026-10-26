@@ -1,6 +1,6 @@
 const el=id=>document.getElementById(id);
 let data=null,generation=0,yearData=null,yearGeneration=0;
-const modules={'/tf/arbeitsbericht':'Arbeitsbericht','/tf/leuna-uebergabeprotokoll':'Leuna Übergabeprotokoll'};
+const modules={'/tf/bremszettel':'Bremszettel','/tf/arbeitsbericht':'Arbeitsbericht','/tf/leuna-uebergabeprotokoll':'Leuna Übergabeprotokoll'};
 async function api(path,options={}){const response=await fetch(path,{credentials:'same-origin',...options});if(response.status===401){location.href='/account';throw Error('Anmeldung erforderlich');}const body=await response.json().catch(()=>({}));if(!response.ok)throw Error(typeof body.detail==='string'?body.detail:'Anfrage fehlgeschlagen ('+response.status+')');return body;}
 function text(tag,value,ignore=false){const node=document.createElement(tag);node.textContent=value;if(ignore)node.setAttribute('data-i18n-ignore','');return node;}
 function clock(minutes){return Math.floor(minutes/60)+':'+String(minutes%60).padStart(2,'0')+' h';}
