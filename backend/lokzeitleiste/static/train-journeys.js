@@ -63,7 +63,7 @@ window.TrainJourneyEditor=class{
   for(const [name,cls] of Object.entries({train_number:'train-number',start_station:'train-start-station',start_at:'train-departure',end_station:'train-end-station',end_at:'train-arrival'}))fields[name].parentElement.classList.add(cls);
   item.autoStart=fields.start_at.value===this.o.bounds().start;item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
-  item.gps=window.GpsRecorder?.mount({userId:this.o.userId,journeyId:item.id,container:item.panel,numberField:fields.train_number,trainNumber:()=>fields.train_number.value,readonly:()=>this.o.readonly(),dutyDay:()=>this.o.bounds().start.slice(0,10),stations:this.o.stations,resolve:this.o.resolve});
+  item.gps=window.GpsRecorder?.mount({userId:this.o.userId,journeyId:item.id,container:item.panel,numberField:fields.train_number,trainNumber:()=>fields.train_number.value,readonly:()=>this.o.readonly(),dutyDay:()=>this.o.bounds().start.slice(0,10),stations:this.o.stations,resolve:this.o.resolve,importStops:rows=>this.importGps(item,rows)});
   for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{if(name==='start_at'){item.autoStart=false;if(item.autoEnd)fields.end_at.value=this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;}if(name==='end_at')item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.gps?.freeze();this.ready(item);this.table(item);this.changed();this.refreshTabs();});}
   item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrt'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.hidden=!REASONS.includes('Pause')||!CAUSES.includes('CTL');item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid train-event-grid';const f=item.eventFields={};
   f.cause=this.select(eventGrid,'Art',CAUSES);
@@ -95,7 +95,7 @@ window.TrainJourneyEditor=class{
  }
  ready(item){const f=item.fields,number=f.train_number.value.trim(),complete=!!(number&&[...number].length<=12&&/^[\p{L}\p{N}]+$/u.test(number)&&f.start_station.value.trim()&&f.end_station.value.trim()&&Number.isFinite(this.o.minute(f.start_at.value))&&this.o.minute(f.end_at.value)>this.o.minute(f.start_at.value));item.form.hidden=!!this.o.viewOnly?.()||!complete;item.eventTable.hidden=!complete;}
  dutyChanged(){if(this.o.readonly())return;const bounds=this.o.bounds(),start=bounds.start;for(const item of this.items){if(item.autoStart){item.fields.start_at.value=start;item.lastStart=start;if(item.autoEnd)item.fields.end_at.value=this.after(start,60);}if(!item.events.length&&!this.pendingEvent(item))this.clearEvent(item);item.gps?.freeze();this.ready(item);this.table(item);}this.changed();}
- activate(id){this.active=id;this.refreshTabs();}
+ activate(id){this.active=id;this.refreshTabs();this.items.find(item=>item.id===id)?.gps?.drawMap();}
  refreshTabs(){this.bar.hidden=!this.items.length;if(this.items.length)this.bar.append(this.o.button);else this.o.container.before(this.o.button);for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
   item.rows.replaceChildren();const f=item.fields,bounds=this.o.bounds();item.tableTitle.textContent=t('Zugnummer')+': '+f.train_number.value;item.tableTitle.setAttribute('data-i18n-ignore','');let previous=bounds.start;const stamp=(value,prior)=>window.ReportTableTime(value,bounds.start,bounds.end,prior);
@@ -117,6 +117,29 @@ window.TrainJourneyEditor=class{
  async header(item){const f=item.fields,number=f.train_number.value.trim();if(!number||[...number].length>12||!/^[\p{L}\p{N}]+$/u.test(number))throw Error('Zugnummer: nur Buchstaben und Zahlen, maximal zwölf Zeichen.');if(!item.header.reportValidity())throw Error('Bitte die Zugdaten vollständig eingeben.');this.checkRange(f.start_at.value,f.end_at.value);await this.resolve(f.start_station);await this.resolve(f.end_station);}
  pendingEvent(item){if(item.editing)return true;return Object.entries(item.eventFields).some(([name,field])=>field.value.trim()!==(item.suggestedTimes?.[name]||''));}
  hasPending(){return this.items.some(item=>this.pendingEvent(item));}
+ async importGps(item,rows){
+  if(this.o.readonly())throw Error('Dieser Arbeitsbericht ist nicht bearbeitbar.');
+  if(this.pendingEvent(item))throw Error('Bitte den aktuellen Zugfahrteintrag zuerst speichern oder abbrechen.');
+  const localTime=ms=>{const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms)),p=Object.fromEntries(parts.map(p=>[p.type,p.value]));return p.year+'-'+p.month+'-'+p.day+'T'+p.hour+':'+p.minute;};
+  const additions=[];
+  for(const row of rows.filter(r=>r.kind==='Halt'&&r.end>r.start)){
+   if(!CAUSES.includes('CTL'))throw Error('Art CTL muss für die GPS-Übernahme aktiv sein.');
+   const reason=row.reason||{};if(!row.station?.code||!reason.reason)throw Error('Für jeden Halt ZMS und Grund wählen und speichern.');
+   if(!REASONS.includes(reason.reason))throw Error('Ein GPS-Grund ist nicht mehr aktiv. Bitte neu auswählen.');
+   const start_at=localTime(row.start),end_at=localTime(row.end);this.checkRange(start_at,end_at);
+   const event={id:this.o.uuid(),station:row.station.code,station_name:row.station.name,reason:reason.reason,reason_label:reason.label||choiceLabel('reason',reason.reason),reason_detail:reason.detail||'',cause:'CTL',cause_label:choiceLabel('cause','CTL'),cause_detail:'',start_at,end_at};
+   if([...item.events,...additions].some(e=>e.start_at===start_at&&e.end_at===end_at&&e.station===event.station&&e.reason===event.reason))continue;
+   if(event.reason==='Pause'&&this.items.flatMap(t=>t.events).concat(additions).some(e=>e.reason==='Pause'&&this.o.minute(start_at)<this.o.minute(e.end_at)&&this.o.minute(end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
+   additions.push(event);
+  }
+  if(item.events.length+additions.length>500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');
+  const endpoints=[['start_station','Start'],['end_station','Ende']].filter(([key,kind])=>!item.fields[key].value&&rows.some(r=>r.kind===kind&&r.station?.code));
+  if(!additions.length&&!endpoints.length){this.o.message('Keine neuen GPS-Standzeiten zum Übernehmen.');return false;}
+  if(!confirm(t('GPS-Standzeiten in die Zugfahrtdetails übernehmen?')+' '+additions.length+' · '+t('Bahnhöfe')+': '+endpoints.length))return false;
+  item.events.push(...additions);item.events.sort((a,b)=>a.start_at.localeCompare(b.start_at));
+  for(const [key,kind]of [['start_station','Start'],['end_station','Ende']]){const station=rows.find(r=>r.kind===kind)?.station;if(station?.code&&!item.fields[key].value){item.fields[key].value=labelStation(station.code,station.name);this.cacheStation(station.code,station.name);}}
+  this.clearEvent(item);this.changed();return true;
+ }
  async validate(){for(const item of this.items){if(this.pendingEvent(item))throw Error('Bitte das Ereignis zuerst eintragen oder die Bearbeitung abbrechen.');await this.header(item);for(const event of item.events)this.checkRange(event.start_at,event.end_at);}this.changed();return this.draft();}
  async insert(item,withPause=false){
   if(this.o.readonly()||!item.form.reportValidity())return;

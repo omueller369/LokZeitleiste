@@ -20,7 +20,7 @@ let nativeRunning=false,nativePoints=[],opened=[];context.window.openActiveGpsRe
 context.window.AndroidPortal={gps:async(method,values)=>{if(method==='start'){nativeRunning=true;if(values.reset)nativePoints=[];return {};}if(method==='stop'){nativeRunning=false;return {};}if(method==='erase'){nativePoints=[];return {};}return {running:nativeRunning,points:nativePoints.filter(point=>point.t>values.after).slice(0,1000)};}};
 (async()=>{
  const field=new Element('input'),container=new Element('div');field.value='123';
- const options={userId:5,journeyId:'00000000-0000-4000-8000-000000000001',container,numberField:field,trainNumber:()=>field.value,readonly:()=>false,stations(){},resolve:async()=>({code:'BBB'})};
+ const options={userId:5,journeyId:'00000000-0000-4000-8000-000000000001',container,numberField:field,trainNumber:()=>field.value,readonly:()=>false,selectStart:async()=>({code:'BBB',name:'Berlin Beispiel'}),stations(){},resolve:async()=>({code:'BBB'})};
  context.window.isSecureContext=false;let recorder=context.window.GpsRecorder.mount(options);await recorder.readyPromise;await recorder.start();assert(nativeRunning);assert(context.window.GpsRecorder.isActive());
  nativePoints.push({t:1792627200000,lat:52,lon:13,accuracy:5,speed:0});await recorder.nativeRead();assert.equal(recorder.record.points.length,1);
  recorder.clear();assert(nativeRunning);nativePoints.push({t:1792627205000,lat:52,lon:13,accuracy:5,speed:0});recorder=context.window.GpsRecorder.mount(options);await recorder.readyPromise;assert(context.window.GpsRecorder.isActive());assert.equal(recorder.record.points.length,2);assert(opened.includes(options.journeyId));const before=opened.length;await recorder.nativeRead();assert.equal(opened.length,before);

@@ -107,3 +107,15 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(legacy.json()['reasons']['s0']['reason'],'sonstiges');revision+=1
         same=self.save(path,expected_revision=revision)[1];self.assertEqual(same.json()['reasons']['s0']['reason'],'sonstiges');revision+=1
         changed=self.save(path,expected_revision=revision,points=points(310))[1];self.assertEqual(changed.json()['reasons'],{})
+
+    def test_nearby_covers_5km_and_start_selection_survives_save(self):
+        elements=[dict(lat=52,lon=13.065,tags={'railway:ref':'BBB'})]
+        with patch('lokzeitleiste.gps.osm_query',return_value=elements) as query:
+            response=self.driver.get('/api/v1/tf/gps/nearby?lat=52&lon=13');self.assertEqual(response.status_code,200,response.text)
+            self.assertEqual(response.json()['radius_m'],5000);self.assertEqual(response.json()['stations'][0]['code'],'BBB')
+            self.assertGreater(response.json()['stations'][0]['distance_m'],4000);self.assertEqual(query.call_args.args[2],6500)
+        path,response=self.save(start_station='BBB');self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['analysis']['rows'][0]['station']['code'],'BBB')
+        self.assertEqual(self.save(path,expected_revision=1,start_station='BBB',points=points(310))[1].json()['analysis']['rows'][0]['station']['code'],'BBB')
+        self.assertEqual(self.save(start_station='INVALID')[1].status_code,422)
+        self.assertEqual(self.client.get('/api/v1/tf/gps/nearby?lat=52&lon=13').status_code,403)

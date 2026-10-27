@@ -4,7 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 from uuid import UUID
 from typing import Annotated
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter,Depends,HTTPException,Query
 from fastapi.responses import FileResponse
 from pydantic import BaseModel,Field,model_validator
 from sqlalchemy import select
@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from .db import database_session
 from .models import User,RailwayStation,TrainGpsRecording,GpsStationCache,now_utc
 from .tf_portal import driver_dependency
-from .gps_analysis import analyse,candidates
+from .gps_analysis import analyse,candidates,distance
 
 _finite=Annotated[float,Field(allow_inf_nan=False)]
 class Point(BaseModel):
@@ -25,6 +25,7 @@ class Point(BaseModel):
 class Recording(BaseModel):
     train_number:str=Field(pattern=r'^[A-Za-z0-9]{1,12}$')
     points:list[Point]=Field(min_length=1,max_length=20000)
+    start_station:str|None=Field(default=None,max_length=10)
     ended:bool=True
     expected_revision:int=Field(default=0,ge=0)
     @model_validator(mode='after')
@@ -48,14 +49,14 @@ class Choices(BaseModel):
 
 _lock=threading.Lock();_last_query=0
 
-def osm_query(lat,lon):
+def osm_query(lat,lon,radius=3500):
     global _last_query
     # One small vicinity query per explicit request; cached for 30 days.
     if not _lock.acquire(blocking=False):raise HTTPException(429,'ZMS-Dienst beschäftigt. Bitte später erneut versuchen.')
     try:
         if time.monotonic()-_last_query<2:raise HTTPException(429,'ZMS-Abfragen bitte mit Abstand wiederholen.')
         _last_query=time.monotonic()
-        query=f'[out:json][timeout:12];nwr(around:3500,{lat:.5f},{lon:.5f})["railway"~"^(station|halt|junction|yard|service_station|crossover|blockpost)$"];out center tags;'
+        query=f'[out:json][timeout:12];nwr(around:{radius},{lat:.5f},{lon:.5f})["railway"~"^(station|halt|junction|yard|service_station|crossover|blockpost)$"];out center tags;'
         request=urllib.request.Request('https://overpass-api.de/api/interpreter',data=urllib.parse.urlencode({'data':query}).encode(),headers={'User-Agent':'LokZeitleiste-GPS-Browsertest/1.0 (+https://github.com/omueller369/LokZeitleiste)','Content-Type':'application/x-www-form-urlencoded'})
         try:
             with urllib.request.urlopen(request,timeout=18) as response:
@@ -67,12 +68,12 @@ def osm_query(lat,lon):
         except Exception as exc:raise HTTPException(503,'ZMS-Daten derzeit nicht verfügbar. GPS bleibt gespeichert.') from exc
     finally:_lock.release()
 
-def station_data(db,lat,lon):
-    cell=f'{round(lat,2):.2f},{round(lon,2):.2f}';cached=db.get(GpsStationCache,cell)
+def station_data(db,lat,lon,nearby=False):
+    cell=('near:' if nearby else '')+f'{round(lat,2):.2f},{round(lon,2):.2f}';cached=db.get(GpsStationCache,cell)
     if cached and cached.updated_at>now_utc()-timedelta(days=30):elements=json.loads(cached.payload_json)
     else:
         # Center on the rounded cell, so cached coverage is identical for every caller.
-        elements=osm_query(round(lat,2),round(lon,2))
+        elements=osm_query(round(lat,2),round(lon,2),6500) if nearby else osm_query(round(lat,2),round(lon,2))
         if not cached:cached=GpsStationCache(cell=cell);db.add(cached)
         cached.payload_json=json.dumps(elements,ensure_ascii=False);cached.updated_at=now_utc()
         try:db.commit()
@@ -108,6 +109,11 @@ def create_router(require_account):
         return dict(payload,revision=row.revision,analysis=result)
     @router.get('/tf/gps.js')
     def script():return FileResponse(Path(__file__).parent/'static'/'gps.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+    @router.get('/api/v1/tf/gps/nearby')
+    def nearby(lat:float=Query(ge=-90,le=90,allow_inf_nan=False),lon:float=Query(ge=-180,le=180,allow_inf_nan=False),user:User=Depends(driver),db:Session=Depends(database_session)):
+        stations=station_data(db,lat,lon,nearby=True)
+        result=[dict(r,distance_m=round(distance(dict(lat=lat,lon=lon),r))) for r in stations if distance(dict(lat=lat,lon=lon),r)<=5000]
+        return dict(radius_m=5000,stations=sorted(result,key=lambda r:r['distance_m']))
     @router.get('/api/v1/tf/gps/{journey_id}')
     def get(journey_id:UUID,user:User=Depends(driver),db:Session=Depends(database_session)):return view(owned(db,user,journey_id))
     @router.put('/api/v1/tf/gps/{journey_id}')
@@ -118,6 +124,10 @@ def create_router(require_account):
         payload=data.model_dump(exclude={'expected_revision'});previous=json.loads(row.payload_json) if row else {}
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
         payload['reasons']=previous.get('reasons',{}) if previous.get('points')==payload['points'] else {}
+        if data.start_station:
+            station=db.get(RailwayStation,data.start_station.strip().upper())
+            if not station:raise HTTPException(422,'Bitte einen gültigen Startbahnhof (DS100) wählen.')
+            payload['start_station']=station.code;payload['stations']['start']=dict(code=station.code,name=station.name)
         if not row:row=TrainGpsRecording(owner_id=user.id,journey_id=str(journey_id),revision=0);db.add(row)
         row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     @router.delete('/api/v1/tf/gps/{journey_id}')
@@ -153,5 +163,7 @@ def create_router(require_account):
             for key,value in sorted(data.reasons.items()):
                 if value.reason:labels[key]=use_value(db,'reason',value.reason,payload.get('reasons',{}).get(key,{}).get('reason')).label
             payload['reasons']={key:dict(value.model_dump(),label=labels[key]) for key,value in data.reasons.items() if value.reason}
-        payload['stations']=selected;row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
+        payload['stations']=selected
+        if selected.get('start'):payload['start_station']=selected['start']['code']
+        row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     return router
