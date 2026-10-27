@@ -15,3 +15,8 @@ Automatisierte API-Tests prüfen Zugriff, PNG-Transparenz, Ersetzen, fehlerhafte
 
 ## Größere Signatur in Feld 40
 PNG wird ohne zusätzlichen Rand exakt auf die Alpha-Zeichnungsgrenzen zugeschnitten. Auch ältere gespeicherte PNGs werden beim Rendern erneut zugeschnitten. Proportionale Skalierung vergrößert kleine Bilder ebenfalls, bis Breite oder Höhe des verfügbaren Bereichs erreicht ist. Rechte Hälfte von Feld 40 wird nahezu über die gesamte Feldhöhe (Formularkoordinaten 1732–1773) genutzt; die Feldbeschriftung ist auf die linke Hälfte begrenzt, um Überschneidungen zu vermeiden. Name bleibt links. Bereits gespeicherte Unterschriften müssen nicht neu gezeichnet werden; PDF erneut speichern.
+
+## Positionsgetreue Formular-Zeichenfläche
+Neu angelegte Unterschriften nutzen den festen Ausschnitt (640,1680)–(940,1830) in Formular-Koordinaten, vergrößert auf 1000×500 Pixel. Private Hintergrund-API `/api/v1/tf/me/signature/background` zeigt Formularränder und die letzten drei Buchstaben des eigenen Namens. Hintergrund liegt ausschließlich als CSS-Bild hinter der transparenten Canvas und wird niemals mitgespeichert.
+
+Upload `capture_mode=field40-v1` erfordert die feste Canvas-Größe. Server berechnet aus den tatsächlichen Alpha-Grenzen die unveränderliche Position und Größe im Formular, speichert nur die zugeschnittene PNG und separat die Geometrie in `user_signature_placements`. Die neue Tabelle wird im üblichen Update angelegt, keine Änderung vorhandener Tabellen nötig. Renderer platziert diese Unterschrift exakt an der erfassten Position, auch außerhalb von Feld 40, ohne automatische Anpassung. Ältere Unterschriften ohne Positionsdaten behalten die bisherige Einpassung, bis sie neu gezeichnet werden.

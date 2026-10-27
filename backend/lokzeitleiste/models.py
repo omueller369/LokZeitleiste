@@ -844,3 +844,8 @@ class UserSignature(Base):
     user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),primary_key=True)
     image_data:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,onupdate=now_utc,nullable=False)
+
+class UserSignaturePlacement(Base):
+    __tablename__='user_signature_placements'
+    user_id:Mapped[int]=mapped_column(ForeignKey('user_signatures.user_id'),primary_key=True)
+    geometry_json:Mapped[str]=mapped_column(Text,nullable=False)

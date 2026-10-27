@@ -20,7 +20,7 @@ def formatted(value):
     if isinstance(value,str):return value
     return format(Decimal(str(value)).normalize(),'f').replace('.',',')
 
-def render(sheet,result,created_at,created_by,transparent=False,signature=None):
+def render(sheet,result,created_at,created_by,transparent=False,signature=None,signature_position=None):
     with Image.open(TEMPLATE) as source:
         image=Image.new('RGBA',source.size,(255,255,255,0)) if transparent else source.convert('RGB')
     draw=ImageDraw.Draw(image);sx=image.width/1335;sy=image.height/1888
@@ -46,7 +46,7 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None):
         else:raise ValueError('Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.')
         top=y1+2 if valign=='top' else y1+(height-len(lines)*step)//2+2
         for line in lines:
-            left=x1+3 if align=='left' else x1+(x2-x1-draw.textlength(line,font=f))/2
+            left=x1+3 if align=='left' else x2-3-draw.textlength(line,font=f) if align=='right' else x1+(x2-x1-draw.textlength(line,font=f))/2
             draw.text((left,top),line,font=f,fill='black',anchor='lt');top+=step
     def cross(x,y):
         x*=sx;y*=sy;d=6*sx
@@ -97,27 +97,32 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None):
     box((269,1751,493,1771),local.strftime('%H:%M'),14)
     if signature:
         # Field 40: printed name left; transparent signature right with a small inset.
-        box((502,1751,698,1771),created_by,14,'left')
+        box((502,1751,698,1771),created_by,14,'right' if signature_position else 'left')
         with Image.open(io.BytesIO(signature)) as source:ink=source.convert('RGBA')
         bounds=ink.getchannel('A').getbbox()
         if bounds:ink=ink.crop(bounds)
-        left,top,right,bottom=[round(v*scale) for v,scale in [(702,sx),(1732,sy),(886,sx),(1773,sy)]]
-        scale=min((right-left)/ink.width,(bottom-top)/ink.height)
-        ink=ink.resize((max(1,round(ink.width*scale)),max(1,round(ink.height*scale))),Image.Resampling.LANCZOS)
-        destination=(right-ink.width,top+(bottom-top-ink.height)//2)
+        if signature_position:
+            x,y,w,h=signature_position
+            ink=ink.resize((max(1,round(w*sx)),max(1,round(h*sy))),Image.Resampling.LANCZOS)
+            destination=(round(x*sx),round(y*sy))
+        else:
+            left,top,right,bottom=[round(v*scale) for v,scale in [(702,sx),(1732,sy),(886,sx),(1773,sy)]]
+            scale=min((right-left)/ink.width,(bottom-top)/ink.height)
+            ink=ink.resize((max(1,round(ink.width*scale)),max(1,round(ink.height*scale))),Image.Resampling.LANCZOS)
+            destination=(right-ink.width,top+(bottom-top-ink.height)//2)
         if image.mode=='RGBA':image.alpha_composite(ink,destination)
         else:image.paste(ink,destination,ink)
     else:box((502,1751,885,1771),created_by,14)
     output=io.BytesIO();image.save(output,format='PNG',optimize=True);return output.getvalue()
 
 
-def render_pdf(sheet,result,created_at,created_by,signature=None):
+def render_pdf(sheet,result,created_at,created_by,signature=None,signature_position=None):
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.utils import ImageReader
     from pypdf import PdfReader,PdfWriter
     overlay=io.BytesIO();document=canvas.Canvas(overlay,pagesize=A4,invariant=1,pageCompression=1)
-    pixels=render(sheet,result,created_at,created_by,transparent=True,signature=signature)
+    pixels=render(sheet,result,created_at,created_by,transparent=True,signature=signature,signature_position=signature_position)
     document.drawImage(ImageReader(io.BytesIO(pixels)),0,0,width=A4[0],height=A4[1],mask='auto')
     document.showPage();document.save();overlay.seek(0)
     source=PdfReader(TEMPLATE.with_suffix('.pdf'));writer=PdfWriter();writer.clone_document_from_reader(source)

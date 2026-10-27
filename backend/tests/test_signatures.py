@@ -72,3 +72,31 @@ class SignatureTest(unittest.TestCase):
         x0,y0,x1,y1=round(702*w/1335),round(1732*h/1888),round(886*w/1335),round(1773*h/1888)
         bounds=signed.getchannel('A').crop((x0,y0,x1,y1)).getbbox();self.assertIsNotNone(bounds)
         self.assertGreaterEqual(bounds[3]-bounds[1],y1-y0-1)
+    def test_positioned_capture_background_geometry_and_exact_pdf_position(self):
+        import json
+        from lokzeitleiste.models import UserSignaturePlacement,User
+        from lokzeitleiste.signatures import VIEWPORT
+        from lokzeitleiste.brake_sheet_image import render
+        from lokzeitleiste.brake_sheets import Sheet,calculate
+        from datetime import datetime
+        from sqlalchemy import select
+        # The ink intentionally crosses field 40's upper/right borders.
+        image=Image.new('RGBA',(1000,500),(0,0,0,0));ImageDraw.Draw(image).rectangle((600,100,899,349),fill='black')
+        raw=io.BytesIO();image.save(raw,format='PNG')
+        guide=self.driver.get(self.base+'/background');self.assertEqual(guide.status_code,200)
+        self.assertEqual(Image.open(io.BytesIO(guide.content)).size,(1000,500))
+        self.assertEqual(self.client.get(self.base+'/background').status_code,403)
+        saved=self.driver.put(self.base,data={'capture_mode':'field40-v1'},files={'file':('sig.png',raw.getvalue(),'image/png')});self.assertEqual(saved.status_code,200,saved.text)
+        ink=Image.open(io.BytesIO(saved.content));self.assertEqual(ink.size,(300,250));self.assertEqual(ink.mode,'RGBA')
+        with Session(self.engine) as db:
+            user=db.scalar(select(User).where(User.username=='787100'));placement=db.get(UserSignaturePlacement,user.id);geometry=json.loads(placement.geometry_json)
+            self.assertEqual(geometry,[820.0,1710.0,90.0,75.0])
+            sheet=Sheet(**self.sheet(departure_date='2026-10-27'));result=calculate(db,sheet)
+        rendered=Image.open(io.BytesIO(render(sheet,result,datetime(2026,10,27),'Mira Beispiel',transparent=True,signature=saved.content,signature_position=geometry)))
+        sx=rendered.width/1335;sy=rendered.height/1888
+        # Signature keeps its captured extents; it is not fitted inside the field.
+        self.assertGreater(rendered.getpixel((round(900*sx),round(1780*sy)))[3],200)
+        self.assertEqual(self.driver.put(self.base,data={'capture_mode':'wrong'},files={'file':('sig.png',raw.getvalue(),'image/png')}).status_code,422)
+        self.assertEqual(self.driver.put(self.base,data={'capture_mode':'field40-v1'},files={'file':('sig.png',sample(),'image/png')}).status_code,422)
+        self.assertEqual(self.driver.put(self.base,files={'file':('sig.png',sample(),'image/png')}).status_code,200)
+        with Session(self.engine) as db:self.assertIsNone(db.get(UserSignaturePlacement,user.id))
