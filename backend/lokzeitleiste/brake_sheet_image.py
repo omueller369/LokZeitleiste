@@ -20,6 +20,17 @@ def formatted(value):
     if isinstance(value,str):return value
     return format(Decimal(str(value)).normalize(),'f').replace('.',',')
 
+def field40_name(image,name):
+    """Identical left-aligned name layout for the drawing guide and final form."""
+    draw=ImageDraw.Draw(image);sx=image.width/1335;sy=image.height/1888;logical=14
+    while logical>6 and draw.textlength(name,font=font(round(logical*sy)))>196*sx-6:logical-=1
+    f=font(round(logical*sy));step=round(logical*sy*1.22)
+    x=round(502*sx)+3;y=round(1751*sy)+(round(1771*sy)-round(1751*sy)-4-step)//2+2
+    draw.text((x,y),name,font=f,fill='black',anchor='lt')
+    tail_width=draw.textlength(name[-3:],font=f)
+    end=x+draw.textlength(name,font=f)
+    return max(502,(end-tail_width)/sx-5)
+
 def render(sheet,result,created_at,created_by,transparent=False,signature=None,signature_position=None):
     with Image.open(TEMPLATE) as source:
         image=Image.new('RGBA',source.size,(255,255,255,0)) if transparent else source.convert('RGB')
@@ -97,7 +108,7 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
     box((269,1751,493,1771),local.strftime('%H:%M'),14)
     if signature:
         # Field 40: printed name left; transparent signature right with a small inset.
-        box((502,1751,698,1771),created_by,14,'right' if signature_position else 'left')
+        field40_name(image,created_by)
         with Image.open(io.BytesIO(signature)) as source:ink=source.convert('RGBA')
         bounds=ink.getchannel('A').getbbox()
         if bounds:ink=ink.crop(bounds)

@@ -100,3 +100,21 @@ class SignatureTest(unittest.TestCase):
         self.assertEqual(self.driver.put(self.base,data={'capture_mode':'field40-v1'},files={'file':('sig.png',sample(),'image/png')}).status_code,422)
         self.assertEqual(self.driver.put(self.base,files={'file':('sig.png',sample(),'image/png')}).status_code,200)
         with Session(self.engine) as db:self.assertIsNone(db.get(UserSignaturePlacement,user.id))
+    def test_left_name_guide_and_v2_capture_match(self):
+        import json
+        from lokzeitleiste.signatures import guide_layout
+        from lokzeitleiste.models import User,UserSignaturePlacement
+        from lokzeitleiste.brake_sheet_image import TEMPLATE,field40_name
+        from sqlalchemy import select
+        with Image.open(TEMPLATE) as source:original=source.convert('RGB')
+        named=original.copy();field40_name(named,'Oliver Müller')
+        box=ImageChops.difference(original,named).getbbox();sx=original.width/1335
+        self.assertLess(box[0],510*sx);self.assertLess(box[2],698*sx)
+        image=Image.new('RGBA',(1000,500),(0,0,0,0));ImageDraw.Draw(image).rectangle((500,200,799,299),fill='black');raw=io.BytesIO();image.save(raw,format='PNG')
+        r=self.driver.put(self.base,data={'capture_mode':'field40-left-v2'},files={'file':('sig.png',raw.getvalue(),'image/png')});self.assertEqual(r.status_code,200,r.text)
+        with Session(self.engine) as db:
+            user=db.scalar(select(User).where(User.username=='787100'));geometry=json.loads(db.get(UserSignaturePlacement,user.id).geometry_json)
+        _,viewport=guide_layout('Mira Beispiel');x0,y0,x1,y1=viewport
+        self.assertAlmostEqual(geometry[0],x0+(x1-x0)*.5);self.assertAlmostEqual(geometry[1],y0+(y1-y0)*.4)
+        self.assertAlmostEqual(geometry[2],(x1-x0)*.3);self.assertAlmostEqual(geometry[3],(y1-y0)*.2)
+        guide=self.driver.get(self.base+'/background?mode=field40-left-v2');self.assertEqual(guide.status_code,200);self.assertEqual(Image.open(io.BytesIO(guide.content)).size,(1000,500))
