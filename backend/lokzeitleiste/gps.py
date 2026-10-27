@@ -138,12 +138,12 @@ def create_router(require_account):
         row=owned(db,user,journey_id);result=view(row)
         # Incremental explicit lookup: one uncached vicinity per click, cached rows together.
         for item in result['analysis']['rows']:
-            cell=f'{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}';cached=db.get(GpsStationCache,cell)
+            cell=f'near:{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}';cached=db.get(GpsStationCache,cell)
             if not cached or cached.updated_at<=now_utc()-timedelta(days=30):
-                station_data(db,item['lat'],item['lon']);break
+                station_data(db,item['lat'],item['lon'],nearby=True);break
         for item in result['analysis']['rows']:
-            cached=db.get(GpsStationCache,f'{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}')
-            item['candidates']=candidates(item,station_data(db,item['lat'],item['lon'])) if cached and cached.updated_at>now_utc()-timedelta(days=30) else []
+            cached=db.get(GpsStationCache,f'near:{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}')
+            item['candidates']=candidates(item,station_data(db,item['lat'],item['lon'],nearby=True)) if cached and cached.updated_at>now_utc()-timedelta(days=30) else []
             item['lookup_pending']=not cached or cached.updated_at<=now_utc()-timedelta(days=30)
         return result
     @router.put('/api/v1/tf/gps/{journey_id}/stations')

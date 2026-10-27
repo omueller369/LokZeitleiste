@@ -35,9 +35,9 @@ class AnalysisTest(unittest.TestCase):
         result=analyse(moving);self.assertEqual(len(result['rows']),2)
         self.assertAlmostEqual(result['rows'][0]['direction'],90,delta=1)
         row=dict(lat=52,lon=13,direction=90)
-        nearby=[dict(code='E',name='Ahead',lat=52,lon=13.01),dict(code='W',name='Behind',lat=52,lon=12.99),dict(code='F',name='Far',lat=52,lon=14)]
-        self.assertEqual([r['code'] for r in candidates(row,nearby)],['E'])
-        self.assertEqual(len(candidates({**row,'direction':None},nearby)),2)
+        nearby=[dict(code='E',name='Ahead',lat=52,lon=13.01),dict(code='W',name='Behind',lat=52,lon=12.995),dict(code='F',name='Far',lat=52,lon=14)]
+        self.assertEqual([r['code'] for r in candidates(row,nearby)],['W'])
+        self.assertEqual(len(candidates({**row,'direction':None},nearby)),1)
 
 class RecordingTest(unittest.TestCase):
     setUp=StationDirectoryTest.setUp
@@ -119,3 +119,11 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(self.save(path,expected_revision=1,start_station='BBB',points=points(310))[1].json()['analysis']['rows'][0]['station']['code'],'BBB')
         self.assertEqual(self.save(start_station='INVALID')[1].status_code,422)
         self.assertEqual(self.client.get('/api/v1/tf/gps/nearby?lat=52&lon=13').status_code,403)
+
+    def test_stop_proposes_nearest_station_within_5km_without_heading(self):
+        path,response=self.save();elements=[dict(lat=52,lon=13.065,tags={'railway:ref':'BBB'})]
+        with patch('lokzeitleiste.gps.osm_query',return_value=elements) as query:
+            result=self.driver.post(path+'/stations');self.assertEqual(result.status_code,200,result.text)
+            station=result.json()['analysis']['rows'][0]['candidates'][0]
+            self.assertEqual(station['code'],'BBB');self.assertGreater(station['distance_m'],4000)
+            self.assertEqual(query.call_args.args[2],6500)

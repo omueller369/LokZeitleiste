@@ -13,3 +13,6 @@ Im TF-Portal Arbeitsbericht → Zugfahrt nach Eingabe einer Zugnummer. Die Schal
 Keine neue Datenbanktabelle oder kostenpflichtige API. Neue API `/api/v1/tf/gps/nearby?lat=…&lon=…` ist TF-geschützt. Bestätigter Startbahnhof wird innerhalb des vorhandenen GPS-Payloads serverseitig validiert und gespeichert. Name kommt aus dem eigenen Bahnhofskatalog, nicht aus fremden OSM-Texten.
 
 Automatisierte Tests: 5-km-Abdeckung, Cache-Radius, Startzuordnung, Zugriffsschutz, Browser-/Android-Lebenszyklus, tatsächlicher Auswahl- und Hilfe-Dialog im DOM-Harness, Kartenlayer/Verlauf, Ereignisübernahme mit Berlin-Zeit, Deduplizierung und Validierung. Keine reale GPS-Fahrt und kein Mobilgerät getestet; nach Update mit freigegebenem Standort prüfen. Android-Quellen verwenden dieselben Portaldateien; kein APK gebaut.
+
+## Nächstgelegene ZMS ohne Fahrtrichtung
+Für GPS-Standorte wird ausschließlich die räumlich nächste bekannte ZMS bis maximal 5 km Entfernung vorgeschlagen. Fahrtrichtung ist kein Filter oder Sortierkriterium mehr. Vorschläge verwenden den gesonderten 6,5-km-Abfragecache, damit ältere kleinere Cachebereiche die 5-km-Suche nicht einschränken. Die bestätigte Startbahnhofsauswahl bleibt erhalten.

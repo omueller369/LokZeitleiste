@@ -45,7 +45,6 @@ def candidates(row,stations):
     result=[]
     for station in stations:
         meters=distance(row,station)
-        angle=abs((bearing(row,station)-(row['direction'] or 0)+180)%360-180)
-        if meters<=2000 and (meters<=100 or row['direction'] is None or angle<=90):
+        if meters<=5000:
             result.append(dict(station,distance_m=round(meters),direction_known=row['direction'] is not None))
-    return sorted(result,key=lambda r:r['distance_m'])[:5]
+    return sorted(result,key=lambda r:distance(row,r))[:1]
