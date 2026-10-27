@@ -21,7 +21,7 @@ class SignatureTest(unittest.TestCase):
     def test_private_transparent_replace_and_validation(self):
         self.assertEqual(self.driver.get(self.base).status_code,404)
         first=self.driver.put(self.base,files={'file':('sig.png',sample(True),'image/png')});self.assertEqual(first.status_code,200,first.text)
-        im=Image.open(io.BytesIO(first.content));self.assertEqual(im.mode,'RGBA');self.assertEqual(im.getpixel((0,0))[3],0);self.assertIsNotNone(im.getchannel('A').getbbox());self.assertIn('no-store',first.headers['cache-control'])
+        im=Image.open(io.BytesIO(first.content));self.assertEqual(im.mode,'RGBA');self.assertEqual(im.getpixel((0,0))[3],0);self.assertEqual(im.getchannel('A').getbbox(),(0,0,im.width,im.height));self.assertIn('no-store',first.headers['cache-control'])
         second=self.driver.put(self.base,files={'file':('sig.png',sample(variant=True),'image/png')});self.assertEqual(second.status_code,200);self.assertNotEqual(first.content,second.content)
         self.assertEqual(self.driver.get(self.base).content,second.content)
         self.assertEqual(self.client.get(self.base).status_code,403)
@@ -44,7 +44,7 @@ class SignatureTest(unittest.TestCase):
         signed=Image.open(io.BytesIO(render(sheet,r,datetime(2026,10,27,10),'Test TF',signature=signature))).convert('RGB')
         bounds=ImageChops.difference(normal,signed).getbbox();self.assertIsNotNone(bounds)
         sx=normal.width/1335;sy=normal.height/1888
-        self.assertGreaterEqual(bounds[0],int(502*sx));self.assertLessEqual(bounds[2],round(885*sx));self.assertGreaterEqual(bounds[1],int(1751*sy));self.assertLessEqual(bounds[3],round(1771*sy))
+        self.assertGreaterEqual(bounds[0],int(502*sx));self.assertLessEqual(bounds[2],round(889*sx));self.assertGreaterEqual(bounds[1],int(1730*sy));self.assertLessEqual(bounds[3],round(1775*sy))
         path='/api/v1/tf/brake-sheets/'+str(uuid4());self.assertEqual(self.driver.put(path,json={'expected_revision':0,'sheet':sheet.model_dump(mode='json')}).status_code,200)
         with patch('lokzeitleiste.brake_sheet_image.render',wraps=render) as renderer:
             self.assertEqual(self.driver.post(path+'/preview',json={'expected_revision':1}).status_code,200)
@@ -55,3 +55,20 @@ class SignatureTest(unittest.TestCase):
         with patch('lokzeitleiste.brake_sheet_mail.render',return_value=b'PNG') as png,patch('lokzeitleiste.brake_sheet_mail.render_pdf',return_value=b'%PDF-test') as pdf:
             self.assertEqual(self.driver.post(path+'/mail',json={'expected_revision':1}).status_code,200)
             self.assertEqual(png.call_args.kwargs['signature'],signature);self.assertEqual(pdf.call_args.kwargs['signature'],signature)
+
+    def test_render_trims_legacy_margins_and_enlarges_small_signature(self):
+        from lokzeitleiste.signatures import normalize
+        from lokzeitleiste.brake_sheet_image import render,TEMPLATE
+        from lokzeitleiste.brake_sheets import Sheet,calculate
+        from datetime import datetime
+        from sqlalchemy.orm import Session
+        image=Image.new('RGBA',(1000,500),(0,0,0,0));ImageDraw.Draw(image).rectangle((490,245,509,254),fill='black')
+        raw=io.BytesIO();image.save(raw,format='PNG')
+        trimmed=Image.open(io.BytesIO(normalize(raw.getvalue())));self.assertEqual(trimmed.size,(20,10))
+        sheet=Sheet(**self.sheet(departure_date='2026-10-27'))
+        with Session(self.engine) as db:result=calculate(db,sheet)
+        with Image.open(TEMPLATE) as source:w,h=source.size
+        signed=Image.open(io.BytesIO(render(sheet,result,datetime(2026,10,27),'Test TF',transparent=True,signature=raw.getvalue()))).convert('RGBA')
+        x0,y0,x1,y1=round(702*w/1335),round(1732*h/1888),round(886*w/1335),round(1773*h/1888)
+        bounds=signed.getchannel('A').crop((x0,y0,x1,y1)).getbbox();self.assertIsNotNone(bounds)
+        self.assertGreaterEqual(bounds[3]-bounds[1],y1-y0-1)

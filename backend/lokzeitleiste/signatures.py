@@ -24,8 +24,7 @@ def normalize(content):
     bounds=alpha.getbbox()
     if not bounds:raise HTTPException(422,'Bitte zuerst eine Unterschrift zeichnen.')
     ink=Image.new('RGBA',image.size,(0,0,0,0));ink.putalpha(alpha);ink=ink.crop(bounds)
-    padded=Image.new('RGBA',(ink.width+8,ink.height+8),(0,0,0,0));padded.alpha_composite(ink,(4,4))
-    output=io.BytesIO();padded.save(output,format='PNG',optimize=True);return output.getvalue()
+    output=io.BytesIO();ink.save(output,format='PNG',optimize=True);return output.getvalue()
 
 def signature_for(db,user):
     row=db.get(UserSignature,user.id)

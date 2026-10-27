@@ -97,10 +97,13 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None):
     box((269,1751,493,1771),local.strftime('%H:%M'),14)
     if signature:
         # Field 40: printed name left; transparent signature right with a small inset.
-        box((502,1751,702,1771),created_by,14,'left')
+        box((502,1751,698,1771),created_by,14,'left')
         with Image.open(io.BytesIO(signature)) as source:ink=source.convert('RGBA')
-        left,top,right,bottom=[round(v*scale) for v,scale in [(706,sx),(1753,sy),(882,sx),(1769,sy)]]
-        ink.thumbnail((right-left,bottom-top),Image.Resampling.LANCZOS)
+        bounds=ink.getchannel('A').getbbox()
+        if bounds:ink=ink.crop(bounds)
+        left,top,right,bottom=[round(v*scale) for v,scale in [(702,sx),(1732,sy),(886,sx),(1773,sy)]]
+        scale=min((right-left)/ink.width,(bottom-top)/ink.height)
+        ink=ink.resize((max(1,round(ink.width*scale)),max(1,round(ink.height*scale))),Image.Resampling.LANCZOS)
         destination=(right-ink.width,top+(bottom-top-ink.height)//2)
         if image.mode=='RGBA':image.alpha_composite(ink,destination)
         else:image.paste(ink,destination,ink)
