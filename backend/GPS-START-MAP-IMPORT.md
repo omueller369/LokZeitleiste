@@ -16,3 +16,10 @@ Automatisierte Tests: 5-km-Abdeckung, Cache-Radius, Startzuordnung, Zugriffsschu
 
 ## Nächstgelegene ZMS ohne Fahrtrichtung
 Für GPS-Standorte wird ausschließlich die räumlich nächste bekannte ZMS bis maximal 5 km Entfernung vorgeschlagen. Fahrtrichtung ist kein Filter oder Sortierkriterium mehr. Vorschläge verwenden den gesonderten 6,5-km-Abfragecache, damit ältere kleinere Cachebereiche die 5-km-Suche nicht einschränken. Die bestätigte Startbahnhofsauswahl bleibt erhalten.
+
+## Mitlaufende Karte und Zoom
+Aktive Aufzeichnung: Nachführung bei jedem neuen ausreichend genauen GPS-Punkt (Browser/Android), gewählter Zoom bleibt erhalten. +/− zoomen, Zwei-Finger-Geste zoomt um den Gestenmittelpunkt, ein Finger verschiebt. Verschieben/Pinch schalten in freie Ansicht; „Position folgen“ reaktiviert die Nachführung. „Gesamter Verlauf“ passt die Ansicht an alle Punkte an. Zoomstufen 2–19.
+
+OpenRailwayMap-Standardebene ist über der OSM-Grundkarte eingeblendet und mit „Bahnkarte“ schaltbar. Bei Ladefehlern wird sie bis zur erneuten manuellen Aktivierung deaktiviert, Grundkarte und Verlauf bleiben erhalten. Attribution sichtbar, Browsercache und nur sichtbarer Kartenausschnitt; kein Prefetch. Alternative eigene Bahnkacheln mit `window.GpsRailTileUrl`. Öffentlicher ORM-Dienst nur für kleine Entwicklungstests: gewerbliche/zugangsbeschränkte Daueranwendungen benötigen eine eigene bzw. entsprechend freigegebene Instanz. Bedingungen: https://wiki.openstreetmap.org/wiki/OpenRailwayMap/API. Keine Serverinstallation oder API-Schlüssel für den Test erforderlich.
+
+Pointer-/DOM-Tests prüfen Nachführung, Zoomerhalt, Pinch, freie Ansicht, Gesamtansicht, Zoomgrenzen, Layerausfall und Vermeidung von Kachelanfragen bei unsichtbarem Tab. Tatsächliche Touchbedienung und externe Kachelverfügbarkeit auf Mobilgeräten nach dem Update prüfen.
