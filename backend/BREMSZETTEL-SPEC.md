@@ -93,3 +93,11 @@ TF-Dashboard: kompakte Kacheln in vier Spalten, bei kleiner Breite drei, auf Mob
 
 ## Fettschrift für internationale Formularwerte
 Alle eingetragenen und berechneten Werte werden in Bildvorschau und PDF fett ausgegeben (DejaVu Sans Bold, Ersatzschrift Vera Bold). Vorlagenbeschriftung und Feldgeometrie bleiben erhalten. Der gemeinsame Renderer passt die Texte weiterhin an die vorhandenen Felder an.
+
+### Bahnhofsnamen in Vorschau und PDF
+Im internationalen Bremszettel werden die Felder 4a/4b und 16a/16b nur mit dem
+Bahnhofsnamen ausgegeben. Bei einer Auswahl `DS100 · Bahnhofsname` entfällt das
+DS100-Präfix ausschließlich bei der Ausgabe; Suchfunktion und gespeicherte
+Auswahl bleiben erhalten. Manuell eingegebene Namen (z. B. in Polen) bleiben
+unverändert. Bereits archivierte PDF-Dateien werden dadurch nicht überschrieben;
+eine neu erzeugte Vorschau oder PDF verwendet die neue Darstellung.

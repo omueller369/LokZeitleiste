@@ -1,5 +1,5 @@
 """Deterministic raster preview on the clean bilingual international form template."""
-import io,os
+import io,os,re
 from decimal import Decimal
 from functools import lru_cache
 from pathlib import Path
@@ -19,6 +19,12 @@ def formatted(value):
     if value is None:return ''
     if isinstance(value,str):return value
     return format(Decimal(str(value)).normalize(),'f').replace('.',',')
+
+def station_name(value):
+    """Hide the DS100 prefix in output, retaining manually entered station names."""
+    text=value.strip()
+    match=re.fullmatch(r'[A-Za-z0-9]{1,10}\s*·\s*(.+)',text)
+    return match.group(1).strip() if match else text
 
 def field40_name(image,name):
     """Identical left-aligned name layout for the drawing guide and final form."""
@@ -69,8 +75,8 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
     box((12,157,203,182),sheet.issuer)
     box((210,157,380,183),' / '.join(n for n in sheet.train_numbers if n),16)
     box((387,157,619,182),date)
-    box((12,210,316,236),sheet.station_from,15)
-    box((323,210,619,236),sheet.station_to,15)
+    box((12,210,316,236),station_name(sheet.station_from),15)
+    box((323,210,619,236),station_name(sheet.station_to),15)
     columns=[(806,966),(973,1051),(1059,1129),(1138,1206)]
     for country,(left,right) in zip(sheet.countries,columns):
         if not country.country:continue
@@ -82,8 +88,8 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
     box((590,303,1295,591),sheet.special,17,'left',valign='top')
     for active,y in [(sheet.dangerous,619),(sheet.exceptional,649),(sheet.restrictions,697),(sheet.waste,768)]:
         if active:cross(27,y)
-    box((381,627,598,654),sheet.station_from,14)
-    box((607,627,833,654),sheet.station_to,14)
+    box((381,627,598,654),station_name(sheet.station_from),14)
+    box((607,627,833,654),station_name(sheet.station_to),14)
     def vehicle(number):return f'{number[:2]} {number[2:4]} {number[4:8]} {number[8:11]}-{number[11:]}'
     box((382,701,598,732),vehicle(sheet.first_vehicle),15)
     box((608,701,833,732),vehicle(sheet.last_vehicle),15)

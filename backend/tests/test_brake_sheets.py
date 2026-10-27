@@ -21,6 +21,28 @@ class BrakeSheetTest(unittest.TestCase):
     def sheet(self,**changes):
         data=dict(issuer='CTL DE',train_numbers=['00123','98765'],brake_mode='G',station_from='BHF · Berlin',station_to='Warszawa',class_de='D4',class_pl='C',locos=[dict(vehicle_id=self.vehicle['id'],vehicle_revision=1,note='Test')],required_percent=130)
         return dict(data,**changes)
+    def test_station_names_without_ds100_in_rendered_output(self):
+        from datetime import datetime
+        from unittest.mock import patch
+        from PIL import ImageDraw
+        from lokzeitleiste.brake_sheet_image import station_name,render
+        from lokzeitleiste.brake_sheets import Sheet
+        self.assertEqual(station_name('BHF · Berlin Hauptbahnhof'),'Berlin Hauptbahnhof')
+        self.assertEqual(station_name('Warszawa Centralna'),'Warszawa Centralna')
+        self.assertEqual(station_name('Frankfurt (Oder)'),'Frankfurt (Oder)')
+        data=self.sheet(departure_date='2026-10-27',station_from='BHF · Berlin',station_to='WAW · Warszawa')
+        result=self.driver.post(self.base+'/calculate',json=data).json()
+        texts=[];original=ImageDraw.ImageDraw.text
+        def capture(draw,xy,text,*args,**kwargs):
+            texts.append(text)
+            return original(draw,xy,text,*args,**kwargs)
+        with patch.object(ImageDraw.ImageDraw,'text',capture):
+            render(Sheet(**data),result,datetime(2026,10,27,12),'Test Tf')
+        self.assertEqual(texts.count('Berlin'),2)
+        self.assertEqual(texts.count('Warszawa'),2)
+        self.assertFalse(any('BHF' in text or 'WAW' in text for text in texts))
+        self.assertEqual(data['station_from'],'BHF · Berlin')
+
     def test_calculation_unit_conversion_floor_and_negative_only(self):
         response=self.driver.post(self.base+'/calculate',json=self.sheet());self.assertEqual(response.status_code,200,response.text)
         r=response.json();self.assertEqual(Decimal(str(r['a']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['weight'])),Decimal('84.5'));self.assertEqual(Decimal(str(r['total']['length'])),Decimal('19'));self.assertEqual(r['total']['count'],1)
