@@ -25,6 +25,8 @@ class PortalPolicy(base: String) {
         "/tf/shell.js" -> "tf-shell.js"
         "/tf/shell.css" -> "tf-shell.css"
         "/tf/profile.js" -> "tf-profile.js"
+        "/tf/signature.js" -> "tf-signature.js"
+        "/tf/signature.css" -> "tf-signature.css"
         "/tf/messages.js" -> "tf-messages.js"
         "/tf/ctl-logistics-logo.jpg" -> "ctl-logistics-logo.jpg"
         "/tf/lokuebergabebuch", "/tf/loco-handover" -> "loco-handover.html"

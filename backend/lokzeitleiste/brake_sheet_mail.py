@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from .db import database_session
 from .models import BrakeSheetDraft,BrakeSheetDispatch,MailboxAccount,MailboxSettings,MailboxProvision,EmployeeEmail,User,now_utc
 from .tf_portal import driver_dependency
+from .signatures import signature_for
 from .brake_sheets import Sheet,PreviewRequest,calculate
 from .brake_sheet_image import render,render_pdf
 from .documents.storage import generated
@@ -72,8 +73,8 @@ def create_router(require_account):
         sheet=Sheet.model_validate_json(draft.payload_json);result=calculate(db,sheet)
         if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
         try:
-            png=render(sheet,result,draft.created_at,draft.created_by_name)
-            pdf=render_pdf(sheet,result,draft.created_at,draft.created_by_name)
+            png=render(sheet,result,draft.created_at,draft.created_by_name,signature=signature_for(db,user))
+            pdf=render_pdf(sheet,result,draft.created_at,draft.created_by_name,signature=signature_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
         filename=f'Bremszettel-{number}-{day.isoformat()}.PDF'

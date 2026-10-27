@@ -838,3 +838,9 @@ class NationalBrakeSheetDraft(Base):
     created_by_name:Mapped[str]=mapped_column(String(241),nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime,nullable=False,default=now_utc)
 
+
+class UserSignature(Base):
+    __tablename__='user_signatures'
+    user_id:Mapped[int]=mapped_column(ForeignKey('users.id'),primary_key=True)
+    image_data:Mapped[bytes]=mapped_column(LargeBinary().with_variant(LONGBLOB(),'mysql'),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime,default=now_utc,onupdate=now_utc,nullable=False)

@@ -1,0 +1,14 @@
+# Persönliche TF-Unterschrift
+
+Unter `/tf/me` („Mein Konto“) gibt es die kleine Vorschau und „Unterschrift hinzufügen“. Das Overlay öffnet eine leere hellgraue Canvas-Fläche; Hintergrund wird nicht in die PNG gezeichnet. Finger, Stift und Maus verwenden Pointer Events mit Koordinatenumrechnung und Pointer Capture. Die Seite scrollt während des Zeichnens innerhalb der Fläche nicht.
+
+- Speichern ersetzt die eigene gespeicherte Unterschrift; die alte bleibt bei Abbruch/Fehler erhalten.
+- Löschen leert die aktuelle Zeichenfläche. Es löscht nicht die bislang gespeicherte Unterschrift.
+- Abbrechen, X links oben und Escape verhalten sich gleich. Bei ungespeicherter Zeichnung erscheint das zweite Overlay mit „Nicht verwerfen“ / „Verwerfen“.
+- Leere Zeichnungen werden abgewiesen. Fehlgeschlagene Übertragung erhält die Zeichnung zum erneuten Speichern.
+
+Private TF-Endpunkte: GET/PUT `/api/v1/tf/me/signature`. Keine Benutzer-ID im Request, ausschließlich eigene Daten nach abgeschlossenem Initialpasswortwechsel. Maximal 1 MiB PNG und 2 Mio. Pixel; Reencoding entfernt Metadaten, weiße Bildteile werden transparent. Schwarz/Alpha-PNG wird eng zugeschnitten und mit transparentem Rand gespeichert. Neue Tabelle `user_signatures` wird durch normales `init_db` bei Update/Neuinstallation angelegt. Kein Dateiupload in öffentliches Verzeichnis, keine lokale persistente Browserkopie; Cache-Control no-store, Android-API-Cache ausgeschlossen.
+
+Internationaler Bremszettel: Bei Vorschau, reiner PDF-Ablage und Mailvorbereitung wird die aktuelle eigene Unterschrift mitgegeben. Feld 40: gedruckter TF-Name links, Unterschrift rechts proportional skaliert, Abstand oben/unten ca. 2 und rechts ca. 3 Formularpixel. Ohne Unterschrift bleibt die bisherige Namensdarstellung. Bereits archivierte PDFs/Versand-Snapshots werden nicht nachträglich verändert; neue Speichern-Aktion erzeugt den aktuellen Stand. Nationaler Bremszettel unverändert.
+
+Automatisierte API-Tests prüfen Zugriff, PNG-Transparenz, Ersetzen, fehlerhafte/leere Dateien und Beschränkung der Bildänderungen auf Feld 40. UI-Test prüft Pointer-Eingaben, Verwerfen-Warnung, Fortsetzen, Leeren und explizites Speichern. Die tatsächliche Bedienung auf einem Mobilgerät nach dem Serverupdate noch prüfen. Android-Quellen/Asset-Zuordnung ergänzt; keine APK erstellt.

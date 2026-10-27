@@ -722,3 +722,6 @@ app.include_router(brake_sheet_mail_router(require_account))
 
 from .national_brake_sheets import create_router as national_brake_sheets_router
 app.include_router(national_brake_sheets_router(require_account))
+
+from .signatures import create_router as signatures_router
+app.include_router(signatures_router(require_account))

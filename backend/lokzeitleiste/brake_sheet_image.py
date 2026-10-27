@@ -20,7 +20,7 @@ def formatted(value):
     if isinstance(value,str):return value
     return format(Decimal(str(value)).normalize(),'f').replace('.',',')
 
-def render(sheet,result,created_at,created_by,transparent=False):
+def render(sheet,result,created_at,created_by,transparent=False,signature=None):
     with Image.open(TEMPLATE) as source:
         image=Image.new('RGBA',source.size,(255,255,255,0)) if transparent else source.convert('RGB')
     draw=ImageDraw.Draw(image);sx=image.width/1335;sy=image.height/1888
@@ -95,17 +95,26 @@ def render(sheet,result,created_at,created_by,transparent=False):
     local=created_at.replace(tzinfo=ZoneInfo('UTC')).astimezone(ZoneInfo('Europe/Berlin'))
     box((15,1751,259,1771),local.strftime('%d.%m.%Y'),14)
     box((269,1751,493,1771),local.strftime('%H:%M'),14)
-    box((502,1751,885,1771),created_by,14)
+    if signature:
+        # Field 40: printed name left; transparent signature right with a small inset.
+        box((502,1751,702,1771),created_by,14,'left')
+        with Image.open(io.BytesIO(signature)) as source:ink=source.convert('RGBA')
+        left,top,right,bottom=[round(v*scale) for v,scale in [(706,sx),(1753,sy),(882,sx),(1769,sy)]]
+        ink.thumbnail((right-left,bottom-top),Image.Resampling.LANCZOS)
+        destination=(right-ink.width,top+(bottom-top-ink.height)//2)
+        if image.mode=='RGBA':image.alpha_composite(ink,destination)
+        else:image.paste(ink,destination,ink)
+    else:box((502,1751,885,1771),created_by,14)
     output=io.BytesIO();image.save(output,format='PNG',optimize=True);return output.getvalue()
 
 
-def render_pdf(sheet,result,created_at,created_by):
+def render_pdf(sheet,result,created_at,created_by,signature=None):
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.utils import ImageReader
     from pypdf import PdfReader,PdfWriter
     overlay=io.BytesIO();document=canvas.Canvas(overlay,pagesize=A4,invariant=1,pageCompression=1)
-    pixels=render(sheet,result,created_at,created_by,transparent=True)
+    pixels=render(sheet,result,created_at,created_by,transparent=True,signature=signature)
     document.drawImage(ImageReader(io.BytesIO(pixels)),0,0,width=A4[0],height=A4[1],mask='auto')
     document.showPage();document.save();overlay.seek(0)
     source=PdfReader(TEMPLATE.with_suffix('.pdf'));writer=PdfWriter();writer.clone_document_from_reader(source)

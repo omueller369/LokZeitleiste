@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from .db import database_session
 from .models import BrakeSheetDraft,RailwayVehicle,VehicleRetirement,TfProfile,User,now_utc
 from .tf_portal import driver_dependency
+from .signatures import signature_for
 from .vehicles import vehicle_view,is_retired
 
 class Country(BaseModel):
@@ -163,7 +164,7 @@ def create_router(require_account):
         sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
         if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
         from .brake_sheet_image import render
-        try:content=render(sheet,result,row.created_at,row.created_by_name)
+        try:content=render(sheet,result,row.created_at,row.created_by_name,signature=signature_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         return Response(content,media_type='image/png',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Disposition':'inline; filename="bremszettel-vorschau.png"'})
     @router.post('/api/v1/tf/brake-sheets/{id}/archive')
@@ -175,7 +176,7 @@ def create_router(require_account):
         from .brake_sheet_image import render_pdf
         from .documents.storage import generated
         from urllib.parse import quote
-        try:content=render_pdf(sheet,result,row.created_at,row.created_by_name)
+        try:content=render_pdf(sheet,result,row.created_at,row.created_by_name,signature=signature_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
         filename=f'Bremszettel-{number}-{day.isoformat()}.PDF'
