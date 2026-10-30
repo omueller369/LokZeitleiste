@@ -72,8 +72,8 @@ class TrainEventIn(BaseModel):
 
     @model_validator(mode='after')
     def valid_event(self):
-        if not self.station and not (self.reason=='Pause' and self.cause in ('CTL','CTL Logistics DE')):raise ValueError('DS100-Kürzel erforderlich.')
-        if not self.station:self.station_name=''
+        self.station_name=self.station_name.strip()
+        if not self.station and not self.station_name and not (self.reason=='Pause' and self.cause in ('CTL','CTL Logistics DE')):raise ValueError('DS100-Kürzel oder Ortsname erforderlich.')
         if self.end_at<=self.start_at:raise ValueError('Bis muss nach Von liegen.')
         self.reason_detail=self.reason_detail.strip() if self.reason=='sonstiges' else ''
         self.cause_detail=self.cause_detail.strip() if self.cause=='sonstiges' else ''

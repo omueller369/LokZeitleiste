@@ -4,7 +4,7 @@ window.TrainJourneyReasons=REASONS;
 const CAUSES=['CTL','DB InfraGo','Dritte Stelle','sonstiges'];
 const node=(tag,value)=>{const n=document.createElement(tag);if(value!==undefined)n.textContent=value;return n;};
 const t=value=>window.I18n?.t(value)||value;
-const labelStation=(code,name)=>name?code+' · '+name:code;
+const labelStation=(code,name)=>name?(code?code+' · ':'')+name:code;
 const stationParts=value=>{const parts=value.trim().split(' · ');return {code:parts[0],name:parts.slice(1).join(' · ')};};
 window.ReportTableTime=(value,start,end,previous=start)=>{if(!value)return '';const day=value.slice(0,10),time=value.slice(11,16);return start&&end&&start.slice(0,10)!==end.slice(0,10)&&day!==(previous||start).slice(0,10)?day.split('-').reverse().join('.')+' · '+time:time;};
 const causeLabel=value=>value==='CTL Logistics DE'?'CTL':value;
@@ -124,11 +124,11 @@ window.TrainJourneyEditor=class{
   const additions=[];
   for(const row of rows.filter(r=>r.kind==='Halt'&&r.end>r.start)){
    if(!CAUSES.includes('CTL'))throw Error('Art CTL muss für die GPS-Übernahme aktiv sein.');
-   const reason=row.reason||{};if(!row.station?.code||!reason.reason)throw Error('Für jeden Halt ZMS und Grund wählen und speichern.');
+   const reason=row.reason||{};if(!(row.station?.code||row.station?.name)||!reason.reason)throw Error('Für jeden Halt Standort und Grund wählen und speichern.');
    if(!REASONS.includes(reason.reason))throw Error('Ein GPS-Grund ist nicht mehr aktiv. Bitte neu auswählen.');
    const start_at=localTime(row.start),end_at=localTime(row.end);this.checkRange(start_at,end_at);
-   const event={id:this.o.uuid(),station:row.station.code,station_name:row.station.name,reason:reason.reason,reason_label:reason.label||choiceLabel('reason',reason.reason),reason_detail:reason.detail||'',cause:'CTL',cause_label:choiceLabel('cause','CTL'),cause_detail:'',start_at,end_at};
-   if([...item.events,...additions].some(e=>e.start_at===start_at&&e.end_at===end_at&&e.station===event.station&&e.reason===event.reason))continue;
+   const event={id:this.o.uuid(),station:row.station.code||'',station_name:row.station.name,reason:reason.reason,reason_label:reason.label||choiceLabel('reason',reason.reason),reason_detail:reason.detail||'',cause:'CTL',cause_label:choiceLabel('cause','CTL'),cause_detail:'',start_at,end_at};
+   if([...item.events,...additions].some(e=>e.start_at===start_at&&e.end_at===end_at&&e.station===event.station&&e.station_name===event.station_name&&e.reason===event.reason))continue;
    if(event.reason==='Pause'&&this.items.flatMap(t=>t.events).concat(additions).some(e=>e.reason==='Pause'&&this.o.minute(start_at)<this.o.minute(e.end_at)&&this.o.minute(end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
    additions.push(event);
   }
@@ -144,7 +144,7 @@ window.TrainJourneyEditor=class{
  async insert(item,withPause=false){
   if(this.o.readonly()||!item.form.reportValidity())return;
   this.o.block(true);
-  try{await this.header(item);const f=item.eventFields;const prior=item.events.find(e=>e.id===item.editing);if((!REASONS.includes(f.reason.value)&&prior?.reason!==f.reason.value)||(!CAUSES.includes(f.cause.value)&&prior?.cause!==f.cause.value))throw Error('Bitte Grund und Art auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=f.reason.value==='Pause'&&f.cause.value==='CTL'?{code:'',name:''}:await this.resolve(f.station);
+  try{await this.header(item);const f=item.eventFields;const prior=item.events.find(e=>e.id===item.editing);if((!REASONS.includes(f.reason.value)&&prior?.reason!==f.reason.value)||(!CAUSES.includes(f.cause.value)&&prior?.cause!==f.cause.value))throw Error('Bitte Grund und Art auswählen.');this.checkRange(f.start_at.value,f.end_at.value);const station=f.reason.value==='Pause'&&f.cause.value==='CTL'?{code:'',name:''}:prior&&!prior.station&&prior.station_name&&f.station.value.trim()&&!f.station.value.includes(' · ')?{code:'',name:f.station.value.trim()}:await this.resolve(f.station);
    if(f.reason.value==='sonstiges'&&(!f.reason_detail.value.trim()||f.reason_detail.value.length>256))throw Error('Sonstigen Grund bitte beschreiben.');if(f.cause.value==='sonstiges'&&(!f.cause_detail.value.trim()||f.cause_detail.value.length>50))throw Error('Sonstige Art bitte beschreiben.');
    const event={id:item.editing||this.o.uuid(),reason:f.reason.value,reason_label:prior?.reason===f.reason.value?prior.reason_label||choiceLabel('reason',f.reason.value):choiceLabel('reason',f.reason.value),reason_detail:f.reason.value==='sonstiges'?f.reason_detail.value.trim():'',cause:f.cause.value,cause_label:prior?.cause===f.cause.value?prior.cause_label||choiceLabel('cause',f.cause.value):choiceLabel('cause',f.cause.value),cause_detail:f.cause.value==='sonstiges'?f.cause_detail.value.trim():'',station:station.code,station_name:station.name,start_at:f.start_at.value,end_at:f.end_at.value};
    const all=this.items.flatMap(train=>train.events.filter(e=>e.id!==event.id));if(event.reason==='Pause'&&all.some(e=>e.reason==='Pause'&&this.o.minute(event.start_at)<this.o.minute(e.end_at)&&this.o.minute(event.end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
