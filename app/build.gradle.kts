@@ -17,6 +17,11 @@ android {
         versionName = "0.6"
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
     }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
     buildFeatures { compose = true; buildConfig = true }
 }
 
