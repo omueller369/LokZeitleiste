@@ -7,6 +7,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.lokzeitleiste.app.data.Ds100Station
 import de.lokzeitleiste.app.data.searchDs100
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -18,8 +21,20 @@ internal fun LocationPromptDialog(
 ) {
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
-    val matches = remember(query, directory, suggestions) {
-        if (query.isBlank()) suggestions.take(50) else searchDs100(query, directory)
+    var matches by remember { mutableStateOf(suggestions.take(50)) }
+    var searching by remember { mutableStateOf(false) }
+    LaunchedEffect(query, directory, suggestions) {
+        val text = query
+        if (text.isBlank()) {
+            matches = suggestions.take(50)
+            searching = false
+        } else {
+            matches = emptyList()
+            searching = true
+            delay(200)
+            matches = withContext(Dispatchers.Default) { searchDs100(text, directory) }
+            searching = false
+        }
     }
     AlertDialog(onDismissRequest = onDismiss,
         title = { Text("Wo steht der Zug?") },
@@ -44,7 +59,8 @@ internal fun LocationPromptDialog(
                         }
                     }
                 }
-                if (query.isNotBlank() && matches.isEmpty()) Text("Kein Treffer. Den Ortsnamen kannst du trotzdem übernehmen.")
+                if (searching) Text("Suche …")
+                if (!searching && query.isNotBlank() && matches.isEmpty()) Text("Kein Treffer. Den Ortsnamen kannst du trotzdem übernehmen.")
                 if (matches.size == 50) Text("Bis zu 50 Treffer – Eingabe bei Bedarf genauer machen.")
                 Text("DS100-Verzeichnis: Stand 04/2018. Angaben bitte prüfen.", style = MaterialTheme.typography.bodySmall)
             }
