@@ -54,3 +54,27 @@ fun matchPlaces(places: List<String>, directory: List<Ds100Station>): List<Ds100
         names.any { place -> station == place || station.startsWith("$place ") }
     }.distinctBy { it.code }.sortedWith(compareBy({ it.name }, { it.code }))
 }
+
+fun shouldAskForLocation(seconds: Long, recording: Boolean, activeStop: Boolean, locationName: String, alreadyAsked: Boolean): Boolean =
+    seconds > 300L && recording && activeStop && locationName.isBlank() && !alreadyAsked
+
+/** Offline search by either name or DS100, with exact code matches first. */
+fun searchDs100(query: String, directory: List<Ds100Station>, limit: Int = 50): List<Ds100Station> {
+    val name = normalizePlace(query)
+    val code = query.filterNot { it.isWhitespace() }.uppercase(java.util.Locale.GERMAN)
+    if (name.isBlank() || limit <= 0) return emptyList()
+    return directory.mapNotNull { row ->
+        val rowCode = row.code.filterNot { it.isWhitespace() }.uppercase(java.util.Locale.GERMAN)
+        val rowName = normalizePlace(row.name)
+        val rank = when {
+            rowCode == code -> 0
+            rowName == name -> 1
+            rowCode.startsWith(code) -> 2
+            rowName.startsWith(name) -> 3
+            rowName.contains(name) -> 4
+            else -> return@mapNotNull null
+        }
+        row to rank
+    }.sortedWith(compareBy({ it.second }, { it.first.name }, { it.first.code }))
+        .map { it.first }.distinctBy { it.code }.take(limit)
+}

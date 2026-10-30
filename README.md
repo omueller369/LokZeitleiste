@@ -41,3 +41,5 @@ Vor jedem gespeicherten Standort befindet sich eine Checkbox. „Übernehmen“ 
 Bestehende lokale Speicherbereiche, Benutzerzuordnungen und Monatseinträge bleiben erhalten. Alte Standzeiten werden ohne Formatwechsel gelesen und erhalten beim Speichern zusätzlich stabile Kennungen. Zugfahrtdetails werden lokal mit dem Monatseintrag gespeichert; der bestehende Monatsversand überträgt diese zusätzlichen Standzeitdetails noch nicht an das Backend.
 
 Die Tests für Erkennung, Ortsabgleich, wiederholte Übernahme und Altformat-Lesen laufen mit `gradle :app:testDebugUnitTest`; der PR-Workflow prüft außerdem `:app:assembleDebug`.
+
+Nach mehr als fünf Minuten laufendem GPS-Stillstand ohne eingetragenen Standort fragt die App einmal pro Aufenthalt nach dem Standort. Im Dropdown kann offline nach Ortsname oder DS100 gesucht werden (bis zu 50 Treffer, exakte DS100-Treffer zuerst). Ein Treffer ergänzt Bahnhofsname und Kürzel; „Nur Ortsnamen übernehmen“ speichert den Freitext ohne DS100. „Später“ beendet die Abfrage ohne Datenänderung; über „Standort per Ort / DS100 ergänzen“ lässt sie sich erneut öffnen. Die Zeiten laufen währenddessen weiter.

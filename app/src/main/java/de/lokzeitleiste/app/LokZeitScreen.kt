@@ -103,6 +103,9 @@ fun LokZeitApp(username: String) {
     var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     var transferOpen by remember { mutableStateOf(false) }
     var lookupVersion by remember { mutableIntStateOf(0) }
+    var locationPromptOpen by remember { mutableStateOf(false) }
+    var locationPromptAutomatic by remember { mutableStateOf(false) }
+    var promptedForArrival by remember { mutableStateOf<Long?>(null) }
     var lookupBusy by remember { mutableStateOf(false) }
     var directory by remember { mutableStateOf(emptyList<Ds100Station>()) }
     LaunchedEffect(username) {
@@ -178,9 +181,19 @@ fun LokZeitApp(username: String) {
         } finally { lookupBusy = false }
     }
     val elapsed = arrival?.let { duration(it, departure ?: now) } ?: 0L
+    LaunchedEffect(elapsed, gpsEnabled, dutyStarted, gpsTrackingStop, departure, station, arrival) {
+        val activeStop = gpsTrackingStop && arrival != null && departure == null
+        if (locationPromptAutomatic && (!gpsEnabled || !dutyStarted || !activeStop || station.isNotBlank())) locationPromptOpen = false
+        if (shouldAskForLocation(elapsed, gpsEnabled && dutyStarted, activeStop, station,
+                promptedForArrival == arrival)) {
+            promptedForArrival = arrival
+            locationPromptAutomatic = true
+            locationPromptOpen = true
+        }
+    }
     LaunchedEffect(elapsed, reason) { if (elapsed < MIN_PAUSE && reason == "Pause") reason = "" }
     fun persist(newEntries: List<StopEntry>) { entries = newEntries; saveEntries(context, username, newEntries) }
-    fun reset() { lookupVersion = 0; arrival = null; departure = null; station = ""; ds100 = ""; gpsTrackingStop = false; stopLocation = null; suggestions = emptyList(); detector.reset(); reason = ""; note = ""; source = "Manuell" }
+    fun reset() { locationPromptOpen = false; promptedForArrival = null; lookupVersion = 0; arrival = null; departure = null; station = ""; ds100 = ""; gpsTrackingStop = false; stopLocation = null; suggestions = emptyList(); detector.reset(); reason = ""; note = ""; source = "Manuell" }
 
     Scaffold(topBar = { TopAppBar(title = { Text("Zugfahrt · LokZeit") }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -208,6 +221,7 @@ fun LokZeitApp(username: String) {
             }
             item {
                 Text("Aktueller Aufenthalt", style = MaterialTheme.typography.titleLarge)
+                TextButton(onClick = { locationPromptAutomatic = false; promptedForArrival = arrival; locationPromptOpen = true }) { Text("Standort per Ort / DS100 ergänzen") }
                 suggestions.forEach { suggestion ->
                     TextButton(onClick = {
                         station = suggestion.name; ds100 = suggestion.code; suggestions = emptyList()
@@ -265,6 +279,13 @@ fun LokZeitApp(username: String) {
             persist(entries.toMutableList().also { it[index] = updated }); editing = null
         }, onDelete = { selectedIds = selectedIds - entry.id; persist(entries.toMutableList().also { it.removeAt(index) }); editing = null })
     } }
+    if (locationPromptOpen) LocationPromptDialog(directory, suggestions,
+        onChoose = { name, code ->
+            station = name; ds100 = code; suggestions = emptyList()
+            source = if (gpsTrackingStop || source.startsWith("GPS")) "GPS – Standort manuell ergänzt" else "Manuell"
+            locationPromptOpen = false
+            message = "Standort übernommen: $name"
+        }, onDismiss = { locationPromptOpen = false })
     if (transferOpen) TransferStopsDialog(username, entries.filter { it.id in selectedIds },
         onDismiss = { transferOpen = false }, onTransferred = {
             selectedIds = emptySet(); transferOpen = false
