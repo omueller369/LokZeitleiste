@@ -11,7 +11,7 @@ fun loadEntries(context: Context, username: String): List<Entry> = runCatching {
         Entry(it.getString("kind"), it.getString("date"), it.getString("start"), it.getString("end"),
             it.getInt("pause"), it.getInt("guest"), it.optString("note"),
             it.optBoolean("away", false), it.optString("accommodation"), it.optString("hotelName"),
-            it.optString("clientId").ifBlank { java.util.UUID.randomUUID().toString() },
+            it.optString("clientId").ifBlank { java.util.UUID.nameUUIDFromBytes("$i:$it".toByteArray(Charsets.UTF_8)).toString() },
             stopsFromJson(it.optJSONArray("stops") ?: JSONArray()))
     } }
 }.getOrDefault(emptyList())

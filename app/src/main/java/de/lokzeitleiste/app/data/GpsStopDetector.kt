@@ -44,7 +44,8 @@ data class Ds100Station(val code: String, val name: String)
 
 private fun normalizePlace(value: String): String = java.text.Normalizer.normalize(
     value.lowercase(java.util.Locale.GERMAN).replace("ß", "ss"), java.text.Normalizer.Form.NFD
-).replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z0-9]+"), " ").trim()
+).replace(Regex("\\p{M}+"), "").replace(Regex("[^a-z0-9]+"), " ")
+    .replace(Regex("\\b(am|an der)\\b"), " ").replace(Regex("\\s+"), " ").trim()
 
 fun matchPlaces(places: List<String>, directory: List<Ds100Station>): List<Ds100Station> {
     val names = places.map(::normalizePlace).filter { it.isNotBlank() }.toSet()

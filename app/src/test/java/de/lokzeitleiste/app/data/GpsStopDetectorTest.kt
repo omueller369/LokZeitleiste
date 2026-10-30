@@ -33,9 +33,10 @@ class GpsStopDetectorTest {
 
     @Test fun `place lookup respects word boundaries and returns ambiguous stations for review`() {
         val directory = listOf(Ds100Station("AA", "Hamburg-Altona"), Ds100Station("AH", "Hamburg Hbf"),
-            Ds100Station("X", "Hamburger Straße"), Ds100Station("Y", "Bad Münster"))
+            Ds100Station("X", "Hamburger Straße"), Ds100Station("Y", "Bad Münster"), Ds100Station("FF", "Frankfurt (Main) Hbf"))
         assertEquals(setOf("AA", "AH"), matchPlaces(listOf("Hamburg"), directory).map { it.code }.toSet())
         assertEquals(listOf("Y"), matchPlaces(listOf("Bad Munster"), directory).map { it.code })
+        assertEquals(listOf("FF"), matchPlaces(listOf("Frankfurt am Main"), directory).map { it.code })
         assertTrue(matchPlaces(listOf("Unbekannt"), directory).isEmpty())
     }
 

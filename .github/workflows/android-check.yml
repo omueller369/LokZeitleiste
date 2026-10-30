@@ -4,6 +4,7 @@ on:
     paths:
       - 'app/**'
       - '*.gradle.kts'
+      - 'gradle.properties'
       - '.github/workflows/android-check.yml'
   workflow_dispatch:
 permissions:
