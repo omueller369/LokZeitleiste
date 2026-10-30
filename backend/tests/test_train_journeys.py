@@ -33,6 +33,18 @@ class TrainJourneysTest(unittest.TestCase):
         self.assertEqual(changed.status_code,200,changed.text)
         self.assertEqual(changed.json()['documented_pause_minutes'],50)
 
+    def test_gps_place_without_code_roundtrips_in_train_details(self):
+        data=self.data();event=data['train_journeys'][0]['events'][0]
+        event.update(cause='CTL',reason='Zugfolge',station='',station_name='Freier Ortsname')
+        report=self.create(data)
+        saved=report['train_journeys'][0]['events'][0]
+        self.assertEqual(saved['station'],'')
+        self.assertEqual(saved['station_name'],'Freier Ortsname')
+        trains=copy.deepcopy(report['train_journeys']);trains[0]['events'][0]['station_name']='Anderer Ort'
+        response=self.update(report['id'],trains)
+        self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['train_journeys'][0]['events'][0]['station_name'],'Anderer Ort')
+
     def test_multiple_trains_and_pause_documentation_without_work_deduction(self):
         data=self.data();data['train_journeys'].append(dict(self.train(),events=[]))
         report=self.create(data);self.assertEqual(len(report['train_journeys']),2)

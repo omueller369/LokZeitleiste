@@ -22,10 +22,20 @@ class Point(BaseModel):
     lon:_finite=Field(ge=-180,le=180)
     accuracy:_finite=Field(ge=0,le=100000)
     speed:_finite|None=Field(default=None,ge=0,le=200)
+class LocationChoice(BaseModel):
+    code:str=Field(default='',max_length=10)
+    name:str=Field(min_length=1,max_length=255)
+    @model_validator(mode='after')
+    def clean(self):
+        self.code=self.code.strip().upper();self.name=self.name.strip()
+        if not self.name:raise ValueError('Ortsname erforderlich.')
+        return self
+
 class Recording(BaseModel):
     train_number:str=Field(pattern=r'^[A-Za-z0-9]{1,12}$')
     points:list[Point]=Field(min_length=1,max_length=20000)
     start_station:str|None=Field(default=None,max_length=10)
+    locations:dict[str,LocationChoice]|None=Field(default=None,max_length=1024)
     ended:bool=True
     expected_revision:int=Field(default=0,ge=0)
     @model_validator(mode='after')
@@ -125,7 +135,8 @@ def create_router(require_account):
         payload=json.loads(row.payload_json);result=analyse(payload['points'])
         payload.setdefault('reasons',{})
         for item in result['rows']:
-            item['station']=payload.get('stations',{}).get(item['key'])
+            item['station']=payload.get('locations',{}).get(str(item['start'])) if item['kind']=='Halt' else None
+            item['station']=item['station'] or payload.get('stations',{}).get(item['key'])
             item['reason']=payload['reasons'].get(item['key'],{})
         return dict(payload,revision=row.revision,analysis=result)
     @router.get('/tf/gps.js')
@@ -143,6 +154,16 @@ def create_router(require_account):
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
         payload=data.model_dump(exclude={'expected_revision'});previous=json.loads(row.payload_json) if row else {}
+        stops={str(item['start']) for item in analyse(payload['points'])['rows'] if item['kind']=='Halt'}
+        locations=payload.get('locations')
+        if locations is None:locations={key:value for key,value in previous.get('locations',{}).items() if key in stops}
+        if any(key not in stops for key in locations):raise HTTPException(422,'Standort gehört nicht zu einem erkannten Halt.')
+        for choice in locations.values():
+            if choice['code']:
+                station=db.get(RailwayStation,choice['code'])
+                if not station:raise HTTPException(422,'Bitte eine gültige DS100-Betriebsstelle wählen.')
+                choice.update(code=station.code,name=station.name)
+        payload['locations']=locations
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
         payload['reasons']=previous.get('reasons',{}) if previous.get('points')==payload['points'] else {}
         payload['selection']=previous.get('selection',[]) if previous.get('points')==payload['points'] else []

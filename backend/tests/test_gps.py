@@ -83,6 +83,24 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(self.driver.put(path+'/stations',json={'expected_revision':2,'stations':{'start':'UNKNOWN'}}).status_code,422)
         _,changed=self.save(path,expected_revision=2,points=points(310));self.assertIsNone(changed.json()['analysis']['rows'][0]['station'])
 
+    def test_live_location_name_and_ds100_survive_sync_without_changing_points(self):
+        path,response=self.save(locations={str(BASE):{'code':'','name':'Freier Ortsname'}})
+        self.assertEqual(response.status_code,200,response.text)
+        data=response.json();self.assertEqual(data['analysis']['rows'][1]['station'],{'code':'','name':'Freier Ortsname'})
+        self.assertEqual(data['points'],points())
+        changed=points(310)
+        response=self.save(path,expected_revision=1,points=changed)[1]
+        self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['locations'][str(BASE)]['name'],'Freier Ortsname')
+        self.assertEqual(response.json()['points'],changed)
+        response=self.save(path,expected_revision=2,points=changed,locations={str(BASE):{'code':'BBB','name':'Wrong display'}})[1]
+        self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['analysis']['rows'][1]['station']['name'],'Berlin Beispiel')
+        self.assertEqual(self.driver.get(path).json()['locations'][str(BASE)]['code'],'BBB')
+        for locations in [{str(BASE):{'code':'UNKNOWN','name':'Name'}},{'unknown-stop':{'name':'Name'}},{str(BASE):{'name':'  '}}]:
+            self.assertEqual(self.save(path,expected_revision=3,points=changed,locations=locations)[1].status_code,422)
+        self.assertEqual(self.driver.get(path).json()['points'],changed)
+
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records
         self.save()
