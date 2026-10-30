@@ -16,7 +16,7 @@ Das Backend enthält jetzt ein Modul für tabellarische PDF-Eingangsbestätigung
 
 Die [Backend-Anleitung](backend/README.md) beschreibt den ersten lokalen Aufbau auf Debian: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 
-Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit bleiben zunächst lokal und sind noch nicht mit den Monatsdaten verbunden.
+Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit lassen sich lokal den Details eines Monatseintrags vom Typ Zugfahrt zuordnen. Der Monatsversand überträgt diese Standzeitdetails noch nicht an das Backend.
 
 ## Noch offen
 
@@ -26,7 +26,7 @@ Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden�
 - Berechnung von Arbeits-, Nacht- und Sonntagsstunden und später Ausbleibe benötigt noch verbindliche Fachregeln. Die bisherigen vorläufigen Regeln stehen in der App und in den früheren Anforderungen.
 - Nach 365 Tagen läuft das Anmeldetoken ab. Danach ist eine neue Anmeldung nötig. Passwortzurücksetzung, weitere Admin-Funktionen und Schema-Migrationen folgen später.
 
-Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank geprüft. Ein MySQL-Integrationslauf und ein Android-Build waren in dieser Umgebung ohne MySQL-Server bzw. Android SDK nicht möglich. LokZeit selbst wurde nicht verändert.
+Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank geprüft. Ein MySQL-Integrationslauf war ohne MySQL-Server nicht möglich. Der Android-Debug-Build und die sieben ergänzten Unit-Tests wurden für die GPS-Erweiterung erfolgreich in GitHub Actions ausgeführt.
 
 ## GPS-Ortssuche und Zugfahrtdetails
 
