@@ -71,7 +71,7 @@ class RecordingTest(unittest.TestCase):
 
     def test_osm_cache_canonical_ds100_and_confirmed_selection(self):
         path,response=self.save();self.assertEqual(response.status_code,200,response.text)
-        elements=[dict(lat=52,lon=13,tags={'railway:ref':'BBB','name':'Untrusted external name'}),dict(lat=52,lon=13,tags={'railway:ref':'NOTKNOWN'})]
+        elements=[dict(lat=52,lon=13,tags={'place':'town','name':'Berlin'}),dict(lat=52,lon=13,tags={'railway:ref':'NOTKNOWN','name':'Ignored railway site'})]
         with patch('lokzeitleiste.gps.osm_query',return_value=elements) as query:
             result=self.driver.post(path+'/stations');self.assertEqual(result.status_code,200,result.text)
             self.assertEqual(result.json()['analysis']['rows'][0]['candidates'][0]['name'],'Berlin Beispiel')
@@ -109,7 +109,7 @@ class RecordingTest(unittest.TestCase):
         changed=self.save(path,expected_revision=revision,points=points(310))[1];self.assertEqual(changed.json()['reasons'],{})
 
     def test_nearby_covers_5km_and_start_selection_survives_save(self):
-        elements=[dict(lat=52,lon=13.065,tags={'railway:ref':'BBB'})]
+        elements=[dict(lat=52,lon=13.065,tags={'place':'town','name':'Berlin'})]
         with patch('lokzeitleiste.gps.osm_query',return_value=elements) as query:
             response=self.driver.get('/api/v1/tf/gps/nearby?lat=52&lon=13');self.assertEqual(response.status_code,200,response.text)
             self.assertEqual(response.json()['radius_m'],5000);self.assertEqual(response.json()['stations'][0]['code'],'BBB')
@@ -120,10 +120,43 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(self.save(start_station='INVALID')[1].status_code,422)
         self.assertEqual(self.client.get('/api/v1/tf/gps/nearby?lat=52&lon=13').status_code,403)
 
-    def test_stop_proposes_nearest_station_within_5km_without_heading(self):
-        path,response=self.save();elements=[dict(lat=52,lon=13.065,tags={'railway:ref':'BBB'})]
+    def test_stop_proposes_ds100_by_nearest_place_name_within_5km(self):
+        path,response=self.save();elements=[dict(lat=52,lon=13.065,tags={'place':'town','name':'Berlin'})]
         with patch('lokzeitleiste.gps.osm_query',return_value=elements) as query:
             result=self.driver.post(path+'/stations');self.assertEqual(result.status_code,200,result.text)
             station=result.json()['analysis']['rows'][0]['candidates'][0]
             self.assertEqual(station['code'],'BBB');self.assertGreater(station['distance_m'],4000)
             self.assertEqual(query.call_args.args[2],6500)
+
+    def test_unmatched_place_has_times_without_station_and_legacy_data_survives(self):
+        path,response=self.save(start_station='BBB');self.assertEqual(response.status_code,200)
+        data={'expected_revision':1,'stations':{'start':'BBB','s0':'CCC'},'reasons':{'s0':{'reason':'V1'}},'selection':['s0']}
+        saved=self.driver.put(path+'/stations',json=data);self.assertEqual(saved.status_code,200,saved.text)
+        elements=[dict(lat=52,lon=13,tags={'place':'village','name':'Unknown Village','railway:ref':'AAA'}),dict(lat=52,lon=13.01,tags={'place':'city','name':'Berlin'})]
+        with patch('lokzeitleiste.gps.osm_query',return_value=elements):
+            result=self.driver.post(path+'/stations');self.assertEqual(result.status_code,200,result.text)
+            rows=result.json()['analysis']['rows'];self.assertTrue(all(r['candidates']==[] for r in rows))
+            self.assertEqual(rows[1]['station']['code'],'CCC');self.assertEqual(rows[1]['end']-rows[1]['start'],305000)
+        self.assertEqual(self.driver.get(path).json()['selection'],['s0'])
+        unchanged=self.save(path,expected_revision=2,start_station='BBB')[1].json()
+        self.assertEqual(unchanged['stations']['s0']['code'],'CCC');self.assertEqual(unchanged['reasons']['s0']['reason'],'V1');self.assertEqual(unchanged['selection'],['s0'])
+        self.assertEqual(self.driver.put(path+'/stations',json={**data,'expected_revision':3,'selection':['not-a-row']}).status_code,422)
+
+    def test_place_outside_radius_and_railway_reference_are_not_suggestions(self):
+        path,_=self.save()
+        elements=[dict(lat=52,lon=13.1,tags={'place':'town','name':'Berlin'}),dict(lat=52,lon=13,tags={'railway':'station','railway:ref':'BBB','name':'Berlin'})]
+        with patch('lokzeitleiste.gps.osm_query',return_value=elements):
+            response=self.driver.post(path+'/stations');self.assertEqual(response.status_code,200,response.text)
+            self.assertEqual(response.json()['analysis']['rows'][1]['candidates'],[])
+
+    def test_place_query_uses_names_and_not_railway_sites(self):
+        import json,urllib.parse
+        from lokzeitleiste import gps
+        class Response:
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def read(self,*args):return json.dumps({'elements':[]}).encode()
+        with patch.object(gps,'_last_query',0),patch('urllib.request.urlopen',return_value=Response()) as fetch:
+            gps.osm_query(52,13,6500)
+        query=urllib.parse.parse_qs(fetch.call_args.args[0].data.decode())['data'][0]
+        self.assertIn('["place"',query);self.assertIn('["name"]',query);self.assertNotIn('["railway"',query)

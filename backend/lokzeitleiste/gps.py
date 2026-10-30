@@ -1,5 +1,5 @@
-"""Private browser-test GPS recordings and cached OSM operating-site suggestions."""
-import json,math,time,threading,urllib.request,urllib.parse
+"""Private browser-test GPS recordings and cached place-name/DS100 suggestions."""
+import json,math,time,threading,urllib.request,urllib.parse,re,unicodedata
 from datetime import timedelta
 from pathlib import Path
 from uuid import UUID
@@ -13,7 +13,7 @@ from sqlalchemy.exc import IntegrityError
 from .db import database_session
 from .models import User,RailwayStation,TrainGpsRecording,GpsStationCache,now_utc
 from .tf_portal import driver_dependency
-from .gps_analysis import analyse,candidates,distance
+from .gps_analysis import analyse,distance
 
 _finite=Annotated[float,Field(allow_inf_nan=False)]
 class Point(BaseModel):
@@ -46,6 +46,7 @@ class Choices(BaseModel):
     expected_revision:int=Field(ge=1)
     stations:dict[str,str]=Field(default_factory=dict,max_length=1024)
     reasons:dict[str,StopReason]|None=Field(default=None,max_length=1024)
+    selection:list[str]|None=Field(default=None,max_length=1024)
 
 _lock=threading.Lock();_last_query=0
 
@@ -56,7 +57,7 @@ def osm_query(lat,lon,radius=3500):
     try:
         if time.monotonic()-_last_query<2:raise HTTPException(429,'ZMS-Abfragen bitte mit Abstand wiederholen.')
         _last_query=time.monotonic()
-        query=f'[out:json][timeout:12];nwr(around:{radius},{lat:.5f},{lon:.5f})["railway"~"^(station|halt|junction|yard|service_station|crossover|blockpost)$"];out center tags;'
+        query=f'[out:json][timeout:12];nwr(around:{radius},{lat:.5f},{lon:.5f})["place"~"^(city|town|village|hamlet|suburb|quarter|neighbourhood|locality|isolated_dwelling)$"]["name"];out center tags;'
         request=urllib.request.Request('https://overpass-api.de/api/interpreter',data=urllib.parse.urlencode({'data':query}).encode(),headers={'User-Agent':'LokZeitleiste-GPS-Browsertest/1.0 (+https://github.com/omueller369/LokZeitleiste)','Content-Type':'application/x-www-form-urlencoded'})
         try:
             with urllib.request.urlopen(request,timeout=18) as response:
@@ -68,12 +69,23 @@ def osm_query(lat,lon,radius=3500):
         except Exception as exc:raise HTTPException(503,'ZMS-Daten derzeit nicht verfügbar. GPS bleibt gespeichert.') from exc
     finally:_lock.release()
 
+def place_key(lat,lon):
+    return f'place:{round(lat,2):.2f},{round(lon,2):.2f}'
+
+def normalized_name(value):
+    return ' '.join(re.sub(r'[^\w]+',' ',unicodedata.normalize('NFKC',value).casefold()).split())
+
 def station_data(db,lat,lon,nearby=False):
-    cell=('near:' if nearby else '')+f'{round(lat,2):.2f},{round(lon,2):.2f}';cached=db.get(GpsStationCache,cell)
+    """Find the nearest named place within 5 km, then match its name in DS100.
+
+    Separate cache namespace deliberately leaves previous railway cache entries intact.
+    No railway reference or distance to a railway site is used for suggestions.
+    """
+    cell=place_key(lat,lon);cached=db.get(GpsStationCache,cell)
     if cached and cached.updated_at>now_utc()-timedelta(days=30):elements=json.loads(cached.payload_json)
     else:
-        # Center on the rounded cell, so cached coverage is identical for every caller.
-        elements=osm_query(round(lat,2),round(lon,2),6500) if nearby else osm_query(round(lat,2),round(lon,2))
+        # 6.5 km around rounded cell fully covers each caller's 5 km circle.
+        elements=osm_query(round(lat,2),round(lon,2),6500)
         if not cached:cached=GpsStationCache(cell=cell);db.add(cached)
         cached.payload_json=json.dumps(elements,ensure_ascii=False);cached.updated_at=now_utc()
         try:db.commit()
@@ -81,15 +93,24 @@ def station_data(db,lat,lon,nearby=False):
             db.rollback();cached=db.get(GpsStationCache,cell)
             if not cached:raise
             elements=json.loads(cached.payload_json)
-    stations=[];seen=set()
+    places=[]
     for item in elements:
-        tags=item.get('tags',{});code=(tags.get('ref:DB') or tags.get('railway:ref') or '').strip().upper()
-        catalog=db.get(RailwayStation,code) if code and len(code)<=10 else None
-        if not catalog:continue
+        tags=item.get('tags',{});name=tags.get('name','').strip()
+        if tags.get('place') not in {'city','town','village','hamlet','suburb','quarter','neighbourhood','locality','isolated_dwelling'} or not name:continue
         point=item if 'lat' in item else item.get('center',{})
-        if code in seen or not isinstance(point.get('lat'),(int,float)) or not isinstance(point.get('lon'),(int,float)):continue
-        if not math.isfinite(point['lat']) or not math.isfinite(point['lon']) or not -90<=point['lat']<=90 or not -180<=point['lon']<=180:continue
-        seen.add(code);stations.append(dict(code=code,name=catalog.name,lat=point['lat'],lon=point['lon']))
+        if any(not isinstance(point.get(k),(int,float)) or not math.isfinite(point[k]) for k in ('lat','lon')):continue
+        if not -90<=point['lat']<=90 or not -180<=point['lon']<=180:continue
+        meters=distance(dict(lat=lat,lon=lon),point)
+        if meters<=5000:places.append(dict(name=name,lat=point['lat'],lon=point['lon'],distance_m=meters))
+    if not places:return []
+    place=min(places,key=lambda p:(p['distance_m'],p['name']));key=normalized_name(place['name'])
+    if not key:return []
+    stations=[]
+    for station in db.scalars(select(RailwayStation).order_by(RailwayStation.name,RailwayStation.code)):
+        name=normalized_name(station.name)
+        # Exact place name or a station qualifier, e.g. Berlin Hauptbahnhof.
+        if name==key or name.startswith(key+' '):
+            stations.append(dict(code=station.code,name=station.name,lat=place['lat'],lon=place['lon'],place_name=place['name']))
     return stations
 
 def create_router(require_account):
@@ -124,6 +145,7 @@ def create_router(require_account):
         payload=data.model_dump(exclude={'expected_revision'});previous=json.loads(row.payload_json) if row else {}
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
         payload['reasons']=previous.get('reasons',{}) if previous.get('points')==payload['points'] else {}
+        payload['selection']=previous.get('selection',[]) if previous.get('points')==payload['points'] else []
         if data.start_station:
             station=db.get(RailwayStation,data.start_station.strip().upper())
             if not station:raise HTTPException(422,'Bitte einen gültigen Startbahnhof (DS100) wählen.')
@@ -138,12 +160,12 @@ def create_router(require_account):
         row=owned(db,user,journey_id);result=view(row)
         # Incremental explicit lookup: one uncached vicinity per click, cached rows together.
         for item in result['analysis']['rows']:
-            cell=f'near:{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}';cached=db.get(GpsStationCache,cell)
+            cell=place_key(item['lat'],item['lon']);cached=db.get(GpsStationCache,cell)
             if not cached or cached.updated_at<=now_utc()-timedelta(days=30):
                 station_data(db,item['lat'],item['lon'],nearby=True);break
         for item in result['analysis']['rows']:
-            cached=db.get(GpsStationCache,f'near:{round(item["lat"],2):.2f},{round(item["lon"],2):.2f}')
-            item['candidates']=candidates(item,station_data(db,item['lat'],item['lon'],nearby=True)) if cached and cached.updated_at>now_utc()-timedelta(days=30) else []
+            cached=db.get(GpsStationCache,place_key(item['lat'],item['lon']))
+            item['candidates']=[dict(station,distance_m=round(distance(item,station))) for station in station_data(db,item['lat'],item['lon'],nearby=True)] if cached and cached.updated_at>now_utc()-timedelta(days=30) else []
             item['lookup_pending']=not cached or cached.updated_at<=now_utc()-timedelta(days=30)
         return result
     @router.put('/api/v1/tf/gps/{journey_id}/stations')
@@ -163,6 +185,9 @@ def create_router(require_account):
             for key,value in sorted(data.reasons.items()):
                 if value.reason:labels[key]=use_value(db,'reason',value.reason,payload.get('reasons',{}).get(key,{}).get('reason')).label
             payload['reasons']={key:dict(value.model_dump(),label=labels[key]) for key,value in data.reasons.items() if value.reason}
+        if data.selection is not None:
+            if any(key not in keys for key in data.selection):raise HTTPException(422,'Ungültige GPS-Auswahl.')
+            payload['selection']=list(dict.fromkeys(data.selection))
         payload['stations']=selected
         if selected.get('start'):payload['start_station']=selected['start']['code']
         row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
