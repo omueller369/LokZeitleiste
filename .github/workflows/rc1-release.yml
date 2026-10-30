@@ -1,0 +1,45 @@
+name: Publish LokZeitleiste RC1
+on:
+  push:
+    branches: ['release/0.25-rc.1']
+permissions:
+  contents: write
+concurrency:
+  group: lokzeitleiste-v0.25-rc.1
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -r backend/requirements-dev.txt
+      - name: Validate RC version and GPS functionality
+        run: |
+          test "$(PYTHONPATH=backend python -c 'from lokzeitleiste.version import SOFTWARE_VERSION; print(SOFTWARE_VERSION)')" = '0.25-rc.1'
+          git diff --check
+          node --check backend/lokzeitleiste/static/gps.js
+          node --check backend/lokzeitleiste/static/train-journeys.js
+          node backend/tests/test_gps_browser.cjs
+          node backend/tests/test_gps_android.cjs
+          node backend/tests/test_gps_live_location.cjs
+          node backend/tests/test_gps_import.cjs
+          PYTHONPATH=backend:backend/tests python -m unittest test_gps test_train_journeys -q
+      - name: Package immutable RC source
+        run: |
+          mkdir release
+          git archive --format=tar.gz --prefix=LokZeitleiste-v0.25-rc.1/ -o release/LokZeitleiste-v0.25-rc.1.tar.gz HEAD
+          git archive --format=zip --prefix=LokZeitleiste-v0.25-rc.1/ -o release/LokZeitleiste-v0.25-rc.1.zip HEAD
+          cp docs/releases/v0.25-rc.1.md release/RELEASE-NOTES.md
+          cd release
+          sha256sum LokZeitleiste-v0.25-rc.1.tar.gz LokZeitleiste-v0.25-rc.1.zip RELEASE-NOTES.md > SHA256SUMS
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.25-rc.1 release/LokZeitleiste-v0.25-rc.1.tar.gz release/LokZeitleiste-v0.25-rc.1.zip release/RELEASE-NOTES.md release/SHA256SUMS \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title 'LokZeitleiste 0.25 RC1' --notes-file docs/releases/v0.25-rc.1.md
