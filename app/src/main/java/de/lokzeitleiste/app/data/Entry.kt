@@ -7,7 +7,8 @@ data class Entry(
     val kind: String, val date: String, val start: String, val end: String,
     val pause: Int, val guest: Int, val note: String,
     val away: Boolean = false, val accommodation: String = "", val hotelName: String = "",
-    val clientId: String = UUID.randomUUID().toString()
+    val clientId: String = UUID.randomUUID().toString(),
+    val stops: List<StopEntry> = emptyList()
 )
 
 fun minutes(time: String): Int = LocalTime.parse(time).let { it.hour * 60 + it.minute }

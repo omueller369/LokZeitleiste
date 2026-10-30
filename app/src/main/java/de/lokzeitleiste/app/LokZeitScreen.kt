@@ -1,14 +1,12 @@
 package de.lokzeitleiste.app
 
+import de.lokzeitleiste.app.data.*
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -24,7 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -43,37 +40,24 @@ private fun duration(a: Long, b: Long) = ((b - a) / 1000).coerceAtLeast(0)
 private fun Long.clock() = "%02d:%02d:%02d".format(this / 3600, (this % 3600) / 60, this % 60)
 
 data class Station(val id: String, val name: String, val lat: Double, val lon: Double, val ref: String = "")
-data class StopEntry(val station: String, val arrival: Long, val departure: Long, val reason: String, val note: String, val source: String, val ds100: String = "")
 
 private fun loadEntries(context: Context, username: String): List<StopEntry> = runCatching {
     val array = JSONArray(context.getSharedPreferences("lokzeit_" + username, 0).getString("entries", "[]"))
-    (0 until array.length()).map { i -> array.getJSONObject(i).let { StopEntry(it.getString("station"), it.getLong("arrival"), it.getLong("departure"), it.getString("reason"), it.optString("note"), it.optString("source", "Manuell"), it.optString("ds100")) } }
+    stopsFromJson(array)
 }.getOrDefault(emptyList())
 private fun saveEntries(context: Context, username: String, entries: List<StopEntry>) {
-    val data = JSONArray()
-    entries.forEach { data.put(JSONObject().put("station", it.station).put("arrival", it.arrival).put("departure", it.departure).put("reason", it.reason).put("note", it.note).put("source", it.source).put("ds100", it.ds100)) }
+    val data = stopsToJson(entries)
     context.getSharedPreferences("lokzeit_" + username, 0).edit().putString("entries", data.toString()).apply()
 }
-private fun loadStations(context: Context, username: String): List<Station> = runCatching {
-    val array = JSONArray(context.getSharedPreferences("lokzeit_" + username, 0).getString("stations", "[]"))
-    (0 until array.length()).map { i -> array.getJSONObject(i).let { Station(it.getString("id"), it.getString("name"), it.getDouble("lat"), it.getDouble("lon"), it.optString("ref")) } }
-}.getOrDefault(emptyList())
-private fun saveStations(context: Context, username: String, stations: List<Station>) {
-    val array = JSONArray()
-    stations.forEach { array.put(JSONObject().put("id", it.id).put("name", it.name).put("lat", it.lat).put("lon", it.lon).put("ref", it.ref)) }
-    context.getSharedPreferences("lokzeit_" + username, 0).edit().putString("stations", array.toString()).apply()
+private fun fetchPlaces(lat: Double, lon: Double): List<Station> {
+    val query = "[out:json][timeout:25];nwr[place~\"^(city|town|village|hamlet|suburb|quarter)$\"](around:5000,$lat,$lon);out center;"
+    return fetchQuery(query).filter { place -> distanceMeters(lat, lon, place.lat, place.lon) <= 5000f }
 }
 
-private fun fetchStations(lat: Double, lon: Double): List<Station> {
-    // One user-initiated request for a 10 km radius; location samples never trigger network requests.
-    val query = "[out:json][timeout:25];(nwr[railway~\"^(station|yard|service_station|junction|halt)$\"](around:10000,$lat,$lon););out center;"
-    return fetchQuery(query)
-}
-
-private fun fetchByDs100(ref: String): List<Station> {
-    require(Regex("[A-Z0-9]{2,7}").matches(ref))
-    val query = "[out:json][timeout:25];nwr[\"railway:ref\"=\"$ref\"][railway](47.2,5.8,55.1,15.1);out center;"
-    return fetchQuery(query)
+private fun distanceMeters(lat: Double, lon: Double, otherLat: Double, otherLon: Double): Float {
+    val result = FloatArray(1)
+    Location.distanceBetween(lat, lon, otherLat, otherLon, result)
+    return result[0]
 }
 
 private fun fetchQuery(query: String): List<Station> {
@@ -83,7 +67,7 @@ private fun fetchQuery(query: String): List<Station> {
     connection.readTimeout = 35000
     connection.doOutput = true
     connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-    connection.setRequestProperty("User-Agent", "LokZeit/0.2 (offline station cache)")
+    connection.setRequestProperty("User-Agent", "LokZeitleiste (place lookup)")
     try {
         connection.outputStream.use { it.write("data=${java.net.URLEncoder.encode(query, "UTF-8")}".toByteArray()) }
         if (connection.responseCode !in 200..299) error("OSM-Datenserver: HTTP ${connection.responseCode}")
@@ -103,21 +87,32 @@ private fun fetchQuery(query: String): List<Station> {
 @Composable
 fun LokZeitApp(username: String) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val prefs = remember { context.getSharedPreferences("lokzeit_" + username, 0) }
     var dutyStarted by remember { mutableStateOf(prefs.getBoolean("duty", false)) }
     var trainNumber by remember { mutableStateOf(prefs.getString("train", "") ?: "") }
     var entries by remember { mutableStateOf(loadEntries(context, username)) }
-    var stations by remember { mutableStateOf(loadStations(context, username)) }
     var currentLocation by remember { mutableStateOf<Location?>(null) }
     var gpsEnabled by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf("GPS ist ausgeschaltet") }
     var station by remember { mutableStateOf("") }
     var ds100 by remember { mutableStateOf("") }
-    var candidateId by remember { mutableStateOf<String?>(null) }
-    var currentStopId by remember { mutableStateOf<String?>(null) }
-    var candidateSince by remember { mutableLongStateOf(0L) }
-    var outsideSince by remember { mutableLongStateOf(0L) }
+    val detector = remember { GpsStopDetector() }
+    var gpsTrackingStop by remember { mutableStateOf(false) }
+    var stopLocation by remember { mutableStateOf<Location?>(null) }
+    var suggestions by remember { mutableStateOf(emptyList<Ds100Station>()) }
+    var selectedIds by remember { mutableStateOf(emptySet<String>()) }
+    var transferOpen by remember { mutableStateOf(false) }
+    var lookupVersion by remember { mutableIntStateOf(0) }
+    var lookupBusy by remember { mutableStateOf(false) }
+    var directory by remember { mutableStateOf(emptyList<Ds100Station>()) }
+    LaunchedEffect(username) {
+        directory = withContext(Dispatchers.IO) {
+            context.assets.open("ds100.tsv").bufferedReader().useLines { lines ->
+                lines.mapNotNull { line -> line.split('\t', limit = 2).takeIf { it.size == 2 }
+                    ?.let { Ds100Station(it[0], it[1]) } }.toList()
+            }
+        }
+    }
     var arrival by remember { mutableStateOf<Long?>(null) }
     var departure by remember { mutableStateOf<Long?>(null) }
     var source by remember { mutableStateOf("Manuell") }
@@ -135,48 +130,57 @@ fun LokZeitApp(username: String) {
     DisposableEffect(gpsEnabled, dutyStarted) {
         if (gpsEnabled && dutyStarted && (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
             runCatching {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 15f, listener)
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000L, 15f, listener)
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000L, 0f, listener)
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000L, 0f, listener)
             }.onFailure { message = "GPS nicht verfügbar: ${it.message}" }
         }
         onDispose { locationManager.removeUpdates(listener) }
     }
-    // Conservative point proximity: require two minutes within 300 m and two minutes beyond 600 m.
-    // OSM points do not describe signal boundaries; a driver must review the result.
-    LaunchedEffect(currentLocation, stations, dutyStarted) {
+    LaunchedEffect(gpsEnabled, dutyStarted) { detector.reset() }
+    LaunchedEffect(currentLocation, dutyStarted, gpsEnabled) {
         val fix = currentLocation ?: return@LaunchedEffect
-        if (!dutyStarted || fix.accuracy > 100f || fix.time < System.currentTimeMillis() - 120000) return@LaunchedEffect
-        val timestamp = fix.time
-        val nearest = stations.map { s ->
-            val result = FloatArray(1)
-            Location.distanceBetween(fix.latitude, fix.longitude, s.lat, s.lon, result)
-            s to result[0]
-        }.minByOrNull { it.second }
-        if (arrival == null) {
-            val nearby = nearest?.takeIf { it.second <= 300f }?.first
-            if (nearby == null) { candidateId = null; candidateSince = 0L }
-            else if (candidateId != nearby.id) { candidateId = nearby.id; candidateSince = timestamp }
-            else if (timestamp - candidateSince >= 120000) {
-                station = nearby.name; ds100 = nearby.ref; currentStopId = nearby.id; arrival = candidateSince
-                departure = null; source = "GPS/OSM – prüfen"; reason = ""; note = ""
-                candidateId = null; message = "${nearby.name} erkannt – Zeiten bitte prüfen"
-            }
-        } else if (departure == null && source.startsWith("GPS")) {
-            val selected = stations.firstOrNull { it.id == currentStopId } ?: return@LaunchedEffect
-            val distance = FloatArray(1)
-            Location.distanceBetween(fix.latitude, fix.longitude, selected.lat, selected.lon, distance)
-            if (distance[0] <= 600f) outsideSince = 0L
-            else if (outsideSince == 0L) outsideSince = timestamp
-            else if (timestamp - outsideSince >= 120000) {
-                departure = outsideSince; outsideSince = 0L
-                message = "Abfahrt erkannt – bitte kontrollieren und speichern"
-            }
+        if (!gpsEnabled || !dutyStarted || fix.accuracy > 50f ||
+            fix.time < System.currentTimeMillis() - 120000L) return@LaunchedEffect
+        if (arrival != null && !gpsTrackingStop) return@LaunchedEffect
+        if (departure != null) return@LaunchedEffect
+        val event = detector.sample(fix.time, fix.latitude, fix.longitude,
+            if (fix.hasSpeed()) fix.speed else null, ::distanceMeters) ?: return@LaunchedEffect
+        if (event.departure == null && arrival == null) {
+            arrival = event.arrival; departure = null; gpsTrackingStop = true
+            stopLocation = Location(fix); source = "GPS – prüfen"
+            station = ""; ds100 = ""; reason = ""; note = ""; suggestions = emptyList()
+            message = "Stillstand erkannt – Standort kann ergänzt werden"
+            lookupVersion++
+        } else if (gpsTrackingStop && event.departure != null) {
+            departure = event.departure; gpsTrackingStop = false
+            message = "Abfahrt erkannt – Standzeit bitte prüfen und speichern"
         }
+    }
+    // A separate effect keeps slow name resolution from cancelling time detection.
+    LaunchedEffect(lookupVersion, directory) {
+        if (lookupVersion == 0 || directory.isEmpty()) return@LaunchedEffect
+        val fix = stopLocation ?: currentLocation ?: return@LaunchedEffect
+        val startedFor = arrival
+        val originalName = station
+        val originalCode = ds100
+        lookupBusy = true
+        try {
+            val names = withContext(Dispatchers.IO) { fetchPlaces(fix.latitude, fix.longitude).map { it.name } }
+            val matches = matchPlaces(names, directory)
+            if (arrival == startedFor && station == originalName && ds100 == originalCode) {
+                suggestions = matches
+                message = if (matches.isEmpty()) "Kein DS100-Treffer zum Ort – nur Zeiten erfasst; Standort manuell ergänzen"
+                    else "${matches.size} DS100-Vorschläge zu Orten im 5-km-Umkreis – bitte auswählen"
+            }
+        } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
+        catch (error: Exception) {
+            message = "Ortssuche fehlgeschlagen – Zeiten bleiben erhalten; Standort manuell ergänzen"
+        } finally { lookupBusy = false }
     }
     val elapsed = arrival?.let { duration(it, departure ?: now) } ?: 0L
     LaunchedEffect(elapsed, reason) { if (elapsed < MIN_PAUSE && reason == "Pause") reason = "" }
     fun persist(newEntries: List<StopEntry>) { entries = newEntries; saveEntries(context, username, newEntries) }
-    fun reset() { arrival = null; departure = null; station = ""; ds100 = ""; currentStopId = null; reason = ""; note = ""; source = "Manuell" }
+    fun reset() { lookupVersion = 0; arrival = null; departure = null; station = ""; ds100 = ""; gpsTrackingStop = false; stopLocation = null; suggestions = emptyList(); detector.reset(); reason = ""; note = ""; source = "Manuell" }
 
     Scaffold(topBar = { TopAppBar(title = { Text("Zugfahrt · LokZeit") }) }) { padding ->
         LazyColumn(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -184,57 +188,44 @@ fun LokZeitApp(username: String) {
                 Text("Dienst und Zug", style = MaterialTheme.typography.titleLarge)
                 Button(onClick = {
                     dutyStarted = !dutyStarted; prefs.edit().putBoolean("duty", dutyStarted).apply()
-                    if (!dutyStarted) { gpsEnabled = false; message = "Dienst beendet" }
+                    if (!dutyStarted) { gpsEnabled = false; gpsTrackingStop = false; message = "Dienst beendet" }
                 }) { Text(if (dutyStarted) "Dienst beenden" else "Dienst starten") }
                 OutlinedTextField(trainNumber, { trainNumber = it; prefs.edit().putString("train", it).apply() }, label = { Text("Zugnummer") }, modifier = Modifier.fillMaxWidth())
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = dutyStarted, onClick = {
                         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
                             permission.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-                        else gpsEnabled = !gpsEnabled
+                        else { gpsEnabled = !gpsEnabled; if (!gpsEnabled) gpsTrackingStop = false }
                     }) { Text(if (gpsEnabled) "GPS stoppen" else "GPS starten") }
-                    Button(enabled = currentLocation != null, onClick = {
-                        val fix = currentLocation ?: return@Button
-                        scope.launch {
-                            message = "OSM-Betriebsstellen werden geladen …"
-                            runCatching { withContext(Dispatchers.IO) { fetchStations(fix.latitude, fix.longitude) } }
-                                .onSuccess { fetched ->
-                                    stations = (stations + fetched).distinctBy { it.id }
-                                    saveStations(context, username, stations)
-                                    message = "${fetched.size} Betriebsstellen geladen; lokal gespeichert"
-                                }.onFailure { message = "Abruf fehlgeschlagen: ${it.message}" }
-                        }
-                    }) { Text("OSM laden") }
+                    Button(enabled = currentLocation != null && !lookupBusy && directory.isNotEmpty(), onClick = {
+                        if (arrival == null) stopLocation = null
+                        lookupVersion++
+                    }) { Text(if (lookupBusy) "Suche …" else "Ort / DS100 suchen") }
                 }
                 Text(message, style = MaterialTheme.typography.bodySmall)
-                Text("${stations.size} Betriebsstellen gespeichert. GPS nur bei geöffnetem Bildschirm und laufendem Dienst. OSM laden jeweils für die aktuelle Umgebung (10 km).", style = MaterialTheme.typography.bodySmall)
+                Text("GPS erfasst Stillstände unabhängig vom Standort. Ortssuche: 5 km. Nur bei geöffnetem Bildschirm und laufendem Dienst.", style = MaterialTheme.typography.bodySmall)
+                Text("DS100-Verzeichnis: DB AG, Stand 04/2018 (CC BY 4.0). Vorschläge bitte prüfen.", style = MaterialTheme.typography.bodySmall)
             }
             item {
                 Text("Aktueller Aufenthalt", style = MaterialTheme.typography.titleLarge)
-                OutlinedTextField(station, { station = it; source = "Manuell korrigiert" }, label = { Text("Betriebsstelle (editierbar)") }, modifier = Modifier.fillMaxWidth())
+                suggestions.forEach { suggestion ->
+                    TextButton(onClick = {
+                        station = suggestion.name; ds100 = suggestion.code; suggestions = emptyList()
+                    }) { Text("${suggestion.code} · ${suggestion.name}") }
+                }
+                OutlinedTextField(station, { station = it; source = "Manuell korrigiert" }, label = { Text("Bahnhofsname (manuell ergänzbar)") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(ds100, { ds100 = it.uppercase().trim() }, label = { Text("DS100-Kürzel") }, modifier = Modifier.fillMaxWidth())
-                Button(enabled = Regex("[A-Z0-9]{2,7}").matches(ds100), onClick = {
-                    val code = ds100
-                    val cached = stations.firstOrNull { it.ref.equals(code, ignoreCase = true) }
-                    if (cached != null) { station = cached.name; ds100 = cached.ref; source = "DS100/OSM – prüfen"; message = "$code: ${cached.name} gefunden" }
-                    else scope.launch {
-                        message = "DS100 $code wird gesucht …"
-                        runCatching { withContext(Dispatchers.IO) { fetchByDs100(code) } }
-                            .onSuccess { results ->
-                                val match = results.firstOrNull { it.ref.equals(code, ignoreCase = true) }
-                                if (match == null) message = "DS100 $code in OSM nicht gefunden – Betriebsstelle manuell eintragen"
-                                else {
-                                    stations = (stations + results).distinctBy { it.id }; saveStations(context, username, stations)
-                                    station = match.name; ds100 = match.ref; source = "DS100/OSM – prüfen"; message = "$code: ${match.name} gefunden"
-                                }
-                            }.onFailure { message = "DS100-Abfrage fehlgeschlagen: ${it.message}" }
-                    }
+                Button(enabled = ds100.isNotBlank() && directory.isNotEmpty(), onClick = {
+                    val matches = directory.filter { it.code.replace(" ", "").equals(ds100.replace(" ", ""), ignoreCase = true) }
+                    suggestions = matches
+                    message = if (matches.isEmpty()) "DS100 nicht gefunden – Bahnhofsname manuell ergänzen"
+                        else "DS100 gefunden – Vorschlag bitte auswählen"
                 }) { Text("DS100 suchen") }
                 Text("Ankunft: ${arrival?.let(::stamp) ?: "–"}   Abfahrt: ${departure?.let(::stamp) ?: "–"}")
                 Text("Standzeit: ${elapsed.clock()} · $source")
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(enabled = arrival == null, onClick = { arrival = System.currentTimeMillis(); departure = null; source = "Manuell" }) { Text("Ankunft") }
-                    Button(enabled = arrival != null && departure == null, onClick = { departure = System.currentTimeMillis() }) { Text("Abfahrt") }
+                    Button(enabled = arrival != null && departure == null, onClick = { departure = System.currentTimeMillis(); gpsTrackingStop = false }) { Text("Abfahrt") }
                     if (arrival != null) TextButton(onClick = { reset() }) { Text("Verwerfen") }
                 }
                 Text("Erkannte Zeiten können nach dem Speichern bearbeitet werden.")
@@ -242,15 +233,25 @@ fun LokZeitApp(username: String) {
             item {
                 StopReasonDropdown(reason, elapsed, onSelect = { reason = it })
                 OutlinedTextField(note, { note = it }, label = { Text("Notiz (optional)") }, modifier = Modifier.fillMaxWidth())
-                Button(enabled = arrival != null && departure != null && station.isNotBlank() && validReason(reason, elapsed), onClick = {
+                Button(enabled = arrival != null && departure != null && validReason(reason, elapsed), onClick = {
                     persist(listOf(StopEntry(station.trim(), arrival!!, departure!!, reason, note.trim(), source, ds100)) + entries)
                     reset()
                 }, modifier = Modifier.fillMaxWidth()) { Text("Standzeit speichern") }
             }
-            item { Text("Standzeiten – Zug ${trainNumber.ifBlank { "–" }}", style = MaterialTheme.typography.titleLarge) }
+            item {
+                Text("Standzeiten – Zug ${trainNumber.ifBlank { "–" }}", style = MaterialTheme.typography.titleLarge)
+                Button(enabled = selectedIds.isNotEmpty(), onClick = { transferOpen = true }) {
+                    Text("Übernehmen (${selectedIds.size})")
+                }
+            }
             itemsIndexed(entries) { index, entry ->
                 Card(Modifier.fillMaxWidth()) { Column(Modifier.padding(12.dp)) {
-                    Text(entry.station, style = MaterialTheme.typography.titleMedium)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = entry.id in selectedIds, onCheckedChange = { checked ->
+                            selectedIds = if (checked) selectedIds + entry.id else selectedIds - entry.id
+                        })
+                        Text(entry.station.ifBlank { "Standort ergänzen" }, style = MaterialTheme.typography.titleMedium)
+                    }
                     Text("${stamp(entry.arrival)} – ${stamp(entry.departure)}")
                     Text("${duration(entry.arrival, entry.departure).clock()} · ${entry.reason}${if (entry.note.isBlank()) "" else " – ${entry.note}"}")
                     Text("${entry.source}${if (entry.ds100.isBlank()) "" else " · DS100 ${entry.ds100}"}", style = MaterialTheme.typography.bodySmall)
@@ -262,12 +263,18 @@ fun LokZeitApp(username: String) {
     editing?.let { index -> entries.getOrNull(index)?.let { entry ->
         EditStopDialog(entry, onDismiss = { editing = null }, onSave = { updated ->
             persist(entries.toMutableList().also { it[index] = updated }); editing = null
-        }, onDelete = { persist(entries.toMutableList().also { it.removeAt(index) }); editing = null })
+        }, onDelete = { selectedIds = selectedIds - entry.id; persist(entries.toMutableList().also { it.removeAt(index) }); editing = null })
     } }
+    if (transferOpen) TransferStopsDialog(username, entries.filter { it.id in selectedIds },
+        onDismiss = { transferOpen = false }, onTransferred = {
+            selectedIds = emptySet(); transferOpen = false
+            message = "Ausgewählte Standzeiten in die Details der Zugfahrt übernommen"
+        })
+
 }
 
 @Composable
-private fun EditStopDialog(entry: StopEntry, onDismiss: () -> Unit, onSave: (StopEntry) -> Unit, onDelete: () -> Unit) {
+internal fun EditStopDialog(entry: StopEntry, onDismiss: () -> Unit, onSave: (StopEntry) -> Unit, onDelete: () -> Unit) {
     var name by remember(entry) { mutableStateOf(entry.station) }
     var code by remember(entry) { mutableStateOf(entry.ds100) }
     var arrival by remember(entry) { mutableStateOf(stamp(entry.arrival)) }
@@ -289,8 +296,8 @@ private fun EditStopDialog(entry: StopEntry, onDismiss: () -> Unit, onSave: (Sto
             TextButton(onClick = onDelete) { Text("Falschen Eintrag löschen") }
         }
     }, confirmButton = {
-        TextButton(enabled = name.isNotBlank() && start != null && end != null && end >= start && validReason(reason, seconds), onClick = {
-            onSave(StopEntry(name.trim(), start!!, end!!, reason, note.trim(), "Manuell korrigiert", code))
+        TextButton(enabled = start != null && end != null && end >= start && validReason(reason, seconds), onClick = {
+            onSave(entry.copy(station = name.trim(), arrival = start!!, departure = end!!, reason = reason, note = note.trim(), source = "Manuell korrigiert", ds100 = code))
         }) { Text("Speichern") }
     }, dismissButton = { TextButton(onClick = onDismiss) { Text("Abbrechen") } })
 }

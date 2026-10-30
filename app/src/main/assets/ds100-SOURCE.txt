@@ -1,0 +1,7 @@
+DS100-Verzeichnis: Deutsche Bahn AG, DBNetz-Betriebsstellenverzeichnis, Stand April 2018.
+Lizenz: Creative Commons Attribution 4.0, https://creativecommons.org/licenses/by/4.0/
+Originalquelle: http://data.deutschebahn.com/dataset/data-betriebsstellen
+Archiv: https://github.com/fourplusone/ds100/blob/master/DBNetz-Betriebsstellenverzeichnis-Stand2018-04.csv
+Änderung: auf Kürzel und Name reduziert, Datensätze mit Ablaufdatum entfernt, sortiert, TSV UTF-8.
+Dieser historische Datenstand ist keine aktuelle oder vollständige Betriebsgrundlage.
+Aktueller Herausgeber: https://www.dbinfrago.com/web/schienennetz/betrieb/allgemeine-betriebsinformationen/betriebsstellen-12592996

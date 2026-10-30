@@ -27,3 +27,17 @@ Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden�
 - Nach 365 Tagen läuft das Anmeldetoken ab. Danach ist eine neue Anmeldung nötig. Passwortzurücksetzung, weitere Admin-Funktionen und Schema-Migrationen folgen später.
 
 Der Python-API-Testlauf wurde lokal mit SQLite als isolierter Testdatenbank geprüft. Ein MySQL-Integrationslauf und ein Android-Build waren in dieser Umgebung ohne MySQL-Server bzw. Android SDK nicht möglich. LokZeit selbst wurde nicht verändert.
+
+## GPS-Ortssuche und Zugfahrtdetails
+
+Die GPS-Aufzeichnung erkennt einen Stillstand nach zwei Minuten im Bereich von 75 m (gemeldete Geschwindigkeit höchstens 1,5 m/s). Bewegung über 150 m oder über 2,5 m/s bestätigt nach 30 Sekunden die Abfahrt. Zeiten werden auf den Beginn der jeweiligen Erkennung zurückgesetzt. Veraltete/ungenaue Positionen werden ignoriert; längere Datenlücken gelten nicht als Stillstandsnachweis. GPS benötigt den geöffneten Bildschirm und einen laufenden Dienst. Erkannte Zeiten müssen weiterhin geprüft, mit einem Grund versehen und gespeichert werden.
+
+Zur Standortzuordnung werden ausschließlich OSM-Ortsnamen (Stadt, Gemeinde, Dorf, Ortsteil) innerhalb von 5 km gesucht und mit dem lokalen DS100-Verzeichnis über den Ortsnamen abgeglichen. Es wird keine nächstgelegene Betriebsstelle ausgewählt. Mehrere Treffer stehen zur Auswahl; ohne Treffer oder bei Netzfehler bleiben DS100 und Bahnhofsname leer und können manuell ergänzt werden. Standzeiten lassen sich ohne Standort speichern und später bearbeiten.
+
+**Datenstand:** Das enthaltene DS100-Verzeichnis ist ein Archivstand der Deutschen Bahn AG von **April 2018**, CC BY 4.0, und muss fachlich geprüft werden. Es ist kein aktuelles Verzeichnis. Herkunft und Verarbeitung stehen in `app/src/main/assets/ds100-SOURCE.txt`. Für einen neueren Stand kann `ds100.tsv` durch UTF-8-Daten mit einer Zeile `Kürzel<TAB>Name` pro Betriebsstelle ersetzt werden; Quellenangabe und angezeigten Stand dabei ebenfalls aktualisieren. OSM-Ortsdaten: © OpenStreetMap-Mitwirkende, ODbL, https://www.openstreetmap.org/copyright.
+
+Vor jedem gespeicherten Standort befindet sich eine Checkbox. „Übernehmen“ öffnet die Auswahl einer bestehenden Zugfahrt aus der Monatsübersicht. Die ausgewählten Standzeiten müssen in deren Zeitraum liegen. Sie werden zusätzlich unter „Details“ dieser Zugfahrt gespeichert, nach Ankunft sortiert und können dort bearbeitet werden. Wiederholtes Übernehmen desselben Halts aktualisiert ihn anhand seiner stabilen Kennung. Die ursprüngliche Aufzeichnung wird dabei nicht entfernt.
+
+Bestehende lokale Speicherbereiche, Benutzerzuordnungen und Monatseinträge bleiben erhalten. Alte Standzeiten werden ohne Formatwechsel gelesen und erhalten beim Speichern zusätzlich stabile Kennungen. Zugfahrtdetails werden lokal mit dem Monatseintrag gespeichert; der bestehende Monatsversand überträgt diese zusätzlichen Standzeitdetails noch nicht an das Backend.
+
+Die Tests für Erkennung, Ortsabgleich, wiederholte Übernahme und Altformat-Lesen laufen mit `gradle :app:testDebugUnitTest`; der PR-Workflow prüft außerdem `:app:assembleDebug`.

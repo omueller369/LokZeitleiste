@@ -67,6 +67,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
     var accommodationExpanded by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
+    var detailsId by remember { mutableStateOf<String?>(null) }
     var transitionEntry by remember { mutableStateOf<Entry?>(null) }
     var transitionDate by remember { mutableStateOf(LocalDate.now().toString()) }
     var transitionTime by remember { mutableStateOf("12:00") }
@@ -208,6 +209,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                                 Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.pause} min", Modifier.width(105.dp))
                                 Text(if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft")) "—" else "${entry.guest} min", Modifier.width(105.dp))
                                 Text(if (entry.kind == "Urlaub") "1 Tag" else displayTime(length(entry)), Modifier.width(105.dp))
+                                if (entry.kind == "Zugfahrt") TextButton(onClick = { detailsId = entry.clientId }) { Text("Details (${entry.stops.size})") }
                                 if (entry.kind in listOf("Rufbereitschaft", "Bereitschaft"))
                                     TextButton(onClick = {
                                         transitionEntry = entry; transitionDate = entry.date
@@ -230,6 +232,12 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onLogout: () -> U
                 }
             }
         }
+    }
+    entries.firstOrNull { it.clientId == detailsId }?.let { trip ->
+        TrainDetailsDialog(trip, onDismiss = { detailsId = null }, onSave = { updated ->
+            entries = entries.map { if (it.clientId == updated.clientId) updated else it }
+            saveEntries(context, username, entries)
+        })
     }
     transitionEntry?.let { original ->
         AlertDialog(onDismissRequest = { transitionEntry = null },
