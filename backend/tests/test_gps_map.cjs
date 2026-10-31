@@ -30,5 +30,15 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');r.mapState.zoom=19;r.drawMap();r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,19);assert.equal(r.mapZoomIn.disabled,true);
  const layer=r.mapSvg.children.find(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org'));layer.events.error();assert.equal(r.railFailed,true);assert(!r.mapSvg.children.some(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org')));assert(r.mapSvg.children.some(n=>String(n.attributes.href).includes('tile.openstreetmap.org')));
  context.document.visibilityState='hidden';r.drawMap();assert(!r.mapSvg.children.some(n=>n.tag==='image'));assert(r.mapSvg.children.some(n=>n.tag==='polyline'));
+ // Old recordings need no migration: markers are derived from original fixes.
+ r.record={ended:true,points:Array.from({length:63},(_,i)=>({...point(52,13,100000+i*5000),speed:0}))};r.draw();
+ const markers=()=>r.mapSvg.children.filter(n=>n.attributes['data-gps-stop']);assert.equal(markers().length,1);
+ const marker=markers()[0];assert.equal(marker.children[0].attributes.fill,'#1565c0');assert.equal(marker.children[1].attributes.fill,'#d00000');
+ const input=r.liveInputs[0].station;let focused=0,scrolled=0;input.focus=()=>focused++;input.scrollIntoView=()=>scrolled++;input.setSelectionRange=(a,b)=>assert.equal(a,b);marker.events.click();assert.equal(focused,1);assert.equal(scrolled,1);
+ let prevented=false;marker.events.keydown({key:'Enter',preventDefault(){prevented=true;}});assert(prevented);assert.equal(focused,2);
+ const key=r.liveInputs[0].row.key;r.record.stop_edits={[key]:{imported:true}};let imported=null;r.o.focusImported=value=>imported=value;r.draw();assert.equal(r.liveInputs.length,0);markers()[0].events.click();assert.equal(imported,key);
+ // Signal gaps do not invent stops, and short stationary runs have no marker.
+ r.record={ended:true,points:[{...point(52,13,1),speed:0},{...point(52,13,400001),speed:0}]};r.draw();assert.equal(markers().length,0);
+ console.log('GPS stop markers: legacy fixes, two colors, click/keyboard focus, imported details and gap exclusion: PASS');
  console.log('GPS map: live follow, preserved zoom, pinch, overview, zoom limits, ORM fallback and visible-only tiles: PASS');
 })().catch(e=>{console.error(e);process.exitCode=1;});
