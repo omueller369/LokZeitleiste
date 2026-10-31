@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter,Depends,HTTPException,UploadFile,File,Header
 from fastapi.responses import Response
 from pydantic import BaseModel,Field
-from sqlalchemy import select
+from sqlalchemy import select,delete
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from ..db import database_session
@@ -20,6 +20,7 @@ class DraftInput(BaseModel):
 
 def find(db,user,client_id):
     return db.scalar(select(Draft).where(Draft.owner_id==user.id,Draft.client_id==str(client_id)))
+def deleted(row):return bool(row and json.loads(row.payload_json).get('_deleted'))
 def lock_owner(db,user):db.scalar(select(User).where(User.id==user.id).with_for_update())
 def draft_files(db,row):
     keys=json.loads(row.receipt_keys_json)
@@ -28,6 +29,7 @@ def view(db,row):
     return dict(client_id=row.client_id,report=json.loads(row.payload_json),revision=row.revision,updated_at=row.updated_at.isoformat(),receipt_keys=json.loads(row.receipt_keys_json),files=[dict(key=f.file_key,name=f.filename,mime_type=f.mime_type) for f in draft_files(db,row)])
 def before_finalize(db,user,client_id,revision):
     lock_owner(db,user);row=find(db,user,client_id)
+    if deleted(row):raise HTTPException(409,'Dieser Entwurf wurde gelöscht.')
     if row and not row.finalized_report_id:
         if revision!=row.revision:raise HTTPException(409,'Der Entwurf wurde auf einem anderen Gerät geändert. Bitte den Serverstand laden.')
         if len(draft_files(db,row))!=len(json.loads(row.receipt_keys_json)):raise HTTPException(409,'Nicht alle Entwurfsbelege wurden gesichert. Bitte erneut sichern.')
@@ -49,12 +51,21 @@ def create_router(require_account):
     @router.get('')
     def listing(user=Depends(driver),db:Session=Depends(database_session)):
         rows=list(db.scalars(select(Draft).where(Draft.owner_id==user.id).order_by(Draft.updated_at.desc())))
-        return dict(drafts=[view(db,r) for r in rows if not r.finalized_report_id],finalized=[dict(client_id=r.client_id,report_id=r.finalized_report_id) for r in rows if r.finalized_report_id])
+        return dict(drafts=[view(db,r) for r in rows if not r.finalized_report_id and not deleted(r)],finalized=[dict(client_id=r.client_id,report_id=r.finalized_report_id) for r in rows if r.finalized_report_id])
     @router.get('/{client_id}')
     def detail(client_id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
         row=find(db,user,client_id)
-        if not row or row.finalized_report_id:raise HTTPException(404,'Entwurf nicht gefunden.')
+        if not row or row.finalized_report_id or deleted(row):raise HTTPException(404,'Entwurf nicht gefunden.')
         return view(db,row)
+    @router.delete('/{client_id}')
+    def remove(client_id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
+        lock_owner(db,user)
+        if db.scalar(select(DutyReport.id).where(DutyReport.tf_user_id==user.id,DutyReport.client_id==str(client_id))):raise HTTPException(409,'Bereits synchronisierte Arbeitsberichte können hier nicht gelöscht werden.')
+        row=find(db,user,client_id)
+        if row:
+            if row.finalized_report_id:raise HTTPException(409,'Arbeitsbericht bereits synchronisiert.')
+            db.execute(delete(DraftFile).where(DraftFile.draft_id==row.id));row.payload_json=json.dumps({'_deleted':True});row.receipt_keys_json='[]';row.revision+=1;row.updated_at=now_utc();db.commit()
+        return {'ok':True}
     @router.put('/{client_id}')
     def save(client_id:UUID,data:DraftInput,user=Depends(driver),db:Session=Depends(database_session)):
         if client_id!=data.report.client_id:raise HTTPException(422,'Entwurfs-ID stimmt nicht überein.')
@@ -62,6 +73,7 @@ def create_router(require_account):
         if len(payload.encode('utf-8'))>60000:raise HTTPException(422,'Arbeitsbericht enthält zu viele Zugfahrtdaten.')
         lock_owner(db,user);row=find(db,user,client_id)
         if db.scalar(select(DutyReport.id).where(DutyReport.tf_user_id==user.id,DutyReport.client_id==str(client_id))):raise HTTPException(409,'Dieser Arbeitsbericht wurde bereits abgeschlossen. Bitte die Monatsliste aktualisieren.')
+        if deleted(row):raise HTTPException(409,'Dieser Entwurf wurde gelöscht. Bitte einen neuen Arbeitsbericht beginnen.')
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'Der Entwurf wurde auf einem anderen Gerät geändert. Bitte den Serverstand laden.')
         keys=list(dict.fromkeys(str(k) for k in data.receipt_keys))
         if not row:row=Draft(owner_id=user.id,client_id=str(client_id),revision=0);db.add(row)
@@ -77,7 +89,7 @@ def create_router(require_account):
         try:name,mime,digest=validate_receipt(file.filename,content)
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         lock_owner(db,user);row=find(db,user,client_id)
-        if not row or row.finalized_report_id:raise HTTPException(404,'Entwurf nicht gefunden.')
+        if not row or row.finalized_report_id or deleted(row):raise HTTPException(404,'Entwurf nicht gefunden.')
         if str(file_key) not in json.loads(row.receipt_keys_json):raise HTTPException(409,'Der Beleg gehört nicht mehr zum aktuellen Entwurf.')
         existing=db.scalar(select(DraftFile).where(DraftFile.draft_id==row.id,DraftFile.file_key==str(file_key)))
         if existing and existing.content_hash!=digest:raise HTTPException(409,'Beleg-ID ist bereits mit anderen Daten belegt.')

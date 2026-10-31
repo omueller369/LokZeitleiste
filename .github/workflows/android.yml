@@ -59,7 +59,7 @@ jobs:
           gradle --no-daemon :app:testDebugUnitTest :app:assembleDebug :app:lintDebug \
             -PlokzeitleisteApiBaseUrl=https://ctl-software.io-goerlitz.eu \
             -PlokzeitleisteVersionCode=$((100000 + GITHUB_RUN_NUMBER)) \
-            -PlokzeitleisteVersionName=0.11-test.$GITHUB_RUN_NUMBER
+            -PlokzeitleisteVersionName=0.26-test.$GITHUB_RUN_NUMBER
       - uses: actions/upload-artifact@v4
         with:
           name: LokZeitleiste-TF-Portal-debug
@@ -75,10 +75,10 @@ jobs:
           python - <<'PYUPDATE'
           import hashlib, json, os, pathlib
           apk=pathlib.Path('update-release/LokZeitleiste-TF-Portal.apk')
-          metadata={'application_id':'de.lokzeitleiste.app','version_code':100000+int(os.environ['GITHUB_RUN_NUMBER']),'version_name':'0.11-test.'+os.environ['GITHUB_RUN_NUMBER'],'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
+          metadata={'application_id':'de.lokzeitleiste.app','version_code':100000+int(os.environ['GITHUB_RUN_NUMBER']),'version_name':'0.26-test.'+os.environ['GITHUB_RUN_NUMBER'],'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
           pathlib.Path('update-release/update.json').write_text(json.dumps(metadata,indent=2)+'\n')
           PYUPDATE
           gh release create "android-test-$GITHUB_RUN_NUMBER" \
             update-release/LokZeitleiste-TF-Portal.apk update-release/update.json \
-            --prerelease --target "$GITHUB_SHA" --title "TF Portal Android 0.11 Test $GITHUB_RUN_NUMBER" \
+            --prerelease --target "$GITHUB_SHA" --title "TF Portal Android 0.26 Test $GITHUB_RUN_NUMBER" \
             --notes "Automatisch geprüfte Tablet-Testversion. Installation und Updates erfordern denselben Signierschlüssel und die Android-Bestätigung."

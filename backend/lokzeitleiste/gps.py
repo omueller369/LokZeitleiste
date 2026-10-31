@@ -22,10 +22,21 @@ class Point(BaseModel):
     lon:_finite=Field(ge=-180,le=180)
     accuracy:_finite=Field(ge=0,le=100000)
     speed:_finite|None=Field(default=None,ge=0,le=200)
+class StopEdit(BaseModel):
+    station_input:str=Field(default='',max_length=270)
+    station:dict[str,str]|None=None
+    reason:str=Field(default='',max_length=64)
+    detail:str=Field(default='',max_length=256)
+    end:int|None=Field(default=None,ge=946684800000,le=4133980800000)
+    manual_end:bool=False
+    imported:bool=False
+
 class Recording(BaseModel):
     train_number:str=Field(pattern=r'^[A-Za-z0-9]{1,12}$')
     points:list[Point]=Field(min_length=1,max_length=20000)
     start_station:str|None=Field(default=None,max_length=10)
+    end_station:str|None=Field(default=None,max_length=10)
+    stop_edits:dict[str,StopEdit]|None=Field(default=None,max_length=1024)
     ended:bool=True
     expected_revision:int=Field(default=0,ge=0)
     @model_validator(mode='after')
@@ -143,6 +154,36 @@ def create_router(require_account):
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
         payload=data.model_dump(exclude={'expected_revision'});previous=json.loads(row.payload_json) if row else {}
+        stops={'live-'+str(item['start']):item for item in analyse(payload['points'])['rows'] if item['kind']=='Halt'}
+        edits=payload.get('stop_edits')
+        if edits is None:edits={key:value for key,value in previous.get('stop_edits',{}).items() if key in stops}
+        if any(key not in stops for key in edits):raise HTTPException(422,'Standzeit gehört nicht zur Aufzeichnung.')
+        for key,edit in edits.items():
+            if edit.get('end') is not None and edit['end']<=stops[key]['start']:raise HTTPException(422,'Ende muss nach Beginn der Standzeit liegen.')
+            if edit.get('station'):
+                code=edit['station'].get('code','').strip().upper()
+                if not code:
+                    name=edit['station'].get('name','').strip()
+                    if not name or len(name)>255:raise HTTPException(422,'Ungültiger älterer Ortsname.')
+                    edit['station']=dict(code='',name=name)
+                else:
+                    station=db.get(RailwayStation,code)
+                    if not station:raise HTTPException(422,'Bitte gültigen DS100-Standort wählen.')
+                    edit['station']=dict(code=station.code,name=station.name)
+        # Preserve explicit assignments from older 0.25/RC recordings.
+        for item in analyse(previous.get('points',[]))['rows']:
+            key='live-'+str(item['start'])
+            if item['kind']!='Halt' or key not in stops or key in edits:continue
+            station=previous.get('stations',{}).get(item['key']) or previous.get('locations',{}).get(str(item['start']))
+            reason=previous.get('reasons',{}).get(item['key'],{})
+            if station:edits[key]=dict(station=station,station_input=(station.get('code','')+' · ' if station.get('code') else '')+station.get('name',''),reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
+        payload['stop_edits']=edits
+        if 'locations' in previous:payload['locations']=previous['locations']
+        if data.end_station:
+            station=db.get(RailwayStation,data.end_station.strip().upper())
+            if not station:raise HTTPException(422,'Bitte gültigen Endbahnhof wählen.')
+            payload['end_station']=station.code
+
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
         payload['reasons']=previous.get('reasons',{}) if previous.get('points')==payload['points'] else {}
         payload['selection']=previous.get('selection',[]) if previous.get('points')==payload['points'] else []
@@ -150,6 +191,8 @@ def create_router(require_account):
             station=db.get(RailwayStation,data.start_station.strip().upper())
             if not station:raise HTTPException(422,'Bitte einen gültigen Startbahnhof (DS100) wählen.')
             payload['start_station']=station.code;payload['stations']['start']=dict(code=station.code,name=station.name)
+        if data.end_station:
+            end=db.get(RailwayStation,payload['end_station']);payload['stations']['end']=dict(code=end.code,name=end.name)
         if not row:row=TrainGpsRecording(owner_id=user.id,journey_id=str(journey_id),revision=0);db.add(row)
         row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     @router.delete('/api/v1/tf/gps/{journey_id}')

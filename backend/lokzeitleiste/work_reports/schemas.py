@@ -54,6 +54,7 @@ CAUSES=('CTL','CTL Logistics DE','CTL Logistics PL','DB InfraGo','Dritte Stelle'
 
 class TrainEventIn(BaseModel):
     id:UUID
+    gps_stop_key:str=Field(default='',max_length=64)
     reason:str=Field(min_length=1,max_length=64)
     reason_label:str=Field(default='',max_length=200)
     reason_detail:str=Field(default='',max_length=256)
@@ -72,8 +73,8 @@ class TrainEventIn(BaseModel):
 
     @model_validator(mode='after')
     def valid_event(self):
-        if not self.station and not (self.reason=='Pause' and self.cause in ('CTL','CTL Logistics DE')):raise ValueError('DS100-Kürzel erforderlich.')
-        if not self.station:self.station_name=''
+        self.station_name=self.station_name.strip()
+        if not self.station and not self.station_name and not (self.reason=='Pause' and self.cause in ('CTL','CTL Logistics DE')):raise ValueError('DS100-Kürzel erforderlich.')
         if self.end_at<=self.start_at:raise ValueError('Bis muss nach Von liegen.')
         self.reason_detail=self.reason_detail.strip() if self.reason=='sonstiges' else ''
         self.cause_detail=self.cause_detail.strip() if self.cause=='sonstiges' else ''

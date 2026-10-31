@@ -1,4 +1,4 @@
-# LokZeitleiste v0.25
+# LokZeitleiste v0.26
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -205,3 +205,8 @@ Hochgeladene JPEG- und PNG-Bilder erscheinen in den Protokolldetails direkt als 
 **`install-ctlsoftware-test.sh`** richtet auf einem frischen Ubuntu 26.04 die gesamte Serverumgebung ein: Apache/HTTPS, MariaDB (`db_ctl`/`dbo_ctl`, Passwort wird abgefragt), DNS-Vorgaben für STRATO (BIND nur lokal), Postfix/Dovecot, DKIM/SRS und die CTL-Anwendung mit 20 Test-TF samt Bildern. Domain `ctl-software.io-goerlitz.eu`, IP `212.227.86.251`. Die vier Postfächer `info`, `diso`, `vkplanung` und `railpool` speichern Nachrichten lokal und leiten sie zusätzlich an `omueller369@gmail.com` weiter. [Vollständige Anleitung, DNS-Voraussetzungen, Mailzugänge und Fortsetzung](docs/INSTALL-CTLSOFTWARE-TEST.md). Dies ist eine eigene Installationsart ohne ISPConfig und kein Update der bisherigen laufenden Umgebung.
 
 Persönliche TF-/Mitarbeiterpostfächer, Domainliste und Update einer bestehenden Standalone-Testinstallation: [Anleitung](docs/EMPLOYEE-MAIL-UPDATE.md).
+
+
+## Arbeitsbericht und GPS v0.26
+
+Diese Version basiert auf dem Stand 0.25 des Branchs `setup/debian-testumgebung`, nicht auf der RC1. Der GPS-Ablauf wurde auf manuelle Start-/Endbahnhöfe und eine lokale Live-Standzeitenliste umgestellt. Die vollständige Bedienhilfe einschließlich Wiederherstellung, Zwischenspeichern und Löschen steht unter [Version 0.26](docs/VERSION-0.26.md) und im Hilfe-Button des Arbeitsberichts/GPS-Bereichs.
