@@ -32,6 +32,21 @@ class DraftTest(unittest.TestCase):
         result=self.driver.get(self.base).json();self.assertEqual(result['drafts'],[]);self.assertEqual(result['finalized'][0]['report_id'],final.json()['id'])
         self.assertEqual(self.save(changed,2).status_code,409)
         self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=changed,headers={'X-CTL-Draft-Revision':'2'}).status_code,201)
+    def test_delete_unsynchronized_draft_and_protect_finalized_report(self):
+        data=self.payload();self.assertEqual(self.save(data).status_code,200)
+        path=self.base+'/'+data['client_id']
+        self.assertEqual(self.driver.delete(path).status_code,200)
+        self.assertEqual(self.driver.get(path).status_code,404)
+        self.assertEqual(self.driver.delete(path).status_code,200)
+        self.assertEqual(self.driver.get(self.base).json()['drafts'],[])
+        self.assertEqual(self.save(data).status_code,409)
+        data=self.payload();self.assertEqual(self.save(data).status_code,200)
+        path=self.base+'/'+data['client_id']
+        final=self.driver.post('/api/v1/tf/work-reports',json=data,headers={'X-CTL-Draft-Revision':'1'})
+        self.assertEqual(final.status_code,201,final.text)
+        self.assertEqual(self.driver.delete(path).status_code,409)
+        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/'+str(final.json()['id'])).status_code,200)
+
     def test_incomplete_pause_is_allowed_only_for_draft(self):
         data=self.payload();data.update(pause_policy=2,actual_pause=0)
         saved=self.save(data);self.assertEqual(saved.status_code,200,saved.text)

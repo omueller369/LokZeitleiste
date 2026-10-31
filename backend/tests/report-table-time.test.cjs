@@ -41,8 +41,8 @@ test('event editor uses current types and renders date changes across rows',()=>
   assert.deepEqual(Array.from(fields.cause.options,o=>o.value),['','CTL','DB InfraGo','Dritte Stelle','sonstiges']);
   assert.equal(fields.cause.parentElement.children[0].textContent,'Art');
   const rows=item.rows.children.map(row=>row.children.map(cell=>cell.textContent));
-  assert.equal(rows[0][5],'CTL');assert.equal(rows[0][6],'Pause');
-  assert.equal(rows[0][9],'13.10.2026 · 00:10');
-  assert.equal(rows[1][8],'00:15');assert.equal(rows[1][9],'00:30');
+  assert.equal(rows[0][0],'CTL');assert.equal(rows[0][1],'Pause');
+  assert.equal(rows[0][4],'13.10.2026 · 00:10');
+  assert.equal(rows[1][3],'00:15');assert.equal(rows[1][4],'00:30');
   item.ctlPause.onclick();assert.equal(fields.cause.value,'CTL');assert.equal(fields.reason.value,'Pause');assert.equal(fields.station.required,false);
 });

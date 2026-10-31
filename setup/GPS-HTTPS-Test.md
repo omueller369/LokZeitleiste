@@ -4,6 +4,10 @@ Für **ctl-software.io-goerlitz.eu / 212.227.86.251**, Ubuntu, Apache und vorhan
 
 Let's Encrypt stellt kostenlose Zertifikate bereit. Certbot, die Browser-GPS-Funktion und die verwendeten OpenStreetMap-Daten benötigen keinen kostenpflichtigen API-Schlüssel. Die bereits vorhandenen Kosten für Server, Domain und Internet bleiben bestehen. Öffentliche Overpass-Abfragen sind für diesen kleinen Test vorgesehen und können zeitweise begrenzt werden. Für regelmäßigen größeren Betrieb ist ein eigener OSM-Datendienst einzuplanen.
 
+## Aktueller Ablauf ab Version 0.26
+
+Start- und Endbahnhof werden nur manuell über DS100 oder Bahnhofsname ausgewählt. Live-Standzeiten über fünf Minuten lassen sich mit Standort, Grund und gegebenenfalls manuellem Ende direkt in die Zugfahrtdetails übernehmen. GPS-Lücken werden als geschätzte Verbindung dargestellt; Internetunterbrechungen erzeugen keine Warnmeldung. Die aktuelle vollständige Anleitung steht in [VERSION-0.26.md](../docs/VERSION-0.26.md). Die nachfolgenden Abschnitte zur älteren Testoberfläche dienen nur noch der technischen Einrichtung und Fehlerdiagnose.
+
 ## 1. Vorher lokale Arbeitsberichte synchronisieren
 
 Noch unter der bisherigen HTTP-Adresse alle lokal gespeicherten Arbeitsberichte mit dem Server synchronisieren. Der Browser verwaltet HTTP und HTTPS als getrennte Ursprünge: lokale Browserentwürfe werden beim Wechsel nicht automatisch übernommen. Bei Bedarf vorher zusätzlich sichern. Danach die folgende Einrichtung ausführen.

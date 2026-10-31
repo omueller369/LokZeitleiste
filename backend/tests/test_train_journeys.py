@@ -33,6 +33,15 @@ class TrainJourneysTest(unittest.TestCase):
         self.assertEqual(changed.status_code,200,changed.text)
         self.assertEqual(changed.json()['documented_pause_minutes'],50)
 
+    def test_imported_gps_identity_survives_edit_and_server_storage(self):
+        data=self.data();data['train_journeys'][0]['events'][0]['gps_stop_key']='live-1792627200000'
+        report=self.create(data);saved=report['train_journeys'][0]['events'][0]
+        self.assertEqual(saved['gps_stop_key'],'live-1792627200000')
+        trains=copy.deepcopy(report['train_journeys']);trains[0]['events'][0]['end_at']='2026-10-12T10:25'
+        changed=self.update(report['id'],trains)
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertEqual(changed.json()['train_journeys'][0]['events'][0]['gps_stop_key'],'live-1792627200000')
+
     def test_multiple_trains_and_pause_documentation_without_work_deduction(self):
         data=self.data();data['train_journeys'].append(dict(self.train(),events=[]))
         report=self.create(data);self.assertEqual(len(report['train_journeys']),2)

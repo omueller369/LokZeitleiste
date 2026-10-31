@@ -83,6 +83,22 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(self.driver.put(path+'/stations',json={'expected_revision':2,'stations':{'start':'UNKNOWN'}}).status_code,422)
         _,changed=self.save(path,expected_revision=2,points=points(310));self.assertIsNone(changed.json()['analysis']['rows'][0]['station'])
 
+    def test_live_stop_edits_end_station_and_import_flag_survive_checkpoint(self):
+        key='live-'+str(BASE)
+        path,response=self.save(ended=False,end_station='BBB',stop_edits={key:{'station_input':'BBB · Berlin Beispiel','station':{'code':'BBB','name':'ignored'},'reason':'sonstiges','detail':'Warten auf Ablösung','end':BASE+305000,'manual_end':True,'imported':True}})
+        self.assertEqual(response.status_code,200,response.text)
+        value=response.json();self.assertEqual(value['points'],points())
+        self.assertFalse(value['ended']);self.assertEqual(value['end_station'],'BBB')
+        self.assertEqual(value['stations']['end']['name'],'Berlin Beispiel')
+        self.assertEqual(value['stop_edits'][key]['station']['name'],'Berlin Beispiel')
+        self.assertTrue(self.driver.get(path).json()['stop_edits'][key]['imported'])
+        changed=self.save(path,expected_revision=1,points=points(310))[1]
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertTrue(changed.json()['stop_edits'][key]['imported'])
+        for edits in [{'bad-key':{}},{key:{'end':BASE}},{key:{'station':{'code':'unknown','name':'x'}}}]:
+            self.assertEqual(self.save(path,expected_revision=2,points=points(310),stop_edits=edits)[1].status_code,422)
+        self.assertEqual(self.save(path,expected_revision=2,end_station='UNKNOWN')[1].status_code,422)
+
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records
         self.save()

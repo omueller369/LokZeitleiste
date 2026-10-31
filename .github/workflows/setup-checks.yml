@@ -25,6 +25,8 @@ jobs:
           bash setup/tests/test-platform.sh
           bash setup/tests/test-auto-admin.sh
           for script in backend/lokzeitleiste/static/*.js; do node --check "$script"; done
+      - name: JavaScript regression tests
+        run: for test in backend/tests/*.cjs; do node "$test" || exit 1; done
       - name: Compose configuration
         working-directory: backend
         run: |

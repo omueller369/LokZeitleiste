@@ -1,0 +1,25 @@
+# Version 0.26 – GPS und Arbeitsbericht
+
+Ausgangspunkt ist Version 0.25 auf `setup/debian-testumgebung`. RC1 wird nicht vorausgesetzt. Vorhandene Arbeitsberichte, GPS-Punkte und Stammdaten bleiben erhalten; auch ältere gespeicherte Standortzuordnungen werden weiterhin gelesen. Es ist keine Datenbankmigration erforderlich.
+
+1. **GPS-Lücken:** Zwischen Signalverlust und nächstem gültigen Punkt erscheint eine gestrichelte Verbindung. Im GPX wird ein separates Verbindungssegment mit `lzt:estimated=true` exportiert. Es werden keine gemessenen Positionen erfunden. Eine Lücke über 30 Sekunden und ungenaue Punkte zählen nicht als Standzeit.
+2. **Internet:** Bei Verbindungsunterbrechung gibt es keine Internet-Warnmeldung. Die GPS-Punkte werden weiter lokal gespeichert. Kartenkacheln und neue DS100-Suchtreffer benötigen eine Verbindung; zuvor gewählte Bahnhöfe stehen im lokalen Zugfahrtcache zur Verfügung. Speicherfehler, fehlende Standortberechtigungen und tatsächliche Datenkonflikte werden weiterhin angezeigt.
+3. **Startbahnhof:** Aufzeichnung starten, DS100 oder Bahnhofsname selbst eingeben und einen Treffer wählen. Angezeigt wird `DS100 · Bahnhofsname`. Es wird kein Standort automatisch gesucht.
+4. **Endbahnhof:** Beim Beenden wird ebenfalls ausschließlich die eigene Eingabe verlangt. Bei Abbruch dieses Dialogs bleiben die GPS-Daten gesichert; den Endbahnhof später in den Zugdaten ergänzen.
+5. **Standzeiten:** Nach mehr als fünf Minuten unter 3 km/h erscheint ein Halt sofort in der Liste. Standort per DS100/Bahnhofsname wählen. Grund auswählen oder als Freitext eingeben (wird als „Sonstiges“ gespeichert). Bei Weiterfahrt wird „Bis“ ergänzt; fehlt ein Ende, kann es manuell in Berliner Zeit eingegeben werden. `↑ Übernehmen` fügt den Halt nach Bestätigung den Zugfahrtdetails hinzu. Er verschwindet aus der GPS-Liste und bleibt in den Details bearbeitbar. Die Punktfolge bleibt zur Nachvollziehbarkeit erhalten. Eine feste Kennung verhindert doppelte Übernahmen.
+6. **Wiederherstellung:** Offene Dienst-, Gastfahrt- und Zugfahrtereignis-Eingaben werden auf diesem Gerät automatisch gesichert. Beim erneuten Öffnen des Arbeitsberichts wird der letzte Bearbeitungsstand wieder angezeigt. Browserdaten nicht löschen und keinen privaten Modus verwenden. Browser-GPS kann beim Schließen der Seite unterbrochen werden; Android verwendet den Standortdienst.
+7. **Löschen:** Solange der Bericht noch nicht endgültig synchronisiert ist, kann er über „Arbeitsbericht löschen“ oder in der Monatsliste gelöscht werden. Laufendes GPS wird gestoppt. Zugehörige lokale GPS-Daten und Belege werden entfernt; bei fehlender Verbindung wird die Serverlöschung nachgeholt. Bereits endgültig synchronisierte Berichte sind geschützt. Andere Berichte bleiben erhalten.
+8. **Zwischenspeichern:** Sichert zugleich die vorhandenen GPS-Aufzeichnungen, ohne die Aufzeichnung zu beenden. Ein laufender Android-Journalstand wird vorher eingelesen. Bei Verbindung werden die GPS-Daten zusätzlich serverseitig gesichert. Während dieses Abgleichs eingehende GPS-Punkte bleiben erhalten. Unvollständige Formulare bleiben als lokaler Bearbeitungsstand gesichert; für die endgültige Synchronisation müssen die Pflichtangaben vollständig sein.
+
+## Testserver aktualisieren
+
+Für den eigenständigen, mit `install-ctlsoftware-test.sh` eingerichteten Testserver:
+
+```bash
+curl -fL https://raw.githubusercontent.com/omueller369/LokZeitleiste/setup/debian-testumgebung/install-ctlsoftware-test.sh -o install-ctlsoftware-test.sh
+sudo bash install-ctlsoftware-test.sh --update
+```
+
+Die Update-Routine aktualisiert den normalen Testbranch und sichert zuvor Datenbank, Konfiguration und bisherigen Backend-Code unter `/etc/ctlsoftware-test-setup/backups/`. Dies gilt auch, wenn die Anwendung zuletzt aus dem festen RC1-Quellpaket installiert wurde, sofern der ursprüngliche Testserver-Checkout noch vorhanden ist. Für diesen Wechsel nicht den alten RC1-Pfad mit `--source` angeben.
+
+Danach Portal neu laden; die Softwareinformation zeigt `0.26`. Docker/ISPConfig verwenden ihre jeweils eigene Update-Anleitung. Eine vorhandene APK enthält gegebenenfalls zusätzlich eine gebündelte Offline-Oberfläche; für deren Stand 0.26 die neu gebaute Tablet-Test-APK mit demselben Signierschlüssel verwenden.
