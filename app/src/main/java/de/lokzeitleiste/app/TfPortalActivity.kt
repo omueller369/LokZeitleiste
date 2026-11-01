@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.webkit.*
 import android.widget.*
 import androidx.activity.ComponentActivity
@@ -64,7 +66,7 @@ class TfPortalActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if(TokenVault.username(this).isBlank()) { login();return }
-        try { policy=PortalPolicy(ApiClient.base()) } catch(error:Exception) { Toast.makeText(this,error.message,Toast.LENGTH_LONG).show();finish();return }
+        try { policy=PortalPolicy(ApiClient.base()) } catch(error:Exception) { toast(error.message?:"Serveradresse (HTTPS) prüfen.");finish();return }
         store=GpsTrackStore(this)
         LanguageRuntime.initialize(this)
         LanguageRuntime.code=getSharedPreferences("lokzeitleiste_language",MODE_PRIVATE).getString("language","de")?:"de"
@@ -84,7 +86,13 @@ class TfPortalActivity : ComponentActivity() {
         } })
         lifecycleScope.launch { initialize() }
     }
-    private fun toast(message:String) = Toast.makeText(this,LanguageRuntime.translate(message,LanguageRuntime.code),Toast.LENGTH_LONG).show()
+    private fun toast(message:String) {
+        val notice=Toast.makeText(this,LanguageRuntime.translate(message,LanguageRuntime.code),Toast.LENGTH_LONG)
+        notice.show()
+        if(message.contains("GPS",ignoreCase=true) || message.contains("HTTPS",ignoreCase=true)) {
+            Handler(Looper.getMainLooper()).postDelayed({ notice.cancel() },3000L)
+        }
+    }
     private fun navigateHome() { if(GpsRecordingService.currentKey!=null)toast("Bitte zuerst die GPS-Aufzeichnung beenden.") else web.loadUrl(policy.origin+"/tf") }
     private fun login() { startActivity(Intent(this,MainActivity::class.java));finish() }
     private fun logout(force:Boolean=false) {

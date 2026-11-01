@@ -1,4 +1,6 @@
 import unittest
+import json
+from pathlib import Path
 from uuid import uuid4
 from unittest.mock import patch
 from fastapi.testclient import TestClient
@@ -15,11 +17,20 @@ def points(seconds=305,speed=0):
 
 class AnalysisTest(unittest.TestCase):
     def test_strict_thresholds_and_endpoints(self):
-        self.assertEqual([r['kind'] for r in analyse(points(300))['rows']],['Start','Ende'])
+        self.assertEqual([r['kind'] for r in analyse(points(235))['rows']],['Start','Ende'])
         result=analyse(points());self.assertEqual([r['kind'] for r in result['rows']],['Start','Halt','Ende'])
         self.assertEqual(result['rows'][1]['end']-result['rows'][1]['start'],305000)
         self.assertEqual(len(analyse(points(speed=3/3.6))['rows']),2)
         self.assertEqual(len(analyse(points(speed=2.99/3.6))['rows']),3)
+
+        self.assertEqual(len(analyse(points(240))['rows']),3)
+
+    def test_rail_stop_fixtures_match_browser(self):
+        cases=json.loads((Path(__file__).parent/'fixtures/gps-rail-stops.json').read_text())
+        for case in cases:
+            with self.subTest(case=case['name']):
+                rows=analyse(case['points'],case['edits'])['rows']
+                self.assertEqual([dict(start=row['start'],end=row['end']) for row in rows if row['kind']=='Halt'],case['expected'])
 
     def test_gaps_and_accuracy_never_count_as_stops(self):
         data=points();data[31:]=[{**p,'t':p['t']+60000} for p in data[31:]]
@@ -98,6 +109,24 @@ class RecordingTest(unittest.TestCase):
         for edits in [{'bad-key':{}},{key:{'end':BASE}},{key:{'station':{'code':'unknown','name':'x'}}}]:
             self.assertEqual(self.save(path,expected_revision=2,points=points(310),stop_edits=edits)[1].status_code,422)
         self.assertEqual(self.save(path,expected_revision=2,end_station='UNKNOWN')[1].status_code,422)
+
+    def test_four_minute_jitter_stop_and_existing_edits_roundtrip(self):
+        data=points(240)
+        # Movement/jitter inside the stop area must not split the interval.
+        for i in range(5,len(data),5):data[i]={**data[i],'lat':52.0005,'speed':2}
+        key='live-'+str(BASE)
+        path,response=self.save(points=data,stop_edits={key:{'station_input':'BBB','reason':'V1'}})
+        self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['analysis']['rows'][1]['end'],BASE+240000)
+        # Two previously edited halts remain separately addressable even inside 100m.
+        edits={key:{'reason':'V1','imported':True},'live-'+str(BASE+300000):{'reason':'V2','station_input':'CCC'}}
+        saved=self.save(path,expected_revision=1,points=points(600),stop_edits=edits)[1]
+        self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(len([r for r in saved.json()['analysis']['rows'] if r['kind']=='Halt']),2)
+        self.assertTrue(saved.json()['stop_edits'][key]['imported'])
+        changed=self.save(path,expected_revision=2,points=points(610))[1]
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertEqual(changed.json()['stop_edits']['live-'+str(BASE+300000)]['station_input'],'CCC')
 
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records
