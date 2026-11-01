@@ -128,6 +128,27 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(changed.status_code,200,changed.text)
         self.assertEqual(changed.json()['stop_edits']['live-'+str(BASE+300000)]['station_input'],'CCC')
 
+    def test_legacy_station_assignment_does_not_shift_to_new_shorter_stop(self):
+        data=points(240)+[dict(points()[0],t=BASE+245000,lat=52.002,speed=2)]
+        data += [dict(points()[0],t=BASE+s*1000,lat=52.004) for s in range(250,556,5)]
+        path,response=self.save(points=data)
+        self.assertEqual(response.status_code,200,response.text)
+        with Session(self.engine) as db:
+            row=db.query(TrainGpsRecording).filter_by(journey_id=path.rsplit('/',1)[1]).one()
+            payload=json.loads(row.payload_json);payload.pop('detection_version',None);payload.pop('stop_edits',None)
+            payload.update(stations={'s0':dict(code='CCC',name='Legacy location')},reasons={'s0':dict(reason='V1',detail='')},selection=['s0'])
+            row.payload_json=json.dumps(payload);db.commit()
+        result=self.driver.get(path).json()
+        stops=[r for r in result['analysis']['rows'] if r['kind']=='Halt']
+        self.assertEqual(len(stops),2)
+        self.assertIsNone(stops[0]['station'])
+        self.assertEqual(stops[1]['station']['code'],'CCC')
+        self.assertEqual(result['selection'],['s1'])
+        self.assertEqual(result['stop_edits']['live-'+str(BASE+250000)]['station']['code'],'CCC')
+        saved=self.save(path,expected_revision=1,points=data)[1]
+        self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(saved.json()['stations']['s1']['code'],'CCC')
+
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records
         self.save()

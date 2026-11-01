@@ -11,21 +11,36 @@ function download(name,content,type){if(window.AndroidPortal){window.AndroidPort
 function berlinInput(ms){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms)).map(p=>[p.type,p.value]));return p.year+'-'+p.month+'-'+p.day+'T'+p.hour+':'+p.minute+':'+p.second;}
 function berlinTime(value){if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value))return null;const wall=Date.parse(value+(value.length===16?':00':'')+'Z');let result=wall;for(let i=0;i<3;i++)result+=wall-Date.parse(berlinInput(result)+'Z');return berlinInput(result).slice(0,value.length)===value?result:null;}
 // Start below 3 km/h; a departure needs both >5 km/h and leaving the 100 m stop area.
-function liveStops(points,ended=false,edits={}){
+function liveStops(points,ended=false,edits={},legacy=false){
  let run=[],last=null,rows=[];
  const distance=(a,b)=>{const r=Math.PI/180,h=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(h)));};
- const finish=closed=>{if(run.length>1&&run.at(-1).t-run[0].t>=240000)rows.push({key:'live-'+run[0].t,kind:'Halt',start:run[0].t,end:closed?run.at(-1).t:null,observed_end:run.at(-1).t,lat:run[0].lat,lon:run[0].lon});run=[];};
+ const finish=closed=>{if(run.length>1&&(legacy?run.at(-1).t-run[0].t>300000:run.at(-1).t-run[0].t>=240000))rows.push({key:'live-'+run[0].t,kind:'Halt',start:run[0].t,end:closed?run.at(-1).t:null,observed_end:run.at(-1).t,lat:run[0].lat,lon:run[0].lon});run=[];};
  for(const p of points){
   if(last&&p.t-last.t>30000)finish(false);
   if(p.accuracy>50){finish(false);last=p;continue;}
   // Existing edited/imported stops retain their identity after an update.
-  if(run.length&&edits?.['live-'+p.t])finish(true);
+  if(!legacy&&run.length&&edits?.['live-'+p.t])finish(true);
   let speed=p.speed;if(speed==null&&last&&last.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000)speed=distance(last,p)/((p.t-last.t)/1000);
-  if(run.length){if(distance(run[0],p)<=100+1e-6)run.push(p);else if(speed!=null&&speed*3.6>5)finish(true);}
+  if(legacy){if(speed!=null&&speed*3.6<3)run.push(p);else finish(true);}
+  else if(run.length){if(distance(run[0],p)<=100+1e-6)run.push(p);else if(speed!=null&&speed*3.6>5)finish(true);}
   else if(speed!=null&&speed*3.6<3)run.push(p);
   last=p;
  }
  finish(ended);return rows;
+}
+// Upgrade cached legacy assignments by start time, never by a newly shifted row number.
+function normaliseRecording(record){
+ if(!record||record.detection_version===2)return;
+ const old=liveStops(record.points||[],true,{},true),edits=record.stop_edits||{};
+ for(const [i,row]of old.entries()){
+  const station=record.stations?.['s'+i]||record.locations?.[String(row.start)],reason=record.reasons?.['s'+i]||{};
+  if(!edits[row.key]&&(station||reason.reason))edits[row.key]={station,station_input:station?(station.code?station.code+' · ':'')+station.name:'',reason:reason.reason||'',detail:reason.detail||'',imported:false};
+ }
+ record.stop_edits=edits;
+ const fresh=liveStops(record.points||[],true,edits),mapping={start:'start',end:'end'};
+ for(const [i,row]of old.entries()){const j=fresh.findIndex(item=>item.start===row.start);if(j>=0)mapping['s'+i]='s'+j;}
+ for(const field of ['stations','reasons'])record[field]=Object.fromEntries(Object.entries(record[field]||{}).filter(([key])=>mapping[key]).map(([key,value])=>[mapping[key],value]));
+ record.selection=(record.selection||[]).filter(key=>mapping[key]).map(key=>mapping[key]);record.detection_version=2;
 }
 const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
 
@@ -136,7 +151,7 @@ class Recorder{
  this.mapState={mode:'free',zoom,center:{x:Math.max(0,Math.min(1,center.x)),y:Math.max(0,Math.min(1,center.y))}};this.drawMap();});
  for(const type of ['pointerup','pointercancel','lostpointercapture'])this.map.addEventListener(type,e=>{this.mapPointers.delete(e.pointerId);begin();});
  }
- setFocusedStop(key){if(this.focusedStopKey===key)return;this.focusedStopKey=key;this.drawMap();}
+ setFocusedStop(key){if(this.focusedStopKey===key)return;this.focusedStopKey=key;for(const marker of this.mapSvg?.children||[]){const stopKey=marker.getAttribute('data-gps-stop');if(!stopKey)continue;const selected=stopKey===key,position=marker.getAttribute('transform').replace(/ scale\([^)]*\)$/,'');marker.setAttribute('transform',position+' scale('+(selected?2:1)+')');marker.setAttribute('aria-pressed',String(selected));}}
  focusStop(key){this.setFocusedStop(key);const input=this.liveInputs?.find(item=>item.row.key===key)?.station;if(input){input.scrollIntoView?.({behavior:'smooth',block:'center'});input.focus({preventScroll:true});input.setSelectionRange?.(input.value.length,input.value.length);}else this.o.focusImported?.(key);}
  mapZoom(delta){if(!this.mapView)return;const zoom=Math.max(2,Math.min(19,this.mapView.zoom+delta)),mode=this.mapState?.mode==='follow'?'follow':'free';this.mapState={mode,zoom,center:this.mapView.center};this.drawMap();}
  drawMap(){
@@ -162,7 +177,7 @@ class Recorder{
  this.map.append(node('small',t(this.mapState.mode==='follow'?'Karte folgt der aktuellen Position.':'Kartenansicht frei gewählt. Position folgen zum Nachführen drücken.')));if(this.railFailed)this.map.append(node('small',t('OpenRailwayMap nicht verfügbar. Grundkarte bleibt aktiv.')));
  }
 
- draw(){if(this.liveInputs?.some(row=>[row.station,row.reason,row.detail,row.end].includes(document.activeElement))){const rows=liveStops(this.record?.points||[],!!this.record?.ended,this.record?.stop_edits).filter(row=>!this.record.stop_edits?.[row.key]?.imported&&!this.o.hasImported?.(row.key));for(const input of this.liveInputs){const current=rows.find(row=>row.key===input.row.key);if(current?.end&&!this.record.stop_edits?.[current.key]?.manual_end)input.end.value=berlinInput(current.end);}if(rows.map(row=>row.key).join()===this.liveInputs.map(input=>input.row.key).join()){this.drawMap();this.freeze();return;}}this.drawMap();this.results.replaceChildren();this.stationInputs=[];this.drawStops();this.freeze();}
+ draw(){normaliseRecording(this.record);if(this.liveInputs?.some(row=>[row.station,row.reason,row.detail,row.end].includes(document.activeElement))){const rows=liveStops(this.record?.points||[],!!this.record?.ended,this.record?.stop_edits).filter(row=>!this.record.stop_edits?.[row.key]?.imported&&!this.o.hasImported?.(row.key));for(const input of this.liveInputs){const current=rows.find(row=>row.key===input.row.key);if(current?.end&&!this.record.stop_edits?.[current.key]?.manual_end)input.end.value=berlinInput(current.end);}if(rows.map(row=>row.key).join()===this.liveInputs.map(input=>input.row.key).join()){this.drawMap();this.freeze();return;}}this.drawMap();this.results.replaceChildren();this.stationInputs=[];this.drawStops();this.freeze();}
  async checkpoint(){
  if(this.checkpointTask)return this.checkpointTask;
  this.checkpointTask=(async()=>{if(active===this&&window.AndroidPortal)await this.nativeRead();await this.persist();if(!this.record?.points?.length||navigator.onLine===false)return false;

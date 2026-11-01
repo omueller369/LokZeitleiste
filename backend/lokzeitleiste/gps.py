@@ -132,8 +132,30 @@ def create_router(require_account):
         row=db.scalar(query.with_for_update() if lock else query)
         if not row:raise HTTPException(404,'Keine GPS-Aufzeichnung vorhanden.')
         return row
+    def read_payload(row):
+        payload=json.loads(row.payload_json)
+        if payload.get('detection_version')==2:return payload
+        # Old s0/s1 assignments refer to the previous five-minute detector.
+        # Resolve them by their original start time before inserting new four-minute rows.
+        old=[r for r in analyse(payload['points'],legacy=True)['rows'] if r['kind']=='Halt']
+        edits=payload.get('stop_edits') or {}
+        for item in old:
+            station=payload.get('stations',{}).get(item['key']) or payload.get('locations',{}).get(str(item['start']))
+            reason=payload.get('reasons',{}).get(item['key'],{})
+            key='live-'+str(item['start'])
+            if key not in edits and (station or reason):
+                edits[key]=dict(station=station,station_input=((station.get('code','')+' · ' if station.get('code') else '')+station.get('name','')) if station else '',reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
+        payload['stop_edits']=edits
+        new={r['start']:r['key'] for r in analyse(payload['points'],edits)['rows'] if r['kind']=='Halt'}
+        key_map={r['key']:new[r['start']] for r in old if r['start'] in new}
+        key_map.update(start='start',end='end')
+        for field in ('stations','reasons'):
+            payload[field]={key_map[k]:value for k,value in payload.get(field,{}).items() if k in key_map}
+        payload['selection']=[key_map[k] for k in payload.get('selection',[]) if k in key_map]
+        payload['detection_version']=2
+        return payload
     def view(row):
-        payload=json.loads(row.payload_json);result=analyse(payload['points'],payload.get('stop_edits') or {})
+        payload=read_payload(row);result=analyse(payload['points'],payload.get('stop_edits') or {})
         payload.setdefault('reasons',{})
         for item in result['rows']:
             item['station']=payload.get('stations',{}).get(item['key'])
@@ -153,7 +175,8 @@ def create_router(require_account):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
-        payload=data.model_dump(exclude={'expected_revision'});previous=json.loads(row.payload_json) if row else {}
+        payload=data.model_dump(exclude={'expected_revision'});previous=read_payload(row) if row else {}
+        payload['detection_version']=2
         preserved_starts=set((previous.get('stop_edits') or {}))|set(payload.get('stop_edits') or {})
         stops={'live-'+str(item['start']):item for item in analyse(payload['points'],preserved_starts)['rows'] if item['kind']=='Halt'}
         edits=payload.get('stop_edits')
@@ -218,7 +241,7 @@ def create_router(require_account):
         ensure_defaults(db)
         row=owned(db,user,journey_id,True)
         if row.revision!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
-        payload=json.loads(row.payload_json);keys={item['key'] for item in analyse(payload['points'],payload.get('stop_edits') or {})['rows']};selected={}
+        payload=read_payload(row);keys={item['key'] for item in analyse(payload['points'],payload.get('stop_edits') or {})['rows']};selected={}
         for key,code in data.stations.items():
             station=db.get(RailwayStation,code.strip().upper())
             if key not in keys or not station:raise HTTPException(422,'Bitte gültige DS100-Betriebsstellen wählen.')
