@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from ..db import database_session
 from ..models import DutyReportDraft as Draft,DutyReportDraftFile as DraftFile,DutyReport,DutyReceipt,User,now_utc
 from ..tf_portal import driver_dependency
-from .schemas import DraftReportIn
+from .schemas import DraftReportIn,sort_train_events
 from .receipts import MAX_FILE,validate_receipt,recipient
 
 class DraftInput(BaseModel):
@@ -26,7 +26,8 @@ def draft_files(db,row):
     keys=json.loads(row.receipt_keys_json)
     return list(db.scalars(select(DraftFile).where(DraftFile.draft_id==row.id,DraftFile.file_key.in_(keys)))) if keys else []
 def view(db,row):
-    return dict(client_id=row.client_id,report=json.loads(row.payload_json),revision=row.revision,updated_at=row.updated_at.isoformat(),receipt_keys=json.loads(row.receipt_keys_json),files=[dict(key=f.file_key,name=f.filename,mime_type=f.mime_type) for f in draft_files(db,row)])
+    payload=json.loads(row.payload_json);sort_train_events(payload.get('train_journeys',[]))
+    return dict(client_id=row.client_id,report=payload,revision=row.revision,updated_at=row.updated_at.isoformat(),receipt_keys=json.loads(row.receipt_keys_json),files=[dict(key=f.file_key,name=f.filename,mime_type=f.mime_type) for f in draft_files(db,row)])
 def before_finalize(db,user,client_id,revision):
     lock_owner(db,user);row=find(db,user,client_id)
     if deleted(row):raise HTTPException(409,'Dieser Entwurf wurde gelöscht.')

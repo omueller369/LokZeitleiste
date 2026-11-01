@@ -9,7 +9,7 @@ from ..reports.intervals import set_end_date,period_entries,interval
 from ..reports.absence import is_rest_day
 from ..reports.daily import WORK_KINDS
 from ..worktime.service import validate_no_overlap
-from .schemas import minutes,minimum_pause,required_pause,ReportIn,train_pause_minutes
+from .schemas import minutes,minimum_pause,required_pause,ReportIn,train_pause_minutes,sort_train_events
 
 
 def report_view(db,report):
@@ -22,7 +22,7 @@ def report_view(db,report):
     start=datetime.fromisoformat(payload['start_at']);end=datetime.fromisoformat(payload['end_at'])
     guest_total=sum(minutes(datetime.fromisoformat(t['start_at']),datetime.fromisoformat(t['end_at'])) for t in payload['trips'])
     guest_inside=sum(max(0,minutes(max(start,datetime.fromisoformat(t['start_at'])),min(end,datetime.fromisoformat(t['end_at'])))) for t in payload['trips'])
-    payload.setdefault('train_journeys',[])
+    sort_train_events(payload.setdefault('train_journeys',[]))
     payload.setdefault('ausbleibe',[])
     payload.setdefault('kind','Sonstige Erfassung')
     payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('hotel_location','');payload.setdefault('pause_policy',1)
