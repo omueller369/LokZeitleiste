@@ -186,6 +186,23 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(saved.status_code,200,saved.text)
         self.assertEqual(saved.json()['stop_edits'][second]['reason'],'V3')
 
+    def test_deleted_stop_flags_survive_sync_for_gps_and_manual_stands(self):
+        first='live-'+str(BASE);second='live-'+str(BASE+300000)
+        path,response=self.save(points=points(600),stop_edits={first:dict(deleted=True,reason='V1'),second:dict(deleted=True,station_input='BBB')})
+        self.assertEqual(response.status_code,200,response.text)
+        changed=self.save(path,expected_revision=1,points=points(610))[1]
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertTrue(changed.json()['stop_edits'][first]['deleted'])
+        self.assertTrue(changed.json()['stop_edits'][second]['deleted'])
+        self.assertEqual(changed.json()['points'],points(610))
+        key='manual-'+str(BASE)
+        path,response=self.save(points=[],manual_stops=[dict(key=key,start=BASE,end=BASE+125000)],stop_edits={key:dict(deleted=True,reason='sonstiges',detail='Discarded halt')})
+        self.assertEqual(response.status_code,200,response.text)
+        saved=self.driver.get(path).json()
+        self.assertTrue(saved['stop_edits'][key]['deleted'])
+        self.assertEqual(saved['manual_stops'][0]['end'],BASE+125000)
+        self.assertEqual(saved['points'],[])
+
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records
         self.save()

@@ -30,6 +30,7 @@ class StopEdit(BaseModel):
     end:int|None=Field(default=None,ge=946684800000,le=4133980800000)
     manual_end:bool=False
     imported:bool=False
+    deleted:bool=False
 
 class ManualStop(BaseModel):
     key:str=Field(pattern=r'^manual-[0-9]{12,16}$',max_length=64)
