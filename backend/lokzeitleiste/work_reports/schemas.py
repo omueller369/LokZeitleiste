@@ -110,7 +110,15 @@ class TrainJourneyIn(BaseModel):
     def valid_journey(self):
         if self.end_at<=self.start_at:raise ValueError('Ankunft muss nach Abfahrt liegen.')
         if len({e.id for e in self.events})!=len(self.events):raise ValueError('Ereignis-IDs müssen eindeutig sein.')
+        self.events.sort(key=lambda e:(e.start_at,e.end_at,str(e.id)))
         return self
+
+
+def sort_train_events(journeys):
+    """Chronological views for historical JSON payloads without rewriting saved reports."""
+    for journey in journeys:
+        journey['events']=sorted(journey.get('events',[]),key=lambda e:(datetime.fromisoformat(e['start_at']),datetime.fromisoformat(e['end_at']),str(e.get('id',''))))
+    return journeys
 
 
 def train_pause_minutes(journeys):

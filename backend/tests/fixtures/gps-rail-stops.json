@@ -639,7 +639,7 @@
   ]
 },
 {
-  "name": "existing edited stop boundaries survive merging",
+  "name": "historical edited stops merge but source edits survive",
   "edits": {
     "live-1792627500000": {
       "imported": true
@@ -648,10 +648,6 @@
   "expected": [
     {
       "start": 1792627200000,
-      "end": 1792627495000
-    },
-    {
-      "start": 1792627500000,
       "end": 1792627800000
     }
   ],

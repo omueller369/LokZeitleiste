@@ -87,3 +87,5 @@
 .gps-map>svg{max-width:900px;max-height:none!important;margin:0 auto}
 
 .gps-box .gps-location{min-width:230px}.gps-box .gps-location input[type="checkbox"]{width:22px;min-width:22px;height:22px;vertical-align:middle;margin-right:8px}.gps-box .gps-location input:not([type="checkbox"]){width:calc(100% - 36px);min-width:170px;display:inline-block}
+
+.gps-box .gps-stand-toggle{background:#167b32;color:#fff;border:2px solid #126429;min-height:44px;font-weight:700}.gps-box .gps-stand-toggle[aria-pressed="true"]{background:#ba1424;border-color:#95101c}.gps-box .gps-stand-toggle:disabled{opacity:.55}.gps-box .gps-stand-duration{color:#b00020;font-weight:800;font-size:1.15rem;align-self:center}

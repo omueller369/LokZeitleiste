@@ -19,6 +19,7 @@ window.loadTrainJourneyChoices=async()=>{
  REASONS.splice(0,REASONS.length,...values.filter(row=>row.category==='reason'&&row.active).map(row=>row.value));
  CAUSES.splice(0,CAUSES.length,...values.filter(row=>row.category==='cause'&&row.active).map(row=>row.value));
 };
+const chronological=events=>[...events].sort((a,b)=>a.start_at.localeCompare(b.start_at)||a.end_at.localeCompare(b.end_at)||String(a.id).localeCompare(String(b.id)));
 window.TrainJourneyEditor=class{
  constructor(options){
   this.o=options;this.stationCache=new Map();this.items=[];this.active=null;
@@ -49,7 +50,7 @@ window.TrainJourneyEditor=class{
  }
  make(data){
   this.cacheStation(data.start_station,data.start_station_name);this.cacheStation(data.end_station,data.end_station_name);for(const event of data.events||[])this.cacheStation(event.station,event.station_name);
-  const item={id:data.id,events:(data.events||[]).map(e=>({...e,cause:causeLabel(e.cause)})),editing:null};
+  const item={id:data.id,events:chronological(data.events||[]).map(e=>({...e,cause:causeLabel(e.cause)})),editing:null};
   item.panel=node('section');item.panel.className='train-panel';item.panel.id='train-panel-'+data.id;item.panel.setAttribute('role','tabpanel');
   item.tab=node('button');item.tab.type='button';item.tab.id='train-tab-'+data.id;item.tab.setAttribute('role','tab');item.tab.setAttribute('aria-controls',item.panel.id);item.panel.setAttribute('aria-labelledby',item.tab.id);
   item.tab.onclick=()=>this.activate(item.id);
@@ -63,7 +64,7 @@ window.TrainJourneyEditor=class{
   for(const [name,cls] of Object.entries({train_number:'train-number',start_station:'train-start-station',start_at:'train-departure',end_station:'train-end-station',end_at:'train-arrival'}))fields[name].parentElement.classList.add(cls);
   item.autoStart=fields.start_at.value===this.o.bounds().start;item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;
   item.headerSet.append(grid);item.header.append(item.headerSet);item.panel.append(item.header);
-  item.gps=window.GpsRecorder?.mount({userId:this.o.userId,journeyId:item.id,container:item.panel,numberField:fields.train_number,trainNumber:()=>fields.train_number.value,readonly:()=>this.o.readonly(),dutyDay:()=>this.o.bounds().start.slice(0,10),stations:this.o.stations,resolve:field=>this.resolve(field),focusImported:key=>{const row=[...item.rows.children].find(row=>row.gpsStopKey===key);if(row){row.onclick();const field=item.eventFields.station;field.scrollIntoView?.({behavior:'smooth',block:'center'});field.focus({preventScroll:true});field.setSelectionRange?.(field.value.length,field.value.length);}},hasImported:key=>item.events.some(e=>e.gps_stop_key===key),endpointStation:kind=>stationParts(fields[kind+'_station'].value),endpoint:(kind,station)=>{const known=station.name?station:this.stationCache.get(station.code.toUpperCase())||station;fields[kind+'_station'].value=labelStation(known.code,known.name);this.cacheStation(station.code,station.name);this.ready(item);this.changed();},importStops:rows=>this.importGps(item,rows)});
+  item.gps=window.GpsRecorder?.mount({userId:this.o.userId,journeyId:item.id,container:item.panel,numberField:fields.train_number,trainNumber:()=>fields.train_number.value,readonly:()=>this.o.readonly(),dutyDay:()=>this.o.bounds().start.slice(0,10),stations:this.o.stations,resolve:field=>this.resolve(field),changed:()=>this.changed(),focusImported:key=>{const row=[...item.rows.children].find(row=>row.gpsStopKey===key);if(row){row.onclick();const field=item.eventFields.station;field.scrollIntoView?.({behavior:'smooth',block:'center'});field.focus({preventScroll:true});field.setSelectionRange?.(field.value.length,field.value.length);}},importedKeys:()=>item.events.map(e=>e.gps_stop_key).filter(Boolean),hasImported:key=>item.events.some(e=>e.gps_stop_key===key),endpointStation:kind=>stationParts(fields[kind+'_station'].value),endpoint:(kind,station)=>{const known=station.name?station:this.stationCache.get(station.code.toUpperCase())||station;fields[kind+'_station'].value=labelStation(known.code,known.name);this.cacheStation(station.code,station.name);this.ready(item);this.changed();},importStops:rows=>this.importGps(item,rows)});
   for(const [name,field] of Object.entries(fields)){field.dataset.field=name;field.addEventListener('input',()=>{if(name==='start_at'){item.autoStart=false;if(item.autoEnd)fields.end_at.value=this.after(fields.start_at.value,60);item.lastStart=fields.start_at.value;}if(name==='end_at')item.autoEnd=fields.end_at.value===this.after(fields.start_at.value,60);item.gps?.freeze();this.ready(item);this.table(item);this.changed();this.refreshTabs();});}
   item.form=node('form');item.eventSet=node('fieldset');item.eventSet.append(node('legend','Zugfahrt'));item.ctlPause=node('button','CTL Pause');item.ctlPause.type='button';item.ctlPause.hidden=!REASONS.includes('Pause')||!CAUSES.includes('CTL');item.ctlPause.onclick=()=>{if(this.o.readonly())return;this.clearEvent(item);item.eventFields.reason.value='Pause';item.eventFields.cause.value='CTL';this.details(item);item.eventFields.start_at.focus();};item.eventSet.append(item.ctlPause);const eventGrid=node('div');eventGrid.className='report-grid train-event-grid';const f=item.eventFields={};
   f.cause=this.select(eventGrid,'Art',CAUSES);
@@ -99,6 +100,7 @@ window.TrainJourneyEditor=class{
  activate(id){this.active=id;this.refreshTabs();this.items.find(item=>item.id===id)?.gps?.drawMap();}
  refreshTabs(){this.bar.hidden=!this.items.length;if(this.items.length)this.bar.append(this.o.button);else this.o.container.before(this.o.button);for(const [i,item] of this.items.entries()){item.tab.textContent=t('Zugfahrt')+' '+(i+1)+(item.fields.train_number.value?' · '+item.fields.train_number.value:'');item.tab.setAttribute('data-i18n-ignore','');const selected=item.id===this.active;item.tab.setAttribute('aria-selected',String(selected));item.tab.tabIndex=selected?0:-1;item.panel.hidden=!selected;}this.freeze();}
  table(item){
+  item.events=chronological(item.events);
   item.rows.replaceChildren();const f=item.fields,bounds=this.o.bounds();item.tableTitle.textContent=t('Zugnummer')+': '+f.train_number.value;item.tableTitle.setAttribute('data-i18n-ignore','');let previous=bounds.start;const stamp=(value,prior)=>window.ReportTableTime(value,bounds.start,bounds.end,prior);
   for(const event of item.events){const row=node('tr');row.gpsStopKey=event.gps_stop_key||'';row.onfocus=()=>item.gps?.setFocusedStop(row.gpsStopKey||null);row.onblur=()=>item.gps?.setFocusedStop(null);row.tabIndex=0;row.classList.toggle('selected',item.editing===event.id);const n=this.o.minute(event.end_at)-this.o.minute(event.start_at),reason=t(event.reason_label||choiceLabel('reason',event.reason))+(event.reason==='sonstiges'?' · '+event.reason_detail:''),cause=t(event.cause_label||choiceLabel('cause',event.cause))+(event.cause==='sonstiges'?' · '+event.cause_detail:'');
    for(const value of [cause,reason,labelStation(event.station,event.station_name),stamp(event.start_at,previous),stamp(event.end_at,event.start_at),this.o.clock(n),this.o.clock(event.reason==='Pause'?n:0)]){const cell=node('td',value);cell.setAttribute('data-i18n-ignore','');row.append(cell);}
@@ -110,7 +112,7 @@ window.TrainJourneyEditor=class{
  restoreEditing(rows){for(const saved of rows||[]){const item=this.items.find(item=>item.id===saved.id);if(!item)continue;item.editing=saved.editing||null;item.suggestedTimes=saved.suggestedTimes||item.suggestedTimes;for(const [key,value]of Object.entries(saved.eventFields||{}))if(item.eventFields[key])item.eventFields[key].value=value;this.details(item);for(const [key,value]of Object.entries(saved.eventFields||{}))if(item.eventFields[key])item.eventFields[key].value=value;item.submit.textContent=item.editing?'Speichern':'Eintragen';item.cancel.hidden=!this.pendingEvent(item);item.deleteEvent.hidden=!item.editing;}}
  async checkpointGps(){await Promise.all(this.items.map(item=>item.gps?.checkpoint()));}
  async discardGps(){for(const item of this.items)await item.gps?.discard();}
- draft(){return this.items.map(item=>{const f=item.fields,a=stationParts(f.start_station.value),b=stationParts(f.end_station.value);return {id:item.id,train_number:f.train_number.value.trim(),start_station:a.code,start_station_name:a.name,start_at:f.start_at.value,end_station:b.code,end_station_name:b.name,end_at:f.end_at.value,events:item.events.map(e=>({...e}))};});}
+ draft(){return this.items.map(item=>{const f=item.fields,a=stationParts(f.start_station.value),b=stationParts(f.end_station.value);return {id:item.id,train_number:f.train_number.value.trim(),start_station:a.code,start_station_name:a.name,start_at:f.start_at.value,end_station:b.code,end_station_name:b.name,end_at:f.end_at.value,events:chronological(item.events).map(e=>({...e}))};});}
  pauseMinutes(){return this.items.reduce((n,item)=>n+item.events.reduce((a,e)=>a+(e.reason==='Pause'?this.o.minute(e.end_at)-this.o.minute(e.start_at):0),0),0);}
  pauseSummary(){this.summary.textContent=t('Pausen aus Zugfahrten')+': '+this.o.clock(this.pauseMinutes());this.summary.setAttribute('data-i18n-ignore','');}
  changed(){this.refreshSuggestions();this.pauseSummary();this.o.changed(this.draft());}
@@ -133,7 +135,7 @@ window.TrainJourneyEditor=class{
    if(!REASONS.includes(reason.reason))throw Error('Ein GPS-Grund ist nicht mehr aktiv. Bitte neu auswählen.');
    const start_at=localTime(row.start),end_at=localTime(row.end);this.checkRange(start_at,end_at);
    const event={id:this.o.uuid(),gps_stop_key:row.key||'',station:row.station.code,station_name:row.station.name,reason:reason.reason,reason_label:reason.label||choiceLabel('reason',reason.reason),reason_detail:reason.detail||'',cause:'CTL',cause_label:choiceLabel('cause','CTL'),cause_detail:'',start_at,end_at};
-   if([...item.events,...additions].some(e=>(row.key&&e.gps_stop_key===row.key)||e.start_at===start_at&&e.end_at===end_at&&e.station===event.station&&e.reason===event.reason))continue;
+   if([...item.events,...additions].some(e=>((row.source_keys||[row.key]).includes(e.gps_stop_key)&&e.gps_stop_key)||e.start_at===start_at&&e.end_at===end_at&&e.station===event.station&&e.reason===event.reason))continue;
    if(event.reason==='Pause'&&this.items.flatMap(t=>t.events).concat(additions).some(e=>e.reason==='Pause'&&this.o.minute(start_at)<this.o.minute(e.end_at)&&this.o.minute(end_at)>this.o.minute(e.start_at)))throw Error('Dokumentierte Pausen dürfen sich nicht überschneiden.');
    additions.push(event);
   }
@@ -141,7 +143,7 @@ window.TrainJourneyEditor=class{
   const endpoints=[['start_station','Start'],['end_station','Ende']].filter(([key,kind])=>!item.fields[key].value&&rows.some(r=>r.kind===kind&&r.station?.code));
   if(!additions.length&&!endpoints.length){this.o.message('Keine neuen GPS-Standzeiten zum Übernehmen.');return false;}
   if(!confirm(t('GPS-Standzeiten in die Zugfahrtdetails übernehmen?')+' '+additions.length+' · '+t('Bahnhöfe')+': '+endpoints.length))return false;
-  item.events.push(...additions);item.events.sort((a,b)=>a.start_at.localeCompare(b.start_at));
+  item.events.push(...additions);item.events=chronological(item.events);
   for(const [key,kind]of [['start_station','Start'],['end_station','Ende']]){const station=rows.find(r=>r.kind===kind)?.station;if(station?.code&&!item.fields[key].value){item.fields[key].value=labelStation(station.code,station.name);this.cacheStation(station.code,station.name);}}
   this.clearEvent(item);this.changed();return true;
  }
@@ -160,7 +162,7 @@ window.TrainJourneyEditor=class{
     if(item.events.length+(item.editing?0:1)+1>500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');
     pause={id:this.o.uuid(),reason:'Pause',reason_label:choiceLabel('reason','Pause'),reason_detail:'',cause:'CTL',cause_label:choiceLabel('cause','CTL'),cause_detail:'',station:'',station_name:'',start_at:event.start_at,end_at:event.end_at};
    }
-   if(item.editing)item.events=item.events.map(e=>e.id===item.editing?event:e);else{if(item.events.length>=500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');item.events.push(event);}if(pause)item.events.push(pause);this.clearEvent(item,event.end_at);this.changed();this.o.message('');
+   if(item.editing)item.events=item.events.map(e=>e.id===item.editing?event:e);else{if(item.events.length>=500)throw Error('Höchstens 500 Ereignisse pro Zugfahrt.');item.events.push(event);}if(pause)item.events.push(pause);item.events=chronological(item.events);this.clearEvent(item,event.end_at);this.changed();this.o.message('');
   }catch(error){this.o.message(error.message);}finally{this.o.block(false);}
  }
 };

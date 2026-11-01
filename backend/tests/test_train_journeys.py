@@ -33,6 +33,21 @@ class TrainJourneysTest(unittest.TestCase):
         self.assertEqual(changed.status_code,200,changed.text)
         self.assertEqual(changed.json()['documented_pause_minutes'],50)
 
+    def test_chronological_create_and_legacy_report_view(self):
+        data=self.data();pause=data['train_journeys'][0]['events'][0]
+        early=dict(self.event(),id=str(uuid4()),reason='V1',cause='CTL',start_at='2026-10-12T09:15',end_at='2026-10-12T09:30')
+        late=dict(early,id=str(uuid4()),start_at='2026-10-12T11:00',end_at='2026-10-12T11:10')
+        data['train_journeys'][0]['events']=[late,pause,early]
+        report=self.create(data)
+        events=report['train_journeys'][0]['events']
+        self.assertEqual([e['start_at'][:16] for e in events],['2026-10-12T09:15','2026-10-12T10:05','2026-10-12T11:00'])
+        with Session(self.engine) as db:
+            row=db.get(DutyReport,report['id']);payload=json.loads(row.payload_json)
+            payload['train_journeys'][0]['events'].reverse();row.payload_json=json.dumps(payload);db.commit();original=row.payload_json
+        restored=self.driver.get('/api/v1/tf/work-reports/'+str(report['id'])).json()
+        self.assertEqual([e['id'] for e in restored['train_journeys'][0]['events']],[e['id'] for e in events])
+        with Session(self.engine) as db:self.assertEqual(db.get(DutyReport,report['id']).payload_json,original)
+
     def test_imported_gps_identity_survives_edit_and_server_storage(self):
         data=self.data();data['train_journeys'][0]['events'][0]['gps_stop_key']='live-1792627200000'
         report=self.create(data);saved=report['train_journeys'][0]['events'][0]

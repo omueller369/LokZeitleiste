@@ -13,7 +13,7 @@ def bearing(a,b):
     p,q=map(math.radians,[a['lat'],b['lat']]);d=math.radians(b['lon']-a['lon'])
     return math.degrees(math.atan2(math.sin(d)*math.cos(q),math.cos(p)*math.sin(q)-math.sin(p)*math.cos(q)*math.cos(d)))%360
 
-def analyse(points,preserved_starts=(),legacy=False):
+def analyse(points,preserved_starts=(),legacy=False,version2=False):
     rows=[];gaps=[];run=[];last=None
     def finish():
         if len(run)>1 and (run[-1]['t']-run[0]['t']>300_000 if legacy else run[-1]['t']-run[0]['t']>=240_000):
@@ -24,7 +24,7 @@ def analyse(points,preserved_starts=(),legacy=False):
             finish();gaps.append(dict(start=last['t'],end=point['t'],reason='GPS-Lücke'))
         if point['accuracy']>MAX_ACCURACY:
             finish();gaps.append(dict(start=point['t'],end=point['t'],reason='GPS ungenau'));last=point;continue
-        if not legacy and run and 'live-'+str(point['t']) in preserved_starts:finish()
+        if version2 and run and 'live-'+str(point['t']) in preserved_starts:finish()
         speed=point.get('speed')
         if speed is None and last and last['accuracy']<=MAX_ACCURACY and 0<point['t']-last['t']<=MAX_GAP:
             speed=distance(last,point)/((point['t']-last['t'])/1000)

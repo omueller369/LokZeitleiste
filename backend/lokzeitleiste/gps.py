@@ -31,18 +31,35 @@ class StopEdit(BaseModel):
     manual_end:bool=False
     imported:bool=False
 
+class ManualStop(BaseModel):
+    key:str=Field(pattern=r'^manual-[0-9]{12,16}$',max_length=64)
+    start:int=Field(ge=946684800000,le=4133980800000)
+    end:int|None=Field(default=None,ge=946684800000,le=4133980800000)
+    @model_validator(mode='after')
+    def ordered(self):
+        if self.end is not None and self.end<=self.start:raise ValueError('Ende muss nach Beginn der Standzeit liegen.')
+        if self.key!='manual-'+str(self.start):raise ValueError('Standzeitkennung passt nicht zum Beginn.')
+        return self
+
 class Recording(BaseModel):
     train_number:str=Field(pattern=r'^[A-Za-z0-9]{1,12}$')
-    points:list[Point]=Field(min_length=1,max_length=20000)
+    points:list[Point]=Field(default_factory=list,max_length=20000)
     start_station:str|None=Field(default=None,max_length=10)
     end_station:str|None=Field(default=None,max_length=10)
+    manual_stops:list[ManualStop]|None=Field(default=None,max_length=500)
     stop_edits:dict[str,StopEdit]|None=Field(default=None,max_length=1024)
     ended:bool=True
     expected_revision:int=Field(default=0,ge=0)
     @model_validator(mode='after')
     def ordered(self):
         if any(b.t<=a.t for a,b in zip(self.points,self.points[1:])):raise ValueError('GPS-Zeitstempel müssen aufsteigen.')
-        if self.points[-1].t-self.points[0].t>48*3600_000:raise ValueError('GPS-Aufzeichnung höchstens 48 Stunden.')
+        if not self.points and not self.manual_stops:raise ValueError('GPS-Punkte oder manuelle Standzeit erforderlich.')
+        if self.manual_stops:
+            if len({r.key for r in self.manual_stops})!=len(self.manual_stops):raise ValueError('Standzeitkennungen müssen eindeutig sein.')
+            if sum(r.end is None for r in self.manual_stops)>1:raise ValueError('Nur eine Standzeit darf laufen.')
+            ordered=sorted(self.manual_stops,key=lambda r:r.start)
+            if any(a.end is None or a.end>b.start for a,b in zip(ordered,ordered[1:])):raise ValueError('Manuelle Standzeiten dürfen sich nicht überschneiden.')
+        if self.points and self.points[-1].t-self.points[0].t>48*3600_000:raise ValueError('GPS-Aufzeichnung höchstens 48 Stunden.')
         return self
 class StopReason(BaseModel):
     reason:str=Field(default='',max_length=64)
@@ -134,10 +151,10 @@ def create_router(require_account):
         return row
     def read_payload(row):
         payload=json.loads(row.payload_json)
-        if payload.get('detection_version')==2:return payload
+        if payload.get('detection_version')==3:return payload
         # Old s0/s1 assignments refer to the previous five-minute detector.
         # Resolve them by their original start time before inserting new four-minute rows.
-        old=[r for r in analyse(payload['points'],legacy=True)['rows'] if r['kind']=='Halt']
+        old=[r for r in analyse(payload['points'],payload.get('stop_edits') or {},legacy=payload.get('detection_version')!=2,version2=payload.get('detection_version')==2)['rows'] if r['kind']=='Halt']
         edits=payload.get('stop_edits') or {}
         for item in old:
             station=payload.get('stations',{}).get(item['key']) or payload.get('locations',{}).get(str(item['start']))
@@ -146,13 +163,19 @@ def create_router(require_account):
             if key not in edits and (station or reason):
                 edits[key]=dict(station=station,station_input=((station.get('code','')+' · ' if station.get('code') else '')+station.get('name','')) if station else '',reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
         payload['stop_edits']=edits
-        new={r['start']:r['key'] for r in analyse(payload['points'],edits)['rows'] if r['kind']=='Halt'}
-        key_map={r['key']:new[r['start']] for r in old if r['start'] in new}
+        new=[r for r in analyse(payload['points'])['rows'] if r['kind']=='Halt']
+        key_map={}
+        for item in old:
+            match=next((r for r in new if r['start']<=item['start']<=r['end']),None)
+            if match:key_map[item['key']]=match['key']
         key_map.update(start='start',end='end')
         for field in ('stations','reasons'):
-            payload[field]={key_map[k]:value for k,value in payload.get(field,{}).items() if k in key_map}
-        payload['selection']=[key_map[k] for k in payload.get('selection',[]) if k in key_map]
-        payload['detection_version']=2
+            values={}
+            for key,value in payload.get(field,{}).items():
+                if key in key_map:values.setdefault(key_map[key],value)
+            payload[field]=values
+        payload['selection']=list(dict.fromkeys(key_map[k] for k in payload.get('selection',[]) if k in key_map))
+        payload['detection_version']=3
         return payload
     def view(row):
         payload=read_payload(row);result=analyse(payload['points'],payload.get('stop_edits') or {})
@@ -176,9 +199,17 @@ def create_router(require_account):
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
         payload=data.model_dump(exclude={'expected_revision'});previous=read_payload(row) if row else {}
-        payload['detection_version']=2
-        preserved_starts=set((previous.get('stop_edits') or {}))|set(payload.get('stop_edits') or {})
-        stops={'live-'+str(item['start']):item for item in analyse(payload['points'],preserved_starts)['rows'] if item['kind']=='Halt'}
+        payload['detection_version']=3
+        if payload['manual_stops'] is None:payload['manual_stops']=previous.get('manual_stops',[])
+        gps_stops=[item for item in analyse(payload['points'])['rows'] if item['kind']=='Halt']
+        stops={'live-'+str(item['start']):item for item in gps_stops}
+        for item in payload['manual_stops']:stops[item['key']]=item
+        timestamps={p['t'] for p in payload['points']}
+        # Retain all historical source IDs even when several halts now merge into one.
+        for key in set(previous.get('stop_edits') or {})|set(payload.get('stop_edits') or {}):
+            if key.startswith('live-') and key[5:].isdigit() and int(key[5:]) in timestamps:
+                match=next((item for item in gps_stops if item['start']<=int(key[5:])<=item['end']),None)
+                if match:stops[key]=dict(match,start=int(key[5:]))
         edits=payload.get('stop_edits')
         if edits is None:edits={key:value for key,value in (previous.get('stop_edits') or {}).items() if key in stops}
         if any(key not in stops for key in edits):raise HTTPException(422,'Standzeit gehört nicht zur Aufzeichnung.')

@@ -118,11 +118,11 @@ class RecordingTest(unittest.TestCase):
         path,response=self.save(points=data,stop_edits={key:{'station_input':'BBB','reason':'V1'}})
         self.assertEqual(response.status_code,200,response.text)
         self.assertEqual(response.json()['analysis']['rows'][1]['end'],BASE+240000)
-        # Two previously edited halts remain separately addressable even inside 100m.
+        # Historical source edits survive even though their GPS intervals now merge.
         edits={key:{'reason':'V1','imported':True},'live-'+str(BASE+300000):{'reason':'V2','station_input':'CCC'}}
         saved=self.save(path,expected_revision=1,points=points(600),stop_edits=edits)[1]
         self.assertEqual(saved.status_code,200,saved.text)
-        self.assertEqual(len([r for r in saved.json()['analysis']['rows'] if r['kind']=='Halt']),2)
+        self.assertEqual(len([r for r in saved.json()['analysis']['rows'] if r['kind']=='Halt']),1)
         self.assertTrue(saved.json()['stop_edits'][key]['imported'])
         changed=self.save(path,expected_revision=2,points=points(610))[1]
         self.assertEqual(changed.status_code,200,changed.text)
@@ -148,6 +148,43 @@ class RecordingTest(unittest.TestCase):
         saved=self.save(path,expected_revision=1,points=data)[1]
         self.assertEqual(saved.status_code,200,saved.text)
         self.assertEqual(saved.json()['stations']['s1']['code'],'CCC')
+
+    def test_manual_stand_without_gps_points_roundtrip_and_validation(self):
+        key='manual-'+str(BASE)
+        path,response=self.save(points=[],manual_stops=[dict(key=key,start=BASE,end=None)])
+        self.assertEqual(response.status_code,200,response.text)
+        self.assertEqual(response.json()['points'],[])
+        self.assertIsNone(self.driver.get(path).json()['manual_stops'][0]['end'])
+        changed=self.save(path,expected_revision=1,points=[],manual_stops=[dict(key=key,start=BASE,end=BASE+125000)],stop_edits={key:dict(station_input='BBB',station=dict(code='BBB',name='x'),reason='sonstiges',detail='Warten',imported=True)})[1]
+        self.assertEqual(changed.status_code,200,changed.text)
+        self.assertEqual(changed.json()['stop_edits'][key]['station']['name'],'Berlin Beispiel')
+        self.assertTrue(changed.json()['stop_edits'][key]['imported'])
+        # Older GPS clients that omit the new field cannot erase the manual intervals.
+        extended=self.save(path,expected_revision=2,points=points())[1]
+        self.assertEqual(extended.status_code,200,extended.text)
+        self.assertEqual(extended.json()['manual_stops'][0]['end'],BASE+125000)
+        for rows in [[dict(key=key,start=BASE,end=BASE)], [dict(key='manual-'+str(BASE+1),start=BASE,end=None)], [dict(key=key,start=BASE,end=None),dict(key='manual-'+str(BASE+5000),start=BASE+5000,end=None)], [dict(key=key,start=BASE,end=BASE+15000),dict(key='manual-'+str(BASE+5000),start=BASE+5000,end=BASE+20000)]]:
+            self.assertEqual(self.save(points=[],manual_stops=rows)[1].status_code,422)
+        self.assertEqual(self.driver.delete(path).status_code,200)
+        self.assertEqual(self.driver.get(path).status_code,404)
+
+    def test_version_two_historical_stops_are_merged_without_losing_source_edits(self):
+        first='live-'+str(BASE);second='live-'+str(BASE+300000)
+        path,response=self.save(points=points(600))
+        with Session(self.engine) as db:
+            row=db.query(TrainGpsRecording).filter_by(journey_id=path.rsplit('/',1)[1]).one()
+            payload=json.loads(row.payload_json);payload['detection_version']=2
+            payload['stop_edits']={first:dict(station_input='BBB',reason='V1'),second:dict(station_input='CCC',reason='V3',imported=True)}
+            payload['stations']={'s0':dict(code='BBB',name='First'),'s1':dict(code='CCC',name='Second')}
+            row.payload_json=json.dumps(payload);db.commit()
+        value=self.driver.get(path).json();rows=[r for r in value['analysis']['rows'] if r['kind']=='Halt']
+        self.assertEqual(len(rows),1)
+        self.assertEqual(rows[0]['end']-rows[0]['start'],600000)
+        self.assertTrue(value['stop_edits'][second]['imported'])
+        self.assertEqual(value['stop_edits'][first]['station_input'],'BBB')
+        saved=self.save(path,expected_revision=1,points=points(610),stop_edits=value['stop_edits'])[1]
+        self.assertEqual(saved.status_code,200,saved.text)
+        self.assertEqual(saved.json()['stop_edits'][second]['reason'],'V3')
 
     def test_reset_deletes_private_recordings(self):
         from lokzeitleiste.accounts.seed_demo_tf import delete_tf_records

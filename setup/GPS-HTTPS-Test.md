@@ -6,7 +6,7 @@ Let's Encrypt stellt kostenlose Zertifikate bereit. Certbot, die Browser-GPS-Fun
 
 ## Aktueller Ablauf ab Version 0.26
 
-Start- und Endbahnhof werden nur manuell über DS100 oder Bahnhofsname ausgewählt. Live-Standzeiten ab vier Minuten lassen sich mit Standort, Grund und gegebenenfalls manuellem Ende direkt in die Zugfahrtdetails übernehmen. GPS-Lücken werden als geschätzte Verbindung dargestellt; Internetunterbrechungen erzeugen keine Warnmeldung. Die aktuelle vollständige Anleitung steht in [VERSION-0.26.md](../docs/VERSION-0.26.md). Die nachfolgenden Abschnitte zur älteren Testoberfläche dienen nur noch der technischen Einrichtung und Fehlerdiagnose.
+Start- und Endbahnhof werden nur manuell über DS100 oder Bahnhofsname ausgewählt. Live-Standzeiten ab vier Minuten lassen sich mit Standort, Grund und gegebenenfalls manuellem Ende direkt in die Zugfahrtdetails übernehmen. GPS-Lücken werden als geschätzte Verbindung dargestellt; Internetunterbrechungen erzeugen keine Warnmeldung. Ohne laufendes GPS steht zusätzlich die manuelle Standzeiterfassung über Start Stand/Ende Stand zur Verfügung. Alte GPS-Verläufe werden mit den aktuellen Regeln neu ausgewertet; Zugfahrtdetails werden chronologisch angezeigt. Die aktuelle vollständige Anleitung steht in [VERSION-0.26.md](../docs/VERSION-0.26.md). Die nachfolgenden Abschnitte zur älteren Testoberfläche dienen nur noch der technischen Einrichtung und Fehlerdiagnose.
 
 ## 1. Vorher lokale Arbeitsberichte synchronisieren
 
