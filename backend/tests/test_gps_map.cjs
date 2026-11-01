@@ -3,12 +3,14 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert');
 class Element{
  constructor(tag){this.tag=tag;this.children=[];this.attributes={};this.value='';this.events={};}
  addEventListener(k,f){this.events[k]=f;}
+ contains(value){return this===value||this.children.some(child=>child.contains?.(value));}
  showModal(){this.open=true;}
  close(){this.open=false;}
  remove(){this.removed=true;}
  append(...items){this.children.push(...items);}
  replaceChildren(...items){this.children=items;}
  setAttribute(key,value){this.attributes[key]=value;}
+ getAttribute(key){return this.attributes[key];}
  getBoundingClientRect(){return {left:0,top:0,width:600,height:300};}
  click(){}
 }
@@ -36,9 +38,24 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const marker=markers()[0];assert.equal(marker.children[0].attributes.fill,'#1565c0');assert.equal(marker.children[1].attributes.fill,'#d00000');
  const input=r.liveInputs[0].station;let focused=0,scrolled=0;input.focus=()=>focused++;input.scrollIntoView=()=>scrolled++;input.setSelectionRange=(a,b)=>assert.equal(a,b);marker.events.click();assert.equal(focused,1);assert.equal(scrolled,1);
  let prevented=false;marker.events.keydown({key:'Enter',preventDefault(){prevented=true;}});assert(prevented);assert.equal(focused,2);
+ assert.strictEqual(markers()[0],marker);assert(markers()[0].attributes.transform.endsWith('scale(2)'));r.liveInputs[0].tr.events.focusout({relatedTarget:null});
+ assert(markers()[0].attributes.transform.endsWith('scale(1)'));r.liveInputs[0].tr.events.focusin();assert(markers()[0].attributes.transform.endsWith('scale(2)'));
  const key=r.liveInputs[0].row.key;r.record.stop_edits={[key]:{imported:true}};let imported=null;r.o.focusImported=value=>imported=value;r.draw();assert.equal(r.liveInputs.length,0);markers()[0].events.click();assert.equal(imported,key);
  // Signal gaps do not invent stops, and short stationary runs have no marker.
  r.record={ended:true,points:[{...point(52,13,1),speed:0},{...point(52,13,400001),speed:0}]};r.draw();assert.equal(markers().length,0);
+ for(const fixture of JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8'))){const actual=context.window.GpsRecorder.liveStops(fixture.points,true,fixture.edits).map(({start,end})=>({start,end}));assert.equal(JSON.stringify(actual),JSON.stringify(fixture.expected),fixture.name);}
+ // A newly visible four-minute stop must not inherit the old s0 location of a later stop.
+ const oldTrack=JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8')).find(f=>f.name==='two different stops').points;
+ const base=oldTrack[0].t;r.record={ended:true,points:oldTrack.concat(Array.from({length:13},(_,i)=>({...oldTrack.at(-2),t:base+(495+i*5)*1000,speed:0}))).filter(p=>p.t!==base+495000),stations:{s0:{code:'CCC',name:'Old stop'}},reasons:{s0:{reason:'V1'}},selection:['s0']};
+ // Keep the second stop stationary for >5 minutes so it was the only legacy stop.
+ r.draw();assert.equal(r.liveInputs.length,2);assert.equal(r.liveInputs[0].station.value,'');assert.equal(r.liveInputs[1].station.value,'CCC · Old stop');assert.equal(r.record.selection[0],'s1');
+ // GPS/HTTPS warnings pass the auto-dismiss option and clear their status after 3 seconds.
+ const scheduled=[],notices=[];context.setTimeout=(fn,ms)=>{scheduled.push({fn,ms});return scheduled.length;};context.clearTimeout=id=>{if(scheduled[id-1])scheduled[id-1].cancelled=true;};context.window.ReportFeedback={error:(message,options)=>notices.push({message,options})};
+ r.fail('GPS fehlt oder wurde abgelehnt. Aufzeichnung hat eine Lücke.');assert.equal(notices.at(-1).options.autoCloseMs,3000);assert.equal(scheduled.at(-1).ms,3000);scheduled.at(-1).fn();assert.equal(r.message.textContent,'');
+ r.fail('GPS benötigt HTTPS oder localhost.');assert.equal(notices.at(-1).options.autoCloseMs,3000);const timeout=scheduled.at(-1);r.say('GPS-Aufzeichnung läuft.');assert(timeout.cancelled);assert.equal(r.message.textContent,'GPS-Aufzeichnung läuft.');
+ r.fail('Präziser Standort wurde nicht erlaubt.');assert.equal(notices.at(-1).options.autoCloseMs,3000);
+ r.fail('GPS konnte nicht lokal gespeichert werden. Bitte GPX herunterladen.');assert.equal(notices.at(-1).options.autoCloseMs,undefined);
+ console.log('Rail stop fixtures, four-minute threshold, 100m jitter, >5kmh departure and transient GPS/HTTPS warnings: PASS');
  console.log('GPS stop markers: legacy fixes, two colors, click/keyboard focus, imported details and gap exclusion: PASS');
  console.log('GPS map: live follow, preserved zoom, pinch, overview, zoom limits, ORM fallback and visible-only tiles: PASS');
 })().catch(e=>{console.error(e);process.exitCode=1;});

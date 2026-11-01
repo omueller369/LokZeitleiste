@@ -1,7 +1,7 @@
 /* Accessible error and help dialogs shared by the work report and its GPS editor. */
 (()=>{
 const t=value=>window.I18n?.t(value)||value,node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=t(text);return n;};
-const queue=[];let current=null,returnFocus=null;
+const queue=[];let current=null,returnFocus=null,dismissTimer;
 function hint(message){
  if(/pause|pausen/i.test(message))return 'Bitte eine Pause als Zugfahrtereignis eintragen und die erforderlichen Minuten prüfen.';
  if(/bahnhof|betriebsstelle|station/i.test(message))return 'Bitte DS100 oder Bahnhofsname eingeben und einen Eintrag aus den Vorschlägen auswählen.';
@@ -20,11 +20,11 @@ for(const [heading,content]of [
  ['Entwurf und Wiederkehr','Eingaben im Arbeitsbericht, Gastfahrten und noch nicht eingetragene Zugfahrtereignisse werden auf diesem Gerät automatisch gesichert. Beim erneuten Öffnen erscheint der letzte Bearbeitungsstand. Vor dem Schließen Zwischenspeichern verwenden, um auch GPS und bei verfügbarer Verbindung den Serverstand zu sichern. Unvollständige Zugdaten bleiben als lokaler Entwurf erhalten.'],
  ['Arbeitsbericht löschen','Bis zur endgültigen Synchronisation kann der Arbeitsbericht jederzeit über Arbeitsbericht löschen oder Löschen in der Monatsliste entfernt werden, einschließlich GPS und Belegen. Laufendes GPS wird gestoppt. Offline wird die Serverlöschung später nachgeholt. Bereits synchronisierte Berichte sind davon ausgeschlossen.'],
  ['GPS-Bahnhöfe','Start- und Endbahnhof nur selbst über DS100 oder Bahnhofsname eingeben und auswählen. Es gibt keine automatische Standortsuche. Angezeigt wird DS100 + Bahnhofsname.'],
- ['Standzeiten','Nach mehr als fünf Minuten Stillstand wird der Halt live angezeigt. Standort eingeben, Grund wählen oder Freitext als Sonstiges eingeben. Das Ende wird bei Weiterfahrt ergänzt oder manuell in Berliner Zeit eingetragen. ↑ Übernehmen verschiebt den Halt in die änderbaren Zugfahrtdetails.'],
- ['GPS-Lücken und Internet','Signalverluste werden auf der Karte gestrichelt und im GPX als geschätzte Verbindung geschlossen. Es werden keine Messpunkte oder Standzeiten erfunden. Bei Internetunterbrechung erfolgt keine Warnmeldung; die lokale Aufzeichnung läuft weiter.']])help.append(node('h3',heading),node('p',content));
+ ['Standzeiten','Ab vier Minuten wird der Halt live angezeigt. Bewegungen im 100-m-Umkreis gehören zum selben Halt; Abfahrt erst außerhalb dieses Kreises mit mehr als 5 km/h. Der Kartenpunkt des fokussierten Halts ist doppelt so groß. Standort eingeben, Grund wählen oder Freitext als Sonstiges eingeben. Das Ende wird bei Weiterfahrt ergänzt oder manuell in Berliner Zeit eingetragen. ↑ Übernehmen verschiebt den Halt in die änderbaren Zugfahrtdetails.'],
+ ['GPS-Lücken und Internet','Signalverluste werden auf der Karte gestrichelt und im GPX als geschätzte Verbindung geschlossen. Es werden keine Messpunkte oder Standzeiten erfunden. GPS-Signal- und HTTPS-Hinweise schließen nach drei Sekunden automatisch oder vorher mit Okay. Bei Internetunterbrechung erfolgt keine Warnmeldung; die lokale Aufzeichnung läuft weiter.']])help.append(node('h3',heading),node('p',content));
 document.body.append(dialog,help);
-function next(){if(current||!queue.length)return;current=queue.shift();returnFocus=current.field||document.activeElement;message.textContent=t(current.message);suggestion.textContent=t(current.hint||hint(current.message));dialog.showModal();okay.focus();}
-function finish(){current=null;const focus=returnFocus;returnFocus=null;if(focus?.isConnected!==false&&!focus?.disabled)focus?.focus?.();next();}
+function next(){if(current||!queue.length)return;current=queue.shift();returnFocus=current.field||document.activeElement;message.textContent=t(current.message);suggestion.textContent=t(current.hint||hint(current.message));dialog.showModal();okay.focus();const shown=current;if(current.autoCloseMs) dismissTimer=setTimeout(()=>{if(current===shown&&dialog.open)dialog.close();},current.autoCloseMs);}
+function finish(){clearTimeout(dismissTimer);current=null;const focus=returnFocus;returnFocus=null;if(focus?.isConnected!==false&&!focus?.disabled)focus?.focus?.();next();}
 okay.onclick=()=>dialog.close();dialog.addEventListener('close',finish);dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close();});
 helpButton.onclick=()=>{help.showModal();close.focus();};close.onclick=()=>help.close();help.addEventListener('close',()=>helpButton.focus());
 window.ReportFeedback={help(){help.showModal();close.focus();},error(value,options={}){const message=String(value||'').trim();if(!message||current?.message===message||queue.some(row=>row.message===message))return;queue.push({message,...options});next();},hint};
