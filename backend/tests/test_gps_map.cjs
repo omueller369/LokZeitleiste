@@ -53,6 +53,7 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const scheduled=[],notices=[];context.setTimeout=(fn,ms)=>{scheduled.push({fn,ms});return scheduled.length;};context.clearTimeout=id=>{if(scheduled[id-1])scheduled[id-1].cancelled=true;};context.window.ReportFeedback={error:(message,options)=>notices.push({message,options})};
  r.fail('GPS fehlt oder wurde abgelehnt. Aufzeichnung hat eine Lücke.');assert.equal(notices.at(-1).options.autoCloseMs,3000);assert.equal(scheduled.at(-1).ms,3000);scheduled.at(-1).fn();assert.equal(r.message.textContent,'');
  r.fail('GPS benötigt HTTPS oder localhost.');assert.equal(notices.at(-1).options.autoCloseMs,3000);const timeout=scheduled.at(-1);r.say('GPS-Aufzeichnung läuft.');assert(timeout.cancelled);assert.equal(r.message.textContent,'GPS-Aufzeichnung läuft.');
+ r.fail('Präziser Standort wurde nicht erlaubt.');assert.equal(notices.at(-1).options.autoCloseMs,3000);
  r.fail('GPS konnte nicht lokal gespeichert werden. Bitte GPX herunterladen.');assert.equal(notices.at(-1).options.autoCloseMs,undefined);
  console.log('Rail stop fixtures, four-minute threshold, 100m jitter, >5kmh departure and transient GPS/HTTPS warnings: PASS');
  console.log('GPS stop markers: legacy fixes, two colors, click/keyboard focus, imported details and gap exclusion: PASS');

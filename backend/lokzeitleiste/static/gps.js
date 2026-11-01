@@ -42,7 +42,7 @@ function normaliseRecording(record){
  for(const field of ['stations','reasons'])record[field]=Object.fromEntries(Object.entries(record[field]||{}).filter(([key])=>mapping[key]).map(([key,value])=>[mapping[key],value]));
  record.selection=(record.selection||[]).filter(key=>mapping[key]).map(key=>mapping[key]);record.detection_version=2;
 }
-const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
+const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|Standort.*(nicht erlaubt|verweigert|abgelehnt|fehlt)|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
 
 class Recorder{
  constructor(o){this.o=o;this.key=o.userId+'.'+o.journeyId;this.path='/api/v1/tf/gps/'+o.journeyId;this.record=null;this.analysis=null;this.pending=false;this.loading=false;this.stationInputs=[];this.box=node('section');this.box.className='gps-box';this.box.append(node('h3','GPS-Aufzeichnung (Browsertest)'));
