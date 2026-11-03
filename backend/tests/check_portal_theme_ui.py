@@ -43,7 +43,7 @@ def fixture(name,source,section):
     if section:page=page.replace('id="'+section+'" hidden','id="'+section+'"')
     if section=='workReport':page=page.replace('id="reportDetails" hidden','id="reportDetails"')
     scripts='\n'.join((STATIC/f).read_text() for f in ['tf-help-content.js','tf-help.js','portal-theme.js'])
-    tests="try{"+CHECKS+"}catch(error){document.documentElement.dataset.themeStatus='fail';document.documentElement.dataset.themeMessage=error.stack;window.parent.postMessage({themeStatus:'fail',message:error.stack},'*');}"
+    tests="document.addEventListener('DOMContentLoaded',()=>{try{"+CHECKS+"}catch(error){document.documentElement.dataset.themeStatus='fail';document.documentElement.dataset.themeMessage=error.stack;window.parent.postMessage({themeStatus:'fail',message:error.stack},'*');}},{once:true});"
     return page.replace('</body>','<section class="card"><label>Prüfeingabe<input id="themeProbe"></label><img id="originalImage" alt="Beispielbild"><dialog>Testdialog</dialog></section><script>'+scripts+tests+'</script></body>')
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output-dir',type=Path,required=True);args=parser.parse_args();args.output_dir.mkdir(parents=True,exist_ok=True)
