@@ -7,9 +7,9 @@ window.loadTfHelp=()=>{
  if(window.TfHelp)return Promise.resolve(window.TfHelp);
  if(helpTask)return helpTask;
  helpTask=new Promise((resolve,reject)=>{
-  if(!document.getElementById('tfHelpStyles')){const css=document.createElement('link');css.id='tfHelpStyles';css.rel='stylesheet';css.href='/tf/help.css?v=20261103';document.head.append(css);}
+  if(!document.getElementById('tfHelpStyles')){const css=document.createElement('link');css.id='tfHelpStyles';css.rel='stylesheet';css.href='/tf/help.css?v=20261103-du-notes';document.head.append(css);}
   const load=path=>new Promise((done,fail)=>{const script=document.createElement('script');script.src=path;script.onload=done;script.onerror=()=>{script.remove();fail(Error('Die Anleitung konnte nicht geladen werden. Bitte die Verbindung prüfen.'));};document.head.append(script);});
-  (window.TfHelpPages?Promise.resolve():load('/tf/help-content.js?v=20261103')).then(()=>load('/tf/help.js?v=20261103')).then(()=>resolve(window.TfHelp),reject);
+  (window.TfHelpPages?Promise.resolve():load('/tf/help-content.js?v=20261103-du-notes')).then(()=>load('/tf/help.js?v=20261103-du-notes')).then(()=>resolve(window.TfHelp),reject);
  }).catch(error=>{helpTask=null;throw error;});return helpTask;
 };
 // Downloads need the same tab identity as API requests, rather than shared cookies.

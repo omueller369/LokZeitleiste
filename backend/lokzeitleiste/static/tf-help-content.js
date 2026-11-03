@@ -1,19 +1,19 @@
-// Central TF help. Update affected topics with every user-facing change.
+/* Gemeinsamer Hilfekatalog für alle TF-Module. */
 window.TfHelpRevision="2026-11-03";
 window.TfHelpPages=[
   {
     "id": "start",
     "group": "Erste Schritte",
     "title": "Das TF-Portal kennenlernen",
-    "short": "Hier beginnen: Was die Startseite zeigt und wo Sie Hilfe finden.",
+    "short": "Hier beginnen: Was die Startseite zeigt und wo Du Hilfe findest.",
     "path": "/tf",
     "aliases": [],
     "sections": [
       {
         "title": "Wofür ist das Portal da?",
         "paragraphs": [
-          "Im TF-Portal finden Sie Ihre Arbeitsberichte, den Arbeitsplan, Fahrzeugangaben, Dokumente und weitere Aufgaben. Auf der Startseite hat jede Aufgabe eine eigene Kachel. Eine Kachel ist ein Feld mit einer Überschrift.",
-          "Ein Browser ist das Programm, mit dem Sie Internetseiten öffnen, zum Beispiel Chrome, Edge oder Safari. Die Internetadresse tragen Sie oben in dessen Adressfeld ein. In der Android-App öffnen Sie stattdessen direkt die App."
+          "Im TF-Portal findest Du Deine Arbeitsberichte, den Arbeitsplan, Fahrzeugangaben, Dokumente und weitere Aufgaben. Auf der Startseite hat jede Aufgabe eine eigene Kachel. Eine Kachel ist ein Feld mit einer Überschrift.",
+          "Ein Browser ist das Programm, mit dem Du Internetseiten öffnest, zum Beispiel Chrome, Edge oder Safari. Trage die Internetadresse oben in dessen Adressfeld ein. Öffne auf Android stattdessen direkt die App."
         ],
         "steps": []
       },
@@ -21,23 +21,23 @@ window.TfHelpPages=[
         "title": "Eine Aufgabe öffnen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie auf der Startseite die passende Kachel, zum Beispiel Arbeitsbericht.",
-          "Lesen Sie zunächst die Überschrift. So erkennen Sie, in welchem Bereich Sie sind.",
-          "Mit zurück TF-Portal gelangen Sie wieder zur Auswahl der Kacheln.",
-          "Über ? Hilfe oben auf der Seite öffnen Sie die Erklärung zum aktuellen Bereich. Im Modul Anleitung und Hilfe stehen alle Themen."
+          "Wähle auf der Startseite die passende Kachel, zum Beispiel Arbeitsbericht.",
+          "Lies zunächst die Überschrift. So erkennst Du, in welchem Bereich Du bist.",
+          "Mit zurück TF-Portal gelangst Du wieder zur Auswahl der Kacheln.",
+          "Über ? Hilfe oben auf der Seite öffnest Du die Erklärung zum aktuellen Bereich. Im Modul Anleitung und Hilfe stehen alle Themen."
         ]
       },
       {
         "title": "Wählen heißt klicken oder antippen",
         "paragraphs": [
-          "In dieser Anleitung bedeutet wählen: Am Computer klicken Sie einmal mit der linken Maustaste. Am Handy oder Tablet tippen Sie einmal mit dem Finger auf die genannte Schaltfläche."
+          "In dieser Anleitung bedeutet wählen: Am Computer klickst Du einmal mit der linken Maustaste. Am Handy oder Tablet tippst Du einmal mit dem Finger auf die genannte Schaltfläche."
         ],
         "steps": []
       },
       {
         "title": "Was passiert beim Öffnen der Hilfe?",
         "paragraphs": [
-          "Die Hilfe liegt als Fenster über Ihrer Seite. Die Eingaben dahinter bleiben stehen. X oben links schließt nur die Hilfe. Es löscht keine Eingaben. Das Drucker-Symbol oben rechts öffnet den Druckdialog für die gerade angezeigte Anleitung."
+          "Die Hilfe liegt als Fenster über Deiner Seite. Die Eingaben dahinter bleiben stehen. X oben links schließt nur die Hilfe. Es löscht keine Eingaben. Das Drucker-Symbol oben rechts öffnet den Druckdialog für die gerade angezeigte Anleitung."
         ],
         "steps": []
       }
@@ -54,7 +54,7 @@ window.TfHelpPages=[
       {
         "title": "Eingaben und Auswahlfelder",
         "paragraphs": [
-          "Ein leeres Eingabefeld wird zuerst ausgewählt. Danach schreiben Sie mit der Tastatur. Auf einem Handy öffnet sich die Bildschirmtastatur. Ein Auswahlfeld zeigt mehrere Möglichkeiten. Wählen Sie daraus den passenden Eintrag."
+          "Ein leeres Eingabefeld wird zuerst ausgewählt. Danach schreibst Du mit der Tastatur. Auf einem Handy öffnet sich die Bildschirmtastatur. Ein Auswahlfeld zeigt mehrere Möglichkeiten. Wähle daraus den passenden Eintrag."
         ],
         "steps": []
       },
@@ -68,14 +68,14 @@ window.TfHelpPages=[
       {
         "title": "Wenn etwas nicht bedienbar ist",
         "paragraphs": [
-          "Eine graue Schaltfläche ist im Moment nicht verfügbar. Möglicherweise fehlen Angaben, ein Vorgang läuft noch oder der Eintrag ist geschützt. Lesen Sie den Hinweis daneben. Drücken Sie nicht wiederholt auf dieselbe Schaltfläche."
+          "Eine graue Schaltfläche ist im Moment nicht verfügbar. Möglicherweise fehlen Angaben, ein Vorgang läuft noch oder der Eintrag ist geschützt. Lies den Hinweis daneben. Drücke nicht wiederholt auf dieselbe Schaltfläche."
         ],
         "steps": []
       },
       {
         "title": "Auf kleinen Bildschirmen",
         "paragraphs": [
-          "Einige Gruppen stehen auf dem Handy untereinander statt nebeneinander. In breiten Tabellen können Sie nach links oder rechts wischen. Die Reihenfolge der Arbeitsschritte bleibt gleich."
+          "Einige Gruppen stehen auf dem Handy untereinander statt nebeneinander. In breiten Tabellen kannst Du nach links oder rechts wischen. Die Reihenfolge der Arbeitsschritte bleibt gleich."
         ],
         "steps": []
       }
@@ -85,7 +85,7 @@ window.TfHelpPages=[
     "id": "anmeldung",
     "group": "Erste Schritte",
     "title": "Anmelden, Passwort und Abmelden",
-    "short": "So gelangen Sie in das Portal und verlassen es wieder.",
+    "short": "So gelangst Du in das Portal und verlässt es wieder.",
     "path": "/account",
     "aliases": [],
     "sections": [
@@ -93,23 +93,23 @@ window.TfHelpPages=[
         "title": "Anmelden",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie die Adresse des Portals.",
-          "Tragen Sie Ihren Benutzernamen und Ihr Passwort in die dafür vorgesehenen Felder ein.",
-          "Wählen Sie Anmelden. Wenn Sie ein erstes Passwort erhalten haben, kann die Anwendung Sie zunächst zum Ändern des Passworts auffordern.",
-          "Nach der Anmeldung öffnen Sie die gewünschte Aufgabe im TF-Portal."
+          "Öffne die Adresse des Portals.",
+          "Trage Deinen Benutzernamen und Dein Passwort in die dafür vorgesehenen Felder ein.",
+          "Wähle Anmelden. Wenn Du ein erstes Passwort erhalten hast, kann die Anwendung Dich zunächst zum Ändern des Passworts auffordern.",
+          "Öffne nach der Anmeldung die gewünschte Aufgabe im TF-Portal."
         ]
       },
       {
         "title": "Passwort ändern",
         "paragraphs": [
-          "Unter Mein Konto / Passwort finden Sie den Zugang zur Passwortänderung. Folgen Sie den Feldbeschriftungen. Das neue Passwort muss zur Bestätigung noch einmal gleich eingegeben werden."
+          "Unter Mein Konto / Passwort findest Du den Zugang zur Passwortänderung. Folge den Feldbeschriftungen. Das neue Passwort muss zur Bestätigung noch einmal gleich eingegeben werden."
         ],
         "steps": []
       },
       {
         "title": "Abmelden",
         "paragraphs": [
-          "Beenden Sie zuerst laufende GPS-Aufzeichnungen oder manuelle Standzeiten und speichern Sie Ihren Arbeitsbericht. Wählen Sie danach Abmelden. Wenn die Anmeldung fehlschlägt, prüfen Sie die Schreibweise oder wenden Sie sich an Ihre zuständige Verwaltung."
+          "Beende zuerst laufende GPS-Aufzeichnungen oder manuelle Standzeiten und speichere Deinen Arbeitsbericht. Wähle danach Abmelden. Wenn die Anmeldung fehlschlägt, prüfe die Schreibweise oder wende Dich an Deine zuständige Verwaltung."
         ],
         "steps": []
       }
@@ -127,22 +127,22 @@ window.TfHelpPages=[
         "title": "Das passende Thema finden",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie links ein Modul und darunter ein Thema. Auf dem Handy steht die Themenliste oben.",
+          "Wähle links ein Modul und darunter ein Thema. Auf dem Handy steht die Themenliste oben.",
           "Unter jedem Thema steht ein kurzer Erklärungstext. Er hilft bei der Auswahl.",
-          "Sie können im Suchfeld ein Wort eingeben, zum Beispiel GPS, Passwort oder Beleg. Die Themenliste wird passend eingeschränkt.",
-          "Löschen Sie den Suchbegriff, um wieder alle Themen zu sehen."
+          "Du kannst im Suchfeld ein Wort eingeben, zum Beispiel GPS, Passwort oder Beleg. Die Themenliste wird passend eingeschränkt.",
+          "Lösche den Suchbegriff, um wieder alle Themen zu sehen."
         ]
       },
       {
         "title": "Schließen und Drucken",
         "paragraphs": [
-          "X oben links bringt Sie zurück zur vorherigen Ansicht. Das Drucker-Symbol oben rechts druckt nur die angezeigte Anleitung mit ihren Gruppen. Ihre persönlichen Formulare werden dabei nicht mitgedruckt."
+          "X oben links bringt Dich zurück zur vorherigen Ansicht. Das Drucker-Symbol oben rechts druckt nur die angezeigte Anleitung mit ihren Gruppen. Deine persönlichen Formulare werden dabei nicht mitgedruckt."
         ],
         "steps": [
-          "Wählen Sie das gewünschte Thema.",
-          "Wählen Sie das Drucker-Symbol.",
-          "Im Druckdialog wählen Sie einen vorhandenen Drucker. Wenn Ihr Gerät es anbietet, können Sie auch Als PDF speichern wählen.",
-          "Bestätigen Sie den Druck dort oder brechen Sie ihn ab. Die Anleitung bleibt anschließend geöffnet."
+          "Wähle das gewünschte Thema.",
+          "Wähle das Drucker-Symbol.",
+          "Wähle im Druckdialog einen vorhandenen Drucker. Wenn Dein Gerät es anbietet, kannst Du auch Als PDF speichern wählen.",
+          "Bestätige den Druck dort oder brich ihn ab. Die Anleitung bleibt anschließend geöffnet."
         ]
       },
       {
@@ -166,26 +166,26 @@ window.TfHelpPages=[
       {
         "title": "Eine Meldung erscheint",
         "paragraphs": [
-          "Lesen Sie zuerst die Meldung vollständig. Meist nennt sie ein fehlendes Feld oder den nächsten Schritt. Schließen Sie die Meldung mit Okay und prüfen Sie das genannte Feld. GPS-Signal- und HTTPS-Hinweise schließen nach drei Sekunden auch von selbst."
+          "Lies zuerst die Meldung vollständig. Meist nennt sie ein fehlendes Feld oder den nächsten Schritt. Schließe die Meldung mit Okay und prüfe das genannte Feld. GPS-Signal- und HTTPS-Hinweise schließen nach drei Sekunden auch von selbst."
         ],
         "steps": []
       },
       {
         "title": "Keine Internetverbindung",
         "paragraphs": [
-          "Internet bedeutet hier die Verbindung zwischen Ihrem Gerät und dem Server der Anwendung. Der Server ist der zentrale Rechner, auf dem die übertragenen Angaben für die Anwendung gespeichert werden. Bereits lokal gesicherte Arbeitsberichte bleiben auf diesem Gerät erhalten. Lokal heißt: auf genau diesem Gerät und in diesem Browser. Zum Übertragen und zum erstmaligen Laden vieler anderer Inhalte ist eine Verbindung nötig."
+          "Internet bedeutet hier die Verbindung zwischen Deinem Gerät und dem Server der Anwendung. Der Server ist der zentrale Rechner, auf dem die übertragenen Angaben für die Anwendung gespeichert werden. Bereits lokal gesicherte Arbeitsberichte bleiben auf diesem Gerät erhalten. Lokal heißt: auf genau diesem Gerät und in diesem Browser. Zum Übertragen und zum erstmaligen Laden vieler anderer Inhalte ist eine Verbindung nötig."
         ],
         "steps": [
-          "Unterbrechen Sie nicht wiederholt denselben Speichervorgang.",
-          "Nutzen Sie beim Arbeitsbericht Zwischenspeichern.",
-          "Prüfen Sie die Verbindung und versuchen Sie die Übertragung später erneut.",
-          "Löschen Sie keine Browserdaten, wenn noch nicht übertragene Eingaben auf dem Gerät liegen."
+          "Unterbrich nicht wiederholt denselben Speichervorgang.",
+          "Nutze beim Arbeitsbericht Zwischenspeichern.",
+          "Prüfe die Verbindung und versuche die Übertragung später erneut.",
+          "Lösche keine Browserdaten, wenn noch nicht übertragene Eingaben auf dem Gerät liegen."
         ]
       },
       {
         "title": "Hilfe durch eine zuständige Person",
         "paragraphs": [
-          "Notieren Sie den Bereich, die genaue Meldung und ungefähr die Uhrzeit. Geben Sie diese Angaben Ihrer zuständigen Verwaltung. Teilen Sie dabei nicht Ihr Passwort mit."
+          "Notiere den Bereich, die genaue Meldung und ungefähr die Uhrzeit. Gib diese Angaben Deiner zuständigen Verwaltung. Teile dabei nicht Dein Passwort mit."
         ],
         "steps": []
       }
@@ -210,12 +210,12 @@ window.TfHelpPages=[
         "title": "Schritt für Schritt",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie Neuen Arbeitsbericht erstellen.",
-          "Wählen Sie die passende Dienstart und tragen Sie Dienstbeginn sowie Dienstende ein. Achten Sie auch auf das Datum.",
-          "Ergänzen Sie bei Bedarf Gastfahrten, Zugfahrten und Belege. Die folgenden Hilfethemen erklären diese Gruppen einzeln.",
-          "Prüfen Sie die Zeitwerte und Hinweise. Fehlende Pausen oder unvollständige Angaben müssen vor der endgültigen Übertragung geklärt werden.",
-          "Wählen Sie Zwischenspeichern, um den bisherigen Stand zu sichern.",
-          "Wenn alles vollständig ist, wählen Sie Synchronisieren. Dadurch wird der Bericht endgültig an die Anwendung übertragen."
+          "Wähle Neuen Arbeitsbericht erstellen.",
+          "Wähle die passende Dienstart und trage Dienstbeginn sowie Dienstende ein. Achte auch auf das Datum.",
+          "Ergänze bei Bedarf Gastfahrten, Zugfahrten und Belege. Die folgenden Hilfethemen erklären diese Gruppen einzeln.",
+          "Prüfe die Zeitwerte und Hinweise. Fehlende Pausen oder unvollständige Angaben müssen vor der endgültigen Übertragung geklärt werden.",
+          "Wähle Zwischenspeichern, um den bisherigen Stand zu sichern.",
+          "Wenn alles vollständig ist, wähle Synchronisieren. Dadurch wird der Bericht endgültig an die Anwendung übertragen."
         ]
       },
       {
@@ -246,10 +246,10 @@ window.TfHelpPages=[
         "title": "Beginn und Ende eingeben",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie das Feld Dienstbeginn und tragen Sie Datum und Uhrzeit ein.",
-          "Tragen Sie Dienstende rechts darunter ein. Das Ende muss nach dem Beginn liegen.",
-          "Wenn der Dienst über Mitternacht hinausgeht, wählen Sie beim Ende auch den richtigen folgenden Tag.",
-          "Prüfen Sie die angezeigten Hinweise. Bei Rufbereitschaft oder Abwesenheit gelten besondere Eingabegrenzen."
+          "Wähle das Feld Dienstbeginn und trage Datum und Uhrzeit ein.",
+          "Trage Dienstende rechts darunter ein. Das Ende muss nach dem Beginn liegen.",
+          "Wenn der Dienst über Mitternacht hinausgeht, wähle beim Ende auch den richtigen folgenden Tag.",
+          "Prüfe die angezeigten Hinweise. Bei Rufbereitschaft oder Abwesenheit gelten besondere Eingabegrenzen."
         ]
       },
       {
@@ -262,7 +262,7 @@ window.TfHelpPages=[
       {
         "title": "Ausbleibe und Hotel",
         "paragraphs": [
-          "In Ausbleibe wählen Sie die zutreffenden Kästchen. Unter Hotelübergang können bei Bedarf Ort und Hotelname ergänzt werden. Die angezeigten Zeitwerte berechnet die Anwendung; Sie müssen diese Zahlen nicht selbst in die Anzeige schreiben."
+          "Wähle in Ausbleibe die zutreffenden Kästchen. Unter Hotelübergang können bei Bedarf Ort und Hotelname ergänzt werden. Die angezeigten Zeitwerte berechnet die Anwendung; Du musst diese Zahlen nicht selbst in die Anzeige schreiben."
         ],
         "steps": []
       }
@@ -280,18 +280,18 @@ window.TfHelpPages=[
         "title": "Eine Gastfahrt hinzufügen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie Gastfahrten.",
-          "Geben Sie bei Von und Nach den Bahnhof ein und wählen Sie einen Vorschlag.",
-          "Prüfen Sie Beginn und Ende mit Datum. Die vorgeschlagenen Zeiten können Sie ändern.",
-          "Wählen Sie das Verkehrsmittel. Bei einem anderen Verkehrsmittel ergänzen Sie die Beschreibung.",
-          "Prüfen Sie, ob Selbstzahler zutrifft und ob ein Beleg benötigt wird.",
-          "Wählen Sie Gastfahrt speichern. Die Fahrt steht danach in der Liste."
+          "Öffne Gastfahrten.",
+          "Gib bei Von und Nach den Bahnhof ein und wähle einen Vorschlag.",
+          "Prüfe Beginn und Ende mit Datum. Die vorgeschlagenen Zeiten kannst Du ändern.",
+          "Wähle das Verkehrsmittel. Ergänze bei einem anderen Verkehrsmittel die Beschreibung.",
+          "Prüfe, ob Selbstzahler zutrifft und ob ein Beleg benötigt wird.",
+          "Wähle Gastfahrt speichern. Die Fahrt steht danach in der Liste."
         ]
       },
       {
         "title": "Zeiten und Änderungen",
         "paragraphs": [
-          "Gastfahrten können vor, während oder nach dem Dienst liegen. Die Anwendung unterscheidet die Zeit im Dienst von der Zeit außerhalb. Über Bearbeiten ändern Sie eine hinzugefügte Gastfahrt. Löschen entfernt sie aus dem noch bearbeitbaren Bericht. Abbrechen schließt die laufende Eingabe; bereits hinzugefügte Fahrten bleiben erhalten."
+          "Gastfahrten können vor, während oder nach dem Dienst liegen. Die Anwendung unterscheidet die Zeit im Dienst von der Zeit außerhalb. Über Bearbeiten änderst Du eine hinzugefügte Gastfahrt. Löschen entfernt sie aus dem noch bearbeitbaren Bericht. Abbrechen schließt die laufende Eingabe; bereits hinzugefügte Fahrten bleiben erhalten."
         ],
         "steps": []
       }
@@ -308,29 +308,29 @@ window.TfHelpPages=[
       {
         "title": "Eine Zugfahrt anlegen",
         "paragraphs": [
-          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Sie das Kürzel nicht kennen, können Sie den ausgeschriebenen Bahnhofsnamen eingeben."
+          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Du das Kürzel nicht kennst, kannst Du den ausgeschriebenen Bahnhofsnamen eingeben."
         ],
         "steps": [
-          "Wählen Sie Zugfahrt hinzufügen.",
-          "Tragen Sie Zugnummer, Startbahnhof, Zielbahnhof sowie Abfahrt und Ankunft ein.",
-          "Wählen Sie Bahnhöfe über DS100 oder den ausgeschriebenen Namen aus den Vorschlägen.",
-          "Weitere Zugfahrten erhalten eigene Reiter. Wählen Sie den passenden Reiter, bevor Sie dazu Angaben machen."
+          "Wähle Zugfahrt hinzufügen.",
+          "Trage Zugnummer, Startbahnhof, Zielbahnhof sowie Abfahrt und Ankunft ein.",
+          "Wähle Bahnhöfe über DS100 oder den ausgeschriebenen Namen aus den Vorschlägen.",
+          "Weitere Zugfahrten erhalten eigene Reiter. Wähle den passenden Reiter, bevor Du dazu Angaben machst."
         ]
       },
       {
         "title": "Ein Ereignis eintragen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie Art und Grund.",
-          "Geben Sie Meldestelle/Ort sowie Von und Bis ein.",
-          "Bei Sonstiges ergänzen Sie die gewünschte Erklärung im Textfeld.",
-          "Wählen Sie Eintragen. Die Zeile erscheint in der Detailliste. Diese Liste ist immer zeitlich sortiert."
+          "Wähle Art und Grund.",
+          "Gib Meldestelle/Ort sowie Von und Bis ein.",
+          "Ergänze bei Sonstiges die gewünschte Erklärung im Textfeld.",
+          "Wähle Eintragen. Die Zeile erscheint in der Detailliste. Diese Liste ist immer zeitlich sortiert."
         ]
       },
       {
         "title": "Bearbeiten und Pausen",
         "paragraphs": [
-          "Wählen Sie eine vorhandene Zeile, um ihre Angaben im Eingabebereich zu sehen. Wenn der Bericht bearbeitbar ist, können Sie sie ändern und speichern oder entfernen. Für eine Pause wählen Sie den passenden Pausengrund. Die Schaltfläche Auch als Pause Hinzuf. wird nur angeboten, wenn die Voraussetzungen dafür erfüllt sind."
+          "Wähle eine vorhandene Zeile, um ihre Angaben im Eingabebereich zu sehen. Wenn der Bericht bearbeitbar ist, kannst Du sie ändern und speichern oder entfernen. Wähle für eine Pause den passenden Pausengrund. Die Schaltfläche Auch als Pause Hinzuf. wird nur angeboten, wenn die Voraussetzungen dafür erfüllt sind."
         ],
         "steps": []
       },
@@ -354,7 +354,7 @@ window.TfHelpPages=[
       {
         "title": "GPS bedeutet Standortbestimmung",
         "paragraphs": [
-          "Ihr Gerät ermittelt dabei seine Position. Für die Browser-Aufzeichnung werden eine sichere Verbindung (HTTPS), eine Standortfreigabe und ein sichtbarer Tab benötigt. Ein Tab ist die geöffnete Seite im Browser. Die Android-App nutzt einen Standortdienst und zeigt eine dauerhafte Benachrichtigung."
+          "Dein Gerät ermittelt dabei seine Position. Für die Browser-Aufzeichnung werden eine sichere Verbindung (HTTPS), eine Standortfreigabe und ein sichtbarer Tab benötigt. Ein Tab ist die geöffnete Seite im Browser. Die Android-App nutzt einen Standortdienst und zeigt eine dauerhafte Benachrichtigung."
         ],
         "steps": []
       },
@@ -362,31 +362,31 @@ window.TfHelpPages=[
         "title": "Eine Fahrt aufzeichnen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie die passende Zugfahrt und tragen Sie ihre Zugnummer ein.",
-          "Öffnen Sie den GPS-Bereich mit +.",
-          "Wählen Sie Zugfahrt per GPS aufzeichnen. Geben Sie den Startbahnhof selbst ein und wählen Sie den passenden Vorschlag.",
-          "Erlauben Sie die Standortbestimmung, wenn Ihr Gerät danach fragt.",
-          "Zum Beenden wählen Sie GPS-Aufzeichnung beenden und geben den Endbahnhof ein."
+          "Öffne die passende Zugfahrt und trage ihre Zugnummer ein.",
+          "Öffne den GPS-Bereich mit +.",
+          "Wähle Zugfahrt per GPS aufzeichnen. Gib den Startbahnhof selbst ein und wähle den passenden Vorschlag.",
+          "Erlaube die Standortbestimmung, wenn Dein Gerät danach fragt.",
+          "Wähle zum Beenden GPS-Aufzeichnung beenden und gib den Endbahnhof ein."
         ]
       },
       {
         "title": "Erkannte Standzeiten",
         "paragraphs": [
-          "Ein GPS-Halt erscheint ab vier Minuten. Bewegungen innerhalb von 100 Metern werden zu einem Halt zusammengefasst. Die Abfahrt wird außerhalb dieses Kreises mit mehr als 5 km/h erkannt. Prüfen Sie trotzdem jeden Halt, ergänzen Sie Bahnhof und Grund und wählen Sie ↑ Übernehmen. Der Halt verschwindet aus der offenen Liste und steht dann in den Zugfahrtdetails."
+          "Ein GPS-Halt erscheint ab vier Minuten. Bewegungen innerhalb von 100 Metern werden zu einem Halt zusammengefasst. Die Abfahrt wird außerhalb dieses Kreises mit mehr als 5 km/h erkannt. Prüfe trotzdem jeden Halt, ergänze Bahnhof und Grund und wähle ↑ Übernehmen. Der Halt verschwindet aus der offenen Liste und steht dann in den Zugfahrtdetails."
         ],
         "steps": []
       },
       {
         "title": "Die Karte bedienen",
         "paragraphs": [
-          "Blau-rote Punkte markieren Halte. Wenn Sie einen Punkt oder eine Standzeitenzeile wählen, wird der Punkt größer und in der Kartenmitte herangezoomt. Position folgen zeigt wieder die aktuelle Position. Gesamter Verlauf zeigt die gesamte Strecke. Plus und Minus an der Karte verändern die Vergrößerung."
+          "Blau-rote Punkte markieren Halte. Wenn Du einen Punkt oder eine Standzeitenzeile wählst, wird der Punkt größer und in der Kartenmitte herangezoomt. Position folgen zeigt wieder die aktuelle Position. Gesamter Verlauf zeigt die gesamte Strecke. Plus und Minus an der Karte verändern die Vergrößerung."
         ],
         "steps": []
       },
       {
         "title": "Fehlende Signale, Zeiten und Löschen",
         "paragraphs": [
-          "Bei Signalverlust wird zwischen gültigen Punkten eine gestrichelte, geschätzte Verbindung gezeichnet. Daraus wird keine Standzeit erfunden. Fehlendes Internet erzeugt keine Internet-Warnmeldung. Beginn und Ende eines Halts erscheinen als HH:MM ohne Sekunden. Ein fehlendes Ende können Sie selbst eingeben. Löschen entfernt einen offenen Halt aus Liste und Karte. Die ursprünglichen GPS-Punkte bleiben erhalten."
+          "Bei Signalverlust wird zwischen gültigen Punkten eine gestrichelte, geschätzte Verbindung gezeichnet. Daraus wird keine Standzeit erfunden. Fehlendes Internet erzeugt keine Internet-Warnmeldung. Beginn und Ende eines Halts erscheinen als HH:MM ohne Sekunden. Ein fehlendes Ende kannst Du selbst eingeben. Löschen entfernt einen offenen Halt aus Liste und Karte. Die ursprünglichen GPS-Punkte bleiben erhalten."
         ],
         "steps": []
       },
@@ -410,8 +410,8 @@ window.TfHelpPages=[
       {
         "title": "Wann hilft diese Funktion?",
         "paragraphs": [
-          "Wenn keine GPS-Aufzeichnung läuft, können Sie einen Halt selbst beginnen und beenden. Dafür ist keine Standortfreigabe nötig. Die Anwendung erfindet dabei keinen Punkt auf der Karte.",
-          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Sie das Kürzel nicht kennen, können Sie den ausgeschriebenen Bahnhofsnamen eingeben."
+          "Wenn keine GPS-Aufzeichnung läuft, kannst Du einen Halt selbst beginnen und beenden. Dafür ist keine Standortfreigabe nötig. Die Anwendung erfindet dabei keinen Punkt auf der Karte.",
+          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Du das Kürzel nicht kennst, kannst Du den ausgeschriebenen Bahnhofsnamen eingeben."
         ],
         "steps": []
       },
@@ -419,18 +419,18 @@ window.TfHelpPages=[
         "title": "Eine Standzeit erfassen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie die passende Zugfahrt und darunter den GPS-/Standzeitenbereich mit +.",
-          "Wählen Sie den grünen Button Start Stand.",
-          "Während die Zeit läuft, sehen Sie die Minuten in roter Fettschrift. Der Button wird rot und heißt Ende Stand.",
-          "Wenn der Halt vorbei ist, wählen Sie Ende Stand. Beginn und Ende stehen danach in der Liste, auch wenn der Halt kürzer als vier Minuten war.",
-          "Ergänzen Sie DS100 oder Bahnhofsname sowie den Grund. Einen eigenen Grund schreiben Sie ins Textfeld.",
-          "Wählen Sie ↑ Übernehmen, um den Halt in die Zugfahrtdetails zu übernehmen."
+          "Öffne die passende Zugfahrt und darunter den GPS-/Standzeitenbereich mit +.",
+          "Wähle den grünen Button Start Stand.",
+          "Während die Zeit läuft, siehst Du die Minuten in roter Fettschrift. Der Button wird rot und heißt Ende Stand.",
+          "Wenn der Halt vorbei ist, wähle Ende Stand. Beginn und Ende stehen danach in der Liste, auch wenn der Halt kürzer als vier Minuten war.",
+          "Ergänze DS100 oder Bahnhofsname sowie den Grund. Einen eigenen Grund schreibst Du ins Textfeld.",
+          "Wähle ↑ Übernehmen, um den Halt in die Zugfahrtdetails zu übernehmen."
         ]
       },
       {
         "title": "Wenn die Seite geschlossen wurde",
         "paragraphs": [
-          "Der gespeicherte Beginn ermöglicht es, eine laufende Standzeit nach dem Neuladen fortzusetzen. Nutzen Sie zusätzlich Zwischenspeichern. Zugfahrtdetails arbeiten minutengenau. Ein Halt mit Beginn und Ende innerhalb derselben Minute bleibt zunächst in der Standzeitenliste bearbeitbar."
+          "Der gespeicherte Beginn ermöglicht es, eine laufende Standzeit nach dem Neuladen fortzusetzen. Nutze zusätzlich Zwischenspeichern. Zugfahrtdetails arbeiten minutengenau. Ein Halt mit Beginn und Ende innerhalb derselben Minute bleibt zunächst in der Standzeitenliste bearbeitbar."
         ],
         "steps": []
       }
@@ -454,7 +454,7 @@ window.TfHelpPages=[
       {
         "title": "Wieder öffnen",
         "paragraphs": [
-          "Offene Eingaben werden auf diesem Gerät automatisch gesichert. Wenn Sie den Arbeitsbericht wieder öffnen, wird der letzte Bearbeitungsstand geladen. Dies funktioniert mit demselben Gerät und Browser. Das Löschen von Browserdaten oder ein privates Browserfenster kann diese örtliche Sicherung entfernen."
+          "Offene Eingaben werden auf diesem Gerät automatisch gesichert. Wenn Du den Arbeitsbericht wieder öffnest, wird der letzte Bearbeitungsstand geladen. Dies funktioniert mit demselben Gerät und Browser. Das Löschen von Browserdaten oder ein privates Browserfenster kann diese örtliche Sicherung entfernen."
         ],
         "steps": []
       },
@@ -462,16 +462,16 @@ window.TfHelpPages=[
         "title": "Endgültig übertragen",
         "paragraphs": [],
         "steps": [
-          "Beenden Sie laufende GPS- und manuelle Erfassungen.",
-          "Ergänzen Sie fehlende Angaben und noch nicht eingetragene Ereignisse.",
-          "Prüfen Sie die Listen und wählen Sie Synchronisieren.",
-          "Warten Sie die Rückmeldung ab und prüfen Sie den Status in der Monatsliste."
+          "Beende laufende GPS- und manuelle Erfassungen.",
+          "Ergänze fehlende Angaben und noch nicht eingetragene Ereignisse.",
+          "Prüfe die Listen und wähle Synchronisieren.",
+          "Warte die Rückmeldung ab und prüfe den Status in der Monatsliste."
         ]
       },
       {
         "title": "Löschen und unterschiedliche Stände",
         "paragraphs": [
-          "Solange der Bericht noch nicht endgültig synchronisiert ist, kann er über Arbeitsbericht löschen oder in der Monatsliste gelöscht werden. Damit werden auch zugehörige lokale GPS-Daten und Belege entfernt. Bei fehlender Verbindung wird die Serverlöschung später nachgeholt. Bereits endgültig synchronisierte Berichte sind davor geschützt. Wenn ein Hinweis auf unterschiedliche Bearbeitungsstände erscheint, laden Sie nicht unüberlegt einen anderen Stand: Lesen Sie die Meldung und wählen Sie die gewünschte Fassung."
+          "Solange der Bericht noch nicht endgültig synchronisiert ist, kann er über Arbeitsbericht löschen oder in der Monatsliste gelöscht werden. Damit werden auch zugehörige lokale GPS-Daten und Belege entfernt. Bei fehlender Verbindung wird die Serverlöschung später nachgeholt. Bereits endgültig synchronisierte Berichte sind davor geschützt. Wenn ein Hinweis auf unterschiedliche Bearbeitungsstände erscheint, lade nicht unüberlegt einen anderen Stand: Lies die Meldung und wähle die gewünschte Fassung."
         ],
         "steps": []
       }
@@ -489,17 +489,17 @@ window.TfHelpPages=[
         "title": "Eine Datei auswählen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie den Belegbereich, wenn er für Ihre Eingabe angezeigt wird.",
-          "Wählen Sie Belege wählen. Auf dem Gerät öffnet sich die Dateiauswahl.",
-          "Wählen Sie die passende PDF-, JPEG- oder PNG-Datei. Eine Datei darf höchstens 10 MB groß sein.",
-          "Prüfen Sie, ob die Datei in der Belegliste erscheint.",
-          "Speichern Sie den Arbeitsbericht zwischen und synchronisieren Sie ihn, wenn er vollständig ist."
+          "Öffne den Belegbereich, wenn er für Deine Eingabe angezeigt wird.",
+          "Wähle Belege wählen. Auf dem Gerät öffnet sich die Dateiauswahl.",
+          "Wähle die passende PDF-, JPEG- oder PNG-Datei. Eine Datei darf höchstens 10 MB groß sein.",
+          "Prüfe, ob die Datei in der Belegliste erscheint.",
+          "Speichere den Arbeitsbericht zwischen und synchronisiere ihn, wenn er vollständig ist."
         ]
       },
       {
         "title": "Was bedeutet MB?",
         "paragraphs": [
-          "MB ist eine Angabe für die Dateigröße. Ein sehr großes Foto kann zu groß sein. Die Anwendung meldet das. Nach der Serversynchronisation werden Belege entsprechend der Einrichtung automatisch versendet. Wählen Sie daher nur Dateien aus, die zu diesem Bericht gehören."
+          "MB ist eine Angabe für die Dateigröße. Ein sehr großes Foto kann zu groß sein. Die Anwendung meldet das. Nach der Serversynchronisation werden Belege entsprechend der Einrichtung automatisch versendet. Wähle daher nur Dateien aus, die zu diesem Bericht gehören."
         ],
         "steps": []
       }
@@ -517,16 +517,16 @@ window.TfHelpPages=[
         "title": "Die Liste benutzen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie den gewünschten Monat in der Arbeitsberichtsliste.",
-          "Wählen Sie eine Zeile, um den zugehörigen Bericht zu öffnen.",
-          "Prüfen Sie die Kennzeichnung, ob der Bericht noch lokal oder bereits synchronisiert ist. Verlassen Sie sich nicht allein auf die Farbe.",
-          "Nutzen Sie die angebotene Synchronisieren-Schaltfläche für den gewünschten Bericht oder die Monatsauswahl."
+          "Wähle den gewünschten Monat in der Arbeitsberichtsliste.",
+          "Wähle eine Zeile, um den zugehörigen Bericht zu öffnen.",
+          "Prüfe die Kennzeichnung, ob der Bericht noch lokal oder bereits synchronisiert ist. Verlasse Dich nicht allein auf die Farbe.",
+          "Nutze die angebotene Synchronisieren-Schaltfläche für den gewünschten Bericht oder die Monatsauswahl."
         ]
       },
       {
         "title": "Ältere Berichte",
         "paragraphs": [
-          "Auch alte Zugfahrtdetails werden zeitlich sortiert angezeigt. Bereits übertragene oder gesperrte Angaben können geschützt sein. Eine ausgegraute Eingabe bedeutet dann nicht, dass Ihre Daten verschwunden sind."
+          "Auch alte Zugfahrtdetails werden zeitlich sortiert angezeigt. Bereits übertragene oder gesperrte Angaben können geschützt sein. Eine ausgegraute Eingabe bedeutet dann nicht, dass Deine Daten verschwunden sind."
         ],
         "steps": []
       }
@@ -546,11 +546,11 @@ window.TfHelpPages=[
         "title": "Ein Fahrzeug auswählen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie Lokübergabebuch.",
-          "Nutzen Sie die angezeigte Fahrzeugübersicht oder Suche.",
-          "Wählen Sie das passende Fahrzeug anhand der Nummer.",
-          "Prüfen Sie Status, Fahrzeugangaben und vorhandene Übergabeprotokolle.",
-          "Über Zurück zur Übersicht gelangen Sie zur Fahrzeugliste."
+          "Öffne Lokübergabebuch.",
+          "Nutze die angezeigte Fahrzeugübersicht oder Suche.",
+          "Wähle das passende Fahrzeug anhand der Nummer.",
+          "Prüfe Status, Fahrzeugangaben und vorhandene Übergabeprotokolle.",
+          "Über Zurück zur Übersicht gelangst Du zur Fahrzeugliste."
         ]
       },
       {
@@ -574,18 +574,18 @@ window.TfHelpPages=[
         "title": "Ein Protokoll anlegen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie zuerst das richtige Fahrzeug.",
-          "Wählen Sie Übergabeprotokoll, wenn die Schaltfläche für Sie verfügbar ist.",
-          "Ergänzen Sie die angebotenen Angaben zu Dienst, Zugnummer und Betriebsstelle. Die Betriebsstelle wird über DS100 oder Bahnhofsname gesucht.",
-          "Tragen Sie bei Bedarf die Zählerstände 1.8.0 und 2.8.0, den Kilometerstand und Besonderheiten ein.",
-          "Wählen Sie bei Meldung an nur dann einen Empfänger, wenn eine Meldung gewünscht ist.",
-          "Prüfen Sie alles und wählen Sie Eintragen."
+          "Wähle zuerst das richtige Fahrzeug.",
+          "Wähle Übergabeprotokoll, wenn die Schaltfläche für Dich verfügbar ist.",
+          "Ergänze die angebotenen Angaben zu Dienst, Zugnummer und Betriebsstelle. Die Betriebsstelle wird über DS100 oder Bahnhofsname gesucht.",
+          "Trage bei Bedarf die Zählerstände 1.8.0 und 2.8.0, den Kilometerstand und Besonderheiten ein.",
+          "Wähle bei Meldung an nur dann einen Empfänger, wenn eine Meldung gewünscht ist.",
+          "Prüfe alles und wähle Eintragen."
         ]
       },
       {
         "title": "Dateien und vorhandene Protokolle",
         "paragraphs": [
-          "Es sind PDF-, JPEG- und PNG-Dateien möglich: höchstens zehn Dateien, je 10 MB und zusammen 30 MB. Ein vorhandenes Protokoll öffnen Sie über seine Zeile. Dort können Sie Angaben und angehängte Dateien ansehen. Abbrechen beendet eine noch laufende Eingabe."
+          "Es sind PDF-, JPEG- und PNG-Dateien möglich: höchstens zehn Dateien, je 10 MB und zusammen 30 MB. Öffne ein vorhandenes Protokoll über seine Zeile. Dort kannst Du Angaben und angehängte Dateien ansehen. Abbrechen beendet eine noch laufende Eingabe."
         ],
         "steps": []
       }
@@ -602,14 +602,14 @@ window.TfHelpPages=[
       {
         "title": "Aktueller Stand",
         "paragraphs": [
-          "Dieser Menüpunkt zeigt derzeit den Hinweis Details folgen später. Hier ist noch keine eigene Protokollerfassung freigeschaltet. Sie haben also keinen Eingabeschritt übersehen."
+          "Dieser Menüpunkt zeigt derzeit den Hinweis Details folgen später. Hier ist noch keine eigene Protokollerfassung freigeschaltet. Du hast also keinen Eingabeschritt übersehen."
         ],
         "steps": []
       },
       {
         "title": "Bereits verfügbare Protokolle",
         "paragraphs": [
-          "Übergabeprotokolle zu Triebfahrzeugen finden Sie im Lokübergabebuch beim jeweiligen Fahrzeug. Kehren Sie dafür zum TF-Portal zurück und öffnen Sie dieses Modul."
+          "Übergabeprotokolle zu Triebfahrzeugen findest Du im Lokübergabebuch beim jeweiligen Fahrzeug. Kehre dafür zum TF-Portal zurück und öffne dieses Modul."
         ],
         "steps": []
       }
@@ -627,23 +627,23 @@ window.TfHelpPages=[
         "title": "Einen Monat ansehen",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie Arbeitsplan.",
-          "Wählen Sie den Monat oder wechseln Sie mit den Pfeilen. Aktualisieren lädt den Stand erneut.",
-          "Wählen Sie einen Tag, um seine Angaben zu sehen.",
-          "Beachten Sie die Legende: A steht für Arbeit, R für Ruhe, U für Urlaub, K für Krank und ? für ungeplant."
+          "Öffne Arbeitsplan.",
+          "Wähle den Monat oder wechsle mit den Pfeilen. Aktualisieren lädt den Stand erneut.",
+          "Wähle einen Tag, um seine Angaben zu sehen.",
+          "Beachte die Legende: A steht für Arbeit, R für Ruhe, U für Urlaub, K für Krank und ? für ungeplant."
         ]
       },
       {
         "title": "Jahresansicht",
         "paragraphs": [
-          "Wählen Sie das gewünschte Jahr und laden Sie die Jahresansicht. Farben und Tagesangaben helfen bei der Übersicht. Planänderungen werden durch die Personalplanung vorgenommen; diese Seite dient zum Ansehen Ihres eigenen Plans."
+          "Wähle das gewünschte Jahr und lade die Jahresansicht. Farben und Tagesangaben helfen bei der Übersicht. Planänderungen werden durch die Personalplanung vorgenommen; diese Seite dient zum Ansehen Deines eigenen Plans."
         ],
         "steps": []
       },
       {
         "title": "Plan und Arbeitsbericht sind verschieden",
         "paragraphs": [
-          "Der Plan zeigt die vorgesehenen Tage. Der Arbeitsbericht enthält Ihre erfassten Zeiten. Eine Änderung im Arbeitsbericht schreibt den Plan nicht automatisch um."
+          "Der Plan zeigt die vorgesehenen Tage. Der Arbeitsbericht enthält Deine erfassten Zeiten. Eine Änderung im Arbeitsbericht schreibt den Plan nicht automatisch um."
         ],
         "steps": []
       }
@@ -661,25 +661,25 @@ window.TfHelpPages=[
         "title": "Eine Datei finden",
         "paragraphs": [],
         "steps": [
-          "Öffnen Sie links den gewünschten Ordner. Ein Ordner sammelt zusammengehörige Dateien.",
-          "Wählen Sie bei der passenden Datei Herunterladen. Herunterladen bedeutet: Eine Kopie der Datei wird auf Ihr Gerät übertragen.",
+          "Öffne links den gewünschten Ordner. Ein Ordner sammelt zusammengehörige Dateien.",
+          "Wähle bei der passenden Datei Herunterladen. Herunterladen bedeutet: Eine Kopie der Datei wird auf Dein Gerät übertragen.",
           "Je nach Gerät wird die Datei geöffnet oder im Download-Ordner abgelegt.",
-          "Über Dokumente durchsuchen können Sie nach Dateiname oder Ordner suchen. Aktualisieren lädt die Liste neu."
+          "Über Dokumente durchsuchen kannst Du nach Dateiname oder Ordner suchen. Aktualisieren lädt die Liste neu."
         ]
       },
       {
         "title": "Eine eigene Datei hochladen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie zuerst den passenden Ordner.",
-          "Wählen Sie im Upload-Bereich eine Datei auf Ihrem Gerät.",
-          "Wählen Sie Hochladen und warten Sie die Rückmeldung ab. Die Datei darf höchstens 10 MB groß sein."
+          "Wähle zuerst den passenden Ordner.",
+          "Wähle im Upload-Bereich eine Datei auf Deinem Gerät.",
+          "Wähle Hochladen und warte die Rückmeldung ab. Die Datei darf höchstens 10 MB groß sein."
         ]
       },
       {
         "title": "Löschen und automatisch erstellte Dateien",
         "paragraphs": [
-          "Nur Dateien mit angebotener Löschmöglichkeit können Sie hier entfernen. Automatisch erstellte Dokumente sind geschützt. Die Anwendung zeigt nur die Dokumente, für die Ihr Konto Zugriff hat."
+          "Nur Dateien mit angebotener Löschmöglichkeit kannst Du hier entfernen. Automatisch erstellte Dokumente sind geschützt. Die Anwendung zeigt nur die Dokumente, für die Dein Konto Zugriff hat."
         ],
         "steps": []
       }
@@ -696,7 +696,7 @@ window.TfHelpPages=[
       {
         "title": "Was ist DS100?",
         "paragraphs": [
-          "DS100 ist das kurze Kennzeichen einer Betriebsstelle oder eines Bahnhofs. Wenn Sie das Kürzel nicht kennen, suchen Sie nach dem ausgeschriebenen Namen. Wählen Sie aus den Vorschlägen den passenden Eintrag."
+          "DS100 ist das kurze Kennzeichen einer Betriebsstelle oder eines Bahnhofs. Wenn Du das Kürzel nicht kennst, suche nach dem ausgeschriebenen Namen. Wähle aus den Vorschlägen den passenden Eintrag."
         ],
         "steps": []
       },
@@ -704,24 +704,24 @@ window.TfHelpPages=[
         "title": "Eigene Angaben pflegen",
         "paragraphs": [],
         "steps": [
-          "Suchen Sie einen vorhandenen Bahnhof in Ihrer Liste oder wählen Sie Bahnhof hinzufügen.",
-          "Wählen Sie den passenden Bahnhof aus dem Verzeichnis.",
-          "Ergänzen Sie Ihre Kontakte und die angebotenen Hinweise, zum Beispiel Lokabstellung oder Züge sichern.",
-          "Bei Bedarf laden Sie einen Bahnhofsplan als PDF, JPEG oder PNG hoch.",
-          "Wählen Sie Bahnhof speichern."
+          "Suche einen vorhandenen Bahnhof in Deiner Liste oder wähle Bahnhof hinzufügen.",
+          "Wähle den passenden Bahnhof aus dem Verzeichnis.",
+          "Ergänze Deine Kontakte und die angebotenen Hinweise, zum Beispiel Lokabstellung oder Züge sichern.",
+          "Lade bei Bedarf einen Bahnhofsplan als PDF, JPEG oder PNG hoch.",
+          "Wähle Bahnhof speichern."
         ]
       },
       {
         "title": "Bahnhöfe teilen",
         "paragraphs": [
-          "Wählen Sie die gewünschten Bahnhöfe und einen TF als Empfänger. Prüfen Sie die Auswahl und bestätigen Sie das Senden. Empfangene Bahnhofseinträge liegen zunächst in Ihrer Zwischenablage. Sie entscheiden, was Sie übernehmen. Leere Angaben können ergänzt werden; bestehende eigene Angaben bleiben beim vorgesehenen Zusammenführen erhalten."
+          "Wähle die gewünschten Bahnhöfe und einen TF als Empfänger. Prüfe die Auswahl und bestätige das Senden. Empfangene Bahnhofseinträge liegen zunächst in Deiner Zwischenablage. Du entscheidest, was Du übernimmst. Leere Angaben können ergänzt werden; bestehende eigene Angaben bleiben beim vorgesehenen Zusammenführen erhalten."
         ],
         "steps": []
       },
       {
         "title": "Name oder Kürzel bereits vorhanden",
         "paragraphs": [
-          "Falls eine Meldung auf einen doppelten Namen oder ein doppeltes Kürzel hinweist, ändern Sie die Bezeichnung wie angeboten. Speichern Sie erst, wenn der Hinweis geklärt ist."
+          "Falls eine Meldung auf einen doppelten Namen oder ein doppeltes Kürzel hinweist, ändere die Bezeichnung wie angeboten. Speichere erst, wenn der Hinweis geklärt ist."
         ],
         "steps": []
       }
@@ -738,7 +738,7 @@ window.TfHelpPages=[
       {
         "title": "Nachrichten lesen",
         "paragraphs": [
-          "Die Glocke zeigt die Anzahl ungelesener Nachrichten. Im Modul Kurznachrichten wählen Sie eine Zeile, um die Nachricht zu öffnen. Zwischen Posteingang und Gesendete können Sie umschalten. Mit Zurück und Weiter wechseln Sie die Listenseite."
+          "Die Glocke zeigt die Anzahl ungelesener Nachrichten. Wähle im Modul Kurznachrichten eine Zeile, um die Nachricht zu öffnen. Zwischen Posteingang und Gesendete kannst Du umschalten. Mit Zurück und Weiter wechselst Du die Listenseite."
         ],
         "steps": []
       },
@@ -746,17 +746,17 @@ window.TfHelpPages=[
         "title": "Eine Nachricht schreiben",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie neue Nachricht schreiben.",
-          "Wählen Sie einen oder mehrere Empfänger. Prüfen Sie die Namen sorgfältig.",
-          "Tragen Sie Betreff und Nachricht ein. Der Text darf höchstens 1000 Zeichen haben. Die Anzeige daneben zählt den verfügbaren Platz.",
-          "Wenn nötig, wählen Sie eine Datei als Anhang. Sie darf höchstens 10 MB groß sein.",
-          "Wählen Sie Senden. Erst dadurch wird die Nachricht verschickt."
+          "Wähle neue Nachricht schreiben.",
+          "Wähle einen oder mehrere Empfänger. Prüfe die Namen sorgfältig.",
+          "Trage Betreff und Nachricht ein. Der Text darf höchstens 1000 Zeichen haben. Die Anzeige daneben zählt den verfügbaren Platz.",
+          "Wenn nötig, wähle eine Datei als Anhang. Die Datei darf höchstens 10 MB groß sein.",
+          "Wähle Senden. Erst dadurch wird die Nachricht verschickt."
         ]
       },
       {
         "title": "Antworten, Weiterleiten und Löschen",
         "paragraphs": [
-          "In einer geöffneten Nachricht können Sie antworten oder weiterleiten. Beim Weiterleiten wählen Sie die Empfänger noch einmal aus. Löschen entfernt die Nachricht aus Ihrer Ansicht; die Ansicht anderer Empfänger wird dadurch nicht mitgelöscht. X schließt die geöffnete Nachricht."
+          "In einer geöffneten Nachricht kannst Du antworten oder weiterleiten. Wähle beim Weiterleiten die Empfänger noch einmal aus. Löschen entfernt die Nachricht aus Deiner Ansicht; die Ansicht anderer Empfänger wird dadurch nicht mitgelöscht. X schließt die geöffnete Nachricht."
         ],
         "steps": []
       }
@@ -773,7 +773,7 @@ window.TfHelpPages=[
       {
         "title": "Meine gespeicherten Daten",
         "paragraphs": [
-          "Hier sehen Sie die für Ihr Konto hinterlegten Daten, Adressen und gegebenenfalls Ihr Foto. Nicht jedes Feld ist hier selbst änderbar. Melden Sie unrichtige Personaldaten Ihrer zuständigen Verwaltung."
+          "Hier siehst Du die für Dein Konto hinterlegten Daten, Adressen und gegebenenfalls Dein Foto. Nicht jedes Feld ist hier selbst änderbar. Melde unrichtige Personaldaten Deiner zuständigen Verwaltung."
         ],
         "steps": []
       },
@@ -781,16 +781,16 @@ window.TfHelpPages=[
         "title": "Eine Unterschrift hinterlegen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie Unterschrift hinzufügen, wenn dieser Bereich angeboten wird.",
-          "Zeichnen Sie mit Finger, Stift oder gedrückter Maustaste im weißen Feld.",
-          "Löschen leert die Zeichenfläche, damit Sie neu beginnen können.",
-          "Wählen Sie Speichern, wenn die Unterschrift richtig aussieht. Abbrechen oder X beendet die Eingabe ohne diese Speicherung."
+          "Wähle Unterschrift hinzufügen, wenn dieser Bereich angeboten wird.",
+          "Zeichne mit Finger, Stift oder gedrückter Maustaste im weißen Feld.",
+          "Löschen leert die Zeichenfläche, damit Du neu beginnen kannst.",
+          "Wähle Speichern, wenn die Unterschrift richtig aussieht. Abbrechen oder X beendet die Eingabe ohne diese Speicherung."
         ]
       },
       {
         "title": "Passwort",
         "paragraphs": [
-          "Über Passwort ändern gelangen Sie zur Kontoseite. Folgen Sie dort den Feldbeschriftungen. Eine Passwortänderung kann eine erneute Anmeldung erforderlich machen."
+          "Über Passwort ändern gelangst Du zur Kontoseite. Folge dort den Feldbeschriftungen. Eine Passwortänderung kann eine erneute Anmeldung erforderlich machen."
         ],
         "steps": []
       }
@@ -808,31 +808,31 @@ window.TfHelpPages=[
         "title": "Ein Formular beginnen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie Neu hinzufügen.",
-          "Tragen Sie Aussteller-EVU, Datum, Zugnummern und die Bahnhöfe der Gültigkeit ein.",
-          "Wählen Sie die arbeitenden Triebfahrzeuge und ergänzen Sie die angebotenen Fahrzeug- und Zugangaben aus Ihren Unterlagen.",
-          "Prüfen Sie die Angaben in den Gruppen und die angezeigten fehlenden Felder.",
-          "Sichern Sie bei Bedarf mit Entwurf speichern."
+          "Wähle Neu hinzufügen.",
+          "Trage Aussteller-EVU, Datum, Zugnummern und die Bahnhöfe der Gültigkeit ein.",
+          "Wähle die arbeitenden Triebfahrzeuge und ergänze die angebotenen Fahrzeug- und Zugangaben aus Deinen Unterlagen.",
+          "Prüfe die Angaben in den Gruppen und die angezeigten fehlenden Felder.",
+          "Sichere bei Bedarf mit Entwurf speichern."
         ]
       },
       {
         "title": "Vorschau und fertiges Dokument",
         "paragraphs": [
-          "Vorschau wird verfügbar, wenn die dafür nötigen Angaben vorhanden sind. Öffnen Sie die Vorschau und prüfen Sie die Darstellung. Speichern erstellt das fertige Dokument. Entwurf speichern und Speichern in der Vorschau sind also unterschiedliche Schritte. Gespeicherte Dokumente finden Sie auch in der Dokumentenverwaltung."
+          "Vorschau wird verfügbar, wenn die dafür nötigen Angaben vorhanden sind. Öffne die Vorschau und prüfe die Darstellung. Speichern erstellt das fertige Dokument. Entwurf speichern und Speichern in der Vorschau sind also unterschiedliche Schritte. Gespeicherte Dokumente findest Du auch in der Dokumentenverwaltung."
         ],
         "steps": []
       },
       {
         "title": "Per E-Mail senden",
         "paragraphs": [
-          "Speichern & senden bereitet das Dokument und eine E-Mail vor. Prüfen Sie im folgenden Fenster Empfänger, Betreff, Nachricht und Anhang. Erst Senden verschickt die E-Mail. Wenn Sie abbrechen, wird die vorbereitete E-Mail nicht versendet."
+          "Speichern & senden bereitet das Dokument und eine E-Mail vor. Prüfe im folgenden Fenster Empfänger, Betreff, Nachricht und Anhang. Erst Senden verschickt die E-Mail. Wenn Du abbrichst, wird die vorbereitete E-Mail nicht versendet."
         ],
         "steps": []
       },
       {
         "title": "Vorhandenen Entwurf öffnen",
         "paragraphs": [
-          "Wählen Sie einen Eintrag unter Gespeicherte Entwürfe. Wenn Sie zuvor noch ungespeicherte Änderungen gemacht haben, lesen Sie die Rückfrage zum Verwerfen dieser Änderungen."
+          "Wähle einen Eintrag unter Gespeicherte Entwürfe. Wenn Du zuvor noch ungespeicherte Änderungen gemacht hast, lies die Rückfrage zum Verwerfen dieser Änderungen."
         ],
         "steps": []
       }
@@ -850,24 +850,76 @@ window.TfHelpPages=[
         "title": "Das Formular ausfüllen",
         "paragraphs": [],
         "steps": [
-          "Wählen Sie Neu hinzufügen.",
-          "Wählen Sie die arbeitenden Triebfahrzeuge; bei Bedarf können Sie ein zweites Tfz hinzufügen.",
-          "Tragen Sie Zugdaten, Bahnhöfe und die angebotenen Angaben zu Wagen, Bremsen und Zug ein. Nutzen Sie dafür Ihre Unterlagen.",
-          "Prüfen Sie rot markierte Felder und die Liste fehlender Angaben.",
-          "Mit Entwurf speichern sichern Sie den Zwischenstand."
+          "Wähle Neu hinzufügen.",
+          "Wähle die arbeitenden Triebfahrzeuge; bei Bedarf kannst Du ein zweites Tfz hinzufügen.",
+          "Trage Zugdaten, Bahnhöfe und die angebotenen Angaben zu Wagen, Bremsen und Zug ein. Nutze dafür Deine Unterlagen.",
+          "Prüfe rot markierte Felder und die Liste fehlender Angaben.",
+          "Sichere mit Entwurf speichern den Zwischenstand."
         ]
       },
       {
         "title": "Vorschau und Speichern",
         "paragraphs": [
-          "Vorschau zeigt den ausgefüllten Bremszettel, sobald die nötigen Angaben vollständig sind. Prüfen Sie die Vorschau und wählen Sie Speichern, um das Dokument anzulegen. Der angezeigte Download führt zum gespeicherten Dokument. Dieses ist auch in der Dokumentenverwaltung auffindbar."
+          "Vorschau zeigt den ausgefüllten Bremszettel, sobald die nötigen Angaben vollständig sind. Prüfe die Vorschau und wähle Speichern, um das Dokument anzulegen. Der angezeigte Download führt zum gespeicherten Dokument. Dieses ist auch in der Dokumentenverwaltung auffindbar."
         ],
         "steps": []
       },
       {
         "title": "Entwürfe wieder laden",
         "paragraphs": [
-          "Unter Gespeicherte Entwürfe wählen Sie einen früheren Stand. Prüfen Sie vor dem Wechsel, ob Sie Änderungen am aktuellen Formular noch sichern möchten."
+          "Wähle unter Gespeicherte Entwürfe einen früheren Stand. Prüfe vor dem Wechsel, ob Du Änderungen am aktuellen Formular noch sichern möchtest."
+        ],
+        "steps": []
+      }
+    ]
+  },
+  {
+    "id": "notizen",
+    "group": "Notizen",
+    "title": "Persönliche Notizen erstellen und bearbeiten",
+    "short": "Titel und kurze Texte speichern, später lesen, ändern oder löschen.",
+    "path": "/tf/notizen",
+    "aliases": [],
+    "sections": [
+      {
+        "title": "Eine Notiz hinzufügen",
+        "paragraphs": [
+          "Deine Notizen gehören zu Deinem TF-Konto. Andere TF können sie nicht lesen. Zum Laden, Speichern und Löschen brauchst Du eine Verbindung zum Server."
+        ],
+        "steps": [
+          "Öffne das Modul Notizen und wähle Neu hinzufügen.",
+          "Gib einen kurzen Titel und Deinen Text ein. Der Titel darf bis zu 120 Zeichen haben.",
+          "Unter dem Text steht, wie viele der 1000 Zeichen noch frei sind. Auch Leerzeichen und Zeilenumbrüche zählen.",
+          "Wähle Speichern. Erst nach der Erfolgsmeldung ist Deine Notiz gespeichert. Abbrechen verwirft die neue Eingabe."
+        ]
+      },
+      {
+        "title": "Eine Notiz lesen oder ändern",
+        "paragraphs": [
+          "Die Liste zeigt Deine Notizen mit Titel und Erstelldatum. Das Format dd.mm.yy HH:MM bedeutet zum Beispiel 03.11.26 14:05. Die neueste Notiz steht oben. Die Uhrzeit wird für Deutschland angezeigt."
+        ],
+        "steps": [
+          "Wähle die Zeile einer Notiz. Der vollständige Text wird angezeigt.",
+          "Wähle Bearbeiten, wenn Du Titel oder Text ändern möchtest.",
+          "Wähle Speichern, um Deine Änderungen zu übernehmen. Das ursprüngliche Erstelldatum bleibt erhalten.",
+          "Mit Abbrechen kommst Du ohne Speicherung zur Ansicht zurück."
+        ]
+      },
+      {
+        "title": "Eine Notiz löschen",
+        "paragraphs": [
+          "In jeder Listenzeile steht rechts der Papierkorb 🗑️. Löschen entfernt die ganze Notiz einschließlich Titel und Text."
+        ],
+        "steps": [
+          "Wähle den Papierkorb der richtigen Notiz.",
+          "Prüfe den Titel in der Rückfrage.",
+          "Wähle Löschen, um die Notiz endgültig zu entfernen. Mit Abbrechen bleibt sie erhalten."
+        ]
+      },
+      {
+        "title": "Wenn das Speichern nicht klappt",
+        "paragraphs": [
+          "Lass die Eingabe geöffnet und prüfe die Verbindung. Dein Text bleibt bei einem Fehler im Eingabefeld. Wenn die Notiz inzwischen auf einem anderen Gerät geändert wurde, wird sie nicht einfach überschrieben. Sichere Deinen Text bei Bedarf separat und lade die aktuelle Liste erneut."
         ],
         "steps": []
       }

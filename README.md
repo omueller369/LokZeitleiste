@@ -217,3 +217,10 @@ Diese Version basiert auf dem Stand 0.25 des Branchs `setup/debian-testumgebung`
 Das Modul `/tf/hilfe` und die Schaltfläche `? Hilfe` verwenden den gemeinsamen, nach Modulen und Themen gegliederten Katalog in `backend/lokzeitleiste/static/tf-help-content.js`. `tf-help.js` zeigt Suche, Kurztexte und das Hilfefenster mit X links und Drucker rechts. Die Druckansicht enthält ausschließlich die ausgewählte Anleitung, keine persönlichen Formulare. Android verwendet dafür einen eigenen System-Druckdialog mit einem getrennten, netzwerkgesperrten Druck-WebView.
 
 Die Hilfepflege gehört zu jeder Änderung der TF-Bedienung; siehe [AGENTS.md](AGENTS.md). Die Modulabdeckung wird automatisch geprüft.
+
+
+### Persönliche TF-Notizen und Du-Anrede
+
+Im TF-Portal ergänzt das Modul **Notizen** persönliche, serverseitig zum TF-Konto gespeicherte Notizen. **Neu hinzufügen** öffnet Titel (bis 120 Zeichen) und Text (bis 1000 Unicode-Zeichen) mit Restzeichenzähler. Die Liste zeigt Titel und Erstelldatum als **dd.mm.yy HH:MM** (Europe/Berlin), neueste zuerst. Ein Klick öffnet den vollständigen Text; **Bearbeiten** ermöglicht Änderungen. Der Papierkorb pro Zeile löscht nach ausdrücklicher Rückfrage die ganze Notiz. Abbrechen erhält sie. Erstelldaten bleiben bei Bearbeitung unverändert; Revisionsprüfungen schützen vor dem Überschreiben oder Löschen zwischenzeitlich geänderter Notizen. Für Speichern und Laden ist eine Serververbindung nötig; bei Fehlern bleibt die laufende Eingabe erhalten.
+
+Sämtliche zentralen Hilfetexte und die Bedienhinweise im Hilfeleser verwenden die Du-Anrede. Eine eigene gruppierte Notiz-Anleitung sowie eine Prüfung gegen förmliche Anrede sind ergänzt. Android bündelt das Notizmodul zusammen mit dem Portal. Die neue Datenbanktabelle wird durch den bestehenden idempotenten `init_db`-Ablauf angelegt.

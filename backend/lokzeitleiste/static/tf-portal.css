@@ -38,3 +38,15 @@
 
 /* Compact TF dashboard tiles, retaining comfortable touch targets. */
 #portalHome .modules,.modules{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}.modules .module{padding:14px 12px;border-radius:10px;min-height:100px;display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-content:start;align-items:center}.modules .module-number{width:28px;height:28px;font-size:13px}.modules .module h2{font-size:16px;line-height:1.25;margin:0;overflow-wrap:anywhere}.modules .module p{grid-column:1/-1;font-size:12px;line-height:1.35;margin:0}.modules .module:hover{box-shadow:0 3px 10px #19304422}@media(max-width:950px){.modules{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:650px){.modules{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.modules .module{padding:12px 10px;min-height:94px}.modules .module h2{font-size:15px}}@media(max-width:340px){.modules{grid-template-columns:1fr}}
+
+/* Notes retain one clear title/date button and a separate deletion target on all screens. */
+.tf-notes-list{list-style:none;margin:20px 0;padding:0}
+.tf-notes-list li{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:10px;margin:10px 0;align-items:stretch}
+.tf-note-open{display:flex;align-items:center;justify-content:space-between;gap:16px;background:white;color:#193044;border:1px solid #becdd7;text-align:left;min-width:0}
+.tf-note-open strong{overflow-wrap:anywhere;min-width:0}.tf-note-open time{white-space:nowrap;font-size:.9rem}
+.tf-note-trash{width:48px;padding:8px;background:#fff;color:#9f2020;border:1px solid #c58a8a;font-size:22px}
+.tf-notes-dialog{box-sizing:border-box;width:min(700px,94vw);max-height:90dvh;overflow:auto;padding:22px;border:1px solid #becdd7;border-radius:12px;background:white;color:#193044;font:18px/1.5 system-ui,sans-serif}
+.tf-notes-dialog::backdrop{background:#102a3daa}.tf-notes-heading{display:flex;align-items:start;gap:16px}.tf-notes-heading h2{margin:0;overflow-wrap:anywhere;min-width:0}.tf-notes-heading button{min-width:44px;min-height:44px}
+.tf-notes-dialog label{display:block;margin-top:14px}.tf-notes-dialog input,.tf-notes-dialog textarea{box-sizing:border-box;display:block;width:100%;max-width:100%;padding:10px;border:1px solid #9bb0bd;border-radius:8px;font:inherit}.tf-notes-dialog textarea{resize:vertical;min-height:180px}
+.tf-notes-dialog button{min-height:44px;margin:6px 8px 6px 0}.tf-notes-dialog [role=alert],.tf-note-invalid{color:#a12020}.tf-note-text{white-space:pre-wrap;overflow-wrap:anywhere}.tf-notes-confirm{max-width:520px}.tf-note-delete{background:#a12020}
+@media(max-width:520px){.tf-note-open{align-items:start;flex-direction:column;gap:5px}.tf-notes-dialog{padding:16px}}

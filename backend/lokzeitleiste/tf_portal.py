@@ -27,6 +27,7 @@ def create_router(require_account):
 
     @router.get('/tf')
     @router.get('/tf/hilfe')
+    @router.get('/tf/notizen')
     @router.get('/tf/arbeitsbericht')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
@@ -79,6 +80,9 @@ def create_router(require_account):
         user=user_from_token(db,tf_session or admin_session)
         if not user or user.role!='tf' or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
         return FileResponse(STATIC/('tf-messages.html' if request.url.path.endswith('/nachrichten') else 'tf-profile.html'),headers={'Cache-Control':'no-store'})
+
+    @router.get('/tf/notes.js')
+    def notes_script():return FileResponse(STATIC/'tf-notes.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
 
     @router.get('/tf/help.js')
     def help_script():return FileResponse(STATIC/'tf-help.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})

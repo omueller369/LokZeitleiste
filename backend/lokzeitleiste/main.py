@@ -725,3 +725,6 @@ app.include_router(national_brake_sheets_router(require_account))
 
 from .signatures import create_router as signatures_router
 app.include_router(signatures_router(require_account))
+
+from .notes import create_router as notes_router
+app.include_router(notes_router(require_account))
