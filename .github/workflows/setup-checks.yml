@@ -27,6 +27,13 @@ jobs:
           for script in backend/lokzeitleiste/static/*.js; do node --check "$script"; done
       - name: JavaScript regression tests
         run: for test in backend/tests/*.cjs; do node "$test" || exit 1; done
+      - name: Responsive work report layout
+        run: python backend/tests/check_work_report_layout.py --output-dir "$RUNNER_TEMP/work-report-layout"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: work-report-layout
+          path: ${{ runner.temp }}/work-report-layout/
       - name: Compose configuration
         working-directory: backend
         run: |

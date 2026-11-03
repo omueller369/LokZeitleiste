@@ -23,7 +23,7 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/train-journeys.
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8'),context);
 
 (async()=>{
- const r=context.window.GpsRecorder.mount({userId:5,journeyId:'map',container:new Element('div'),trainNumber:()=> '123',readonly:()=>false,stations(){}});await r.readyPromise;
+ const r=context.window.GpsRecorder.mount({userId:5,journeyId:'map',container:new Element('div'),trainNumber:()=> '123',readonly:()=>false,stations(){}});await r.readyPromise;r.setExpanded(true);
  const point=(lat,lon,t)=>({lat,lon,t,accuracy:5,speed:10});r.record={points:[point(52,13,1),point(52.1,13.1,5001)],ended:false};r.drawMap();
  assert.equal(r.mapState.mode,'follow');assert(Math.abs(r.mapView.center.x-(193.1/360))<1e-12);assert(r.mapSvg.children.some(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org')));
  r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,16);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,16);
