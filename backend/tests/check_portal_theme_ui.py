@@ -1,6 +1,8 @@
 """Real Chrome contrast, layout, module surfaces, modal and print palette checks."""
 import argparse,html,json,re,shutil,subprocess,tempfile
 from pathlib import Path
+from pypdf import PdfReader
+from pypdf.generic import ContentStream
 STATIC=Path(__file__).resolve().parents[1]/'lokzeitleiste'/'static'
 PAGES={
  'start':('tf-portal.html','landing'),'arbeitsbericht':('tf-portal.html','workReport'),
@@ -25,13 +27,13 @@ CHECKS=r'''
  const dark=getComputedStyle(document.body);assert(dark.backgroundColor==='rgb(13, 23, 34)','Dark page canvas');assert(contrast(dark.backgroundColor,dark.color)>7,'High body contrast');
  const field=getComputedStyle(input);assert(contrast(field.color,field.backgroundColor)>4.5,'Readable field');
  assert(input.value==='Ungespeicherter Text','Switch preserves form values');
- for(const node of document.querySelectorAll('.card,.module,dialog,.tf-help-sidebar,.tf-note-open')){const style=getComputedStyle(node);assert(luminance(style.backgroundColor)<.12,'Dark module/dialog surface: '+node.className);assert(contrast(style.color,style.backgroundColor)>4.5,'Readable module/dialog surface');}
- const original=document.getElementById('originalImage');assert(getComputedStyle(original).filter==='none','Original images never inverted');
+ for(const node of document.querySelectorAll('.card,main>section,.module,dialog,.tf-help-sidebar,.tf-note-open')){const style=getComputedStyle(node);assert(luminance(style.backgroundColor)<.12,'Dark module/dialog surface: '+node.className);assert(contrast(style.color,style.backgroundColor)>4.5,'Readable module/dialog surface');}
+ for(const node of document.querySelectorAll('.module-number')){const style=getComputedStyle(node);assert(contrast(style.color,style.backgroundColor)>4.5,'Readable module number');}const original=document.getElementById('originalImage');assert(getComputedStyle(original).filter==='none','Original images never inverted');
  const signature=document.getElementById('signatureCanvas');if(signature)assert(getComputedStyle(signature).backgroundColor==='rgb(255, 255, 255)','Handwriting remains on white');
  const size=button.getBoundingClientRect();assert(size.width>=44&&size.height>=44,'44 pixel touch target');assert(size.left>=0&&size.right<=innerWidth,'Switch fits narrow viewport');
  button.click();assert(document.documentElement.dataset.theme==='light','Switch returns to day mode');assert(getComputedStyle(document.body).backgroundColor===light,'Day palette restored');assert(input.value==='Ungespeicherter Text','Values retained through both modes');
  theme.set('dark');if(document.getElementById('helpWorkspace')){window.TfHelp.mountHub(document.getElementById('helpWorkspace'));window.TfHelp.open('darstellung');const dialog=document.getElementById('tfHelpDialog');assert(getComputedStyle(dialog).backgroundColor==='rgb(23, 38, 53)','Late-created help is dark');dialog.querySelector('.tf-help-close').click();}
- window.addEventListener('beforeprint',()=>{const bg=getComputedStyle(document.body).backgroundColor,scheme=getComputedStyle(document.documentElement).colorScheme;document.documentElement.dataset.printStatus=luminance(bg)>.7&&scheme==='light'?'pass':'fail';});document.documentElement.dataset.themeStatus='pass';window.parent.postMessage({themeStatus:'pass'},'*');
+ document.documentElement.dataset.themeStatus='pass';window.parent.postMessage({themeStatus:'pass'},'*');
 })()
 '''
 def fixture(name,source,section):
@@ -64,7 +66,14 @@ def main():
         # Print media must ignore the night palette, including forms and help dialogs.
         (root/'print.html').write_text(fixture('druck','tf-portal.html','workReport').replace("document.documentElement.dataset.themeStatus='pass';", "document.documentElement.dataset.themeStatus='pass';document.body.setAttribute('data-print-body',getComputedStyle(document.body).backgroundColor);"))
         run=subprocess.run([chrome,'--headless=new','--no-sandbox','--disable-gpu','--allow-file-access-from-files','--virtual-time-budget=3000',f'--user-data-dir={root/"print-profile"}',f'--print-to-pdf={args.output_dir.resolve()/"theme-print.pdf"}','--dump-dom',(root/'print.html').as_uri()],capture_output=True,text=True,timeout=60)
-        print_pass=run.returncode==0 and (args.output_dir/'theme-print.pdf').exists() and 'data-print-status="pass"' in run.stdout
+        pdf=args.output_dir/'theme-print.pdf'
+        colors=[]
+        if pdf.exists():
+            reader=PdfReader(pdf)
+            for page in reader.pages:
+                colors.extend(tuple(float(v) for v in operands) for operands,op in ContentStream(page.get_contents(),reader).operations if op==b'rg')
+        near=lambda color,target: all(abs(a-b)<.006 for a,b in zip(color,target))
+        print_pass=run.returncode==0 and bool(colors) and not any(near(color,(13/255,23/255,34/255)) or near(color,(23/255,38/255,53/255)) for color in colors)
         (args.output_dir/'print.html').write_text(run.stdout);print('Print palette', 'PASS' if print_pass else 'FAIL');results.append(dict(print=True,passed=print_pass))
     (args.output_dir/'results.json').write_text(json.dumps(results,indent=2))
     if not all(r['passed'] for r in results):raise SystemExit(1)

@@ -15,7 +15,7 @@ function refresh(){
 function set(value,persist=true){mode=value==='dark'?'dark':'light';root.dataset.theme=mode;root.style.colorScheme=mode;if(persist)try{localStorage.setItem(key,mode);}catch{}refresh();window.dispatchEvent(new Event('portalthemechange'));return mode;}
 function toggle(){return set(mode==='dark'?'light':'dark');}
 function mount(container){
- container=container||document.querySelector('header.tf-shell .tf-shell-brand')||document.querySelector('header');if(!container)return;
+ container=container||document.querySelector('header.tf-shell .tf-shell-brand')||document.querySelector('header');if(!container&&document.body){container=document.createElement('header');container.className='portal-theme-header';document.body.prepend(container);}if(!container)return;
  if(!button){button=document.createElement('button');button.id='portalThemeToggle';button.type='button';button.className='portal-theme-toggle';button.setAttribute('data-i18n-ignore','');button.onclick=toggle;}
  if(button.parentNode!==container)container.append(button);refresh();
 }

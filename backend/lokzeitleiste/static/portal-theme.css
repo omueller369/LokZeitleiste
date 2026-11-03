@@ -1,13 +1,14 @@
 /* Tagmodus keeps the established palette. Print output is deliberately independent. */
 .portal-theme-toggle{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto;width:44px;min-width:44px;min-height:44px;padding:9px!important;border:1px solid #94adbe!important;border-radius:8px;background:#17445b;color:#fff;cursor:pointer;vertical-align:middle}
-.portal-theme-toggle svg{display:block;pointer-events:none}.portal-theme-toggle:focus-visible{outline:3px solid #e4b640!important;outline-offset:3px}
+.portal-theme-header{display:flex;justify-content:flex-end;padding:10px 20px}.portal-theme-toggle svg{display:block;pointer-events:none}.portal-theme-toggle:focus-visible{outline:3px solid #e4b640!important;outline-offset:3px}
 @media screen{
  html[data-theme=dark]{color-scheme:dark;--night-bg:#0d1722;--night-surface:#172635;--night-raised:#203547;--night-input:#101d2a;--night-text:#e7eef4;--night-muted:#b7c8d6;--night-border:#536d81;--night-link:#a4d7ff;background:var(--night-bg)!important;color:var(--night-text)!important}
  html[data-theme=dark] body{background:var(--night-bg)!important;color:var(--night-text)!important}
- html[data-theme=dark] :is(.card,.module,.choices>a,dialog,fieldset,.gps-box,.brake-loco,.brake-countries fieldset,.tf-help-hub,.tf-help-sidebar,.tf-help-heading,.tf-shell-footer,.backend-sidebar-panel,.backend-section-bar,.pwa-install-card,.document-file,.station-option,#tfYearPlan th[scope=row]){background:var(--night-surface)!important;color:var(--night-text)!important;border-color:var(--night-border)!important}
+ html[data-theme=dark] :is(.card,main>section,.module,.choices>a,dialog,fieldset,.gps-box,.brake-loco,.brake-countries fieldset,.tf-help-hub,.tf-help-sidebar,.tf-help-heading,.tf-shell-footer,.backend-sidebar-panel,.backend-section-bar,.pwa-install-card,.document-file,.station-option,#tfYearPlan th[scope=row]){background:var(--night-surface)!important;color:var(--night-text)!important;border-color:var(--night-border)!important}
  html[data-theme=dark] :is(header,header.tf-shell,.backend-sidebar-header){background:#101e2c!important;color:var(--night-text)!important}
  html[data-theme=dark] :is(h1,h2,h3,h4,legend,label,dt,dd,output){color:var(--night-text)}
  html[data-theme=dark] :is(p,small,summary,.muted,.module p,.station-caption,.document-file small,.tf-help-topics h3,.tf-help-topics small,.tf-help-reading>p:first-child,.tf-help-revision,.tf-help-intro p){color:var(--night-muted)}
+ html[data-theme=dark] .module-number{background:#29485e!important;color:#f2f7ff!important}
  html[data-theme=dark] a{color:var(--night-link)!important}
  html[data-theme=dark] :is(input,select,textarea,option,optgroup){background:var(--night-input)!important;color:var(--night-text)!important;border-color:var(--night-border)!important;accent-color:#90caff}
  html[data-theme=dark] input::placeholder,html[data-theme=dark] textarea::placeholder{color:#a7b9c8;opacity:1}
