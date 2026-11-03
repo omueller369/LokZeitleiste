@@ -26,6 +26,7 @@ def create_router(require_account):
     require_driver=driver_dependency(require_account)
 
     @router.get('/tf')
+    @router.get('/tf/hilfe')
     @router.get('/tf/arbeitsbericht')
     @router.get('/tf/leuna-uebergabeprotokoll')
     @router.get('/tf/arbeitsplan')
@@ -78,6 +79,13 @@ def create_router(require_account):
         user=user_from_token(db,tf_session or admin_session)
         if not user or user.role!='tf' or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
         return FileResponse(STATIC/('tf-messages.html' if request.url.path.endswith('/nachrichten') else 'tf-profile.html'),headers={'Cache-Control':'no-store'})
+
+    @router.get('/tf/help.js')
+    def help_script():return FileResponse(STATIC/'tf-help.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+    @router.get('/tf/help-content.js')
+    def help_content():return FileResponse(STATIC/'tf-help-content.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+    @router.get('/tf/help.css')
+    def help_css():return FileResponse(STATIC/'tf-help.css',media_type='text/css',headers={'Cache-Control':'no-cache'})
 
     @router.get('/tf/shell.js')
     def shell_script():return FileResponse(STATIC/'tf-shell.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})

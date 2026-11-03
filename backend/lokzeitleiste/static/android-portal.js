@@ -14,6 +14,6 @@ window.fetch=async(input,options={})=>{
  catch(error){let cached;try{cached=localStorage.getItem(key);}catch(_){}if(!cached&&url.pathname==='/api/v1/account/me')cached=JSON.stringify(current.account);if(!cached&&url.pathname==='/api/v1/tf/portal')cached=JSON.stringify(current.profile);if(cached)return new Response(cached,{status:200,headers:{'Content-Type':'application/json','X-LokZeitleiste-Offline':'1'}});throw error;}
 };
 async function saveBlob(name,blob){const job=await request('export.start',{name});try{for(let offset=0;offset<blob.size;offset+=49152){const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result.split(',')[1]);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob.slice(offset,offset+49152));});await request('export.chunk',{export_id:job.export_id,data});}}finally{await request('export.finish',{export_id:job.export_id});}}
-window.AndroidPortal={request,saveBlob,gps:(method,values)=>request('gps.'+method,values)};
+window.AndroidPortal={request,saveBlob,printHelp:values=>request('help.print',values),gps:(method,values)=>request('gps.'+method,values)};
 window.addEventListener('languagechange',()=>{if(window.I18n?.language)request('language',{language:window.I18n.language}).catch(()=>{});});
 })();

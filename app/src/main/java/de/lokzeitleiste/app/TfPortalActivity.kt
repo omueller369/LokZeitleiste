@@ -9,6 +9,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.*
 import android.webkit.*
 import android.widget.*
 import androidx.activity.ComponentActivity
@@ -30,6 +33,7 @@ import java.net.URL
 import java.util.UUID
 
 class TfPortalActivity : ComponentActivity() {
+    private var helpPrintView: WebView?=null
     private lateinit var web: WebView
     private lateinit var policy: PortalPolicy
     private lateinit var store: GpsTrackStore
@@ -193,6 +197,7 @@ class TfPortalActivity : ComponentActivity() {
     private fun handle(request:JSONObject,proxy:JavaScriptReplyProxy) {
         try {
             when(request.getString("method")) {
+                "help.print" -> startHelpPrint(request,proxy)
                 "session" -> reply(proxy,request,true,session)
                 "language" -> {
                     val language=request.getString("language");require(language in LanguageRuntime.codes);LanguageRuntime.code=language
@@ -233,6 +238,33 @@ class TfPortalActivity : ComponentActivity() {
             }
         } catch(error:Exception) { reply(proxy,request,false,error.message?:"App-Anfrage fehlgeschlagen.") }
     }
+    private fun startHelpPrint(request:JSONObject,proxy:JavaScriptReplyProxy) {
+        require(helpPrintView==null) { "Ein Druckvorgang läuft bereits." }
+        val title=request.getString("title")
+        val html=HelpPrintDocument.render(title,request.getString("text"))
+        val printView=WebView(this);helpPrintView=printView
+        printView.settings.apply { javaScriptEnabled=false;allowFileAccess=false;allowContentAccess=false;blockNetworkLoads=true }
+        var started=false
+        printView.webViewClient=object:WebViewClient() {
+            override fun onPageFinished(view:WebView,url:String) {
+                if(started)return;started=true
+                view.post {
+                    try {
+                        val delegate=view.createPrintDocumentAdapter("Anleitung – $title")
+                        val adapter=object:PrintDocumentAdapter() {
+                            override fun onStart() { delegate.onStart() }
+                            override fun onLayout(old:PrintAttributes?,new:PrintAttributes?,signal:CancellationSignal,callback:LayoutResultCallback,extras:Bundle?) { delegate.onLayout(old,new,signal,callback,extras) }
+                            override fun onWrite(pages:Array<PageRange>,destination:ParcelFileDescriptor,signal:CancellationSignal,callback:WriteResultCallback) { delegate.onWrite(pages,destination,signal,callback) }
+                            override fun onFinish() { delegate.onFinish();runOnUiThread { if(helpPrintView===view)helpPrintView=null;view.destroy() } }
+                        }
+                        getSystemService(PrintManager::class.java).print("Anleitung – $title",adapter,PrintAttributes.Builder().setMediaSize(PrintAttributes.MediaSize.ISO_A4).build())
+                        reply(proxy,request,true,JSONObject())
+                    } catch(error:Exception) { helpPrintView=null;view.destroy();reply(proxy,request,false,error.message?:"Druckdialog konnte nicht geöffnet werden.") }
+                }
+            }
+        }
+        printView.loadDataWithBaseURL(null,html,"text/html","UTF-8",null)
+    }
     private fun startGps(request:JSONObject,proxy:JavaScriptReplyProxy) {
         try {
             val key=trackKey(request);require(GpsRecordingService.currentKey==null || GpsRecordingService.currentKey==key) { "Eine andere GPS-Aufzeichnung läuft bereits." }
@@ -256,5 +288,5 @@ class TfPortalActivity : ComponentActivity() {
         }
     }
     override fun onResume() { super.onResume();if(::updater.isInitialized)updater.resume() }
-    override fun onDestroy() { fileCallback?.onReceiveValue(null);exportStream?.close();if(::web.isInitialized){web.stopLoading();web.destroy()};super.onDestroy() }
+    override fun onDestroy() { helpPrintView?.destroy();helpPrintView=null;fileCallback?.onReceiveValue(null);exportStream?.close();if(::web.isInitialized){web.stopLoading();web.destroy()};super.onDestroy() }
 }

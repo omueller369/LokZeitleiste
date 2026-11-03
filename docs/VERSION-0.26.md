@@ -39,6 +39,14 @@ Dienstbeginn steht rechts oben, Dienstende direkt darunter. Darunter folgt die u
 
 Die Zugfahrtdetails stehen über dem GPS-Bereich. Dieser ist beim Öffnen zunächst geschlossen. **+** oben rechts öffnet Bedienung, Standzeitenliste und Karte; **−** schließt sie wieder. Laufendes GPS und manuelle Standzeiten werden dadurch nicht beendet. Beim Auswählen eines GPS-Halts in den Zugfahrtdetails wird die Karte bei Bedarf automatisch eingeblendet.
 
+## Anleitung und Hilfe für das gesamte TF-Portal
+
+Die Kachel **Anleitung und Hilfe** öffnet eine nach Modulen und Themen gegliederte Übersicht mit kurzen Beschreibungstexten. Die Themenliste steht links, auf kleinen Bildschirmen oben. Eine Suche findet Themen auch über Wörter im Erklärungstext. Die Anleitung erklärt die Bedienung in einfachem Deutsch und in geordneten Schritten.
+
+**? Hilfe** im Kopfbereich öffnet die Erklärung zum aktuellen Modul. Die bisherigen Hilfe-Schaltflächen im Arbeitsbericht und bei GPS führen ebenfalls in diese gemeinsame Hilfe. **X oben links** schließt das Hilfefenster und bringt den Eingabefokus zurück. Das **Drucker-Symbol oben rechts** öffnet den Druckdialog für die ausgewählte Anleitung. Persönliche Formularwerte und andere Portalbereiche werden dabei nicht gedruckt. In Android öffnet sich der System-Druckdialog mit einem eigenen, vom eigentlichen Portal getrennten Druckdokument. Eine aktuelle APK enthält auch die Hilfedateien.
+
+Der gemeinsame Katalog liegt in `backend/lokzeitleiste/static/tf-help-content.js`. Neue Module und Bedienungsänderungen müssen dort mit erklärt werden; die Hilfepflege ist in `AGENTS.md` festgelegt und die vollständige Abdeckung der Modulkacheln wird automatisch geprüft. Noch nicht freigeschaltete Funktionen werden ausdrücklich als nicht verfügbar erklärt.
+
 ## Testserver aktualisieren
 
 Für den eigenständigen, mit `install-ctlsoftware-test.sh` eingerichteten Testserver:
