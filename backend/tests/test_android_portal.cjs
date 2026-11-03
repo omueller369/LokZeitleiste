@@ -10,5 +10,6 @@ async function boot(id){let online=true,status=200,calls=[];const native={postMe
  app=await boot(2);app.offline();await assert.rejects(app.window.fetch(path));
  app=await boot(1);app.status(401);assert.equal((await app.window.fetch(path)).status,401);assert(app.calls.some(r=>r.method==='expired'));
  const blob=new Blob(['x'.repeat(120000)]);await app.window.AndroidPortal.saveBlob('test.gpx',blob);assert.equal(app.calls.filter(r=>r.method==='export.chunk').length,3);assert(app.calls.filter(r=>r.method==='export.chunk').every(r=>Buffer.from(r.data,'base64').length<=49152));assert.equal(app.calls.at(-1).method,'export.finish');
+ await app.window.AndroidPortal.printHelp({title:'GPS Hilfe',text:'Nur die Anleitung'});assert.equal(app.calls.at(-1).method,'help.print');assert.equal(app.calls.at(-1).text,'Nur die Anleitung');
  console.log('Android portal: account-isolated offline cache, rejected writes, authoritative 401 and chunked export passed.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

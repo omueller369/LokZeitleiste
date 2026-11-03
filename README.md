@@ -210,3 +210,10 @@ Persönliche TF-/Mitarbeiterpostfächer, Domainliste und Update einer bestehende
 ## Arbeitsbericht und GPS v0.26
 
 Diese Version basiert auf dem Stand 0.25 des Branchs `setup/debian-testumgebung`, nicht auf der RC1. Der GPS-Ablauf wurde auf manuelle Start-/Endbahnhöfe und eine lokale Live-Standzeitenliste umgestellt. Die vollständige Bedienhilfe einschließlich Wiederherstellung, Zwischenspeichern und Löschen steht unter [Version 0.26](docs/VERSION-0.26.md) und im Hilfe-Button des Arbeitsberichts/GPS-Bereichs.
+
+
+## Anleitung und Hilfe im TF-Portal
+
+Das Modul `/tf/hilfe` und die Schaltfläche `? Hilfe` verwenden den gemeinsamen, nach Modulen und Themen gegliederten Katalog in `backend/lokzeitleiste/static/tf-help-content.js`. `tf-help.js` zeigt Suche, Kurztexte und das Hilfefenster mit X links und Drucker rechts. Die Druckansicht enthält ausschließlich die ausgewählte Anleitung, keine persönlichen Formulare. Android verwendet dafür einen eigenen System-Druckdialog mit einem getrennten, netzwerkgesperrten Druck-WebView.
+
+Die Hilfepflege gehört zu jeder Änderung der TF-Bedienung; siehe [AGENTS.md](AGENTS.md). Die Modulabdeckung wird automatisch geprüft.
