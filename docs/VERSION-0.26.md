@@ -29,6 +29,16 @@ Ein Klick auf die Standzeitenzeile, eines ihrer Eingabefelder oder den Kartenpun
 
 Die aktuellen GPS-Regeln gelten automatisch beim Laden aller älteren Aufzeichnungen mit erhaltenen GPS-Punkten. Rohpunkte, vorhandene Standort-/Grundangaben und übernommene Zugfahrtereignisse bleiben erhalten; ein erneut zusammengefasster Halt wird nicht nochmals zur Übernahme angeboten, wenn er bereits übernommene Teile enthält. Alle Zeilen in den Zugfahrtdetails werden nach Beginn, Ende und Kennung chronologisch sortiert: beim Laden alter Berichte und Entwürfe, beim Eintragen, nach Änderungen, beim Speichern und für neu erstellte Dokumente. Vorhandene archivierte PDFs bleiben unverändert.
 
+## Kompakter Dienstblock und GPS-Bereich
+
+Im Dienstblock steht links oben die umrahmte Dienstart-Gruppe: **DS** Dienstschicht, **BS** Bereitschaft, **RBS** Rufbereitschaft, **AS** Ausfallschicht, **U** Urlaub, **K** Krank. Die gespeicherten Dienstartwerte und Berechnungsregeln bleiben unverändert; vollständige Bezeichnungen sind als Tooltip und für Screenreader verfügbar.
+
+Links darunter stehen die vier Kennzahlen in einer gemeinsamen Gruppe. Die Beschriftungen lauten **Σ- AZ**, **Min. ☕**, **AZ inkl. ☕**, **Bisher-☕**. Passend unter jeder Beschriftung steht nur der Wert in **h:mm**, ohne Einheiten oder weiteren Text. Die Hinweise zu verpflichtenden bzw. empfohlenen Pausen bleiben verfügbar.
+
+Dienstbeginn steht rechts oben, Dienstende direkt darunter. Darunter folgt die umrahmte Ausbleibe-Gruppe. Der rechte Bereich nutzt auf großen Bildschirmen etwa ein Drittel des Dienstblocks. Auf schmalen Bildschirmen werden die Gruppen untereinander angeordnet.
+
+Die Zugfahrtdetails stehen über dem GPS-Bereich. Dieser ist beim Öffnen zunächst geschlossen. **+** oben rechts öffnet Bedienung, Standzeitenliste und Karte; **−** schließt sie wieder. Laufendes GPS und manuelle Standzeiten werden dadurch nicht beendet. Beim Auswählen eines GPS-Halts in den Zugfahrtdetails wird die Karte bei Bedarf automatisch eingeblendet.
+
 ## Testserver aktualisieren
 
 Für den eigenständigen, mit `install-ctlsoftware-test.sh` eingerichteten Testserver:
