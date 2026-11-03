@@ -1,0 +1,54 @@
+/* Tagmodus keeps the established palette. Print output is deliberately independent. */
+.portal-theme-toggle{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 auto;width:44px;min-width:44px;min-height:44px;padding:9px!important;border:1px solid #94adbe!important;border-radius:8px;background:#17445b;color:#fff;cursor:pointer;vertical-align:middle}
+.portal-theme-header{display:flex;justify-content:flex-end;padding:10px 20px}.portal-theme-toggle svg{display:block;pointer-events:none}.portal-theme-toggle:focus-visible{outline:3px solid #e4b640!important;outline-offset:3px}
+@media screen{
+ html[data-theme=dark]{color-scheme:dark;--night-bg:#0d1722;--night-surface:#172635;--night-raised:#203547;--night-input:#101d2a;--night-text:#e7eef4;--night-muted:#b7c8d6;--night-border:#536d81;--night-link:#a4d7ff;background:var(--night-bg)!important;color:var(--night-text)!important}
+ html[data-theme=dark] body{background:var(--night-bg)!important;color:var(--night-text)!important}
+ html[data-theme=dark] :is(.card,main>section,.module,.choices>a,dialog,fieldset,.gps-box,.brake-loco,.brake-countries fieldset,.tf-help-hub,.tf-help-sidebar,.tf-help-heading,.tf-shell-footer,.backend-sidebar-panel,.backend-section-bar,.pwa-install-card,.document-file,.station-option,#tfYearPlan th[scope=row]){background:var(--night-surface)!important;color:var(--night-text)!important;border-color:var(--night-border)!important}
+ html[data-theme=dark] :is(header,header.tf-shell,.backend-sidebar-header){background:#101e2c!important;color:var(--night-text)!important}
+ html[data-theme=dark] :is(h1,h2,h3,h4,legend,label,dt,dd,output){color:var(--night-text)}
+ html[data-theme=dark] :is(p,small,summary,.muted,.module p,.station-caption,.document-file small,.tf-help-topics h3,.tf-help-topics small,.tf-help-reading>p:first-child,.tf-help-revision,.tf-help-intro p){color:var(--night-muted)}
+ html[data-theme=dark] .module-number{background:#29485e!important;color:#f2f7ff!important}
+ html[data-theme=dark] a{color:var(--night-link)!important}
+ html[data-theme=dark] :is(input,select,textarea,option,optgroup){background:var(--night-input)!important;color:var(--night-text)!important;border-color:var(--night-border)!important;accent-color:#90caff}
+ html[data-theme=dark] input::placeholder,html[data-theme=dark] textarea::placeholder{color:#a7b9c8;opacity:1}
+ html[data-theme=dark] :is(button,.button,.document-return-button,.portal-return-button){background:#244b66;color:#f0f7ff;border-color:#688ba4}
+ html[data-theme=dark] :is(.tf-help-heading button,.tf-help-topics button,.tf-note-open,.tf-note-trash,.station-option,.backend-section-bar a,.backend-section-bar button,.menu-submenu-toggle,.backend-sidebar-panel .menu-tree>li:first-child>a,.report-block-toggle,.train-tabs button){background:var(--night-raised)!important;color:var(--night-text)!important;border-color:var(--night-border)!important;box-shadow:none}
+ html[data-theme=dark] :is(button[aria-selected=true],.tf-help-topics button[aria-current=page],.backend-sidebar-panel a[aria-current=page],.document-tree summary[aria-current],.document-tree summary:hover,.station-option[aria-current=true]){background:#28516c!important;color:#fff!important;border-color:#a4d7ff!important}
+ html[data-theme=dark] :is(table,.excel){background:var(--night-surface);color:var(--night-text)}
+ html[data-theme=dark] :is(th,td,tr,table,fieldset,.train-panel,.train-tab-bar,.receipt-row){border-color:var(--night-border)!important}
+ html[data-theme=dark] :is(thead,tfoot,.excel thead,.excel tfoot){background:var(--night-raised)!important;color:var(--night-text)}
+ html[data-theme=dark] :is(tbody tr:nth-child(even),.excel tbody tr:nth-child(even),.mail-unread,.tf-message-table .unread){background:#1b3042;color:var(--night-text)}
+ html[data-theme=dark] :is(tbody tr:hover,.report-list tbody tr:focus-visible,.train-event-table tbody tr:focus-visible,.report-list tbody tr.selected td,.train-event-table tbody tr.selected td){background:#294c65;color:var(--night-text)}
+ html[data-theme=dark] :is(#reportErrorHint,.tf-help-heading,.tf-notes-heading){background:var(--night-raised)!important;color:var(--night-text)!important}
+ html[data-theme=dark] :is(.error,.tf-message-error,.tf-note-invalid,[role=alert],#message,#reportMessage,#documentMessage,#signatureError,#dutyDuration.over-limit,.report-overrun,.gps-box .gps-stand-duration){color:#ff9c9c!important}
+ html[data-theme=dark] :is(#pauseHint,#kindHint,.warning){color:#f3cb7b!important}
+ html[data-theme=dark] .ok{color:#8ed8b3}
+ html[data-theme=dark] :is(.tf-note-delete,.document-file-actions button){background:#8e2938!important;color:#fff!important}
+ html[data-theme=dark] .gps-box .gps-stand-toggle{background:#17623c;color:#fff;border-color:#75c99d}
+ html[data-theme=dark] .gps-box .gps-stand-toggle[aria-pressed=true]{background:#a32438;border-color:#ff9c9c}
+ html[data-theme=dark] .gps-map>svg{background:#172f40!important;border-color:var(--night-border)}
+ /* Only base tiles are dimmed. Red/blue stop markers and route geometry retain their colors. */
+ html[data-theme=dark] .gps-map svg image:not([data-gps-rail]){filter:brightness(.68) saturate(.7)}
+ html[data-theme=dark] .status{background:color-mix(in srgb,var(--status,#526475) 40%,#152330)!important;color:var(--night-text)!important}
+ html[data-theme=dark] .status.holiday{--status:#dc8997}
+ html[data-theme=dark] .status.combined{background:linear-gradient(135deg,#714459 0 50%,color-mix(in srgb,var(--status,#526475) 40%,#152330) 50% 100%)!important}
+ html[data-theme=dark] .handover-status[data-status=ready]{background:#195847!important;color:#e7fff2!important}
+ html[data-theme=dark] .handover-status[data-status=limited]{background:#67562a!important;color:#fff2ce!important}
+ html[data-theme=dark] .handover-status[data-status=unavailable]{background:#783442!important;color:#fff1f1!important}
+ html[data-theme=dark] :is([data-plan-kind],.month-plan-day){--night-day:#263747;background-color:var(--night-day)!important;background-image:none!important;color:#f1f6fa!important}
+ html[data-theme=dark] :is([data-plan-kind=Urlaub],.month-plan-day[data-kind=vacation]){--night-day:#863d32}
+ html[data-theme=dark] :is([data-plan-kind=Ruhetag],.month-plan-day[data-kind=rest]){--night-day:#195847}
+ html[data-theme=dark] .month-plan-day[data-kind=sick]{--night-day:#773d51}
+ html[data-theme=dark] [data-plan-kind][data-weekend=true]:not([data-plan-kind=Urlaub]):not([data-plan-kind=Ruhetag]){--night-day:#67562a}
+ html[data-theme=dark] :is([data-plan-holiday=true],.month-plan-day.is-holiday){background-image:linear-gradient(135deg,#714459 0 50%,var(--night-day) 50% 100%)!important}
+ html[data-theme=dark] #reportListRows tr[data-sync-state=synced]{background:#165954!important;color:#f0fffc!important}
+ html[data-theme=dark] #reportListRows tr[data-sync-state=local]{background:#713e58!important;color:#fff3fa!important}
+ html[data-theme=dark] #reportListRows tr[data-sync-state] td{color:inherit}
+ /* Original images and document previews are never inverted; handwriting stays dark on white. */
+ html[data-theme=dark] #signatureCanvas{background-color:#fff!important;color:#111;color-scheme:light}
+ html[data-theme=dark] :is(img,iframe){color-scheme:light}
+ html[data-theme=dark] :focus-visible{outline-color:#f2c65c!important}
+ html[data-theme=dark] dialog::backdrop{background:#02070ddd}
+}
+@media print{html[data-theme]{color-scheme:light!important}.portal-theme-toggle{display:none!important}}

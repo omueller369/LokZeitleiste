@@ -86,7 +86,7 @@ class TfPortalTest(unittest.TestCase):
         page=self.driver.get('/tf/hilfe')
         self.assertEqual(page.status_code,200)
         self.assertIn('Anleitung und Hilfe',page.text)
-        for path,content in [('/tf/help.js','window.TfHelp='),('/tf/help-content.js','window.TfHelpPages='),('/tf/help.css','.tf-help-dialog')]:
+        for path,content in [('/tf/help.js','window.TfHelp='),('/tf/help-content.js','window.TfHelpPages='),('/tf/help.css','.tf-help-dialog'),('/theme.js','window.PortalTheme='),('/theme.css','portal-theme-toggle')]:
             response=self.driver.get(path)
             self.assertEqual(response.status_code,200)
             self.assertIn(content,response.text)

@@ -1,5 +1,5 @@
 /* Gemeinsamer Hilfekatalog für alle TF-Module. */
-window.TfHelpRevision="2026-11-03";
+window.TfHelpRevision="2026-11-04";
 window.TfHelpPages=[
   {
     "id": "start",
@@ -76,6 +76,41 @@ window.TfHelpPages=[
         "title": "Auf kleinen Bildschirmen",
         "paragraphs": [
           "Einige Gruppen stehen auf dem Handy untereinander statt nebeneinander. In breiten Tabellen kannst Du nach links oder rechts wischen. Die Reihenfolge der Arbeitsschritte bleibt gleich."
+        ],
+        "steps": []
+      }
+    ]
+  },
+  {
+    "id": "darstellung",
+    "group": "Erste Schritte",
+    "title": "Tagmodus und Nachtmodus wechseln",
+    "short": "Mit Sonne oder Mond zwischen heller und dunkler Darstellung wechseln.",
+    "path": null,
+    "aliases": [],
+    "sections": [
+      {
+        "title": "Die Darstellung umschalten",
+        "paragraphs": [
+          "Oben im Kopf der Seite steht ein Sonne- oder Mond-Symbol. Der Mond schaltet den Nachtmodus ein. Die Sonne schaltet zurück in den Tagmodus. Im Nachtmodus werden Flächen dunkel und die Schrift hell."
+        ],
+        "steps": [
+          "Wähle das Symbol einmal. Die geöffnete Seite wechselt sofort ihre Darstellung.",
+          "Öffne anschließend ein anderes Modul. Auch dort gilt die gewählte Darstellung.",
+          "Wähle das Symbol erneut, wenn Du zurückwechseln möchtest."
+        ]
+      },
+      {
+        "title": "Die Auswahl bleibt gespeichert",
+        "paragraphs": [
+          "Die Auswahl wird in diesem Browser oder auf diesem Gerät gespeichert. Auch nach dem Neuladen bleibt sie erhalten. Ein anderer Browser oder ein anderes Gerät kann eine eigene Auswahl haben. Wenn Dein Browser das Speichern verhindert, funktioniert das Umschalten trotzdem auf der geöffneten Seite."
+        ],
+        "steps": []
+      },
+      {
+        "title": "Farben und Dokumente",
+        "paragraphs": [
+          "Statusfarben und Warnungen bleiben unterscheidbar. Lies trotzdem die jeweilige Beschriftung. Dokumentvorschauen und die Zeichenfläche für Deine Unterschrift behalten ihre eigene Darstellung. Gedruckte Formulare und Hilfetexte werden durch den Nachtmodus nicht dunkel eingefärbt."
         ],
         "steps": []
       }
