@@ -16,6 +16,7 @@ def fixture():
     scripts='\n'.join((STATIC/name).read_text() for name in ['tf-help-content.js','tf-help.js','work-report-feedback.js'])
     checks=r'''
 (async()=>{
+ if(new URLSearchParams(location.search).get('mode')==='print'){window.TfHelp.open('arbeit');document.body.classList.add('tf-help-printing');document.documentElement.dataset.helpStatus='pass';return;}
  const assert=(condition,message)=>{if(!condition)throw Error(message);};
  const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
  const opener=document.getElementById('opener'),privateField=document.getElementById('private');
@@ -34,7 +35,6 @@ def fixture():
  window.TfHelp.open('arbeit');dialog.dispatchEvent(new Event('cancel',{cancelable:true}));await tick();assert(!dialog.open,'Escape/cancel closes help');
  window.loadTfHelp=async()=>window.TfHelp;window.ReportFeedback.error('Bitte Dienstbeginn prüfen.');const error=document.querySelector('.report-feedback');error.querySelector('.report-feedback-actions').lastElementChild.focus();error.querySelector('.report-feedback-actions').lastElementChild.click();await tick();assert(dialog.open&&error.open,'Help opens over an error without closing it');close.click();await tick();assert(error.open&&document.activeElement===error.querySelector('.report-feedback-actions').lastElementChild,'Nested help restores error help button');error.querySelector('.report-feedback-actions').firstElementChild.click();await tick();
  window.TfHelp.open('arbeit');
- if(new URLSearchParams(location.search).get('mode')==='print')document.body.classList.add('tf-help-printing');
  document.documentElement.dataset.helpStatus='pass';window.parent.postMessage({helpStatus:'pass'},'*');
 })().catch(error=>{document.documentElement.dataset.helpStatus='fail';document.documentElement.dataset.helpMessage=error.stack;window.parent.postMessage({helpStatus:'fail',message:error.stack},'*');});
 '''
