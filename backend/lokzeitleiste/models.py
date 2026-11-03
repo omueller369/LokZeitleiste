@@ -849,3 +849,14 @@ class UserSignaturePlacement(Base):
     __tablename__='user_signature_placements'
     user_id:Mapped[int]=mapped_column(ForeignKey('user_signatures.user_id'),primary_key=True)
     geometry_json:Mapped[str]=mapped_column(Text,nullable=False)
+
+
+class TfNote(Base):
+    __tablename__ = 'tf_notes'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    revision: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=now_utc, nullable=False)

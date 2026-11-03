@@ -20,6 +20,8 @@ const context={window,document,location:{pathname:'/tf/arbeitsbericht'},console}
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/tf-help-content.js','utf8'),context);
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/tf-help.js','utf8'),context);
 const pages=window.TfHelpPages,help=window.TfHelp;
+assert(!/\b(?:Sie|Ihnen|Ihr(?:e|er|em|en|es)?)\b/u.test(JSON.stringify(pages)), 'Help uses Du throughout');
+assert(!/\bSie\b/u.test(fs.readFileSync('backend/lokzeitleiste/static/tf-help.js','utf8')), 'Help reader uses Du');
 assert.equal(new Set(pages.map(p=>p.id)).size,pages.length);assert(pages.length>=20);
 for(const page of pages){assert(page.title&&page.short&&page.group);assert(page.sections.length);for(const section of page.sections)assert(section.title&&(section.paragraphs.length||section.steps.length));}
 const html=fs.readFileSync('backend/lokzeitleiste/static/tf-portal.html','utf8');for(const [,path]of html.matchAll(/<a class="module" href="([^"]+)"/g))assert(pages.some(p=>p.path===path||p.aliases.includes(path)),'Missing module help: '+path);

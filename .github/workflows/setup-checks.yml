@@ -43,6 +43,13 @@ jobs:
         with:
           name: tf-help-ui
           path: ${{ runner.temp }}/tf-help-ui/
+      - name: Notes UI checks
+        run: python backend/tests/check_tf_notes_ui.py --output-dir "$RUNNER_TEMP/tf-notes-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tf-notes-ui
+          path: ${{ runner.temp }}/tf-notes-ui/
       - name: Compose configuration
         working-directory: backend
         run: |

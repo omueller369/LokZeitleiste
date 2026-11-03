@@ -59,3 +59,10 @@ sudo bash install-ctlsoftware-test.sh --update
 Die Update-Routine aktualisiert den normalen Testbranch und sichert zuvor Datenbank, Konfiguration und bisherigen Backend-Code unter `/etc/ctlsoftware-test-setup/backups/`. Dies gilt auch, wenn die Anwendung zuletzt aus dem festen RC1-Quellpaket installiert wurde, sofern der ursprüngliche Testserver-Checkout noch vorhanden ist. Für diesen Wechsel nicht den alten RC1-Pfad mit `--source` angeben.
 
 Danach Portal neu laden; die Softwareinformation zeigt `0.26`. Docker/ISPConfig verwenden ihre jeweils eigene Update-Anleitung. Eine vorhandene APK enthält gegebenenfalls zusätzlich eine gebündelte Offline-Oberfläche; für deren Stand 0.26 die neu gebaute Tablet-Test-APK mit demselben Signierschlüssel verwenden.
+
+
+### Persönliche TF-Notizen und Du-Anrede
+
+Im TF-Portal ergänzt das Modul **Notizen** persönliche, serverseitig zum TF-Konto gespeicherte Notizen. **Neu hinzufügen** öffnet Titel (bis 120 Zeichen) und Text (bis 1000 Unicode-Zeichen) mit Restzeichenzähler. Die Liste zeigt Titel und Erstelldatum als **dd.mm.yy HH:MM** (Europe/Berlin), neueste zuerst. Ein Klick öffnet den vollständigen Text; **Bearbeiten** ermöglicht Änderungen. Der Papierkorb pro Zeile löscht nach ausdrücklicher Rückfrage die ganze Notiz. Abbrechen erhält sie. Erstelldaten bleiben bei Bearbeitung unverändert; Revisionsprüfungen schützen vor dem Überschreiben oder Löschen zwischenzeitlich geänderter Notizen. Für Speichern und Laden ist eine Serververbindung nötig; bei Fehlern bleibt die laufende Eingabe erhalten.
+
+Sämtliche zentralen Hilfetexte und die Bedienhinweise im Hilfeleser verwenden die Du-Anrede. Eine eigene gruppierte Notiz-Anleitung sowie eine Prüfung gegen förmliche Anrede sind ergänzt. Android bündelt das Notizmodul zusammen mit dem Portal. Die neue Datenbanktabelle wird durch den bestehenden idempotenten `init_db`-Ablauf angelegt.
