@@ -26,6 +26,9 @@ class PortalPolicy(base: String) {
         "/tf/help.js" -> "tf-help.js"
         "/tf/help-content.js" -> "tf-help-content.js"
         "/tf/help.css" -> "tf-help.css"
+        "/auth-session.js", "/plan-colors.js" -> path.substringAfterLast('/')
+        "/theme.js" -> "portal-theme.js"
+        "/theme.css" -> "portal-theme.css"
         "/tf/shell.js" -> "tf-shell.js"
         "/tf/shell.css" -> "tf-shell.css"
         "/tf/profile.js" -> "tf-profile.js"

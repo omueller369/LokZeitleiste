@@ -728,3 +728,9 @@ app.include_router(signatures_router(require_account))
 
 from .notes import create_router as notes_router
 app.include_router(notes_router(require_account))
+
+@app.get('/theme.js')
+def portal_theme_script():return FileResponse(Path(__file__).parent/'static'/'portal-theme.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+
+@app.get('/theme.css')
+def portal_theme_styles():return FileResponse(Path(__file__).parent/'static'/'portal-theme.css',media_type='text/css',headers={'Cache-Control':'no-cache'})

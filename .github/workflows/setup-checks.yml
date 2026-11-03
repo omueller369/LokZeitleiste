@@ -50,6 +50,13 @@ jobs:
         with:
           name: tf-notes-ui
           path: ${{ runner.temp }}/tf-notes-ui/
+      - name: Day and night mode browser checks
+        run: python backend/tests/check_portal_theme_ui.py --output-dir "$RUNNER_TEMP/portal-theme-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portal-theme-ui
+          path: ${{ runner.temp }}/portal-theme-ui/
       - name: Compose configuration
         working-directory: backend
         run: |
