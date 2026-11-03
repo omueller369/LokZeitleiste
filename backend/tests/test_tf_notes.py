@@ -8,7 +8,7 @@ import test_tf_portal
 
 class TfNotesTest(unittest.TestCase):
     setUp = test_tf_portal.TfPortalTest.setUp
-    tearDown = TfPortalTest.tearDown
+    tearDown = test_tf_portal.TfPortalTest.tearDown
 
     def create(self, title='Mein Titel', text='Erste Zeile\nZweite Zeile'):
         result = self.driver.post('/api/v1/tf/notes', json=dict(title=title, text=text))
