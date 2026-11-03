@@ -38,7 +38,7 @@ def fixture():
  const editor=new window.TrainJourneyEditor({userId:1,button:document.getElementById('newTrainJourney'),container:document.getElementById('trainJourneyEditor'),readonly:()=>false,viewOnly:()=>false,bounds:()=>({start:day+'T08:00',end:day+'T16:00'}),minute:value=>Date.parse(value)/60000,clock:n=>Math.floor(n/60)+':'+String(n%60).padStart(2,'0'),uuid:()=>String(++id),stations(){},resolve:async()=>({code:'BBB',name:'Beispiel'}),changed(){},editingChanged(){},message(){},block(){}});
  editor.restore([{id:'layout-journey',train_number:'123',start_station:'BBB',start_station_name:'Beispiel',end_station:'CCC',end_station_name:'Ziel',start_at:day+'T08:00',end_at:day+'T16:00',events:[{id:'event',station:'BBB',station_name:'Beispiel',reason:'V1',cause:'CTL',start_at:day+'T10:00',end_at:day+'T10:15'}]}]);
  window.LayoutReport.fill(editor,day);
- await document.fonts.ready;await new Promise(requestAnimationFrame);
+ // Bounding-rectangle reads below force synchronous layout; no animation-frame race in headless mode.
  const kinds=[...document.querySelectorAll('#dutyKinds label span')].map(el=>el.textContent);
  assert(kinds.join(',')==='DS,BS,RBS,AS,U,K','Dienstart abbreviations');
  const ids=['dutyDuration','requiredPause','netDuration','documentedPauseTotal'];
@@ -94,15 +94,15 @@ def main():
         (root / 'fixture.html').write_text(fixture())
         for width in [1280, 768, 375, 320]:
             host = root / f'host-{width}.html'
-            host.write_text(f'''<!doctype html><html data-layout-status="pending"><head><meta charset="utf-8"><style>body{{margin:0;background:#eef3f5}}iframe{{border:0;width:{width}px;height:1800px;display:block}}</style></head><body><iframe src="fixture.html"></iframe><script>
-addEventListener('message',event=>{{if(event.source!==document.querySelector('iframe').contentWindow)return;document.documentElement.dataset.layoutStatus=event.data.layoutStatus;document.documentElement.dataset.layoutMessage=event.data.message||'';}});
-</script></body></html>''')
+            host.write_text(f'''<!doctype html><html data-layout-status="pending"><head><meta charset="utf-8"><style>body{{margin:0;background:#eef3f5}}iframe{{border:0;width:{width}px;height:1800px;display:block}}</style><script>
+addEventListener('message',event=>{{if(event.source!==document.querySelector('iframe')?.contentWindow)return;document.documentElement.dataset.layoutStatus=event.data.layoutStatus;document.documentElement.dataset.layoutMessage=event.data.message||'';}});
+</script></head><body><iframe src="fixture.html"></iframe></body></html>''')
             command = [chrome, '--headless=new', '--no-sandbox', '--disable-gpu', '--disable-background-networking', '--allow-file-access-from-files', '--hide-scrollbars', '--force-device-scale-factor=1', '--window-size=1400,1800', '--virtual-time-budget=5000', f'--user-data-dir={root / ("profile-"+str(width))}', f'--screenshot={args.output_dir.resolve() / (str(width)+".png")}', '--dump-dom', host.as_uri()]
             run = subprocess.run(command, capture_output=True, text=True, timeout=60)
             (args.output_dir / f'{width}.html').write_text(run.stdout)
             passed = run.returncode == 0 and 'data-layout-status="pass"' in run.stdout
             match = re.search(r'data-layout-message="([^"]*)"', run.stdout)
-            message = html.unescape(match.group(1)) if match else run.stderr[-2000:]
+            message = html.unescape(match.group(1)) if match else ('Layout fixture did not finish' if 'data-layout-status="pending"' in run.stdout else run.stderr[-2000:])
             results.append(dict(width=width,passed=passed,message=message))
             print(f'Work report layout {width}px: '+('PASS' if passed else 'FAIL '+message))
     (args.output_dir / 'results.json').write_text(json.dumps(results,indent=2))
