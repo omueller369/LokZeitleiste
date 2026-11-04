@@ -1,5 +1,6 @@
 """Private brake-sheet drafts and calculations according to the agreed DE/PL form rules."""
-from .localization import source as _text_source
+from .localization import source as _text_source, text as _localized_text
+from .i18n import request_language
 import json,re
 from datetime import date
 from decimal import Decimal,ROUND_CEILING
@@ -186,10 +187,19 @@ def create_router(require_account):
             raise HTTPException(422,_text_source(IMPORT_ERRORS['file']))
         try:
             imported=await run_in_threadpool(parse_wagons,content)
-            values=imported['wagon_import'].values(mode)
+            source=imported['wagon_import'];selected_mode=mode;notices=[]
+            try:values=source.values(mode)
+            except WagonImportError as error:
+                detected=source.detected_mode()
+                if str(error)!='missing_brake' or detected is None or detected==mode:raise
+                selected_mode=detected;values=source.values(selected_mode)
+                notices.append(_localized_text('server_brake_sheets.text_0ac0b51d459a',request_language.get(),detected=selected_mode,requested=mode))
+            for difference in source.summary_differences():
+                notice='server_brake_sheets.text_0b22cbff963e' if difference['computed'] is None else 'server_brake_sheets.text_a2d61c07db1c'
+                notices.append(_localized_text(notice,request_language.get(),**difference))
         except WagonImportError as error:
             raise HTTPException(422,_text_source(IMPORT_ERRORS[str(error)])) from error
-        return dict(**imported,wagon=values,brake_mode=mode)
+        return dict(**imported,wagon=values,brake_mode=selected_mode,requested_brake_mode=mode,notices=notices)
     @router.get('/api/v1/tf/brake-sheets/vehicles')
     def vehicles(user=Depends(driver),db:Session=Depends(database_session)):
         return [public_vehicle(r) for r in db.scalars(select(RailwayVehicle).where(~RailwayVehicle.id.in_(select(VehicleRetirement.vehicle_id))).order_by(RailwayVehicle.vehicle_number))]

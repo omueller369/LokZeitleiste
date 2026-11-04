@@ -10,3 +10,5 @@
 #brakeImportDialog{box-sizing:border-box;width:min(760px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;border:1px solid #a6becb;border-radius:12px;padding:20px;background:var(--ctl-surface,#fff);color:inherit}#brakeImportDialog::backdrop{background:#132c4099}#brakeImportValues{overflow-x:auto}#brakeImportDialog button{min-height:44px}#brakeImportDialog td{overflow-wrap:anywhere}
 
 .brake-towed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px;margin:12px 0;border:1px solid #a6becb;border-radius:10px}.brake-towed input,.brake-towed select{box-sizing:border-box;width:100%;min-height:44px}#towedResult,#towedRemarks{display:block;white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0}#brakeSectionLinks button{min-height:44px}@media(max-width:700px){.brake-towed{grid-template-columns:1fr}}
+
+.brake-import-notices{white-space:pre-wrap;overflow-wrap:anywhere;border:2px solid #b07812;border-radius:8px;padding:12px;font-weight:650}
