@@ -6,6 +6,11 @@ plugins {
 
 val apiBaseUrl = providers.gradleProperty("lokzeitleisteApiBaseUrl").orElse("https://ctl-software.io-goerlitz.eu").get()
 
+// Read the visible application version from the shared backend version source.
+val softwareVersion = Regex("""SOFTWARE_VERSION\s*=\s*['"]([^'"]+)['"]""")
+    .find(rootProject.file("backend/lokzeitleiste/version.py").readText())
+    ?.groupValues?.get(1) ?: error("Shared software version is missing")
+
 android {
     namespace = "de.lokzeitleiste.app"
     compileSdk = 35
@@ -15,8 +20,8 @@ android {
         applicationId = "de.lokzeitleiste.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("26").get().toInt()
-        versionName = providers.gradleProperty("lokzeitleisteVersionName").orElse("0.26").get()
+        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("27").get().toInt()
+        versionName = providers.gradleProperty("lokzeitleisteVersionName").orElse(softwareVersion).get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
     }
     val signingPath = providers.gradleProperty("lokzeitleisteSigningStoreFile").orElse(providers.environmentVariable("ANDROID_KEYSTORE_PATH")).orNull
