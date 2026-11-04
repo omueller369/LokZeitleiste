@@ -80,6 +80,13 @@ jobs:
         with:
           name: tf-admin-ui
           path: ${{ runner.temp }}/tf-admin-ui/
+      - name: Wagon list Excel import browser checks
+        run: python backend/tests/check_wagon_import_ui.py --output-dir "$RUNNER_TEMP/wagon-import-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wagon-import-ui
+          path: ${{ runner.temp }}/wagon-import-ui/
       - name: Compose configuration
         working-directory: backend
         run: |

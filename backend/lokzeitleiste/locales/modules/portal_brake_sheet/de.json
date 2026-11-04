@@ -113,5 +113,13 @@
   "text_f7ff1178af20": "Abbrechen",
   "text_fbf62953b944": "Spalten 3 und 4 ausblenden",
   "text_fd148453debe": "Bitte auswählen",
-  "text_fec03f06ea3f": "Absender"
+  "text_fec03f06ea3f": "Absender",
+  "text_aa90b9036f16": "Excel importieren",
+  "text_2cda9ae1f6f5": "Wagenlisten-Import prüfen",
+  "text_5a5a4395dada": "Werte übernehmen",
+  "text_9add22f99335": "Wagenlisten-Werte übernommen. Prüfe die Angaben und speichere den Bremszettel.",
+  "text_6088a3b942bf": "G+P: erste fünf Wagen in G mit 25 % Abzug, weitere Wagen in P. Über 500 m ungerundeter Wagenzuglänge zusätzlich 5 % Abzug nur von P. Ergebnisse werden am Ende aufgerundet. Bei 4b und 16b wird nur das erste Wort des Zielbahnhofs übernommen.",
+  "text_fbe000b7288f": "Quelle: Blatt / erste Wagenzeile / letzte Wagenzeile / Summenzeile",
+  "text_845f97a170a6": "Wagenzuglänge vor Rundung, m",
+  "text_8a822ef9b778": "Manuelle Wagenwerte: Die automatische Importberechnung ist gelöst."
 }

@@ -6,8 +6,10 @@ from decimal import Decimal,ROUND_CEILING
 from pathlib import Path
 from typing import Literal
 from uuid import UUID
-from fastapi import APIRouter,Depends,HTTPException
+from fastapi import APIRouter,Depends,HTTPException,UploadFile,File,Form
+from .wagon_import import WagonImport, ImportError as WagonImportError, parse as parse_wagons, MAX_UPLOAD
 from fastapi.responses import FileResponse,Response
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel,Field,field_validator,model_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -59,6 +61,7 @@ class Sheet(BaseModel):
     second_last_vehicle:str=''
     locos:list[Loco]=Field(default_factory=list,max_length=5)
     wagon:WagonValues=Field(default_factory=WagonValues)
+    wagon_import:WagonImport|None=None
     holding_loco:Decimal|None=Field(default=None,ge=0,le=9999,decimal_places=3,allow_inf_nan=False)
     holding_unit:Literal['t','kN']|None=None
     required_percent:int|None=Field(default=None,ge=50,le=150,strict=True)
@@ -103,7 +106,11 @@ def calculate(db,data):
         return sum((Decimal(str(v[key])) for v in lines),Decimal(0))/scale
     a=dict(count=len(lines),length=total('length_m'),holding=data.holding_loco,brake=total('brake_weight'),weight=total('weight_kg',1000))
     if a['length'] is not None:a['length']=a['length'].to_integral_value(rounding=ROUND_CEILING)
-    b=data.wagon.model_dump();summed={key:(value+Decimal(b[key] or 0) if value is not None else None) for key,value in a.items()}
+    b=data.wagon.model_dump()
+    if data.wagon_import:
+        try:b.update(data.wagon_import.values(data.brake_mode))
+        except WagonImportError as error:raise HTTPException(422, _text_source(IMPORT_ERRORS[str(error)])) from error
+    summed={key:(value+Decimal(b[key] or 0) if value is not None else None) for key,value in a.items()}
     if data.holding_loco is None and b['holding'] is not None:summed['holding']=Decimal(b['holding'])
     if not data.holding_unit:summed['holding']=None
     available=int(summed['brake']*100/summed['weight']) if summed['brake'] is not None and summed['weight'] is not None and summed['weight']>0 else None
@@ -127,9 +134,11 @@ def preview_missing(data,result):
         for key,label in [('series',_text_source('server_brake_sheets.text_7c1c344e8ca2')),('length_m',_text_source('server_brake_sheets.text_8d0eb9bb08e7')),('weight_kg',_text_source('server_brake_sheets.text_a6dc8d473148')),('axle_count',_text_source('server_brake_sheets.text_f69432a09518')),('brake_shoe',_text_source('server_brake_sheets.text_8b8c10d71e16')),('brake_weight',_text_source('server_brake_sheets.text_7417d0f1038a'))]:
             if line[key] is None or line[key]=='':missing.append(_text_source('server_brake_sheets.text_4c3c7e125e1d')+str(i+1)+': '+label)
     for key,label in [('count','19b'),('length','20b'),('brake','22b'),('weight','23b')]:
-        if getattr(data.wagon,key) is None:missing.append(label)
+        if result['b'][key] is None:missing.append(label)
     if (data.holding_loco is not None or data.wagon.holding is not None) and not data.holding_unit:missing.append(_text_source('server_brake_sheets.text_39a0dba1b85a'))
     return missing
+
+IMPORT_ERRORS={'file': 'server_brake_sheets.text_57876c2d52fe', 'format': 'server_brake_sheets.text_fc74c531b994', 'missing_brake': 'server_brake_sheets.text_7c3ce0b4afb2', 'mode': 'server_brake_sheets.text_12846d32442d', 'range': 'server_brake_sheets.text_906e2fc6290d'}
 
 class PreviewRequest(BaseModel):
     expected_revision:int=Field(ge=1)
@@ -140,6 +149,18 @@ def create_router(require_account):
     def script():return FileResponse(static/'brake-sheet.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
     @router.get('/tf/brake-sheet.css')
     def style():return FileResponse(static/'brake-sheet.css',media_type='text/css',headers={'Cache-Control':'no-cache'})
+    @router.post('/api/v1/tf/brake-sheets/import-wagons')
+    async def import_wagons(file:UploadFile=File(...),mode:str=Form('G'),user=Depends(driver)):
+        content=await file.read(MAX_UPLOAD+1)
+        await file.close()
+        if not (file.filename or '').lower().endswith('.xlsx') or len(content)>MAX_UPLOAD:
+            raise HTTPException(422,_text_source(IMPORT_ERRORS['file']))
+        try:
+            imported=await run_in_threadpool(parse_wagons,content)
+            values=imported['wagon_import'].values(mode)
+        except WagonImportError as error:
+            raise HTTPException(422,_text_source(IMPORT_ERRORS[str(error)])) from error
+        return dict(**imported,wagon=values,brake_mode=mode)
     @router.get('/api/v1/tf/brake-sheets/vehicles')
     def vehicles(user=Depends(driver),db:Session=Depends(database_session)):
         return [public_vehicle(r) for r in db.scalars(select(RailwayVehicle).where(~RailwayVehicle.id.in_(select(VehicleRetirement.vehicle_id))).order_by(RailwayVehicle.vehicle_number))]

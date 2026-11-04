@@ -31,5 +31,10 @@
   "text_eec21d1fe37f": "DE train number",
   "text_ef73d5882c79": "14. Line category DE",
   "text_ef73da566a06": "First vehicle",
-  "text_f69432a09518": "Number of wheelsets"
+  "text_f69432a09518": "Number of wheelsets",
+  "text_57876c2d52fe": "Choose a valid XLSX file up to 5 MB.",
+  "text_fc74c531b994": "The wagon list could not be read unambiguously. Check headers, wagon positions, vehicle numbers and numeric values.",
+  "text_7c3ce0b4afb2": "G or P brake weights are missing for the selected brake mode. Missing values are not substituted.",
+  "text_12846d32442d": "Wagon list import supports G, P and G+P. Enter wagon values manually for other brake modes.",
+  "text_906e2fc6290d": "Imported values exceed the permitted brake-sheet input limits (1–50 wagons)."
 }
