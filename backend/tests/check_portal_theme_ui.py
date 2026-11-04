@@ -1,6 +1,7 @@
 """Real Chrome contrast, layout, module surfaces, modal and print palette checks."""
 import argparse
-from localized_fixtures import localize_html,html,json,re,shutil,subprocess,tempfile
+from localized_fixtures import localize_html
+import html,json,re,shutil,subprocess,tempfile
 from pathlib import Path
 from pypdf import PdfReader
 from pypdf.generic import ContentStream
