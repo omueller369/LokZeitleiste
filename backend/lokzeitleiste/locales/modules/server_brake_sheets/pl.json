@@ -31,5 +31,10 @@
   "text_eec21d1fe37f": "Numer pociągu DE",
   "text_ef73d5882c79": "14. Klasa linii DE",
   "text_ef73da566a06": "Pierwszy pojazd",
-  "text_f69432a09518": "Liczba zestawów kołowych"
+  "text_f69432a09518": "Liczba zestawów kołowych",
+  "text_57876c2d52fe": "Wybierz prawidłowy plik XLSX o rozmiarze do 5 MB.",
+  "text_fc74c531b994": "Nie można jednoznacznie odczytać listy wagonów. Sprawdź nagłówki, pozycje, numery pojazdów i wartości liczbowe.",
+  "text_7c3ce0b4afb2": "Brakuje mas hamujących G lub P dla wybranego położenia hamulca. Brakujące wartości nie są zastępowane.",
+  "text_12846d32442d": "Import listy wagonów obsługuje G, P oraz G+P. Dla innych położeń wprowadź wartości ręcznie.",
+  "text_906e2fc6290d": "Importowane wartości przekraczają dozwolone granice formularza (1–50 wagonów)."
 }

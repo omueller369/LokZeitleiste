@@ -863,7 +863,9 @@ window.TfHelpPages=globalThis.CtlText.restore([
     "sections": [
       {
         "title": "{{portal_tf_help_content.text_c8b5e562a158}}",
-        "paragraphs": [],
+        "paragraphs": [
+          "{{portal_tf_help_content.text_702b38d037ef}}"
+        ],
         "steps": [
           "{{portal_tf_help_content.text_ceaec4aa0492}}",
           "{{portal_tf_help_content.text_102146750707}}",

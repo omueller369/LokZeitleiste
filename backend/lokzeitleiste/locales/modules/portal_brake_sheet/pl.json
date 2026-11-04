@@ -113,5 +113,13 @@
   "text_f7ff1178af20": "Anuluj",
   "text_fbf62953b944": "Ukryj kolumny 3 i 4",
   "text_fd148453debe": "Wybierz",
-  "text_fec03f06ea3f": "Nadawca"
+  "text_fec03f06ea3f": "Nadawca",
+  "text_aa90b9036f16": "Importuj Excel",
+  "text_2cda9ae1f6f5": "Sprawdź import listy wagonów",
+  "text_5a5a4395dada": "Zastosuj wartości",
+  "text_9add22f99335": "Wartości listy wagonów zostały zastosowane. Sprawdź dane i zapisz kartę próby hamulca.",
+  "text_6088a3b942bf": "G+P: pierwszych pięć wagonów w G z odliczeniem 25 %, pozostałe w P. Powyżej 500 m niezaokrąglonej długości składu dodatkowo 5 % od P. Wyniki zaokrąglane są w górę na końcu. W polach 4b i 16b stosowane jest tylko pierwsze słowo nazwy stacji docelowej.",
+  "text_fbe000b7288f": "Źródło: arkusz / pierwszy wiersz wagonu / ostatni wiersz wagonu / wiersz sumy",
+  "text_845f97a170a6": "Długość składu przed zaokrągleniem, m",
+  "text_8a822ef9b778": "Ręczne wartości wagonów: automatyczne obliczanie importu zostało odłączone."
 }

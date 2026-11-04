@@ -113,5 +113,13 @@
   "text_f7ff1178af20": "Cancel",
   "text_fbf62953b944": "Hide columns 3 and 4",
   "text_fd148453debe": "Please select",
-  "text_fec03f06ea3f": "Sender"
+  "text_fec03f06ea3f": "Sender",
+  "text_aa90b9036f16": "Import Excel",
+  "text_2cda9ae1f6f5": "Review wagon list import",
+  "text_5a5a4395dada": "Apply values",
+  "text_9add22f99335": "Wagon list values applied. Review the details and save the brake sheet.",
+  "text_6088a3b942bf": "G+P: first five wagons in G with a 25% deduction, remaining wagons in P. Above 500 m unrounded wagon-train length, a further 5% is deducted from P only. Results are rounded up at the end. Fields 4b and 16b use only the first word of the destination station.",
+  "text_fbe000b7288f": "Source: sheet / first wagon row / last wagon row / total row",
+  "text_845f97a170a6": "Wagon-train length before rounding, m",
+  "text_8a822ef9b778": "Manual wagon values: automatic import calculation has been detached."
 }
