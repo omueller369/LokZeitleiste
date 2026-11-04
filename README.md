@@ -1,4 +1,4 @@
-# LokZeitleiste v0.26.9
+# LokZeitleiste v0.26.10
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -20,7 +20,7 @@ Die Weboberfläche unter `/admin/planning` bietet einen farbigen Monatskalender 
 
 Die [automatische Ubuntu-Setup-Routine](setup/README.md) prüft Abhängigkeiten und installiert die vollständige Backend-Testumgebung einschließlich Admin-Konto ohne Rückfragen. Vorprüfung: `bash setup.sh --check`; Installation: `sudo bash setup.sh`. Das zufällige initiale Admin-Passwort steht nur für root lesbar in `/var/lib/lokzeitleiste/admin-initial-password`.
 
-Die [Backend-Anleitung](backend/README.md) beschreibt die Testumgebung auf Ubuntu Server 26.04.1 LTS: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://10.0.2.2:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
+Die [Backend-Anleitung](backend/README.md) beschreibt die Testumgebung auf Ubuntu Server 26.04.1 LTS: Apache läuft auf dem Host, Python-API und MySQL 8.4 in Containern. Im Android-Emulator nutzt ein Debug-Build `-PlokzeitleisteApiBaseUrl=http://192.0.2.10:8080`. Spätere Release-Builds benötigen eine erreichbare HTTPS-Adresse. Die Dienste sind noch nicht auf einem Rechner installiert oder gestartet.
 
 Die App speichert Einträge weiterhin lokal pro Tf. Der Button „Monat senden“ überträgt die Einträge des ausgewählten Monats mit stabilen Kennungen; wiederholtes Senden aktualisiert denselben Datensatz. Einträge werden serverseitig dem angemeldeten Tf zugeordnet. Die Zugfahrt-Standzeiten aus LokZeit bleiben zunächst lokal und sind noch nicht mit den Monatsdaten verbunden.
 
@@ -142,7 +142,7 @@ Passwörter können ab v0.24 sechs Zeichen lang sein: TF-/Verwaltungskontoanlage
 
 ## Arbeitsbericht v0.25
 
-Im [TF Portal](backend/lokzeitleiste/work_reports/README.md) Dienstbeginn/-ende, sofortige Dienstzeit-/Pausenberechnung, Pflichtbegründung bei mehr als zwölf Stunden, mehrere DS100-Gastfahrten, Beleg-Upload und die Monatsübersicht nutzen. Synchronisierte Berichte fließen einmalig in die bestehende Arbeitszeitberechnung ein. Belege werden nach dem Speichern über eine dauerhafte Warteschlange versendet; `WORK_REPORT_RECEIPT_EMAIL` konfiguriert das Ziel in API und Mailer. Der Teststack verwendet `omueller369@gmail.com` und fängt Nachrichten in Mailpit ab. Details zu Pausen, Originaldaten, lokalen Entwürfen, Dateigrenzen und Versand stehen in der Modulbeschreibung.
+Im [TF Portal](backend/lokzeitleiste/work_reports/README.md) Dienstbeginn/-ende, sofortige Dienstzeit-/Pausenberechnung, Pflichtbegründung bei mehr als zwölf Stunden, mehrere DS100-Gastfahrten, Beleg-Upload und die Monatsübersicht nutzen. Synchronisierte Berichte fließen einmalig in die bestehende Arbeitszeitberechnung ein. Belege werden nach dem Speichern über eine dauerhafte Warteschlange versendet; `WORK_REPORT_RECEIPT_EMAIL` konfiguriert das Ziel in API und Mailer. Der Teststack verwendet admin@example.org` und fängt Nachrichten in Mailpit ab. Details zu Pausen, Originaldaten, lokalen Entwürfen, Dateigrenzen und Versand stehen in der Modulbeschreibung.
 
 ## Persönliche Menüvariante
 
@@ -202,7 +202,7 @@ Hochgeladene JPEG- und PNG-Bilder erscheinen in den Protokolldetails direkt als 
 
 ## Vollständiger neuer Ubuntu-26.04-Testserver
 
-**`install-ctlsoftware-test.sh`** richtet auf einem frischen Ubuntu 26.04 die gesamte Serverumgebung ein: Apache/HTTPS, MariaDB (`db_ctl`/`dbo_ctl`, Passwort wird abgefragt), DNS-Vorgaben für STRATO (BIND nur lokal), Postfix/Dovecot, DKIM/SRS und die CTL-Anwendung mit 20 Test-TF samt Bildern. Domain `ctl-software.io-goerlitz.eu`, IP `212.227.86.251`. Die vier Postfächer `info`, `diso`, `vkplanung` und `railpool` speichern Nachrichten lokal und leiten sie zusätzlich an `omueller369@gmail.com` weiter. [Vollständige Anleitung, DNS-Voraussetzungen, Mailzugänge und Fortsetzung](docs/INSTALL-CTLSOFTWARE-TEST.md). Dies ist eine eigene Installationsart ohne ISPConfig und kein Update der bisherigen laufenden Umgebung.
+**`install-ctlsoftware-test.sh`** richtet auf einem frischen Ubuntu 26.04 die gesamte Serverumgebung ein: Apache/HTTPS, MariaDB (`db_ctl`/`dbo_ctl`, Passwort wird abgefragt), DNS-Vorgaben für STRATO (BIND nur lokal), Postfix/Dovecot, DKIM/SRS und die CTL-Anwendung mit 20 Test-TF samt Bildern. Domain `portal.example.org`, IP `192.0.2.10`. Die vier Postfächer `info`, `diso`, `vkplanung` und `railpool` speichern Nachrichten lokal und leiten sie zusätzlich an admin@example.org` weiter. [Vollständige Anleitung, DNS-Voraussetzungen, Mailzugänge und Fortsetzung](docs/INSTALL-CTLSOFTWARE-TEST.md). Dies ist eine eigene Installationsart ohne ISPConfig und kein Update der bisherigen laufenden Umgebung.
 
 Persönliche TF-/Mitarbeiterpostfächer, Domainliste und Update einer bestehenden Standalone-Testinstallation: [Anleitung](docs/EMPLOYEE-MAIL-UPDATE.md).
 

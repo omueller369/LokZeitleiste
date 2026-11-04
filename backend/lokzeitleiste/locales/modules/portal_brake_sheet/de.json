@@ -138,5 +138,6 @@
   "text_aa34155bd848": "Bremszettel für die Fahrtabschnitte",
   "text_c751dda21c5e": "Ausgangsbremszettel bearbeiten",
   "text_a092f73716ce": "Automatischer Hinweis für Feld 9",
-  "text_61dff2d93907": "Importiere zuerst die Wagenliste. Geschleppte Tfz werden zusätzlich als Wagen gezählt. Vergib eindeutige Positionen im gesamten Wagenzug. Gleiche Aussetzbahnhöfe brauchen dieselbe Reihenfolgenummer. Änderungen werden im Ausgangsbremszettel vorgenommen; Speichern erstellt die Abschnittsversionen neu."
+  "text_61dff2d93907": "Importiere zuerst die Wagenliste. Geschleppte Tfz werden zusätzlich als Wagen gezählt. Vergib eindeutige Positionen im gesamten Wagenzug. Gleiche Aussetzbahnhöfe brauchen dieselbe Reihenfolgenummer. Änderungen werden im Ausgangsbremszettel vorgenommen; Speichern erstellt die Abschnittsversionen neu.",
+  "text_8849bbb7f2b4": "Neu berechnete Spaltensumme"
 }

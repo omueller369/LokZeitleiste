@@ -138,5 +138,6 @@
   "text_aa34155bd848": "Karty próby hamulca dla odcinków",
   "text_c751dda21c5e": "Edytuj źródłową kartę próby hamulca",
   "text_a092f73716ce": "Automatyczna uwaga do pola 9",
-  "text_61dff2d93907": "Najpierw zaimportuj listę wagonów. Holowane pojazdy są dodatkowo liczone jak wagony. Podaj unikalne pozycje w całym składzie. Ta sama stacja odczepienia musi mieć ten sam numer kolejności. Zmiany wprowadzaj w źródłowej karcie; zapis ponownie tworzy wersje odcinkowe."
+  "text_61dff2d93907": "Najpierw zaimportuj listę wagonów. Holowane pojazdy są dodatkowo liczone jak wagony. Podaj unikalne pozycje w całym składzie. Ta sama stacja odczepienia musi mieć ten sam numer kolejności. Zmiany wprowadzaj w źródłowej karcie; zapis ponownie tworzy wersje odcinkowe.",
+  "text_8849bbb7f2b4": "Ponownie obliczona suma kolumny"
 }
