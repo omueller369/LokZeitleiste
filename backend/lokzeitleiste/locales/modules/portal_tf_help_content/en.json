@@ -140,7 +140,7 @@
   "text_6a69b3c85c4c": "Select Duty start and enter the date and time.",
   "text_6ad691638eb6": "Current version",
   "text_6af10f32691b": "Check the title in the confirmation.",
-  "text_6ba93bb7fbff": "DS means duty shift. BS means standby. RBS means on-call duty. AS means cancelled shift. U means leave. K means sickness. Different time rules apply to each selection.",
+  "text_6ba93bb7fbff": "DS means duty shift. BS means standby. RBS means on-call duty. AS means cancelled shift. U means leave. K means sickness. Selecting BS, RBS, AS or K presets 08:00 to 16:00 on the selected date. Check the date and times. These eight hours count towards credited working time. Sick days receive eight hours of credit, including scheduled rest days.",
   "text_6e5451b962a7": "Attach a file if needed, up to 10 MB.",
   "text_724690ea634f": "In this guide, choose means click once with the left mouse button on a computer, or tap once with your finger on a phone or tablet.",
   "text_73e0cf4b6d15": "Short messages",

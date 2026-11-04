@@ -149,22 +149,39 @@ class WorkReportsTest(unittest.TestCase):
         canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
         self.assertEqual(next(d for d in canonical['days'] if d['date']=='2026-10-19')['credited'],180)
 
+    def test_eight_hour_defaults_count_in_worktime_credit(self):
+        with Session(self.engine) as db:
+            period=PlanMonth(tf_user_id=self.tf,year=2026,month=10);db.add(period);db.flush()
+            db.add(PlanDay(plan_month_id=period.id,day=date(2026,10,4),kind='Ruhetag',note=''));db.commit()
+        for day,kind in enumerate(('Bereitschaft','Rufbereitschaft','Ausfallschicht','Krank'),1):
+            data=self.payload(start=f'2026-10-{day:02d}T08:00',end=f'2026-10-{day:02d}T16:00')
+            data.update(kind=kind,actual_pause=0,trips=[])
+            report=self.create(data)
+            self.assertEqual(report['credited_minutes'],480)
+            self.assertEqual(report['minimum_pause_minutes'],0)
+            if kind=='Krank':self.assertTrue(report['is_rest_day'])
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()
+        self.assertEqual(month['work_minutes'],1920)
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json()
+        self.assertEqual(sum(d['credited'] for d in canonical['days']),1920)
+        self.assertEqual(next(d['sick'] for d in canonical['days'] if d['date']=='2026-10-04'),480)
+
     def test_absence_credit_on_rest_days_and_plan_updates(self):
         with Session(self.engine) as db:
             period=PlanMonth(tf_user_id=self.tf,year=2026,month=10);db.add(period);db.flush()
             db.add_all([PlanDay(plan_month_id=period.id,day=date(2026,10,14),kind='Ruhetag',note=''),PlanDay(plan_month_id=period.id,day=date(2026,10,16),kind='Ruhetag',note='')]);db.commit()
-        for day,kind,credit in [(14,'Urlaub',0),(15,'Urlaub',480),(16,'Krank',0),(17,'Krank',480)]:
+        for day,kind,credit in [(14,'Urlaub',0),(15,'Urlaub',480),(16,'Krank',480),(17,'Krank',480)]:
             data=self.payload(start=f'2026-10-{day}T09:00',end=f'2026-10-{day}T10:00');data.update(kind=kind,actual_pause=0,trips=[])
             report=self.create(data);self.assertEqual(report['credited_minutes'],credit)
             self.assertEqual(self.create(data)['id'],report['id'])
             another=dict(data,client_id=str(uuid4()))
             self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=another).status_code,409)
-        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],960)
-        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(sum(d['credited'] for d in canonical['days']),960)
+        month=self.driver.get('/api/v1/tf/work-reports/month/2026/10').json();self.assertEqual(month['work_minutes'],1440)
+        canonical=self.driver.get('/api/v1/account/worktime/months/2026/10').json();self.assertEqual(sum(d['credited'] for d in canonical['days']),1440)
         with Session(self.engine) as db:
             day=db.scalar(select(PlanDay).where(PlanDay.day==date(2026,10,14)));day.kind='Arbeitstag';db.commit()
-        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()['work_minutes'],1440)
-        self.assertEqual(sum(d['credited'] for d in self.driver.get('/api/v1/account/worktime/months/2026/10').json()['days']),1440)
+        self.assertEqual(self.driver.get('/api/v1/tf/work-reports/month/2026/10').json()['work_minutes'],1920)
+        self.assertEqual(sum(d['credited'] for d in self.driver.get('/api/v1/account/worktime/months/2026/10').json()['days']),1920)
         long_absence=self.payload(start='2026-10-18T06:00',end='2026-10-18T22:00');long_absence.update(kind='Krank',actual_pause=0,trips=[])
         self.assertEqual(self.create(long_absence)['credited_minutes'],480)
         bad=self.payload(start='2026-10-19T23:00',end='2026-10-20T01:00');bad.update(kind='Krank',actual_pause=0,trips=[])
