@@ -98,5 +98,8 @@
   "text_f7a3174c8a5e": "Nowe hasło początkowe (co najmniej 6 znaków)",
   "text_f7ff1178af20": "Anuluj",
   "text_fc309e30dbbe": "Nazwa użytkownika",
-  "text_fc51b9c58f77": "Dane miesięczne · "
+  "text_fc51b9c58f77": "Dane miesięczne · ",
+  "search_label": "Szukaj maszynisty",
+  "search_placeholder": "Nazwisko, numer pracownika, numer maszynisty lub e-mail",
+  "search_empty": "Nie znaleziono pasujących maszynistów."
 }

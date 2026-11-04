@@ -998,6 +998,7 @@ window.TfHelpPages=globalThis.CtlText.restore([
           "{{portal_tf_help_content.tf_admin_intro}}"
         ],
         "steps": [
+          "{{portal_tf_help_content.tf_admin_search}}",
           "{{portal_tf_help_content.tf_admin_step1}}",
           "{{portal_tf_help_content.tf_admin_step2}}",
           "{{portal_tf_help_content.tf_admin_step3}}"

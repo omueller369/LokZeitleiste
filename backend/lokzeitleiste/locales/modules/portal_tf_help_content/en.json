@@ -350,5 +350,6 @@
   "tf_admin_step1": "Click the eye in a row to view the details. The pencil opens editing immediately. You do not need to select a filter first.",
   "tf_admin_step2": "Hover over an icon to see its meaning. The other icons open overtime, hours, planning, worktime or monthly data. Only permitted actions are shown.",
   "tf_admin_step3": "To add a new driver, click “Create driver”. The empty form opens only then. This action is available only with the required permission.",
-  "rail_brand_intro": "Look for the burgundy and navy RS mark with a container wagon. The app icon uses the same mark. The header shows “Rail Software” below it. Your account and saved data are retained."
+  "rail_brand_intro": "Look for the burgundy and navy RS mark with a container wagon. The app icon uses the same mark. The header shows “Rail Software” below it. Your account and saved data are retained.",
+  "tf_admin_search": "Next to the driver type selector, enter a name, personnel number, driver number or email address in the search field. The list updates as you type. You can combine the search with the driver type filter. Clear the search text to see all drivers of the selected type again. Only data you are allowed to see is searchable."
 }

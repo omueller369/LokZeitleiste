@@ -350,5 +350,6 @@
   "tf_admin_step1": "Klicke in einer Zeile auf das Auge, um die Daten anzusehen. Der Stift öffnet sofort die Bearbeitung. Du musst vorher keinen Filter wählen.",
   "tf_admin_step2": "Halte den Mauszeiger über ein Symbol, um seine Bedeutung zu sehen. Die weiteren Symbole öffnen Überstundenkonto, Stundenübersicht, Planung, Arbeitszeit oder Monatsdaten. Du siehst nur Aktionen, für die Du berechtigt bist.",
   "tf_admin_step3": "Für einen neuen TF klickst Du auf „Tf anlegen“. Erst dann öffnet sich das leere Formular. Diese Aktion ist nur mit der passenden Berechtigung sichtbar.",
-  "rail_brand_intro": "Du erkennst die Software am weinroten und dunkelblauen RS-Zeichen mit Containerwagen. Dieses Zeichen findest Du auch beim App-Symbol. Im Kopf steht darunter „Rail Software“. Dein Zugang und Deine gespeicherten Daten bleiben erhalten."
+  "rail_brand_intro": "Du erkennst die Software am weinroten und dunkelblauen RS-Zeichen mit Containerwagen. Dieses Zeichen findest Du auch beim App-Symbol. Im Kopf steht darunter „Rail Software“. Dein Zugang und Deine gespeicherten Daten bleiben erhalten.",
+  "tf_admin_search": "Gib neben der TF-Typauswahl im Suchfeld einen Namen, eine Personalnummer, eine TF-Nummer oder eine E-Mail-Adresse ein. Die Liste passt sich beim Tippen an. Du kannst die Suche mit dem TF-Typ kombinieren. Lösche den Suchtext, um wieder alle TF des gewählten Typs zu sehen. Du kannst nur Daten suchen, die Du sehen darfst."
 }

@@ -25,6 +25,11 @@ CHECKS=r'''
  assert(!document.getElementById('employeeCard').hidden,'List initially visible');
  assert(document.getElementById('newTfLink').getAttribute('href')==='/admin/tf/new','Explicit add link');
  assert(document.querySelector('script[data-backend-nav]'),'Navigation bootstrap survives missing legacy logout');
+ const search=document.getElementById('tfSearch'),type=document.getElementById('tfTypeFilter');
+ const find=()=>search.dispatchEvent(new Event('input'));search.value='ALEX 123';find();assert(document.querySelectorAll('#users tr').length===1,'Case-insensitive multi-term search');
+ type.value='border';type.dispatchEvent(new Event('change'));assert(!document.getElementById('tfNoResults').hidden,'Search combines with type filter');
+ search.value='';find();assert(document.querySelectorAll('#users tr').length===1,'Clearing search retains type filter');type.value='';type.dispatchEvent(new Event('change'));
+ const filterRect=type.getBoundingClientRect(),searchRect=search.getBoundingClientRect();if(innerWidth>600)assert(searchRect.left>filterRect.right,'Search beside type selector');else assert(searchRect.top>filterRect.bottom,'Filters stack on mobile');assert(searchRect.right<=innerWidth,'Search fits viewport');
  const unrelated=document.createElement('dialog');document.body.append(unrelated);
  const edit=document.querySelector('#users .tf-row-actions').children[1];
  assert(edit.title==='Bearbeiten'&&edit.getAttribute('aria-label'),'Accessible edit icon');edit.click();

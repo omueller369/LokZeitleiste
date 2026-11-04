@@ -350,5 +350,6 @@
   "tf_admin_step1": "Kliknij oko w wierszu, aby zobaczyć dane. Ołówek od razu otwiera edycję. Nie musisz wcześniej wybierać filtra.",
   "tf_admin_step2": "Najedź na ikonę, aby zobaczyć jej znaczenie. Pozostałe ikony otwierają konto nadgodzin, zestawienie godzin, planowanie, czas pracy lub dane miesięczne. Widzisz tylko dozwolone działania.",
   "tf_admin_step3": "Aby dodać maszynistę, kliknij „Dodaj maszynistę”. Dopiero wtedy otworzy się pusty formularz. Ta opcja jest widoczna tylko z odpowiednimi uprawnieniami.",
-  "rail_brand_intro": "Oprogramowanie rozpoznasz po bordowo-granatowym znaku RS z wagonem kontenerowym. Ten sam znak jest ikoną aplikacji. W nagłówku widnieje pod nim „Rail Software”. Twoje konto i zapisane dane pozostają zachowane."
+  "rail_brand_intro": "Oprogramowanie rozpoznasz po bordowo-granatowym znaku RS z wagonem kontenerowym. Ten sam znak jest ikoną aplikacji. W nagłówku widnieje pod nim „Rail Software”. Twoje konto i zapisane dane pozostają zachowane.",
+  "tf_admin_search": "Obok wyboru rodzaju maszynisty wpisz w polu wyszukiwania imię, nazwisko, numer pracownika, numer maszynisty lub adres e-mail. Lista zmienia się podczas pisania. Możesz połączyć wyszukiwanie z filtrem rodzaju maszynisty. Usuń tekst, aby ponownie zobaczyć wszystkich maszynistów wybranego rodzaju. Wyszukujesz tylko dane, które możesz widzieć."
 }
