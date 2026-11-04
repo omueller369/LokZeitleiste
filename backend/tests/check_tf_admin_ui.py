@@ -30,7 +30,7 @@ CHECKS=r'''
  assert(edit.title==='Bearbeiten'&&edit.getAttribute('aria-label'),'Accessible edit icon');edit.click();
  const modal=document.querySelector('dialog[data-tf-profile]');assert(modal?.open,'Edit opens immediately despite unrelated dialog');
  assert(modal.querySelector('[name=first_name]').value==='Alex','Correct driver loaded');assert(!modal.querySelector('button:not([type])').hidden,'Save available');
- modal.close();document.querySelector('#users .tf-row-actions').children[0].click();
+ modal.close();await new Promise(resolve=>setTimeout(resolve,0));document.querySelector('#users .tf-row-actions').children[0].click();
  const view=document.querySelector('dialog[data-tf-profile]');assert(view?.open,'View opens immediately');assert(view.querySelector('[name=first_name]').disabled,'View is read-only');
  document.documentElement.dataset.tfAdminStatus='pass';
 })().catch(error=>{document.documentElement.dataset.tfAdminStatus='fail';document.documentElement.dataset.tfAdminMessage=error.stack;});
