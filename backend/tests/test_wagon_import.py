@@ -38,6 +38,10 @@ class WagonImportTest(unittest.TestCase):
         for mode in ['P','G+P']:
             with self.assertRaisesRegex(ImportError,'missing_brake'):source.values(mode)
         self.assertEqual(parse(workbook(total=False))['wagon_import'].values('P')['brake'],560)
+    def test_stale_brake_summary_is_rejected(self):
+        source=parse(workbook())['wagon_import'];source.g_total=Decimal(1000)
+        with self.assertRaisesRegex(ImportError,'format'):source.values('G')
+
     def test_invalid_file_and_mode(self):
         for content in [b'not xlsx',b'x'*(5*1024*1024+1)]:
             with self.assertRaises(ImportError):parse(content)

@@ -45,9 +45,12 @@ class WagonImport(BaseModel):
             field = mode.lower()
             if any(getattr(row, field) is None for row in self.rows):
                 raise ImportError('missing_brake')
+            measured_brake = sum((getattr(row, field) for row in self.rows), Decimal(0))
             brake = getattr(self, field + '_total')
             if brake is None:
-                brake = sum((getattr(row, field) for row in self.rows), Decimal(0))
+                brake = measured_brake
+            elif brake.to_integral_value(rounding=ROUND_CEILING) != measured_brake.to_integral_value(rounding=ROUND_CEILING):
+                raise ImportError('format')
         ceil = lambda v: int(v.to_integral_value(rounding=ROUND_CEILING))
         for supplied, measured in [(self.length_total, raw_length), (self.weight_total, sum((r.weight for r in self.rows), Decimal(0)))]:
             if supplied is not None and ceil(supplied) != ceil(measured): raise ImportError('format')
