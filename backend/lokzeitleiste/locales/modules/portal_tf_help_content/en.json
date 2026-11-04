@@ -130,7 +130,7 @@
   "text_653e24e9fd85": "Draw in the white field with a finger, pen or held mouse button.",
   "text_657c0a8bf4ce": "Complete the form",
   "text_6605644c55dd": "Tick the applicable away allowance boxes. Under Hotel transition, enter place and hotel if needed. The app calculates displayed time values; you do not enter those numbers yourself.",
-  "text_6732ef1c1f7b": "Choose the working locomotives and complete vehicle and train details from your documents.",
+  "text_6732ef1c1f7b": "Choose the working locomotives and complete vehicle and train details from your documents. Selecting DE and G in column 1 suggests 100 km/h, brake mode G in field 15 and line category D4 in field 14. Column 2 is preset to PL, G and 100 km/h; the Polish line category is suggested as D. Field 25 is suggested as 59. Check and adjust these suggestions as needed. All fields remain editable. Later edits and loaded drafts are not reset by this preset.",
   "text_67e0aa2cb655": "Find, add and share your station entries with other drivers.",
   "text_6849d535928b": "DS100 is the short code of an operational point or station. If you do not know it, search for the full name and select the correct suggestion.",
   "text_685aa6fe0695": "Create a train journey",

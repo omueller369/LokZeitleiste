@@ -130,7 +130,7 @@
   "text_653e24e9fd85": "Zeichne mit Finger, Stift oder gedrückter Maustaste im weißen Feld.",
   "text_657c0a8bf4ce": "Das Formular ausfüllen",
   "text_6605644c55dd": "Wähle in Ausbleibe die zutreffenden Kästchen. Unter Hotelübergang können bei Bedarf Ort und Hotelname ergänzt werden. Die angezeigten Zeitwerte berechnet die Anwendung; Du musst diese Zahlen nicht selbst in die Anzeige schreiben.",
-  "text_6732ef1c1f7b": "Wähle die arbeitenden Triebfahrzeuge und ergänze die angebotenen Fahrzeug- und Zugangaben aus Deinen Unterlagen.",
+  "text_6732ef1c1f7b": "Wähle die arbeitenden Triebfahrzeuge und ergänze die angebotenen Fahrzeug- und Zugangaben aus Deinen Unterlagen. Wenn Du in Spalte 1 DE und G auswählst, schlägt das Formular 100 km/h, Bremsstellung G in Feld 15 und Streckenklasse D4 in Feld 14 vor. Spalte 2 wird mit PL, G und 100 km/h vorbelegt; die polnische Streckenklasse wird mit D vorgeschlagen. Feld 25 erhält den Vorschlag 59. Prüfe die Vorschläge und ändere sie bei Bedarf. Alle Felder bleiben bearbeitbar. Spätere Eingaben und geladene Entwürfe werden nicht durch diese Vorbelegung zurückgesetzt.",
   "text_67e0aa2cb655": "Eigene Bahnhofseinträge suchen, ergänzen und mit anderen TF teilen.",
   "text_6849d535928b": "DS100 ist das kurze Kennzeichen einer Betriebsstelle oder eines Bahnhofs. Wenn Du das Kürzel nicht kennst, suche nach dem ausgeschriebenen Namen. Wähle aus den Vorschlägen den passenden Eintrag.",
   "text_685aa6fe0695": "Eine Zugfahrt anlegen",

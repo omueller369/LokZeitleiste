@@ -130,7 +130,7 @@
   "text_653e24e9fd85": "Rysuj w białym polu palcem, rysikiem lub przytrzymanym przyciskiem myszy.",
   "text_657c0a8bf4ce": "Wypełnianie formularza",
   "text_6605644c55dd": "Zaznacz właściwe pola pobytu poza domem. W przejściu hotelowym wpisz miejscowość i hotel, jeśli potrzeba. Aplikacja oblicza wartości czasu; nie wpisujesz tych liczb samodzielnie.",
-  "text_6732ef1c1f7b": "Wybierz czynne pojazdy trakcyjne i uzupełnij dane pojazdów i pociągu na podstawie dokumentów.",
+  "text_6732ef1c1f7b": "Wybierz czynne pojazdy trakcyjne i uzupełnij dane pojazdów i pociągu na podstawie dokumentów. Wybór DE i G w kolumnie 1 proponuje 100 km/h, nastawienie hamulca G w polu 15 i klasę linii D4 w polu 14. Kolumna 2 otrzymuje PL, G i 100 km/h; proponowana polska klasa linii to D. Pole 25 otrzymuje propozycję 59. Sprawdź i w razie potrzeby zmień propozycje. Wszystkie pola pozostają edytowalne. Późniejsze zmiany i wczytane szkice nie są resetowane przez te ustawienia.",
   "text_67e0aa2cb655": "Szukaj, uzupełniaj i udostępniaj własne wpisy stacji innym maszynistom.",
   "text_6849d535928b": "DS100 to skrót posterunku lub stacji. Jeśli go nie znasz, szukaj pełnej nazwy i wybierz właściwą podpowiedź.",
   "text_685aa6fe0695": "Tworzenie przejazdu pociągiem",
