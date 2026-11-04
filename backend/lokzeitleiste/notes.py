@@ -1,4 +1,5 @@
 """Private TF notes: every read and mutation is scoped to the authenticated owner."""
+from .localization import source as _text_source
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select, update, delete
@@ -18,14 +19,14 @@ class NoteInput(BaseModel):
     def clean_title(cls, value):
         value = value.strip()
         if not value:
-            raise ValueError('Ein Titel ist erforderlich.')
+            raise ValueError(_text_source('server_notes.text_450e6fe4fba6'))
         return value
 
     @field_validator('text')
     @classmethod
     def nonempty_text(cls, value):
         if not value.strip():
-            raise ValueError('Ein Text ist erforderlich.')
+            raise ValueError(_text_source('server_notes.text_e5ebdff39d10'))
         return value
 
 
@@ -49,7 +50,7 @@ def create_router(require_account):
     def own_note(db, user, note_id):
         note = db.scalar(select(TfNote).where(TfNote.id == note_id, TfNote.owner_id == user.id))
         if note is None:
-            raise HTTPException(404, 'Notiz nicht gefunden.')
+            raise HTTPException(404, _text_source('server_notes.text_cb9758f208b8'))
         return note
 
     @router.get('/api/v1/tf/notes')
@@ -79,7 +80,7 @@ def create_router(require_account):
                             execution_options={'synchronize_session': False})
         if result.rowcount != 1:
             db.rollback()
-            raise HTTPException(409, 'Die Notiz wurde inzwischen geändert. Sichere Deinen Text und lade die aktuelle Notiz erneut.')
+            raise HTTPException(409, _text_source('server_notes.text_97ff6284277e'))
         db.commit()
         db.expire_all()
         return note_dict(own_note(db, user, note_id))
@@ -93,7 +94,7 @@ def create_router(require_account):
                             execution_options={'synchronize_session': False})
         if result.rowcount != 1:
             db.rollback()
-            raise HTTPException(409, 'Die Notiz wurde inzwischen geändert. Lade die Liste neu und prüfe die Notiz vor dem Löschen.')
+            raise HTTPException(409, _text_source('server_notes.text_143ea716db68'))
         db.commit()
         return {'deleted': note_id}
 

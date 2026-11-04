@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import calendar
 from datetime import date
 from sqlalchemy import select
@@ -7,7 +8,7 @@ from .duties import duty_info, resolve_shift, driver_type
 from .schemas import DayInput
 from .holidays import holiday_info
 
-KINDS = ("Arbeitstag", "Urlaub", "Ruhetag", "Ungeplant")
+KINDS = (_text_source('server_planning_service.text_eb8f579b6931'), _text_source('server_planning_service.text_35d3a889824d'), _text_source('server_planning_service.text_e79aa42d7d18'), _text_source('server_planning_service.text_52e37a639da5'))
 
 
 class RevisionConflict(ValueError):
@@ -24,7 +25,7 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
     days = []
     for number in range(1, calendar.monthrange(year, month)[1] + 1):
         item = stored.get(number)
-        kind = item.kind if item else "Ungeplant"
+        kind = item.kind if item else _text_source('server_planning_service.text_52e37a639da5')
         day=date(year,month,number)
         info=holiday_info(day)
         days.append({"date": day.isoformat(), "kind": kind, **info,
@@ -39,12 +40,12 @@ def get_month(db: Session, tf_id: int, year: int, month: int) -> dict:
     for item in days:item['performed_minutes']=actual.get(item['date'],0)
     counts = {kind: sum(d["kind"] == kind and not d["is_holiday"] for d in days) for kind in KINDS}
     return {"year": year, "month": month,"weekly_minutes":weekly_minutes(db,tf_id),"contract_monthly_minutes":monthly_minutes(db,tf_id,year,month),"driver_type":driver_type(db,tf_id), "revision": period.revision if period else 0,
-            "days": days, "holiday_days":sum(d["is_holiday"] for d in days), "holiday_state":"BE", "work_days": counts["Arbeitstag"], "vacation_days": counts["Urlaub"],
-            "rest_days": counts["Ruhetag"], "unplanned_days": counts["Ungeplant"],
-            "work_target_minutes": sum(d["target_minutes"] for d in days if d["kind"]=="Arbeitstag"),
-            "vacation_minutes": counts["Urlaub"] * 480,
+            "days": days, "holiday_days":sum(d["is_holiday"] for d in days), "holiday_state":"BE", "work_days": counts[_text_source('server_planning_service.text_eb8f579b6931')], "vacation_days": counts[_text_source('server_planning_service.text_35d3a889824d')],
+            "rest_days": counts[_text_source('server_planning_service.text_e79aa42d7d18')], "unplanned_days": counts[_text_source('server_planning_service.text_52e37a639da5')],
+            "work_target_minutes": sum(d["target_minutes"] for d in days if d["kind"]==_text_source('server_planning_service.text_eb8f579b6931')),
+            "vacation_minutes": counts[_text_source('server_planning_service.text_35d3a889824d')] * 480,
             "target_minutes": sum(d["target_minutes"] for d in days),
-            "complete": counts["Ungeplant"] == 0}
+            "complete": counts[_text_source('server_planning_service.text_52e37a639da5')] == 0}
 
 
 def get_year(db: Session, tf_id: int, year: int) -> dict:
@@ -57,7 +58,7 @@ def get_year(db: Session, tf_id: int, year: int) -> dict:
 def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
                revisions: dict[int, int], admin_id: int, source: str):
     if any(d.date.year != year for d in days):
-        raise ValueError("Alle Daten müssen zum gewählten Jahr gehören")
+        raise ValueError(_text_source('server_planning_service.text_defe74489865'))
     groups = {}
     for item in days:
         groups.setdefault(item.date.month, []).append(item)
@@ -68,7 +69,7 @@ def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
                             PlanMonth.year == year, PlanMonth.month == month).with_for_update())
         revision = period.revision if period else 0
         if revisions.get(month) != revision:
-            raise RevisionConflict(f"Plan {month:02d}/{year} wurde inzwischen geändert. Bitte neu laden.")
+            raise RevisionConflict(f"{_text_source('server_planning_service.text_af56fe657b85')}{month:02d}/{year}{_text_source('server_planning_service.text_180d7ca7b864')}")
         periods[month] = period
     changes = 0
     tf_type=driver_type(db,tf_id)
@@ -82,8 +83,8 @@ def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
         changed = False
         for item in groups[month]:
             old = stored.get(item.date)
-            old_kind, old_note = (old.kind, old.note) if old else ("Ungeplant", "")
-            note = item.note.strip() if item.kind != "Ungeplant" else ""
+            old_kind, old_note = (old.kind, old.note) if old else (_text_source('server_planning_service.text_52e37a639da5'), "")
+            note = item.note.strip() if item.kind != _text_source('server_planning_service.text_52e37a639da5') else ""
             duty=db.get(PlanDuty,(tf_id,item.date));old_shift=duty.shift if duty else "standard"
             shift=resolve_shift(db,tf_id,item.kind,item.shift,old_shift,old_kind,known_driver_type=tf_type)
             if (old_kind, old_note,old_shift) == (item.kind, note,shift):
@@ -97,7 +98,7 @@ def apply_days(db: Session, *, tf_id: int, year: int, days: list[DayInput],
                 if duty:db.delete(duty)
             elif duty:duty.shift=shift
             else:db.add(PlanDuty(tf_user_id=tf_id,day=item.date,shift=shift))
-            if item.kind == "Ungeplant":
+            if item.kind == _text_source('server_planning_service.text_52e37a639da5'):
                 if old:
                     db.delete(old)
             elif old:

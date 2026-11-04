@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from fastapi import APIRouter,BackgroundTasks,Depends,HTTPException,UploadFile,File,Query,Header
 from fastapi.responses import Response,FileResponse
 from pathlib import Path
@@ -24,7 +25,7 @@ def create_router(require_account):
     def owned(db,user,report_id,lock=False):
         query=select(DutyReport).where(DutyReport.id==report_id,DutyReport.tf_user_id==user.id)
         report=db.scalar(query.with_for_update() if lock else query)
-        if not report:raise HTTPException(404,'Arbeitsbericht nicht gefunden.')
+        if not report:raise HTTPException(404,_text_source('server_work_reports_api.text_4b663dc2def6'))
         return report
 
     @router.get('/tf/work-report-feedback.js')
@@ -83,13 +84,13 @@ def create_router(require_account):
 
     @router.get('/api/v1/tf/work-reports/month/{year}/{month}')
     def month_view(year:int,month:int,user:User=Depends(driver),db:Session=Depends(database_session)):
-        if not 2000<=year<=2100 or not 1<=month<=12:raise HTTPException(422,'Ungültiger Monat')
+        if not 2000<=year<=2100 or not 1<=month<=12:raise HTTPException(422,_text_source('server_work_reports_api.text_c6ef72ca00bb'))
         from ..reports.intervals import period_entries
         from ..reports.daily import day_rows,WORK_KINDS
         first=date(year,month,1);last=date(year,month,calendar.monthrange(year,month)[1])
         entries=period_entries(db,user.id,first,last)
         profile=db.get(TfProfile,user.id)
-        if not profile:raise HTTPException(404,'Tf nicht gefunden')
+        if not profile:raise HTTPException(404,_text_source('server_work_reports_api.text_a8c327fb1b2a'))
         grouped=defaultdict(list)
         for row in day_rows(entries,profile.federal_state or 'BE'):
             if first<=row.day<=last and row.kind in WORK_KINDS:grouped[row.day].append(row)
@@ -100,7 +101,7 @@ def create_router(require_account):
                 performed_minutes=sum(r.work for r in rows),work_minutes=sum(r.work for r in rows),guest_minutes=sum(r.guest for r in rows),pause_minutes=sum(r.pause for r in rows)))
         by_date={d['date']:d for d in days}
         for entry in entries:
-            if entry.kind in ('Urlaub','Krank') and first<=entry.entry_date<=last:
+            if entry.kind in (_text_source('server_work_reports_api.text_35d3a889824d'),_text_source('server_work_reports_api.text_be1600b499c6')) and first<=entry.entry_date<=last:
                 day=entry.entry_date.isoformat()
                 if day not in by_date:
                     row=dict(date=day,start_at=None,end_at=None,performed_minutes=0,work_minutes=absence_minutes(entry),guest_minutes=0,pause_minutes=0);days.append(row);by_date[day]=row
@@ -153,7 +154,7 @@ def create_router(require_account):
         row=db.scalar(select(DutyReceipt).where(DutyReceipt.report_id==report_id,DutyReceipt.content_hash==digest))
         if not row:
             count=db.scalar(select(func.count()).select_from(DutyReceipt).where(DutyReceipt.report_id==report_id))
-            if count>=20:raise HTTPException(422,'Höchstens 20 Belege pro Arbeitsbericht.')
+            if count>=20:raise HTTPException(422,_text_source('server_work_reports_api.text_c48d000f8dba'))
             row=DutyReceipt(report_id=report_id,filename=name,mime_type=mime,content_hash=digest,content=content,recipient_email=recipient())
             db.add(row);db.commit();db.refresh(row)
         if row.status!='sent':tasks.add_task(process_receipt,row.id)
@@ -163,14 +164,14 @@ def create_router(require_account):
     def download(report_id:int,receipt_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         owned(db,user,report_id)
         row=db.get(DutyReceipt,receipt_id)
-        if not row or row.report_id!=report_id:raise HTTPException(404,'Beleg nicht gefunden.')
+        if not row or row.report_id!=report_id:raise HTTPException(404,_text_source('server_work_reports_api.text_befd7075983c'))
         return Response(row.content,media_type=row.mime_type,headers={'Content-Disposition':f'attachment; filename="Beleg-{row.id}{Path(row.filename).suffix}"','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
 
     @router.post('/api/v1/tf/work-reports/{report_id}/receipts/{receipt_id}/retry')
     def retry(report_id:int,receipt_id:int,tasks:BackgroundTasks,user:User=Depends(driver),db:Session=Depends(database_session)):
         owned(db,user,report_id,lock=True)
         row=db.get(DutyReceipt,receipt_id)
-        if not row or row.report_id!=report_id:raise HTTPException(404,'Beleg nicht gefunden.')
+        if not row or row.report_id!=report_id:raise HTTPException(404,_text_source('server_work_reports_api.text_befd7075983c'))
         if row.status!='sent':row.status='pending';row.attempts=0;row.last_error='';db.commit();tasks.add_task(process_receipt,row.id)
         return receipt_view(row)
 

@@ -1,4 +1,5 @@
 """Permission-filtered landing page, available to every backend account."""
+from .localization import source as _text_source
 from pathlib import Path
 from fastapi import APIRouter,Depends
 from fastapi.responses import FileResponse
@@ -11,27 +12,27 @@ from .models import StaffProfile
 def start_modules(user,p):
     employees=any(p.get(key,0) for key in ('employees','planning','worktime','reports','directory','shifts','email'))
     definitions=[
-        ('tf','TFs (Liste)','/admin/tf','Verwaltung',p.get('employees',0) or int(employees)),
-        ('staff','Verwaltungsmitarbeiter (Liste)','/admin/staff','Verwaltung',p.get('staff',0)),
-        ('directory','Alle Mitarbeiter','/admin/directory','Verwaltung',p.get('directory',0)),
-        ('planning','Arbeitszeitplanung','/admin/planning','Personalplanung',p.get('planning',0)),
-        ('overview','Ruhetagsplan aller TF','/admin/rest-plans','Personalplanung',p.get('planning',0)),
-        ('shifts','Schichtplan','/admin/shifts','Personalplanung',p.get('shifts',0)),
-        ('loco_handover','Lokübergabebuch','/admin/loco-handover','Sonstiges',p.get('loco_handover',0)),
-        ('leasing','Lok-Leasing','/admin/leasing','Stammdaten',p.get('leasing',0)),
-        ('vehicles','Triebfahrzeuge','/admin/vehicles','Stammdaten',p.get('vehicles',0)),
-        ('app_defaults','App Grundwerte','/admin/app-defaults','Stammdaten',p.get('app_defaults',0)),
-        ('worktime','Arbeitszeiterfassung und Korrekturen','/admin/worktime','Sonstiges',p.get('worktime',0)),
-        ('reports','Monatsabrechnung und PDF-Versand','/admin/tf','Sonstiges',p.get('reports',0)),
-        ('roster','Dienstplan','/admin/planning?readonly=1','Personalplanung',min(1,p.get('planning',0))),
-        ('hours','Dienstzeit','/admin/tf/hours','Personalplanung',1 if p.get('planning',0) and (p.get('worktime',0) or p.get('reports',0)) else 0),
-        ('email','Email','/admin/email','Sonstiges',p.get('email',0)),
-        ('messages','Kurznachrichten','/admin/messages','Mein Bereich',2),
-        ('documents','Meine Dokumente','/documents','Mein Bereich',2),
-        ('password','Mein Konto / Passwort','/admin/me','Mein Bereich',2),
+        ('tf',_text_source('server_backend_start.text_e9820ba217c3'),'/admin/tf',_text_source('server_backend_start.text_2456bb8ed72f'),p.get('employees',0) or int(employees)),
+        ('staff',_text_source('server_backend_start.text_20e987b4a823'),'/admin/staff',_text_source('server_backend_start.text_2456bb8ed72f'),p.get('staff',0)),
+        ('directory',_text_source('server_backend_start.text_143327b1cce7'),'/admin/directory',_text_source('server_backend_start.text_2456bb8ed72f'),p.get('directory',0)),
+        ('planning',_text_source('server_backend_start.text_67f08af53537'),'/admin/planning',_text_source('server_backend_start.text_b702020127a6'),p.get('planning',0)),
+        ('overview',_text_source('server_backend_start.text_8d19db2dc6b2'),'/admin/rest-plans',_text_source('server_backend_start.text_b702020127a6'),p.get('planning',0)),
+        ('shifts',_text_source('server_backend_start.text_77ecaf5660bb'),'/admin/shifts',_text_source('server_backend_start.text_b702020127a6'),p.get('shifts',0)),
+        ('loco_handover',_text_source('server_backend_start.text_2f571b7ba8ad'),'/admin/loco-handover',_text_source('server_backend_start.text_9f3d5f8d94cf'),p.get('loco_handover',0)),
+        ('leasing',_text_source('server_backend_start.text_a23174dc39c0'),'/admin/leasing',_text_source('server_backend_start.text_c78f95997238'),p.get('leasing',0)),
+        ('vehicles',_text_source('server_backend_start.text_e76efaf41a3e'),'/admin/vehicles',_text_source('server_backend_start.text_c78f95997238'),p.get('vehicles',0)),
+        ('app_defaults',_text_source('server_backend_start.text_cb5129c1d8f0'),'/admin/app-defaults',_text_source('server_backend_start.text_c78f95997238'),p.get('app_defaults',0)),
+        ('worktime',_text_source('server_backend_start.text_dd4fd942cb88'),'/admin/worktime',_text_source('server_backend_start.text_9f3d5f8d94cf'),p.get('worktime',0)),
+        ('reports',_text_source('server_backend_start.text_1948beff57ad'),'/admin/tf',_text_source('server_backend_start.text_9f3d5f8d94cf'),p.get('reports',0)),
+        ('roster',_text_source('server_backend_start.text_4c6e6372b010'),'/admin/planning?readonly=1',_text_source('server_backend_start.text_b702020127a6'),min(1,p.get('planning',0))),
+        ('hours',_text_source('server_backend_start.text_09d2cf5dc984'),'/admin/tf/hours',_text_source('server_backend_start.text_b702020127a6'),1 if p.get('planning',0) and (p.get('worktime',0) or p.get('reports',0)) else 0),
+        ('email',_text_source('server_backend_start.text_969ccbd3cf63'),'/admin/email',_text_source('server_backend_start.text_9f3d5f8d94cf'),p.get('email',0)),
+        ('messages',_text_source('server_backend_start.text_73e0cf4b6d15'),'/admin/messages',_text_source('server_backend_start.text_824543888534'),2),
+        ('documents',_text_source('server_backend_start.text_52b5952bea66'),'/documents',_text_source('server_backend_start.text_824543888534'),2),
+        ('password',_text_source('server_backend_start.text_b4d616199968'),'/admin/me',_text_source('server_backend_start.text_824543888534'),2),
     ]
-    if user.role=='admin':definitions.extend([('phpmyadmin','phpMyAdmin','/phpmyadmin','Administration',3),('webmailer','Webmailer','/webmailer','Administration',3)])
-    if user.role=='staff':definitions.append(('own_time','Meine Arbeitszeiten','/my/worktime','Mein Bereich',2))
+    if user.role=='admin':definitions.extend([('phpmyadmin','phpMyAdmin','/phpmyadmin',_text_source('server_backend_start.text_4b42c6690ebe'),3),('webmailer',_text_source('server_backend_start.text_99ed27bf3bdb'),'/webmailer',_text_source('server_backend_start.text_4b42c6690ebe'),3)])
+    if user.role=='staff':definitions.append(('own_time',_text_source('server_backend_start.text_e71e0296d76b'),'/my/worktime',_text_source('server_backend_start.text_824543888534'),2))
     return [dict(id=id,label=label,url=url,group=group,level=level,new_tab=id in ('phpmyadmin','webmailer')) for id,label,url,group,level in definitions if level]
 
 

@@ -75,6 +75,6 @@ class TfNotesTest(unittest.TestCase):
     def test_page_and_static_script(self):
         response = self.driver.get('/tf/notizen')
         self.assertEqual(response.status_code,200)
-        self.assertIn('Neu',self.driver.get('/tf/notes.js').text)
+        self.assertIn('CtlText.source',self.driver.get('/tf/notes.js').text)
         self.assertIn('notesWorkspace',response.text)
         self.assertEqual(self.client.get('/tf/notizen',follow_redirects=False).status_code,303)

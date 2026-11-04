@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 const handlers={},self={location:{origin:'https://example.org'},clients:{claim:async()=>{}},addEventListener:(type,fn)=>handlers[type]=fn};let offline=false,calls=0;
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/pwa-sw.js','utf8'),{self,URL,Response,fetch:async()=>{calls++;if(offline)throw Error('offline');return new Response('fresh server response',{status:200});}});
 function dispatch(path,{mode='navigate',method='GET'}={}){let result;handlers.fetch({request:{url:new URL(path,'https://example.org').href,mode,method},respondWith:p=>result=p});return result;}

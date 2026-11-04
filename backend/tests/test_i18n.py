@@ -10,11 +10,11 @@ class I18nTest(unittest.TestCase):
     setUp=test_accounts.AccountsTest.setUp
     tearDown=test_accounts.AccountsTest.tearDown
 
-    def test_five_complete_catalogues_and_removed_language_fallback(self):
-        data=catalog();self.assertEqual(set(data),{'de','en','pl','ru','es'})
+    def test_three_complete_catalogues_and_removed_language_fallback(self):
+        data=catalog();self.assertEqual(set(data),{'de','pl','en'})
         for lang in data:self.assertEqual(set(data[lang]),set(data['de']));self.assertTrue(all(data[lang].values()))
         self.assertEqual(translate('Speichern','en'),'Save')
-        self.assertEqual(translate('2. Personalplanung','es'),'2. Planificación de personal')
+        self.assertEqual(translate('Speichern','pl'),'Zapisz')
         self.assertEqual(language('pl-PL, en;q=0.8'),'pl');self.assertEqual(language('xx'),'de')
         self.assertEqual(display('Speichern','ar'),'Speichern')
         self.assertEqual(language('tr-TR'),'de');self.assertEqual(language('ar'),'de')
@@ -26,11 +26,11 @@ class I18nTest(unittest.TestCase):
     def test_individual_locale_persistence_validation_and_api_errors(self):
         path='/api/v1/account/locale'
         self.assertEqual(self.client.get(path).json(),{'language':'de','configured':False})
-        for lang in ['en','pl','ru','es','de']:
+        for lang in ['en','pl','de']:
             response=self.client.put(path,json={'language':lang})
             self.assertEqual(response.status_code,200,response.text)
             self.assertEqual(self.client.get(path).json(),{'language':lang,'configured':True})
-        for removed in ('xx','tr','ar'):
+        for removed in ('xx','tr','ar','ru','es'):
             self.assertEqual(self.client.put(path,json={'language':removed}).status_code,422)
         from sqlalchemy.orm import Session
         from lokzeitleiste.models import UserLocale

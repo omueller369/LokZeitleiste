@@ -1,13 +1,14 @@
 """Modulrechte: 0=keine, 1=lesen, 2=lesen/schreiben, 3=administrieren."""
+from ..localization import source as _text_source
 import re
 from fastapi import HTTPException
 from sqlalchemy import select
 from ..models import AccountPolicy, ModulePermission, User
 
-MODULES = {"leasing":"Lok-Leasing", "loco_handover":"Lokübergabebuch", "app_defaults":"App Grundwerte", "vehicles":"Triebfahrzeuge", "employees":"Mitarbeiter-Stammdaten", "planning":"Ruhetags- und Urlaubsplanung",
-           "worktime":"Arbeitszeiterfassung und Korrekturen", "reports":"Monatsabrechnung und PDF-Versand",
-           "staff":"Verwaltungsmitarbeiter und Berechtigungen", "directory":"Verwaltung: alle Mitarbeiter",
-           "shifts":"Schichtmodelle und Zuweisungen", "email":"Mitarbeiter-E-Mail"}
+MODULES = {"leasing":_text_source('server_accounts_access.text_a23174dc39c0'), "loco_handover":_text_source('server_accounts_access.text_2f571b7ba8ad'), "app_defaults":_text_source('server_accounts_access.text_cb5129c1d8f0'), "vehicles":_text_source('server_accounts_access.text_e76efaf41a3e'), "employees":"Mitarbeiter-Stammdaten", "planning":_text_source('server_accounts_access.text_32fc56971e4d'),
+           "worktime":_text_source('server_accounts_access.text_dd4fd942cb88'), "reports":_text_source('server_accounts_access.text_1948beff57ad'),
+           "staff":_text_source('server_accounts_access.text_ce72f4c833ff'), "directory":_text_source('server_accounts_access.text_ef61cbee3c30'),
+           "shifts":_text_source('server_accounts_access.text_3d64eed6e362'), "email":"Mitarbeiter-E-Mail"}
 
 
 def password_required(db, user):
@@ -17,7 +18,7 @@ def password_required(db, user):
 
 def ready(db, user):
     if password_required(db, user):
-        raise HTTPException(403, "Bitte zuerst Ihr Initialpasswort ändern.")
+        raise HTTPException(403, _text_source('server_accounts_access.text_7f6db20b42a7'))
 
 
 def permissions(db, user):
@@ -32,7 +33,7 @@ def permissions(db, user):
 def demand(db, user, module, level):
     ready(db,user)
     if permissions(db,user).get(module,0) < level:
-        raise HTTPException(403, "Keine ausreichende Freigabe für dieses Modul.")
+        raise HTTPException(403, _text_source('server_accounts_access.text_a32fc4d85def'))
 
 
 def redact_plan(db,user,summary):
@@ -58,7 +59,7 @@ def authorize_route(db, user, request):
         return
     ready(db,user)
     if path in ('/api/v1/admin/email-domains','/api/v1/admin/email-suggestion') and method=='GET':
-        if not any(permissions(db,user)[m] for m in ('employees','staff','app_defaults')):raise HTTPException(403,'Keine Freigabe')
+        if not any(permissions(db,user)[m] for m in ('employees','staff','app_defaults')):raise HTTPException(403,_text_source('server_accounts_access.text_9f384d3442b4'))
         return
     if path in ('/api/v1/admin/me','/api/v1/admin/modules','/api/v1/admin/start','/api/v1/admin/menu-preference'):
         return
@@ -66,7 +67,7 @@ def authorize_route(db, user, request):
         return demand(db,user,'employees',1)
     if path == '/api/v1/admin/tf' and method == 'GET':
         if not any(permissions(db,user)[m] for m in ('employees','planning','worktime','reports','directory','shifts','email')):
-            raise HTTPException(403, "Keine Mitarbeiter-Module freigegeben.")
+            raise HTTPException(403, _text_source('server_accounts_access.text_e1c65295a6ab'))
         return
     if path == '/api/v1/admin/directory' and method == 'GET':
         return demand(db,user,'directory',1)
@@ -82,7 +83,7 @@ def authorize_route(db, user, request):
     if re.fullmatch(r'/api/v1/admin/tf/\d+/hours/\d+',path) and method == 'GET':
         levels = permissions(db,user)
         if not (levels['planning'] and (levels['worktime'] or levels['reports'])):
-            raise HTTPException(403, 'Planung und Arbeitszeit oder Berichte müssen zum Lesen freigegeben sein.')
+            raise HTTPException(403, _text_source('server_accounts_access.text_13b0e1b3aa9f'))
         return
     if re.fullmatch(r'/api/v1/admin/tf/\d+/photo',path):
         return demand(db,user,'employees',1 if method=='GET' else 2)
@@ -97,7 +98,7 @@ def authorize_route(db, user, request):
     if re.fullmatch(r'/api/v1/admin/accounts/\d+/reset-password',path) and method == 'POST':
         target = db.get(User,int(path.split('/')[-2]))
         if not target:
-            raise HTTPException(404, "Konto nicht gefunden")
+            raise HTTPException(404, _text_source('server_accounts_access.text_b59ef1fdfb31'))
         return demand(db,user,'employees' if target.role == 'tf' else 'staff',3)
     if re.fullmatch(r'/api/v1/admin/tf/\d+',path) and method=='PUT':
         return demand(db,user,'employees',2)
@@ -112,10 +113,10 @@ def authorize_route(db, user, request):
     if re.fullmatch(r'/api/v1/admin/tf/\d+/months(?:/\d+/\d+/(?:entries|summary))?',path) and method == 'GET':
         levels = permissions(db,user)
         if not (levels['worktime'] or levels['reports']):
-            raise HTTPException(403, "Keine Freigabe für Monatsdaten.")
+            raise HTTPException(403, _text_source('server_accounts_access.text_9795d8633c66'))
         return
     # Neue Endpunkte sind gesperrt, bis sie einem Modul zugeordnet wurden.
-    raise HTTPException(403, "Endpunkt hat keine Modulfreigabe.")
+    raise HTTPException(403, _text_source('server_accounts_access.text_2ccb5c73ef75'))
 
 
 def check_delegation(db, actor, requested, target=None):
@@ -123,8 +124,8 @@ def check_delegation(db, actor, requested, target=None):
         return
     ceiling = permissions(db,actor)
     if target and (target.role != 'staff' or target.id == actor.id):
-        raise HTTPException(403, "Dieses Konto darf nur ein Administrator verwalten.")
+        raise HTTPException(403, _text_source('server_accounts_access.text_b0646637e3c4'))
     if target and any(level > ceiling[module] for module,level in permissions(db,target).items()):
-        raise HTTPException(403, "Das Konto hat Rechte außerhalb Ihrer Verwaltungsfreigabe.")
+        raise HTTPException(403, _text_source('server_accounts_access.text_aab61124117c'))
     if any(level > ceiling[module] for module,level in requested.items()):
-        raise HTTPException(403, "Sie dürfen keine höheren Rechte als Ihre eigenen vergeben.")
+        raise HTTPException(403, _text_source('server_accounts_access.text_9af28e6a6dd3'))

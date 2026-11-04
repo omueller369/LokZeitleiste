@@ -1,4 +1,4 @@
-"""Shared five-language catalogue for UI, API messages and generated outputs."""
+"""Shared three-language catalogue for UI, API messages and generated outputs."""
 import json
 import re
 from functools import lru_cache
@@ -6,7 +6,7 @@ from pathlib import Path
 from contextvars import ContextVar
 from .models import UserLocale
 
-LANGUAGES = ('de','en','pl','ru','es')
+LANGUAGES = ('de','pl','en')
 request_language = ContextVar('request_language', default='de')
 
 

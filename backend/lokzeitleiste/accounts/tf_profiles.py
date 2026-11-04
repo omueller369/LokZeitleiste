@@ -1,4 +1,5 @@
 """TF employment, addresses, contract hours and one-time account migration."""
+from ..localization import source as _text_source
 import calendar
 import json
 import secrets
@@ -19,14 +20,14 @@ def berlin_today():
 def ensure_gender_column(db):
     """create_all does not add columns to an existing v0.22 profile table."""
     if 'gender' not in {column['name'] for column in inspect(db.connection()).get_columns('tf_profiles')}:
-        db.execute(text("ALTER TABLE tf_profiles ADD COLUMN gender VARCHAR(20) NOT NULL DEFAULT 'unspecified'"))
+        db.execute(text(_text_source('server_accounts_tf_profiles.text_f665bc9f3fc4')))
 
 
 def migrate_legacy_gender(db):
     """Keep gender entered by the interim tf_profiles.gender implementation."""
     if 'gender' not in {column['name'] for column in inspect(db.connection()).get_columns('tf_profiles')}:
         return
-    mapping={'männlich':'male','weiblich':'female','divers':'diverse','keine Angabe':'unspecified'}
+    mapping={_text_source('server_accounts_tf_profiles.text_c1e0a9a9f71d'):'male','weiblich':'female','divers':'diverse',_text_source('server_accounts_tf_profiles.text_3e0b1cbc7525'):'unspecified'}
     for user_id, value in db.execute(text('SELECT user_id, gender FROM tf_profiles')):
         if db.get(TfIdentity,user_id) is None:
             gender=mapping.get(value,value if value in mapping.values() else 'unspecified')
@@ -51,16 +52,16 @@ def monthly_minutes(db, tf_id, year, month):
 
 def validate_details(db, data, user=None):
     if data.nationality is not None and data.nationality not in json.loads((Path(__file__).parent/'countries.json').read_text()):
-        raise HTTPException(422,'Ungültige Staatsangehörigkeit.')
+        raise HTTPException(422,_text_source('server_accounts_tf_profiles.text_898b838d3945'))
     if data.home_station and not db.get(RailwayStation,data.home_station.strip().upper()):
-        raise HTTPException(422,'Heimatbahnhof bitte aus der Trefferliste wählen.')
+        raise HTTPException(422,_text_source('server_accounts_tf_profiles.text_cde5bbc497af'))
     existing = db.get(TfEmployment,user.id) if user else None
     entry = data.entry_date if 'entry_date' in data.model_fields_set else existing.entry_date if existing else None
     exit = data.exit_date if 'exit_date' in data.model_fields_set else existing.exit_date if existing else None
     if entry and exit and exit < entry:
-        raise HTTPException(422,'Austrittsdatum darf nicht vor dem Beitrittsdatum liegen.')
+        raise HTTPException(422,_text_source('server_accounts_tf_profiles.text_547153433a04'))
     if not user and (data.addresses is None or data.entry_date is None or data.weekly_minutes is None or data.nationality is None):
-        raise HTTPException(422,'TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.')
+        raise HTTPException(422,_text_source('server_accounts_tf_profiles.text_eb5bc3473373'))
 
 
 def save_details(db, user, data):
@@ -121,18 +122,18 @@ def migrate_existing(db):
     pending_ids={u.id for u in pending}
     reserved={u.username for u in db.scalars(select(User)) if u.id not in pending_ids}
     available=[n for n in range(787000,788000) if str(n) not in reserved]
-    if len(pending)>len(available):raise RuntimeError('Nicht genügend freie TF-Nummern mit Präfix 787; keine Migration durchgeführt.')
+    if len(pending)>len(available):raise RuntimeError(_text_source('server_accounts_tf_profiles.text_c18c68242773'))
     secrets.SystemRandom().shuffle(available)
     today=berlin_today()
     originals={u.id:u.username for u in pending}
     for user in pending:
-        if db.get(TfProfile,user.id) is None:raise RuntimeError('TF-Profil fehlt; keine Migration durchgeführt.')
+        if db.get(TfProfile,user.id) is None:raise RuntimeError(_text_source('server_accounts_tf_profiles.text_93f86cbd8d01'))
     # Free numeric legacy names before assignment; all stages share one transaction.
     for user in pending:user.username='__tf_migration_'+str(user.id)+'_'+secrets.token_hex(12)
     db.flush()
     for user,number in zip(pending,available):
         profile=db.get(TfProfile,user.id)
-        if not profile:raise RuntimeError('TF-Profil fehlt; keine Migration durchgeführt.')
+        if not profile:raise RuntimeError(_text_source('server_accounts_tf_profiles.text_93f86cbd8d01'))
         # Preserve a larger contractual workload; old input was monthly minutes.
         weekly=min(10080,max(2400,int((Decimal(profile.target_hours_minutes)*12/52).quantize(Decimal('1'),rounding=ROUND_HALF_UP))))
         db.add(TfNumberMigration(user_id=user.id,previous_username=originals[user.id],tf_number=number))

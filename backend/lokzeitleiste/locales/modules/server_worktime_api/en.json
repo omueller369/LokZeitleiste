@@ -1,0 +1,15 @@
+{
+  "text_0d912f29de32": "Only failed notifications can be retried",
+  "text_0fe5137fab5c": "Reason for change required",
+  "text_21b97cd78bc2": "Invalid period: ",
+  "text_67bd5cf60cd3": "Entry has changed. Please reload.",
+  "text_804ae64b495f": "Employee entry not found",
+  "text_88c6c379cd6d": "Employee federal state missing",
+  "text_907f24b01340": "Email delivery is not configured on the server yet",
+  "text_9111bc2d71b6": "Email delivery is not configured yet",
+  "text_942eccef0aae": "\nEnd date: ",
+  "text_9f17ab58762b": "Change not found",
+  "text_a18a6b0c6dcd": "Employee email address missing",
+  "text_bfddea399370": "Only recorded working times can be corrected",
+  "text_d425970b74c9": "Employee not found"
+}

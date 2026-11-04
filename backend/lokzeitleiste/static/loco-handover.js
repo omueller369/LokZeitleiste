@@ -1,7 +1,7 @@
 (()=>{
 const el=id=>document.getElementById(id),t=value=>window.I18n?.t(value)||value;
 const tf=location.pathname?.startsWith('/tf/'),api='/api/v1/'+(tf?'tf':'admin')+'/loco-handover/vehicles';
-if(tf){const home=el('handoverHome');home.href='/tf';home.textContent=t('TF Portal');}else{const nav=document.createElement('script');nav.src='/admin/backend-nav.js';document.head?.append(nav);}
+if(tf){const home=el('handoverHome');home.href='/tf';home.textContent=t(globalThis.CtlText.source("portal_loco_handover.text_6724bcaedb08"));}else{const nav=document.createElement('script');nav.src='/admin/backend-nav.js';document.head?.append(nav);}
 let rows=[],ticket=0,detailTicket=0,current=null,timer,allowed=false,canWrite=false;
 function message(value){el('vehicleMessage').textContent=t(value);}
 function render(){
@@ -10,28 +10,28 @@ function render(){
   const row=document.createElement('tr'),statusCell=document.createElement('td'),statusBox=document.createElement('span'),dot=document.createElement('span');
   statusBox.className='vehicle-list-status';statusBox.setAttribute('role','img');statusBox.setAttribute('aria-label',t(vehicle.status_label));statusBox.title=t(vehicle.status_label)+(vehicle.status_note?' · '+vehicle.status_note:'');
   dot.className='vehicle-status-dot';dot.dataset.status=vehicle.status;dot.setAttribute('aria-hidden','true');statusBox.append(dot);statusCell.append(statusBox);row.append(statusCell);
-  const numberCell=document.createElement('td'),choose=document.createElement('button');choose.type='button';choose.className='handover-select';choose.textContent=vehicle.vehicle_number;choose.setAttribute('data-i18n-ignore','');choose.setAttribute('aria-label',t('Ansehen')+' · '+vehicle.vehicle_number);numberCell.append(choose);row.append(numberCell);const nameCell=document.createElement('td');nameCell.textContent=vehicle.name;nameCell.setAttribute('data-i18n-ignore','');row.append(nameCell);row.onclick=()=>selectVehicle(vehicle.id);if(current?.id===vehicle.id)row.setAttribute('aria-selected','true');
+  const numberCell=document.createElement('td'),choose=document.createElement('button');choose.type='button';choose.className='handover-select';choose.textContent=vehicle.vehicle_number;choose.setAttribute('data-i18n-ignore','');choose.setAttribute('aria-label',t(globalThis.CtlText.source("portal_loco_handover.text_8e31363947a6"))+' · '+vehicle.vehicle_number);numberCell.append(choose);row.append(numberCell);const nameCell=document.createElement('td');nameCell.textContent=vehicle.name;nameCell.setAttribute('data-i18n-ignore','');row.append(nameCell);row.onclick=()=>selectVehicle(vehicle.id);if(current?.id===vehicle.id)row.setAttribute('aria-selected','true');
   el('vehicleRows').append(row);
  }
 }
 function renderDetails(){
- if(!current)return;el('handoverTitle').textContent=t('Triebfahrzeug')+' · '+current.vehicle_number;
+ if(!current)return;el('handoverTitle').textContent=t(globalThis.CtlText.source("portal_loco_handover.text_9de2ca1927a7"))+' · '+current.vehicle_number;
  el('handoverStatus').textContent=t(current.status_label);el('handoverStatus').dataset.status=current.status;
- const note=current.status!=='ready';el('handoverNoteLabel').hidden=el('handoverNoteBox').hidden=!note;el('handoverNoteLabel').textContent=t(current.status==='limited'?'Einschränkung':'Grund');el('handoverNote').textContent=note?current.status_note:'';el('handoverNote').dataset.status=current.status;
+ const note=current.status!=='ready';el('handoverNoteLabel').hidden=el('handoverNoteBox').hidden=!note;el('handoverNoteLabel').textContent=t(current.status==='limited'?globalThis.CtlText.source("portal_loco_handover.text_6d8031be54ea"):globalThis.CtlText.source("portal_loco_handover.text_b45f40c737c3"));el('handoverNote').textContent=note?current.status_note:'';el('handoverNote').dataset.status=current.status;
  el('handoverName').textContent=current.name;el('handoverNumber').textContent=current.vehicle_number;el('handoverSeries').textContent=current.series;el('handoverDetails').hidden=false;
 }
 async function selectVehicle(id){
  const version=++detailTicket;window.HandoverProtocols?.clear();current=null;el('handoverDetails').hidden=true;message('');render();
- try{const response=await fetch(api+'/'+id,{credentials:'same-origin',cache:'no-store'});if(version!==detailTicket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==detailTicket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');current=data;renderDetails();render();window.HandoverProtocols?.select(current,canWrite);el('handoverDetails').scrollIntoView?.({behavior:'smooth',block:'start'});el('handoverTitle').focus({preventScroll:true});}catch(error){if(version===detailTicket)message(error.message);}
+ try{const response=await fetch(api+'/'+id,{credentials:'same-origin',cache:'no-store'});if(version!==detailTicket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==detailTicket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:globalThis.CtlText.source("portal_loco_handover.text_4d48da0a8b67"));current=data;renderDetails();render();window.HandoverProtocols?.select(current,canWrite);el('handoverDetails').scrollIntoView?.({behavior:'smooth',block:'start'});el('handoverTitle').focus({preventScroll:true});}catch(error){if(version===detailTicket)message(error.message);}
 }
 el('handoverClose').onclick=()=>{window.HandoverProtocols?.clear();detailTicket++;const id=current?.id;current=null;el('handoverDetails').hidden=true;render();const index=rows.findIndex(row=>row.id===id);el('vehicleRows').children[index]?.querySelector('button')?.focus();};
 async function listing(){
  window.HandoverProtocols?.clear();detailTicket++;current=null;el('handoverDetails').hidden=true;
  const version=++ticket,params=new URLSearchParams({q:el('vehicleSearch').value});if(el('vehicleFilter').value)params.set('status',el('vehicleFilter').value);
  rows=[];render();el('vehicleEmpty').hidden=true;message('');
- try{const response=await fetch(api+'?'+params,{credentials:'same-origin',cache:'no-store'});if(version!==ticket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==ticket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Anfrage fehlgeschlagen');rows=data;render();}catch(error){if(version===ticket)message(error.message);}
+ try{const response=await fetch(api+'?'+params,{credentials:'same-origin',cache:'no-store'});if(version!==ticket)return;if(response.status===401){location.href='/account';return;}const data=await response.json();if(version!==ticket)return;if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:globalThis.CtlText.source("portal_loco_handover.text_4d48da0a8b67"));rows=data;render();}catch(error){if(version===ticket)message(error.message);}
 }
 el('vehicleSearch').oninput=()=>{clearTimeout(timer);ticket++;timer=setTimeout(listing,250);};el('vehicleFilter').onchange=listing;el('vehicleReload').onclick=listing;
 window.addEventListener('languagechange',()=>{if(allowed){render();renderDetails();}});
-(async()=>{try{const response=await fetch('/api/v1/account/me',{credentials:'same-origin',cache:'no-store'});if(response.status===401){location.href='/account';return;}if(!response.ok)throw Error('Anmeldung erforderlich');const me=await response.json();if(me.password_change_required){location.href='/account';return;}if(tf&&me.role!=='tf'){location.href='/admin/start';return;}if(!tf&&me.role==='tf'){location.href='/tf';return;}if(!tf&&me.role!=='admin'&&!me.permissions?.loco_handover){message('Freigabe erforderlich');return;}canWrite=tf||me.role==='admin'||me.permissions?.loco_handover>=2;allowed=true;el('handoverContent').hidden=false;await listing();}catch(error){message(error.message);}})();
+(async()=>{try{const response=await fetch('/api/v1/account/me',{credentials:'same-origin',cache:'no-store'});if(response.status===401){location.href='/account';return;}if(!response.ok)throw Error(globalThis.CtlText.source("portal_loco_handover.text_6638bb26a46e"));const me=await response.json();if(me.password_change_required){location.href='/account';return;}if(tf&&me.role!=='tf'){location.href='/admin/start';return;}if(!tf&&me.role==='tf'){location.href='/tf';return;}if(!tf&&me.role!=='admin'&&!me.permissions?.loco_handover){message(globalThis.CtlText.source("portal_loco_handover.text_08597f7b8e11"));return;}canWrite=tf||me.role==='admin'||me.permissions?.loco_handover>=2;allowed=true;el('handoverContent').hidden=false;await listing();}catch(error){message(error.message);}})();
 })();

@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from datetime import datetime, time, timedelta, date
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
@@ -30,9 +31,9 @@ def create_router(require_admin, month_summary, entry_dict):
     def profile_for(db, tf_id):
         user, profile = db.get(User, tf_id), db.get(TfProfile, tf_id)
         if not user or user.role != "tf" or not profile:
-            raise HTTPException(404, "Mitarbeiter nicht gefunden")
+            raise HTTPException(404, _text_source('server_worktime_api.text_d425970b74c9'))
         if not profile.federal_state:
-            raise HTTPException(409, "Bundesland des Mitarbeiters fehlt")
+            raise HTTPException(409, _text_source('server_worktime_api.text_88c6c379cd6d'))
         return profile
 
     @router.get("/months/{year}/{month}")
@@ -58,7 +59,7 @@ def create_router(require_admin, month_summary, entry_dict):
         return [{"id": c.id, "entry_id": c.entry_id, "date": c.entry_date.isoformat(),
                  "previous_start": c.previous_start, "previous_end": c.previous_end,
                  "new_start": c.new_start, "new_end": c.new_end, "reason": c.reason,
-                 "end_date_change":c.email_body.rsplit("\nEnddatum: ",1)[1] if "\nEnddatum: " in c.email_body else None,
+                 "end_date_change":c.email_body.rsplit(_text_source('server_worktime_api.text_942eccef0aae'),1)[1] if _text_source('server_worktime_api.text_942eccef0aae') in c.email_body else None,
                  "admin_id": c.admin_user_id, "created_at": c.created_at.isoformat(),
                  "recipient_email": c.recipient_email, "email_status": c.status,
                  "attempts": c.attempts, "last_error": c.last_error} for c in items]
@@ -71,27 +72,27 @@ def create_router(require_admin, month_summary, entry_dict):
         period = db.scalar(select(WorkMonth).join(WorkEntry).where(
             WorkMonth.tf_user_id == tf_id, WorkEntry.id == entry_id).with_for_update())
         if not period:
-            raise HTTPException(404, "Eintrag des Mitarbeiters nicht gefunden")
+            raise HTTPException(404, _text_source('server_worktime_api.text_804ae64b495f'))
         entry = db.scalar(select(WorkEntry).where(WorkEntry.id == entry_id).with_for_update())
         assert_unlocked(db,entry.id)
         if entry.kind not in WORK_KINDS:
-            raise HTTPException(422, "Nur erfasste Arbeitszeiten können korrigiert werden")
+            raise HTTPException(422, _text_source('server_worktime_api.text_bfddea399370'))
         if data.expected_updated_at.tzinfo or entry.updated_at != data.expected_updated_at:
-            raise HTTPException(409, "Eintrag wurde inzwischen geändert. Bitte neu laden.")
+            raise HTTPException(409, _text_source('server_worktime_api.text_67bd5cf60cd3'))
         reason = data.reason.strip()
         if not reason:
-            raise HTTPException(422, "Änderungsgrund erforderlich")
+            raise HTTPException(422, _text_source('server_worktime_api.text_0fe5137fab5c'))
         try:
             validated = EntryIn.model_validate(dict(entry_dict(entry), start=data.start, end=data.end, **({"end_date":data.end_date} if "end_date" in data.model_fields_set else {})))
         except ValidationError as exc:
-            raise HTTPException(422, "Ungültiger Zeitraum: " + str(exc.errors()[0]["msg"])) from exc
+            raise HTTPException(422, _text_source('server_worktime_api.text_21b97cd78bc2') + str(exc.errors()[0]["msg"])) from exc
         new_start, new_end = validated.start.strftime("%H:%M"), validated.end.strftime("%H:%M")
         if (entry.start_time, entry.end_time,entry.explicit_end_date) == (new_start, new_end,validated.end_date):
             return {"changed": False, "email_status": "unchanged"}
         if not profile.email:
-            raise HTTPException(409, "E-Mail-Adresse des Mitarbeiters fehlt")
+            raise HTTPException(409, _text_source('server_worktime_api.text_a18a6b0c6dcd'))
         if not smtp_configured():
-            raise HTTPException(503, "E-Mail-Versand ist auf dem Server noch nicht eingerichtet")
+            raise HTTPException(503, _text_source('server_worktime_api.text_907f24b01340'))
         old_date=entry_end_date(entry)
         new_date=validated.end_date or (entry.entry_date+timedelta(days=1) if new_end<=new_start else entry.entry_date)
         periods=touched_months(entry.entry_date,max(old_date,new_date))
@@ -110,7 +111,7 @@ def create_router(require_admin, month_summary, entry_dict):
         change = WorkTimeChange(entry_id=entry.id, tf_user_id=tf_id, admin_user_id=admin.id,
             entry_date=entry.entry_date, previous_start=old_start, previous_end=old_end,
             new_start=new_start, new_end=new_end, reason=reason, recipient_email=profile.email,
-            email_body=change_body(profile, entry, old_start, old_end, reason, before, after)+f"\nEnddatum: {old_date} → {entry_end_date(entry)}", status="pending")
+            email_body=change_body(profile, entry, old_start, old_end, reason, before, after)+f"{_text_source('server_worktime_api.text_942eccef0aae')}{old_date} → {entry_end_date(entry)}", status="pending")
         db.add(change)
         db.flush()
         change_id = change.id
@@ -123,11 +124,11 @@ def create_router(require_admin, month_summary, entry_dict):
         item = db.scalar(select(WorkTimeChange).where(WorkTimeChange.id == change_id,
                           WorkTimeChange.tf_user_id == tf_id).with_for_update())
         if not item:
-            raise HTTPException(404, "Änderung nicht gefunden")
+            raise HTTPException(404, _text_source('server_worktime_api.text_9f17ab58762b'))
         if item.status != "failed":
-            raise HTTPException(409, "Nur fehlgeschlagene Benachrichtigungen können erneut gestartet werden")
+            raise HTTPException(409, _text_source('server_worktime_api.text_0d912f29de32'))
         if not smtp_configured():
-            raise HTTPException(503, "E-Mail-Versand ist noch nicht eingerichtet")
+            raise HTTPException(503, _text_source('server_worktime_api.text_9111bc2d71b6'))
         item.status, item.attempts, item.last_error = "pending", 0, ""
         db.commit()
         tasks.add_task(process_change, change_id)

@@ -1,4 +1,5 @@
 """Private browser-test GPS recordings and cached place-name/DS100 suggestions."""
+from .localization import source as _text_source
 import json,math,time,threading,urllib.request,urllib.parse,re,unicodedata
 from datetime import timedelta
 from pathlib import Path
@@ -38,8 +39,8 @@ class ManualStop(BaseModel):
     end:int|None=Field(default=None,ge=946684800000,le=4133980800000)
     @model_validator(mode='after')
     def ordered(self):
-        if self.end is not None and self.end<=self.start:raise ValueError('Ende muss nach Beginn der Standzeit liegen.')
-        if self.key!='manual-'+str(self.start):raise ValueError('Standzeitkennung passt nicht zum Beginn.')
+        if self.end is not None and self.end<=self.start:raise ValueError(_text_source('server_gps.text_6d8354985870'))
+        if self.key!='manual-'+str(self.start):raise ValueError(_text_source('server_gps.text_caf70142ca12'))
         return self
 
 class Recording(BaseModel):
@@ -53,22 +54,22 @@ class Recording(BaseModel):
     expected_revision:int=Field(default=0,ge=0)
     @model_validator(mode='after')
     def ordered(self):
-        if any(b.t<=a.t for a,b in zip(self.points,self.points[1:])):raise ValueError('GPS-Zeitstempel müssen aufsteigen.')
-        if not self.points and not self.manual_stops:raise ValueError('GPS-Punkte oder manuelle Standzeit erforderlich.')
+        if any(b.t<=a.t for a,b in zip(self.points,self.points[1:])):raise ValueError(_text_source('server_gps.text_094ba7dcb28a'))
+        if not self.points and not self.manual_stops:raise ValueError(_text_source('server_gps.text_da0bf51ad2de'))
         if self.manual_stops:
-            if len({r.key for r in self.manual_stops})!=len(self.manual_stops):raise ValueError('Standzeitkennungen müssen eindeutig sein.')
-            if sum(r.end is None for r in self.manual_stops)>1:raise ValueError('Nur eine Standzeit darf laufen.')
+            if len({r.key for r in self.manual_stops})!=len(self.manual_stops):raise ValueError(_text_source('server_gps.text_f899e27a7248'))
+            if sum(r.end is None for r in self.manual_stops)>1:raise ValueError(_text_source('server_gps.text_927e3ef652cc'))
             ordered=sorted(self.manual_stops,key=lambda r:r.start)
-            if any(a.end is None or a.end>b.start for a,b in zip(ordered,ordered[1:])):raise ValueError('Manuelle Standzeiten dürfen sich nicht überschneiden.')
-        if self.points and self.points[-1].t-self.points[0].t>48*3600_000:raise ValueError('GPS-Aufzeichnung höchstens 48 Stunden.')
+            if any(a.end is None or a.end>b.start for a,b in zip(ordered,ordered[1:])):raise ValueError(_text_source('server_gps.text_07743b7daef0'))
+        if self.points and self.points[-1].t-self.points[0].t>48*3600_000:raise ValueError(_text_source('server_gps.text_7098ded12868'))
         return self
 class StopReason(BaseModel):
     reason:str=Field(default='',max_length=64)
     detail:str=Field(default='',max_length=256)
     @model_validator(mode='after')
     def valid_detail(self):
-        self.detail=self.detail.strip() if self.reason=='sonstiges' else ''
-        if self.reason=='sonstiges' and not self.detail:raise ValueError('Sonstigen Grund bitte angeben.')
+        self.detail=self.detail.strip() if self.reason==_text_source('server_gps.text_69384a6be550') else ''
+        if self.reason==_text_source('server_gps.text_69384a6be550') and not self.detail:raise ValueError(_text_source('server_gps.text_58f91be54d8a'))
         return self
 
 class Choices(BaseModel):
@@ -82,20 +83,20 @@ _lock=threading.Lock();_last_query=0
 def osm_query(lat,lon,radius=3500):
     global _last_query
     # One small vicinity query per explicit request; cached for 30 days.
-    if not _lock.acquire(blocking=False):raise HTTPException(429,'ZMS-Dienst beschäftigt. Bitte später erneut versuchen.')
+    if not _lock.acquire(blocking=False):raise HTTPException(429,_text_source('server_gps.text_9ba3a6373f57'))
     try:
-        if time.monotonic()-_last_query<2:raise HTTPException(429,'ZMS-Abfragen bitte mit Abstand wiederholen.')
+        if time.monotonic()-_last_query<2:raise HTTPException(429,_text_source('server_gps.text_348b25b6d7f6'))
         _last_query=time.monotonic()
-        query=f'[out:json][timeout:12];nwr(around:{radius},{lat:.5f},{lon:.5f})["place"~"^(city|town|village|hamlet|suburb|quarter|neighbourhood|locality|isolated_dwelling)$"]["name"];out center tags;'
+        query=f"[out:json][timeout:12];nwr(around:{radius},{lat:.5f},{lon:.5f}{_text_source('server_gps.text_90f858e75790')}"
         request=urllib.request.Request('https://overpass-api.de/api/interpreter',data=urllib.parse.urlencode({'data':query}).encode(),headers={'User-Agent':'LokZeitleiste-GPS-Browsertest/1.0 (+https://github.com/omueller369/LokZeitleiste)','Content-Type':'application/x-www-form-urlencoded'})
         try:
             with urllib.request.urlopen(request,timeout=18) as response:
                 raw=response.read(2*1024*1024+1)
-            if len(raw)>2*1024*1024:raise ValueError('Response too large')
+            if len(raw)>2*1024*1024:raise ValueError(_text_source('server_gps.text_146835ea0bc8'))
             data=json.loads(raw)
-            if data.get('remark'):raise ValueError('Incomplete OSM response')
+            if data.get('remark'):raise ValueError(_text_source('server_gps.text_3299be54a680'))
             return data.get('elements',[])
-        except Exception as exc:raise HTTPException(503,'ZMS-Daten derzeit nicht verfügbar. GPS bleibt gespeichert.') from exc
+        except Exception as exc:raise HTTPException(503,_text_source('server_gps.text_c3d8d43508a9')) from exc
     finally:_lock.release()
 
 def place_key(lat,lon):
@@ -148,14 +149,14 @@ def create_router(require_account):
         if lock:db.scalar(select(User).where(User.id==user.id).with_for_update())
         query=select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id))
         row=db.scalar(query.with_for_update() if lock else query)
-        if not row:raise HTTPException(404,'Keine GPS-Aufzeichnung vorhanden.')
+        if not row:raise HTTPException(404,_text_source('server_gps.text_d425fe5589f1'))
         return row
     def read_payload(row):
         payload=json.loads(row.payload_json)
         if payload.get('detection_version')==3:return payload
         # Old s0/s1 assignments refer to the previous five-minute detector.
         # Resolve them by their original start time before inserting new four-minute rows.
-        old=[r for r in analyse(payload['points'],payload.get('stop_edits') or {},legacy=payload.get('detection_version')!=2,version2=payload.get('detection_version')==2)['rows'] if r['kind']=='Halt']
+        old=[r for r in analyse(payload['points'],payload.get('stop_edits') or {},legacy=payload.get('detection_version')!=2,version2=payload.get('detection_version')==2)['rows'] if r['kind']==_text_source('server_gps.text_0fd998791d67')]
         edits=payload.get('stop_edits') or {}
         for item in old:
             station=payload.get('stations',{}).get(item['key']) or payload.get('locations',{}).get(str(item['start']))
@@ -164,7 +165,7 @@ def create_router(require_account):
             if key not in edits and (station or reason):
                 edits[key]=dict(station=station,station_input=((station.get('code','')+' · ' if station.get('code') else '')+station.get('name','')) if station else '',reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
         payload['stop_edits']=edits
-        new=[r for r in analyse(payload['points'])['rows'] if r['kind']=='Halt']
+        new=[r for r in analyse(payload['points'])['rows'] if r['kind']==_text_source('server_gps.text_0fd998791d67')]
         key_map={}
         for item in old:
             match=next((r for r in new if r['start']<=item['start']<=r['end']),None)
@@ -198,11 +199,11 @@ def create_router(require_account):
     def save(journey_id:UUID,data:Recording,user:User=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
-        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
+        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_gps.text_e9455228bddf'))
         payload=data.model_dump(exclude={'expected_revision'});previous=read_payload(row) if row else {}
         payload['detection_version']=3
         if payload['manual_stops'] is None:payload['manual_stops']=previous.get('manual_stops',[])
-        gps_stops=[item for item in analyse(payload['points'])['rows'] if item['kind']=='Halt']
+        gps_stops=[item for item in analyse(payload['points'])['rows'] if item['kind']==_text_source('server_gps.text_0fd998791d67')]
         stops={'live-'+str(item['start']):item for item in gps_stops}
         for item in payload['manual_stops']:stops[item['key']]=item
         timestamps={p['t'] for p in payload['points']}
@@ -213,23 +214,23 @@ def create_router(require_account):
                 if match:stops[key]=dict(match,start=int(key[5:]))
         edits=payload.get('stop_edits')
         if edits is None:edits={key:value for key,value in (previous.get('stop_edits') or {}).items() if key in stops}
-        if any(key not in stops for key in edits):raise HTTPException(422,'Standzeit gehört nicht zur Aufzeichnung.')
+        if any(key not in stops for key in edits):raise HTTPException(422,_text_source('server_gps.text_edfb4f6ac516'))
         for key,edit in edits.items():
-            if edit.get('end') is not None and edit['end']<=stops[key]['start']:raise HTTPException(422,'Ende muss nach Beginn der Standzeit liegen.')
+            if edit.get('end') is not None and edit['end']<=stops[key]['start']:raise HTTPException(422,_text_source('server_gps.text_6d8354985870'))
             if edit.get('station'):
                 code=edit['station'].get('code','').strip().upper()
                 if not code:
                     name=edit['station'].get('name','').strip()
-                    if not name or len(name)>255:raise HTTPException(422,'Ungültiger älterer Ortsname.')
+                    if not name or len(name)>255:raise HTTPException(422,_text_source('server_gps.text_be7663d51aa2'))
                     edit['station']=dict(code='',name=name)
                 else:
                     station=db.get(RailwayStation,code)
-                    if not station:raise HTTPException(422,'Bitte gültigen DS100-Standort wählen.')
+                    if not station:raise HTTPException(422,_text_source('server_gps.text_b418a717a2d3'))
                     edit['station']=dict(code=station.code,name=station.name)
         # Preserve explicit assignments from older 0.25/RC recordings.
         for item in analyse(previous.get('points',[]),(previous.get('stop_edits') or {}))['rows']:
             key='live-'+str(item['start'])
-            if item['kind']!='Halt' or key not in stops or key in edits:continue
+            if item['kind']!=_text_source('server_gps.text_0fd998791d67') or key not in stops or key in edits:continue
             station=previous.get('stations',{}).get(item['key']) or previous.get('locations',{}).get(str(item['start']))
             reason=previous.get('reasons',{}).get(item['key'],{})
             if station:edits[key]=dict(station=station,station_input=(station.get('code','')+' · ' if station.get('code') else '')+station.get('name',''),reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
@@ -237,7 +238,7 @@ def create_router(require_account):
         if 'locations' in previous:payload['locations']=previous['locations']
         if data.end_station:
             station=db.get(RailwayStation,data.end_station.strip().upper())
-            if not station:raise HTTPException(422,'Bitte gültigen Endbahnhof wählen.')
+            if not station:raise HTTPException(422,_text_source('server_gps.text_5b9f556e58d7'))
             payload['end_station']=station.code
 
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
@@ -245,7 +246,7 @@ def create_router(require_account):
         payload['selection']=previous.get('selection',[]) if previous.get('points')==payload['points'] else []
         if data.start_station:
             station=db.get(RailwayStation,data.start_station.strip().upper())
-            if not station:raise HTTPException(422,'Bitte einen gültigen Startbahnhof (DS100) wählen.')
+            if not station:raise HTTPException(422,_text_source('server_gps.text_f96e8bf660b7'))
             payload['start_station']=station.code;payload['stations']['start']=dict(code=station.code,name=station.name)
         if data.end_station:
             end=db.get(RailwayStation,payload['end_station']);payload['stations']['end']=dict(code=end.code,name=end.name)
@@ -272,20 +273,20 @@ def create_router(require_account):
         from .app_defaults import ensure_defaults,use_value
         ensure_defaults(db)
         row=owned(db,user,journey_id,True)
-        if row.revision!=data.expected_revision:raise HTTPException(409,'GPS-Aufzeichnung wurde geändert. Bitte neu laden.')
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_gps.text_e9455228bddf'))
         payload=read_payload(row);keys={item['key'] for item in analyse(payload['points'],payload.get('stop_edits') or {})['rows']};selected={}
         for key,code in data.stations.items():
             station=db.get(RailwayStation,code.strip().upper())
-            if key not in keys or not station:raise HTTPException(422,'Bitte gültige DS100-Betriebsstellen wählen.')
+            if key not in keys or not station:raise HTTPException(422,_text_source('server_gps.text_c5c16d0e1424'))
             selected[key]=dict(code=station.code,name=station.name)
         if data.reasons is not None:
-            if any(key not in keys for key in data.reasons):raise HTTPException(422,'Ungültiger Grund.')
+            if any(key not in keys for key in data.reasons):raise HTTPException(422,_text_source('server_gps.text_27e6f9d32657'))
             labels={}
             for key,value in sorted(data.reasons.items()):
                 if value.reason:labels[key]=use_value(db,'reason',value.reason,payload.get('reasons',{}).get(key,{}).get('reason')).label
             payload['reasons']={key:dict(value.model_dump(),label=labels[key]) for key,value in data.reasons.items() if value.reason}
         if data.selection is not None:
-            if any(key not in keys for key in data.selection):raise HTTPException(422,'Ungültige GPS-Auswahl.')
+            if any(key not in keys for key in data.selection):raise HTTPException(422,_text_source('server_gps.text_31cbf51014e1'))
             payload['selection']=list(dict.fromkeys(data.selection))
         payload['stations']=selected
         if selected.get('start'):payload['start_station']=selected['start']['code']

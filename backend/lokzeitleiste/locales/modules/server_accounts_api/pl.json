@@ -1,0 +1,16 @@
+{
+  "text_1c983667bad8": "Logowanie nieudane",
+  "text_288eba24f387": "Nie znaleziono pracownika administracji",
+  "text_35e5a9632e18": "Bearer ",
+  "text_5193698dc5b0": "Tylko dla administracji.",
+  "text_6638bb26a46e": "Wymagane logowanie",
+  "text_689fa5701f2b": "Brak zdjęcia",
+  "text_6ec0469e0d45": "Nowe hasło musi różnić się od poprzedniego",
+  "text_715f90ea3b07": "Aktualne hasło jest nieprawidłowe",
+  "text_796d569dbe68": "Hasło początkowe musi różnić się od poprzedniego",
+  "text_b59ef1fdfb31": "Nie znaleziono konta",
+  "text_caa6e4fbaee2": "Nazwa użytkownika zajęta",
+  "text_cc2388b0d186": "Administracja aplikacji",
+  "text_edf0b29d64e6": "Dla własnego konta użyj Zmień hasło",
+  "text_f68b23feaba4": "Nieprawidłowe źródło żądania"
+}

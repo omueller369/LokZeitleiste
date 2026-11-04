@@ -1,0 +1,11 @@
+{
+  "text_3e0b1cbc7525": "keine Angabe",
+  "text_547153433a04": "Austrittsdatum darf nicht vor dem Beitrittsdatum liegen.",
+  "text_898b838d3945": "Ungültige Staatsangehörigkeit.",
+  "text_93f86cbd8d01": "TF-Profil fehlt; keine Migration durchgeführt.",
+  "text_c18c68242773": "Nicht genügend freie TF-Nummern mit Präfix 787; keine Migration durchgeführt.",
+  "text_c1e0a9a9f71d": "männlich",
+  "text_cde5bbc497af": "Heimatbahnhof bitte aus der Trefferliste wählen.",
+  "text_eb5bc3473373": "TF-Nummer, Beitrittsdatum, Wochenarbeitszeit, Staatsangehörigkeit und Adresse erforderlich.",
+  "text_f665bc9f3fc4": "ALTER TABLE tf_profiles ADD COLUMN gender VARCHAR(20) NOT NULL DEFAULT 'unspecified'"
+}

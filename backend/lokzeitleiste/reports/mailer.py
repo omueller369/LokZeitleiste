@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import os
 import smtplib
 import ssl
@@ -14,10 +15,9 @@ def send_receipt(*, recipient: str, filename: str, pdf_data: bytes, lang="de"):
     t=lambda text:translate(text,lang)
     message = EmailMessage()
     message["To"] = recipient
-    message["Subject"] = t("LokZeitleiste: Eingang Ihrer Arbeitszeiten")
+    message[_text_source('server_reports_mailer.text_68971283841a')] = t(_text_source('server_reports_mailer.text_064186587a4b'))
     message.set_content(
-        t("Anbei erhalten Sie die tabellarische Bestätigung der übermittelten Tagesdaten. "
-        "Dies ist keine Entgelt- oder Tarifabrechnung.")
+        t(_text_source('server_reports_mailer.text_57f6eedcda01'))
     )
     message.add_attachment(pdf_data, maintype="application", subtype="pdf", filename=filename)
     _send_message(message)
@@ -27,20 +27,20 @@ def send_time_change(*, recipient: str, body: str, lang="de"):
     from ..i18n import translate
     message = EmailMessage()
     message["To"] = recipient
-    message["Subject"] = translate("LokZeitleiste: Ihre Arbeitszeit wurde angepasst",lang)
+    message[_text_source('server_reports_mailer.text_68971283841a')] = translate(_text_source('server_reports_mailer.text_8ad673d2a411'),lang)
     message.set_content(body)
     _send_message(message)
 
 
 def _send_message(message: EmailMessage, *, recipients=None):
     if not smtp_configured():
-        raise RuntimeError("SMTP_HOST, SMTP_FROM und SMTP_SECURITY müssen gesetzt sein")
+        raise RuntimeError(_text_source('server_reports_mailer.text_a636e47a8952'))
     host = os.environ["SMTP_HOST"]
     security = os.getenv("SMTP_SECURITY", "ssl")
     port = int(os.getenv("SMTP_PORT", "465" if security == "ssl" else "587"))
     sender = os.environ["SMTP_FROM"]
-    if "From" in message:message.replace_header("From",sender)
-    else:message["From"] = sender
+    if _text_source('server_reports_mailer.text_218197693424') in message:message.replace_header(_text_source('server_reports_mailer.text_218197693424'),sender)
+    else:message[_text_source('server_reports_mailer.text_218197693424')] = sender
     context = ssl.create_default_context()
     if security == "ssl":
         connection = smtplib.SMTP_SSL(host, port, timeout=20, context=context)

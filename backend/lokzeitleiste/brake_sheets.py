@@ -1,4 +1,5 @@
 """Private brake-sheet drafts and calculations according to the agreed DE/PL form rules."""
+from .localization import source as _text_source
 import json,re
 from datetime import date
 from decimal import Decimal,ROUND_CEILING
@@ -65,19 +66,19 @@ class Sheet(BaseModel):
     @field_validator('train_numbers')
     @classmethod
     def numbers(cls,values):
-        if any(v and not re.fullmatch(r'[0-9]{5}',v) for v in values):raise ValueError('Zugnummern müssen aus fünf Ziffern bestehen.')
+        if any(v and not re.fullmatch(r'[0-9]{5}',v) for v in values):raise ValueError(_text_source('server_brake_sheets.text_584f0849dc4f'))
         return values
     @field_validator('first_vehicle','last_vehicle','second_first_vehicle','second_last_vehicle')
     @classmethod
     def number(cls,value):
-        if value and not re.fullmatch(r'[0-9]{12}',value):raise ValueError('Fahrzeugnummer muss aus zwölf Ziffern bestehen.')
+        if value and not re.fullmatch(r'[0-9]{12}',value):raise ValueError(_text_source('server_brake_sheets.text_46262d84dc20'))
         return value
     @model_validator(mode='after')
     def rules(self):
         self.section_from=self.station_from;self.section_to=self.station_to
-        if self.second_from or self.second_to or self.second_first_vehicle or self.second_last_vehicle:raise ValueError('Der zweite Gültigkeitsabschnitt bleibt vorerst leer.')
+        if self.second_from or self.second_to or self.second_first_vehicle or self.second_last_vehicle:raise ValueError(_text_source('server_brake_sheets.text_63cfe4faae33'))
         if self.class_de=='D4':self.class_pl='D'
-        if len({x.vehicle_id for x in self.locos})!=len(self.locos):raise ValueError('Triebfahrzeug ist bereits ausgewählt.')
+        if len({x.vehicle_id for x in self.locos})!=len(self.locos):raise ValueError(_text_source('server_brake_sheets.text_0bcfde1957a7'))
         return self
 class Save(BaseModel):
     expected_revision:int=Field(ge=0)
@@ -92,8 +93,8 @@ def calculate(db,data):
     lines=[]
     for item in data.locos:
         row=db.get(RailwayVehicle,item.vehicle_id)
-        if not row or is_retired(db,row.id):raise HTTPException(422,'Ein ausgewähltes Triebfahrzeug steht nicht mehr zur Verfügung.')
-        if row.revision!=item.vehicle_revision:raise HTTPException(409,'Tfz-Stammdaten wurden geändert. Bitte die Fahrzeugauswahl aktualisieren.')
+        if not row or is_retired(db,row.id):raise HTTPException(422,_text_source('server_brake_sheets.text_8886bd616bcb'))
+        if row.revision!=item.vehicle_revision:raise HTTPException(409,_text_source('server_brake_sheets.text_b2337546555c'))
         v=public_vehicle(row);mode=data.brake_mode
         position='G' if mode in ('G','G+P') else mode if mode in ('P','R') else item.position
         brake=Decimal(v['brake_g_25'] if mode=='G+P' else v['brake_'+position.lower()]) if mode!='LL+P' else item.manual_brake
@@ -115,20 +116,20 @@ def calculate(db,data):
 
 def preview_missing(data,result):
     missing=[]
-    for key,label in [('issuer','1. Aussteller-EVU'),('departure_date','3. Abfahrtsdatum'),('station_from','4a. Gültig ab Bahnhof'),('station_to','4b. Gültig bis Bahnhof'),('class_de','14. Streckenklasse DE'),('class_pl','14. Streckenklasse PL'),('first_vehicle','Erstes Fahrzeug'),('last_vehicle','Letztes Fahrzeug'),('required_percent','25. Erforderliche Bremshundertstel')]:
+    for key,label in [('issuer',_text_source('server_brake_sheets.text_65dbe918d2bf')),('departure_date',_text_source('server_brake_sheets.text_ecc994a1bd07')),('station_from',_text_source('server_brake_sheets.text_bd2a532a1cc3')),('station_to',_text_source('server_brake_sheets.text_b9aac3d6c30c')),('class_de',_text_source('server_brake_sheets.text_ef73d5882c79')),('class_pl',_text_source('server_brake_sheets.text_e177ffbeb9fa')),('first_vehicle',_text_source('server_brake_sheets.text_ef73da566a06')),('last_vehicle',_text_source('server_brake_sheets.text_ad360e437797')),('required_percent',_text_source('server_brake_sheets.text_a3d2a62766ce'))]:
         value=getattr(data,key)
         if value is None or isinstance(value,str) and not value.strip():missing.append(label)
-    if not data.train_numbers[0]:missing.append('DE-Zugnummer')
+    if not data.train_numbers[0]:missing.append(_text_source('server_brake_sheets.text_eec21d1fe37f'))
     for i,c in enumerate(data.countries):
         if i<2 or c.country or c.category:
-            if not c.country or not c.category:missing.append('Ländercode / Zugkategorie '+str(i+1))
-    if not result['lines']:missing.append('Triebfahrzeug')
+            if not c.country or not c.category:missing.append(_text_source('server_brake_sheets.text_7ddf4cdaa6b4')+str(i+1))
+    if not result['lines']:missing.append(_text_source('server_brake_sheets.text_9de2ca1927a7'))
     for i,line in enumerate(result['lines']):
-        for key,label in [('series','Baureihe'),('length_m','LüP'),('weight_kg','Gesamtgewicht'),('axle_count','Anzahl Radsätze'),('brake_shoe','Bremssohlenart'),('brake_weight','Bremsgewicht')]:
-            if line[key] is None or line[key]=='':missing.append('Tfz '+str(i+1)+': '+label)
+        for key,label in [('series',_text_source('server_brake_sheets.text_7c1c344e8ca2')),('length_m',_text_source('server_brake_sheets.text_8d0eb9bb08e7')),('weight_kg',_text_source('server_brake_sheets.text_a6dc8d473148')),('axle_count',_text_source('server_brake_sheets.text_f69432a09518')),('brake_shoe',_text_source('server_brake_sheets.text_8b8c10d71e16')),('brake_weight',_text_source('server_brake_sheets.text_7417d0f1038a'))]:
+            if line[key] is None or line[key]=='':missing.append(_text_source('server_brake_sheets.text_4c3c7e125e1d')+str(i+1)+': '+label)
     for key,label in [('count','19b'),('length','20b'),('brake','22b'),('weight','23b')]:
         if getattr(data.wagon,key) is None:missing.append(label)
-    if (data.holding_loco is not None or data.wagon.holding is not None) and not data.holding_unit:missing.append('Einheit Festhaltekraft')
+    if (data.holding_loco is not None or data.wagon.holding is not None) and not data.holding_unit:missing.append(_text_source('server_brake_sheets.text_39a0dba1b85a'))
     return missing
 
 class PreviewRequest(BaseModel):
@@ -151,7 +152,7 @@ def create_router(require_account):
     def creation(row):return dict(created_at=row.created_at.isoformat()+'Z',created_by_name=row.created_by_name)
     def owned(db,user,id):
         row=db.scalar(select(BrakeSheetDraft).where(BrakeSheetDraft.id==str(id),BrakeSheetDraft.owner_id==user.id).with_for_update())
-        if not row:raise HTTPException(404,'Bremszettel nicht gefunden.')
+        if not row:raise HTTPException(404,_text_source('server_brake_sheets.text_c5d2307ed28b'))
         return row
     @router.get('/api/v1/tf/brake-sheets/{id}')
     def detail(id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
@@ -160,9 +161,9 @@ def create_router(require_account):
     @router.post('/api/v1/tf/brake-sheets/{id}/preview')
     def image_preview(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_brake_sheets.text_5a7be4591f8a'))
         sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
-        if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
+        if result['preview_missing']:raise HTTPException(422,_text_source('server_brake_sheets.text_22306b124a93')+', '.join(result['preview_missing']))
         from .brake_sheet_image import render
         try:content=render(sheet,result,row.created_at,row.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
@@ -170,16 +171,16 @@ def create_router(require_account):
     @router.post('/api/v1/tf/brake-sheets/{id}/archive')
     def archive(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_brake_sheets.text_5a7be4591f8a'))
         sheet=Sheet.model_validate_json(row.payload_json);result=calculate(db,sheet)
-        if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
+        if result['preview_missing']:raise HTTPException(422,_text_source('server_brake_sheets.text_22306b124a93')+', '.join(result['preview_missing']))
         from .brake_sheet_image import render_pdf
         from .documents.storage import generated
         from urllib.parse import quote
         try:content=render_pdf(sheet,result,row.created_at,row.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
-        filename=f'Bremszettel-{number}-{day.isoformat()}.PDF'
+        filename=f"{_text_source('server_brake_sheets.text_b1cc93fb59b2')}{number}-{day.isoformat()}.PDF"
         document=generated(db,user,f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}',content,'brake-sheet:'+row.id)
         db.commit()
         return dict(filename=document.display_name,document_path=document.relative_path,download_url='/api/v1/documents/download?path='+quote(document.relative_path,safe=''))
@@ -188,12 +189,12 @@ def create_router(require_account):
         from fastapi.encoders import jsonable_encoder
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         row=db.get(BrakeSheetDraft,str(id))
-        if row and row.owner_id!=user.id:raise HTTPException(404,'Bremszettel nicht gefunden.')
-        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        if row and row.owner_id!=user.id:raise HTTPException(404,_text_source('server_brake_sheets.text_c5d2307ed28b'))
+        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_brake_sheets.text_5a7be4591f8a'))
         result=calculate(db,data.sheet)
         if not row:
             profile=db.get(TfProfile,user.id)
-            if not profile:raise HTTPException(404,'Tf nicht gefunden.')
+            if not profile:raise HTTPException(404,_text_source('server_brake_sheets.text_90407b4e449b'))
             row=BrakeSheetDraft(id=str(id),owner_id=user.id,revision=0,created_at=now_utc(),created_by_name=(profile.first_name+' '+profile.last_name).strip());db.add(row)
         row.payload_json=data.sheet.model_dump_json();row.calculation_json=json.dumps(jsonable_encoder(result));row.revision+=1;row.updated_at=now_utc();db.commit()
         return dict(id=row.id,revision=row.revision,sheet=data.sheet.model_dump(),calculation=result,**creation(row))

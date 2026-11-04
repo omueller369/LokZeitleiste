@@ -2,7 +2,7 @@ const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {readFileSync}=require('node:fs');
 const {join}=require('node:path');
-const vm=require('node:vm');
+const vm=require('./localized-vm.cjs');
 const context={window:{}};
 vm.runInNewContext(readFileSync(join(__dirname,'../lokzeitleiste/static/train-journeys.js'),'utf8'),context);
 const stamp=context.window.ReportTableTime;

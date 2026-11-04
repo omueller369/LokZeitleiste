@@ -1,0 +1,16 @@
+{
+  "text_0d3544409de9": "Check available browser storage and storage permissions. Do not close the page before saving your input.",
+  "text_16584052fd33": "Okay",
+  "text_1824ed44017f": "Check your internet connection and try again. Local reports remain saved until they have been transferred successfully.",
+  "text_3ef5d7a7ff5e": "Check the file size, file format and internet connection. Receipts that have not been transferred remain stored locally.",
+  "text_423e45b97d3e": "The instructions could not be loaded. Open the page again.",
+  "text_440190ed4a16": "Save the current entry or cancel editing first.",
+  "text_55abf32cdd8e": "Check your input and correct the stated cause. Then try again.",
+  "text_609b67679bc4": "Check the start and end dates and times and any overlaps.",
+  "text_7e760b946147": "Please enter a break as a train journey event and check the required minutes.",
+  "text_95472f650a2b": "Help",
+  "text_a9b72683e9fb": "Enter a DS100 code or station name and select a suggested entry.",
+  "text_d034ea0fdad1": "Check the input or operation",
+  "text_d19d77ca4519": "Complete the indicated required field in the specified format.",
+  "text_f561a249bf4d": "Check location permission and the secure connection (HTTPS). Stop any active recording first."
+}

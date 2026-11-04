@@ -1,5 +1,5 @@
 // Browser contract simulation: desktop sidebar, mobile modal, focus and cleanup.
-const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const fs=require('fs'),vm=require('./localized-vm.cjs'),assert=require('assert');
 let document;
 class E{
  constructor(tag){this.tagName=tag.toUpperCase();this.children=[];this.dataset={};this.style={};this.attributes={};this.className='';this.hidden=false;this.inert=false;this.events=new Map();const classes=()=>new Set(this.className.split(/\s+/).filter(Boolean));this.classList={add:(...names)=>{const set=classes();names.forEach(n=>set.add(n));this.className=[...set].join(' ');},remove:(...names)=>{const set=classes();names.forEach(n=>set.delete(n));this.className=[...set].join(' ');},contains:name=>classes().has(name),toggle:(name,force)=>{const set=classes(),yes=force===undefined?!set.has(name):force;if(yes)set.add(name);else set.delete(name);this.className=[...set].join(' ');return yes;}};}

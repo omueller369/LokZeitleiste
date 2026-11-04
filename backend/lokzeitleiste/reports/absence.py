@@ -1,11 +1,12 @@
 """Absence credit follows the current personnel plan; rest days have no credit."""
+from ..localization import source as _text_source
 from sqlalchemy import select
 from sqlalchemy.orm import object_session
 from ..models import PlanDay,PlanMonth,WorkMonth
 
 
 def is_rest_day(db,user_id,day):
-    return db.scalar(select(PlanDay.id).join(PlanMonth).where(PlanMonth.tf_user_id==user_id,PlanDay.day==day,PlanDay.kind=='Ruhetag')) is not None
+    return db.scalar(select(PlanDay.id).join(PlanMonth).where(PlanMonth.tf_user_id==user_id,PlanDay.day==day,PlanDay.kind==_text_source('server_reports_absence.text_e79aa42d7d18'))) is not None
 
 
 def absence_minutes(entry):

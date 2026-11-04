@@ -1,81 +1,102 @@
 /* Gemeinsamer Hilfekatalog für alle TF-Module. */
 window.TfHelpRevision="2026-11-04";
-window.TfHelpPages=[
+window.TfHelpPages=globalThis.CtlText.restore([
   {
     "id": "start",
-    "group": "Erste Schritte",
-    "title": "Das TF-Portal kennenlernen",
-    "short": "Hier beginnen: Was die Startseite zeigt und wo Du Hilfe findest.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_26da72cb8038}}",
+    "short": "{{portal_tf_help_content.text_b1620a32ee9a}}",
     "path": "/tf",
     "aliases": [],
     "sections": [
       {
-        "title": "Wofür ist das Portal da?",
+        "title": "{{portal_tf_help_content.text_ef3f57d0a165}}",
         "paragraphs": [
-          "Im TF-Portal findest Du Deine Arbeitsberichte, den Arbeitsplan, Fahrzeugangaben, Dokumente und weitere Aufgaben. Auf der Startseite hat jede Aufgabe eine eigene Kachel. Eine Kachel ist ein Feld mit einer Überschrift.",
-          "Ein Browser ist das Programm, mit dem Du Internetseiten öffnest, zum Beispiel Chrome, Edge oder Safari. Trage die Internetadresse oben in dessen Adressfeld ein. Öffne auf Android stattdessen direkt die App."
+          "{{portal_tf_help_content.text_af8f9518bcd4}}",
+          "{{portal_tf_help_content.text_2a38441413a0}}"
         ],
         "steps": []
       },
       {
-        "title": "Eine Aufgabe öffnen",
+        "title": "{{portal_tf_help_content.text_8ffa3c7d41b4}}",
         "paragraphs": [],
         "steps": [
-          "Wähle auf der Startseite die passende Kachel, zum Beispiel Arbeitsbericht.",
-          "Lies zunächst die Überschrift. So erkennst Du, in welchem Bereich Du bist.",
-          "Mit zurück TF-Portal gelangst Du wieder zur Auswahl der Kacheln.",
-          "Über ? Hilfe oben auf der Seite öffnest Du die Erklärung zum aktuellen Bereich. Im Modul Anleitung und Hilfe stehen alle Themen."
+          "{{portal_tf_help_content.text_42e577e22c13}}",
+          "{{portal_tf_help_content.text_4e27671f205d}}",
+          "{{portal_tf_help_content.text_bf07971b26a9}}",
+          "{{portal_tf_help_content.text_2ea31f72ee49}}"
         ]
       },
       {
-        "title": "Wählen heißt klicken oder antippen",
+        "title": "{{portal_tf_help_content.text_54a388eed708}}",
         "paragraphs": [
-          "In dieser Anleitung bedeutet wählen: Am Computer klickst Du einmal mit der linken Maustaste. Am Handy oder Tablet tippst Du einmal mit dem Finger auf die genannte Schaltfläche."
+          "{{portal_tf_help_content.text_724690ea634f}}"
         ],
         "steps": []
       },
       {
-        "title": "Was passiert beim Öffnen der Hilfe?",
+        "title": "{{portal_tf_help_content.text_89d7731f9259}}",
         "paragraphs": [
-          "Die Hilfe liegt als Fenster über Deiner Seite. Die Eingaben dahinter bleiben stehen. X oben links schließt nur die Hilfe. Es löscht keine Eingaben. Das Drucker-Symbol oben rechts öffnet den Druckdialog für die gerade angezeigte Anleitung."
+          "{{portal_tf_help_content.text_1870abf16cde}}"
         ],
         "steps": []
       }
     ]
   },
   {
+    "id": "sprache",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_f51f131b291d}}",
+    "short": "{{portal_tf_help_content.text_da4523b7c45e}}",
+    "path": "",
+    "aliases": [],
+    "sections": [
+      {
+        "title": "{{portal_tf_help_content.text_ae835b6a685a}}",
+        "paragraphs": [
+          "{{portal_tf_help_content.text_88961a1f6aa8}}"
+        ],
+        "steps": [
+          "{{portal_tf_help_content.text_1028a0bfb220}}",
+          "{{portal_tf_help_content.text_55098e5391a5}}",
+          "{{portal_tf_help_content.text_74ceb6bfd73a}}"
+        ]
+      }
+    ]
+  },
+  {
     "id": "bedienung",
-    "group": "Erste Schritte",
-    "title": "Schaltflächen, Felder und Zeichen",
-    "short": "Was Plus, Minus, Häkchen und graue Schaltflächen bedeuten.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_086d5255650a}}",
+    "short": "{{portal_tf_help_content.text_feef9fa4558d}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Eingaben und Auswahlfelder",
+        "title": "{{portal_tf_help_content.text_9527cb1ff63b}}",
         "paragraphs": [
-          "Ein leeres Eingabefeld wird zuerst ausgewählt. Danach schreibst Du mit der Tastatur. Auf einem Handy öffnet sich die Bildschirmtastatur. Ein Auswahlfeld zeigt mehrere Möglichkeiten. Wähle daraus den passenden Eintrag."
+          "{{portal_tf_help_content.text_0c5a822b47c5}}"
         ],
         "steps": []
       },
       {
-        "title": "Häufige Zeichen",
+        "title": "{{portal_tf_help_content.text_a3d92b1d4953}}",
         "paragraphs": [
-          "+ öffnet einen zugeklappten Bereich oder fügt einen Eintrag hinzu. Die Beschriftung daneben erklärt, was gemeint ist. − klappt einen Bereich zu. X schließt ein Fenster. Das Drucker-Symbol dient zum Drucken. Ein Häkchen in einem Kästchen bedeutet: Diese Auswahl ist eingeschaltet. Ein runder Auswahlpunkt lässt meist nur eine Möglichkeit zu."
+          "{{portal_tf_help_content.text_9e6f7199aeab}}"
         ],
         "steps": []
       },
       {
-        "title": "Wenn etwas nicht bedienbar ist",
+        "title": "{{portal_tf_help_content.text_9a94403c11a5}}",
         "paragraphs": [
-          "Eine graue Schaltfläche ist im Moment nicht verfügbar. Möglicherweise fehlen Angaben, ein Vorgang läuft noch oder der Eintrag ist geschützt. Lies den Hinweis daneben. Drücke nicht wiederholt auf dieselbe Schaltfläche."
+          "{{portal_tf_help_content.text_fe2613c8da90}}"
         ],
         "steps": []
       },
       {
-        "title": "Auf kleinen Bildschirmen",
+        "title": "{{portal_tf_help_content.text_9d72c0fc2068}}",
         "paragraphs": [
-          "Einige Gruppen stehen auf dem Handy untereinander statt nebeneinander. In breiten Tabellen kannst Du nach links oder rechts wischen. Die Reihenfolge der Arbeitsschritte bleibt gleich."
+          "{{portal_tf_help_content.text_2c82ee521b90}}"
         ],
         "steps": []
       }
@@ -83,34 +104,34 @@ window.TfHelpPages=[
   },
   {
     "id": "darstellung",
-    "group": "Erste Schritte",
-    "title": "Tagmodus und Nachtmodus wechseln",
-    "short": "Mit Sonne oder Mond zwischen heller und dunkler Darstellung wechseln.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_a7af604600d8}}",
+    "short": "{{portal_tf_help_content.text_21cf8c117988}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Die Darstellung umschalten",
+        "title": "{{portal_tf_help_content.text_01267bd3f4dc}}",
         "paragraphs": [
-          "Oben im Kopf der Seite steht ein Sonne- oder Mond-Symbol. Der Mond schaltet den Nachtmodus ein. Die Sonne schaltet zurück in den Tagmodus. Im Nachtmodus werden Flächen dunkel und die Schrift hell."
+          "{{portal_tf_help_content.text_79014b27b578}}"
         ],
         "steps": [
-          "Wähle das Symbol einmal. Die geöffnete Seite wechselt sofort ihre Darstellung.",
-          "Öffne anschließend ein anderes Modul. Auch dort gilt die gewählte Darstellung.",
-          "Wähle das Symbol erneut, wenn Du zurückwechseln möchtest."
+          "{{portal_tf_help_content.text_78a3148fcac7}}",
+          "{{portal_tf_help_content.text_b9a8b3a96abc}}",
+          "{{portal_tf_help_content.text_eb520fb75726}}"
         ]
       },
       {
-        "title": "Die Auswahl bleibt gespeichert",
+        "title": "{{portal_tf_help_content.text_3550c2619571}}",
         "paragraphs": [
-          "Die Auswahl wird in diesem Browser oder auf diesem Gerät gespeichert. Auch nach dem Neuladen bleibt sie erhalten. Ein anderer Browser oder ein anderes Gerät kann eine eigene Auswahl haben. Wenn Dein Browser das Speichern verhindert, funktioniert das Umschalten trotzdem auf der geöffneten Seite."
+          "{{portal_tf_help_content.text_60d5baf13584}}"
         ],
         "steps": []
       },
       {
-        "title": "Farben und Dokumente",
+        "title": "{{portal_tf_help_content.text_fc67f4f8da80}}",
         "paragraphs": [
-          "Statusfarben und Warnungen bleiben unterscheidbar. Lies trotzdem die jeweilige Beschriftung. Dokumentvorschauen und die Zeichenfläche für Deine Unterschrift behalten ihre eigene Darstellung. Gedruckte Formulare und Hilfetexte werden durch den Nachtmodus nicht dunkel eingefärbt."
+          "{{portal_tf_help_content.text_687ee4f79e59}}"
         ],
         "steps": []
       }
@@ -118,33 +139,33 @@ window.TfHelpPages=[
   },
   {
     "id": "anmeldung",
-    "group": "Erste Schritte",
-    "title": "Anmelden, Passwort und Abmelden",
-    "short": "So gelangst Du in das Portal und verlässt es wieder.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_a7a46fc2be1f}}",
+    "short": "{{portal_tf_help_content.text_f77f677e3778}}",
     "path": "/account",
     "aliases": [],
     "sections": [
       {
-        "title": "Anmelden",
+        "title": "{{portal_tf_help_content.text_a329a32263a4}}",
         "paragraphs": [],
         "steps": [
-          "Öffne die Adresse des Portals.",
-          "Trage Deinen Benutzernamen und Dein Passwort in die dafür vorgesehenen Felder ein.",
-          "Wähle Anmelden. Wenn Du ein erstes Passwort erhalten hast, kann die Anwendung Dich zunächst zum Ändern des Passworts auffordern.",
-          "Öffne nach der Anmeldung die gewünschte Aufgabe im TF-Portal."
+          "{{portal_tf_help_content.text_91e1c8d77518}}",
+          "{{portal_tf_help_content.text_5da94441c0b4}}",
+          "{{portal_tf_help_content.text_048f2b970754}}",
+          "{{portal_tf_help_content.text_b7b9b9bc5974}}"
         ]
       },
       {
-        "title": "Passwort ändern",
+        "title": "{{portal_tf_help_content.text_4da6cfe64f1e}}",
         "paragraphs": [
-          "Unter Mein Konto / Passwort findest Du den Zugang zur Passwortänderung. Folge den Feldbeschriftungen. Das neue Passwort muss zur Bestätigung noch einmal gleich eingegeben werden."
+          "{{portal_tf_help_content.text_d3f46a237638}}"
         ],
         "steps": []
       },
       {
-        "title": "Abmelden",
+        "title": "{{portal_tf_help_content.text_545f8be33bf0}}",
         "paragraphs": [
-          "Beende zuerst laufende GPS-Aufzeichnungen oder manuelle Standzeiten und speichere Deinen Arbeitsbericht. Wähle danach Abmelden. Wenn die Anmeldung fehlschlägt, prüfe die Schreibweise oder wende Dich an Deine zuständige Verwaltung."
+          "{{portal_tf_help_content.text_7d48b1ae6ce2}}"
         ],
         "steps": []
       }
@@ -152,39 +173,39 @@ window.TfHelpPages=[
   },
   {
     "id": "hilfe",
-    "group": "Erste Schritte",
-    "title": "Diese Anleitung benutzen und drucken",
-    "short": "Thema suchen, Hilfefenster schließen und eine Anleitung ausdrucken.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_ddba974ed11b}}",
+    "short": "{{portal_tf_help_content.text_35fbe8832a3b}}",
     "path": "/tf/hilfe",
     "aliases": [],
     "sections": [
       {
-        "title": "Das passende Thema finden",
+        "title": "{{portal_tf_help_content.text_c7e503c77886}}",
         "paragraphs": [],
         "steps": [
-          "Wähle links ein Modul und darunter ein Thema. Auf dem Handy steht die Themenliste oben.",
-          "Unter jedem Thema steht ein kurzer Erklärungstext. Er hilft bei der Auswahl.",
-          "Du kannst im Suchfeld ein Wort eingeben, zum Beispiel GPS, Passwort oder Beleg. Die Themenliste wird passend eingeschränkt.",
-          "Lösche den Suchbegriff, um wieder alle Themen zu sehen."
+          "{{portal_tf_help_content.text_0143252224fd}}",
+          "{{portal_tf_help_content.text_4becb8c33f37}}",
+          "{{portal_tf_help_content.text_ae03ac5bdbdc}}",
+          "{{portal_tf_help_content.text_801af74cb1ee}}"
         ]
       },
       {
-        "title": "Schließen und Drucken",
+        "title": "{{portal_tf_help_content.text_b5f8dd9c5b1b}}",
         "paragraphs": [
-          "X oben links bringt Dich zurück zur vorherigen Ansicht. Das Drucker-Symbol oben rechts druckt nur die angezeigte Anleitung mit ihren Gruppen. Deine persönlichen Formulare werden dabei nicht mitgedruckt."
+          "{{portal_tf_help_content.text_a1408dbc35a4}}"
         ],
         "steps": [
-          "Wähle das gewünschte Thema.",
-          "Wähle das Drucker-Symbol.",
-          "Wähle im Druckdialog einen vorhandenen Drucker. Wenn Dein Gerät es anbietet, kannst Du auch Als PDF speichern wählen.",
-          "Bestätige den Druck dort oder brich ihn ab. Die Anleitung bleibt anschließend geöffnet."
+          "{{portal_tf_help_content.text_d53d21612a0d}}",
+          "{{portal_tf_help_content.text_7f39561d6bf8}}",
+          "{{portal_tf_help_content.text_76518b60f513}}",
+          "{{portal_tf_help_content.text_d6b98fcb6b1f}}"
         ]
       },
       {
-        "title": "Stand der Anleitung",
+        "title": "{{portal_tf_help_content.text_0ef2f2f87993}}",
         "paragraphs": [
-          "Die Hilfe gehört zum jeweiligen Softwarestand. Bei Änderungen an Modulen wird dieselbe zentrale Anleitung mit angepasst. In der Android-App werden die Hilfetexte mit der App mitgeliefert; dafür muss eine aktuelle APK installiert sein.",
-          "APK heißt die Installationsdatei der Android-App. Eine PDF ist eine Dokumentdatei, die sich auf vielen Geräten öffnen und ausdrucken lässt."
+          "{{portal_tf_help_content.text_3fc7f2f3a78b}}",
+          "{{portal_tf_help_content.text_5def2667ea73}}"
         ],
         "steps": []
       }
@@ -192,35 +213,35 @@ window.TfHelpPages=[
   },
   {
     "id": "probleme",
-    "group": "Erste Schritte",
-    "title": "Wenn etwas nicht klappt",
-    "short": "Verbindung, Anmeldung, nicht gespeicherte Angaben und Fehlermeldungen.",
+    "group": "{{portal_tf_help_content.text_232c9caabcc3}}",
+    "title": "{{portal_tf_help_content.text_fb803186b063}}",
+    "short": "{{portal_tf_help_content.text_8b2449353afd}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Meldung erscheint",
+        "title": "{{portal_tf_help_content.text_28ff1bf442e8}}",
         "paragraphs": [
-          "Lies zuerst die Meldung vollständig. Meist nennt sie ein fehlendes Feld oder den nächsten Schritt. Schließe die Meldung mit Okay und prüfe das genannte Feld. GPS-Signal- und HTTPS-Hinweise schließen nach drei Sekunden auch von selbst."
+          "{{portal_tf_help_content.text_fd7b28e782b6}}"
         ],
         "steps": []
       },
       {
-        "title": "Keine Internetverbindung",
+        "title": "{{portal_tf_help_content.text_00178bc700d7}}",
         "paragraphs": [
-          "Internet bedeutet hier die Verbindung zwischen Deinem Gerät und dem Server der Anwendung. Der Server ist der zentrale Rechner, auf dem die übertragenen Angaben für die Anwendung gespeichert werden. Bereits lokal gesicherte Arbeitsberichte bleiben auf diesem Gerät erhalten. Lokal heißt: auf genau diesem Gerät und in diesem Browser. Zum Übertragen und zum erstmaligen Laden vieler anderer Inhalte ist eine Verbindung nötig."
+          "{{portal_tf_help_content.text_d9b8f7090ad0}}"
         ],
         "steps": [
-          "Unterbrich nicht wiederholt denselben Speichervorgang.",
-          "Nutze beim Arbeitsbericht Zwischenspeichern.",
-          "Prüfe die Verbindung und versuche die Übertragung später erneut.",
-          "Lösche keine Browserdaten, wenn noch nicht übertragene Eingaben auf dem Gerät liegen."
+          "{{portal_tf_help_content.text_a9e4faf2380a}}",
+          "{{portal_tf_help_content.text_0c8318879b11}}",
+          "{{portal_tf_help_content.text_14c7610ffe31}}",
+          "{{portal_tf_help_content.text_c9257bac3294}}"
         ]
       },
       {
-        "title": "Hilfe durch eine zuständige Person",
+        "title": "{{portal_tf_help_content.text_09a3957e2f74}}",
         "paragraphs": [
-          "Notiere den Bereich, die genaue Meldung und ungefähr die Uhrzeit. Gib diese Angaben Deiner zuständigen Verwaltung. Teile dabei nicht Dein Passwort mit."
+          "{{portal_tf_help_content.text_4ff0f620311a}}"
         ],
         "steps": []
       }
@@ -228,35 +249,35 @@ window.TfHelpPages=[
   },
   {
     "id": "arbeit",
-    "group": "Arbeitsbericht",
-    "title": "Arbeitsbericht: der ganze Ablauf",
-    "short": "Von der neuen Erfassung bis zum Speichern und Übertragen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_d3acc7bcd5ec}}",
+    "short": "{{portal_tf_help_content.text_1e1d4cb9cd4f}}",
     "path": "/tf/arbeitsbericht",
     "aliases": [],
     "sections": [
       {
-        "title": "Was wird erfasst?",
+        "title": "{{portal_tf_help_content.text_25ffb453f6c1}}",
         "paragraphs": [
-          "Ein Arbeitsbericht enthält den Dienstbeginn, das Dienstende und die passende Dienstart. Je nach Bedarf kommen Gastfahrten, Zugfahrten, Standzeiten und Belege hinzu."
+          "{{portal_tf_help_content.text_e780caefe371}}"
         ],
         "steps": []
       },
       {
-        "title": "Schritt für Schritt",
+        "title": "{{portal_tf_help_content.text_4d33c44a7407}}",
         "paragraphs": [],
         "steps": [
-          "Wähle Neuen Arbeitsbericht erstellen.",
-          "Wähle die passende Dienstart und trage Dienstbeginn sowie Dienstende ein. Achte auch auf das Datum.",
-          "Ergänze bei Bedarf Gastfahrten, Zugfahrten und Belege. Die folgenden Hilfethemen erklären diese Gruppen einzeln.",
-          "Prüfe die Zeitwerte und Hinweise. Fehlende Pausen oder unvollständige Angaben müssen vor der endgültigen Übertragung geklärt werden.",
-          "Wähle Zwischenspeichern, um den bisherigen Stand zu sichern.",
-          "Wenn alles vollständig ist, wähle Synchronisieren. Dadurch wird der Bericht endgültig an die Anwendung übertragen."
+          "{{portal_tf_help_content.text_3f1bf6ff1304}}",
+          "{{portal_tf_help_content.text_bed45a5aacf4}}",
+          "{{portal_tf_help_content.text_767a13caa52e}}",
+          "{{portal_tf_help_content.text_52c42f577a8a}}",
+          "{{portal_tf_help_content.text_5e97f1c908e5}}",
+          "{{portal_tf_help_content.text_27ba570dbdb6}}"
         ]
       },
       {
-        "title": "Wo stehen die Angaben?",
+        "title": "{{portal_tf_help_content.text_1e5795412d7d}}",
         "paragraphs": [
-          "Links stehen Dienstart und Zeitwerte. Rechts stehen Dienstbeginn, Dienstende und Ausbleibe. Die Liste der Zugfahrtdetails steht über dem GPS-Bereich. Auf einem kleinen Bildschirm werden die Gruppen untereinander angezeigt."
+          "{{portal_tf_help_content.text_74dffa38113f}}"
         ],
         "steps": []
       }
@@ -264,40 +285,40 @@ window.TfHelpPages=[
   },
   {
     "id": "dienst",
-    "group": "Arbeitsbericht",
-    "title": "Dienstzeiten, Dienstart und Zeitwerte",
-    "short": "Die Kürzel DS bis K und die vier Zeitwerte verstehen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_ad921f1b2ce2}}",
+    "short": "{{portal_tf_help_content.text_4a10577151f6}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Die richtige Dienstart auswählen",
+        "title": "{{portal_tf_help_content.text_33a373ef8b40}}",
         "paragraphs": [
-          "DS bedeutet Dienstschicht. BS bedeutet Bereitschaft. RBS bedeutet Rufbereitschaft. AS bedeutet Ausfallschicht. U bedeutet Urlaub. K bedeutet Krank. Die Anwendung verwendet je nach Auswahl unterschiedliche Zeitregeln."
+          "{{portal_tf_help_content.text_6ba93bb7fbff}}"
         ],
         "steps": []
       },
       {
-        "title": "Beginn und Ende eingeben",
+        "title": "{{portal_tf_help_content.text_fc9dcb9c39ea}}",
         "paragraphs": [],
         "steps": [
-          "Wähle das Feld Dienstbeginn und trage Datum und Uhrzeit ein.",
-          "Trage Dienstende rechts darunter ein. Das Ende muss nach dem Beginn liegen.",
-          "Wenn der Dienst über Mitternacht hinausgeht, wähle beim Ende auch den richtigen folgenden Tag.",
-          "Prüfe die angezeigten Hinweise. Bei Rufbereitschaft oder Abwesenheit gelten besondere Eingabegrenzen."
+          "{{portal_tf_help_content.text_6a69b3c85c4c}}",
+          "{{portal_tf_help_content.text_565a8840dc3d}}",
+          "{{portal_tf_help_content.text_ff4ad25d9ffd}}",
+          "{{portal_tf_help_content.text_85146cb423ca}}"
         ]
       },
       {
-        "title": "Die vier Werte lesen",
+        "title": "{{portal_tf_help_content.text_bcbe78122f9b}}",
         "paragraphs": [
-          "Σ- AZ zeigt die gesamte Dienstspanne. Min. ☕ zeigt die Mindestpause nach der Dienstregel. AZ inkl. ☕ zeigt die angerechnete Arbeitszeit einschließlich dokumentierter Pausen. Bisher-☕ zeigt die bisher dokumentierten Pausen. h:mm bedeutet Stunden und Minuten: 8:30 sind acht Stunden und 30 Minuten; 0:45 sind 45 Minuten."
+          "{{portal_tf_help_content.text_2cb36fd5df02}}"
         ],
         "steps": []
       },
       {
-        "title": "Ausbleibe und Hotel",
+        "title": "{{portal_tf_help_content.text_40d899d3f9f8}}",
         "paragraphs": [
-          "Wähle in Ausbleibe die zutreffenden Kästchen. Unter Hotelübergang können bei Bedarf Ort und Hotelname ergänzt werden. Die angezeigten Zeitwerte berechnet die Anwendung; Du musst diese Zahlen nicht selbst in die Anzeige schreiben."
+          "{{portal_tf_help_content.text_6605644c55dd}}"
         ],
         "steps": []
       }
@@ -305,28 +326,28 @@ window.TfHelpPages=[
   },
   {
     "id": "gast",
-    "group": "Arbeitsbericht",
-    "title": "Gastfahrten eintragen",
-    "short": "Bahnhöfe, Zeiten und Verkehrsmittel einer Gastfahrt angeben.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_d8ea38c0eac8}}",
+    "short": "{{portal_tf_help_content.text_b0a054b0158f}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Gastfahrt hinzufügen",
+        "title": "{{portal_tf_help_content.text_b9d929ce1741}}",
         "paragraphs": [],
         "steps": [
-          "Öffne Gastfahrten.",
-          "Gib bei Von und Nach den Bahnhof ein und wähle einen Vorschlag.",
-          "Prüfe Beginn und Ende mit Datum. Die vorgeschlagenen Zeiten kannst Du ändern.",
-          "Wähle das Verkehrsmittel. Ergänze bei einem anderen Verkehrsmittel die Beschreibung.",
-          "Prüfe, ob Selbstzahler zutrifft und ob ein Beleg benötigt wird.",
-          "Wähle Gastfahrt speichern. Die Fahrt steht danach in der Liste."
+          "{{portal_tf_help_content.text_e51cd863d908}}",
+          "{{portal_tf_help_content.text_fec51d2d9e0e}}",
+          "{{portal_tf_help_content.text_e436eeb3f351}}",
+          "{{portal_tf_help_content.text_a0be2d457351}}",
+          "{{portal_tf_help_content.text_d8d24a7eda76}}",
+          "{{portal_tf_help_content.text_a89f277bd1ea}}"
         ]
       },
       {
-        "title": "Zeiten und Änderungen",
+        "title": "{{portal_tf_help_content.text_f21f50a4c3f9}}",
         "paragraphs": [
-          "Gastfahrten können vor, während oder nach dem Dienst liegen. Die Anwendung unterscheidet die Zeit im Dienst von der Zeit außerhalb. Über Bearbeiten änderst Du eine hinzugefügte Gastfahrt. Löschen entfernt sie aus dem noch bearbeitbaren Bericht. Abbrechen schließt die laufende Eingabe; bereits hinzugefügte Fahrten bleiben erhalten."
+          "{{portal_tf_help_content.text_8bd470989d7f}}"
         ],
         "steps": []
       }
@@ -334,45 +355,45 @@ window.TfHelpPages=[
   },
   {
     "id": "zug",
-    "group": "Arbeitsbericht",
-    "title": "Zugfahrten und ihre Details",
-    "short": "Eine Zugfahrt anlegen und einzelne Ereignisse eintragen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_e36310cb9067}}",
+    "short": "{{portal_tf_help_content.text_863cdea8c47e}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Zugfahrt anlegen",
+        "title": "{{portal_tf_help_content.text_685aa6fe0695}}",
         "paragraphs": [
-          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Du das Kürzel nicht kennst, kannst Du den ausgeschriebenen Bahnhofsnamen eingeben."
+          "{{portal_tf_help_content.text_1ab288c0e867}}"
         ],
         "steps": [
-          "Wähle Zugfahrt hinzufügen.",
-          "Trage Zugnummer, Startbahnhof, Zielbahnhof sowie Abfahrt und Ankunft ein.",
-          "Wähle Bahnhöfe über DS100 oder den ausgeschriebenen Namen aus den Vorschlägen.",
-          "Weitere Zugfahrten erhalten eigene Reiter. Wähle den passenden Reiter, bevor Du dazu Angaben machst."
+          "{{portal_tf_help_content.text_856eca111ad8}}",
+          "{{portal_tf_help_content.text_b46e36dced78}}",
+          "{{portal_tf_help_content.text_3259bc003c4e}}",
+          "{{portal_tf_help_content.text_bf02457555af}}"
         ]
       },
       {
-        "title": "Ein Ereignis eintragen",
+        "title": "{{portal_tf_help_content.text_47013acb455c}}",
         "paragraphs": [],
         "steps": [
-          "Wähle Art und Grund.",
-          "Gib Meldestelle/Ort sowie Von und Bis ein.",
-          "Ergänze bei Sonstiges die gewünschte Erklärung im Textfeld.",
-          "Wähle Eintragen. Die Zeile erscheint in der Detailliste. Diese Liste ist immer zeitlich sortiert."
+          "{{portal_tf_help_content.text_b0a4607ffec3}}",
+          "{{portal_tf_help_content.text_7c2a1d0d4468}}",
+          "{{portal_tf_help_content.text_e13684e81c75}}",
+          "{{portal_tf_help_content.text_757e06e4c250}}"
         ]
       },
       {
-        "title": "Bearbeiten und Pausen",
+        "title": "{{portal_tf_help_content.text_76deca1b3830}}",
         "paragraphs": [
-          "Wähle eine vorhandene Zeile, um ihre Angaben im Eingabebereich zu sehen. Wenn der Bericht bearbeitbar ist, kannst Du sie ändern und speichern oder entfernen. Wähle für eine Pause den passenden Pausengrund. Die Schaltfläche Auch als Pause Hinzuf. wird nur angeboten, wenn die Voraussetzungen dafür erfüllt sind."
+          "{{portal_tf_help_content.text_8f14c925c120}}"
         ],
         "steps": []
       },
       {
-        "title": "GPS-Bereich darunter",
+        "title": "{{portal_tf_help_content.text_dc87aa1fe065}}",
         "paragraphs": [
-          "Die Detailliste steht über GPS. + oben rechts öffnet den GPS-Bereich. − klappt ihn wieder zu, ohne eine laufende Erfassung zu stoppen."
+          "{{portal_tf_help_content.text_f87c793957b9}}"
         ],
         "steps": []
       }
@@ -380,55 +401,55 @@ window.TfHelpPages=[
   },
   {
     "id": "gps",
-    "group": "Arbeitsbericht",
-    "title": "GPS-Aufzeichnung und Karte",
-    "short": "Eine Zugfahrt aufzeichnen, Halte prüfen und Kartenpunkte auswählen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_b6e5befb520a}}",
+    "short": "{{portal_tf_help_content.text_8734e980fce8}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "GPS bedeutet Standortbestimmung",
+        "title": "{{portal_tf_help_content.text_39c45f294312}}",
         "paragraphs": [
-          "Dein Gerät ermittelt dabei seine Position. Für die Browser-Aufzeichnung werden eine sichere Verbindung (HTTPS), eine Standortfreigabe und ein sichtbarer Tab benötigt. Ein Tab ist die geöffnete Seite im Browser. Die Android-App nutzt einen Standortdienst und zeigt eine dauerhafte Benachrichtigung."
+          "{{portal_tf_help_content.text_91ddd8284f36}}"
         ],
         "steps": []
       },
       {
-        "title": "Eine Fahrt aufzeichnen",
+        "title": "{{portal_tf_help_content.text_8c6159198db7}}",
         "paragraphs": [],
         "steps": [
-          "Öffne die passende Zugfahrt und trage ihre Zugnummer ein.",
-          "Öffne den GPS-Bereich mit +.",
-          "Wähle Zugfahrt per GPS aufzeichnen. Gib den Startbahnhof selbst ein und wähle den passenden Vorschlag.",
-          "Erlaube die Standortbestimmung, wenn Dein Gerät danach fragt.",
-          "Wähle zum Beenden GPS-Aufzeichnung beenden und gib den Endbahnhof ein."
+          "{{portal_tf_help_content.text_60b2ee5aaab3}}",
+          "{{portal_tf_help_content.text_057a633120ab}}",
+          "{{portal_tf_help_content.text_f4a9e736dd5c}}",
+          "{{portal_tf_help_content.text_2580c4b2e00e}}",
+          "{{portal_tf_help_content.text_b4a43c957136}}"
         ]
       },
       {
-        "title": "Erkannte Standzeiten",
+        "title": "{{portal_tf_help_content.text_0217d5644486}}",
         "paragraphs": [
-          "Ein GPS-Halt erscheint ab vier Minuten. Bewegungen innerhalb von 100 Metern werden zu einem Halt zusammengefasst. Die Abfahrt wird außerhalb dieses Kreises mit mehr als 5 km/h erkannt. Prüfe trotzdem jeden Halt, ergänze Bahnhof und Grund und wähle ↑ Übernehmen. Der Halt verschwindet aus der offenen Liste und steht dann in den Zugfahrtdetails."
+          "{{portal_tf_help_content.text_f20e2427f98e}}"
         ],
         "steps": []
       },
       {
-        "title": "Die Karte bedienen",
+        "title": "{{portal_tf_help_content.text_f744fea20920}}",
         "paragraphs": [
-          "Blau-rote Punkte markieren Halte. Wenn Du einen Punkt oder eine Standzeitenzeile wählst, wird der Punkt größer und in der Kartenmitte herangezoomt. Position folgen zeigt wieder die aktuelle Position. Gesamter Verlauf zeigt die gesamte Strecke. Plus und Minus an der Karte verändern die Vergrößerung."
+          "{{portal_tf_help_content.text_b434f5e85711}}"
         ],
         "steps": []
       },
       {
-        "title": "Fehlende Signale, Zeiten und Löschen",
+        "title": "{{portal_tf_help_content.text_49740fca5772}}",
         "paragraphs": [
-          "Bei Signalverlust wird zwischen gültigen Punkten eine gestrichelte, geschätzte Verbindung gezeichnet. Daraus wird keine Standzeit erfunden. Fehlendes Internet erzeugt keine Internet-Warnmeldung. Beginn und Ende eines Halts erscheinen als HH:MM ohne Sekunden. Ein fehlendes Ende kannst Du selbst eingeben. Löschen entfernt einen offenen Halt aus Liste und Karte. Die ursprünglichen GPS-Punkte bleiben erhalten."
+          "{{portal_tf_help_content.text_10b290c4eb78}}"
         ],
         "steps": []
       },
       {
-        "title": "Ältere Aufzeichnungen",
+        "title": "{{portal_tf_help_content.text_f1cf22f32bac}}",
         "paragraphs": [
-          "Auch ältere Verläufe mit gespeicherten GPS-Punkten werden nach den aktuellen Regeln ausgewertet. Bisherige Angaben bleiben erhalten. Ein bereits übernommener Halt soll nicht erneut übernommen werden."
+          "{{portal_tf_help_content.text_5ef0df41ce32}}"
         ],
         "steps": []
       }
@@ -436,36 +457,36 @@ window.TfHelpPages=[
   },
   {
     "id": "stand",
-    "group": "Arbeitsbericht",
-    "title": "Standzeit ohne GPS messen",
-    "short": "Mit Start Stand und Ende Stand einen Halt selbst erfassen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_76245b1bd232}}",
+    "short": "{{portal_tf_help_content.text_27063fe9f61b}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Wann hilft diese Funktion?",
+        "title": "{{portal_tf_help_content.text_520ed8aeaa01}}",
         "paragraphs": [
-          "Wenn keine GPS-Aufzeichnung läuft, kannst Du einen Halt selbst beginnen und beenden. Dafür ist keine Standortfreigabe nötig. Die Anwendung erfindet dabei keinen Punkt auf der Karte.",
-          "DS100 ist das kurze Kennzeichen eines Bahnhofs oder einer Betriebsstelle. Wenn Du das Kürzel nicht kennst, kannst Du den ausgeschriebenen Bahnhofsnamen eingeben."
+          "{{portal_tf_help_content.text_e7ea39de3399}}",
+          "{{portal_tf_help_content.text_1ab288c0e867}}"
         ],
         "steps": []
       },
       {
-        "title": "Eine Standzeit erfassen",
+        "title": "{{portal_tf_help_content.text_886e4475e1d0}}",
         "paragraphs": [],
         "steps": [
-          "Öffne die passende Zugfahrt und darunter den GPS-/Standzeitenbereich mit +.",
-          "Wähle den grünen Button Start Stand.",
-          "Während die Zeit läuft, siehst Du die Minuten in roter Fettschrift. Der Button wird rot und heißt Ende Stand.",
-          "Wenn der Halt vorbei ist, wähle Ende Stand. Beginn und Ende stehen danach in der Liste, auch wenn der Halt kürzer als vier Minuten war.",
-          "Ergänze DS100 oder Bahnhofsname sowie den Grund. Einen eigenen Grund schreibst Du ins Textfeld.",
-          "Wähle ↑ Übernehmen, um den Halt in die Zugfahrtdetails zu übernehmen."
+          "{{portal_tf_help_content.text_c1acacd11e92}}",
+          "{{portal_tf_help_content.text_5738973c52f3}}",
+          "{{portal_tf_help_content.text_5b8a908ade4c}}",
+          "{{portal_tf_help_content.text_cc779bbdd42d}}",
+          "{{portal_tf_help_content.text_b4ae69a5954e}}",
+          "{{portal_tf_help_content.text_4814e616dbe0}}"
         ]
       },
       {
-        "title": "Wenn die Seite geschlossen wurde",
+        "title": "{{portal_tf_help_content.text_ad95efb296b5}}",
         "paragraphs": [
-          "Der gespeicherte Beginn ermöglicht es, eine laufende Standzeit nach dem Neuladen fortzusetzen. Nutze zusätzlich Zwischenspeichern. Zugfahrtdetails arbeiten minutengenau. Ein Halt mit Beginn und Ende innerhalb derselben Minute bleibt zunächst in der Standzeitenliste bearbeitbar."
+          "{{portal_tf_help_content.text_139c51a07997}}"
         ],
         "steps": []
       }
@@ -473,40 +494,40 @@ window.TfHelpPages=[
   },
   {
     "id": "speichern",
-    "group": "Arbeitsbericht",
-    "title": "Speichern, Wiederherstellen und Synchronisieren",
-    "short": "Den Unterschied zwischen einem Entwurf und einem übertragenen Bericht verstehen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_38f56f09e648}}",
+    "short": "{{portal_tf_help_content.text_dadf36af42fd}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Zwischenspeichern",
+        "title": "{{portal_tf_help_content.text_d20696eb6a8b}}",
         "paragraphs": [
-          "Ein Entwurf ist ein noch nicht endgültig übertragener Arbeitsbericht. Zwischenspeichern sichert auch vorhandene GPS-Aufzeichnungen und manuelle Standzeiten, ohne eine laufende Erfassung zu beenden. Bei verfügbarer Verbindung wird zusätzlich eine Entwurfssicherung auf dem Server versucht."
+          "{{portal_tf_help_content.text_fc00f6520313}}"
         ],
         "steps": []
       },
       {
-        "title": "Wieder öffnen",
+        "title": "{{portal_tf_help_content.text_4076359f0701}}",
         "paragraphs": [
-          "Offene Eingaben werden auf diesem Gerät automatisch gesichert. Wenn Du den Arbeitsbericht wieder öffnest, wird der letzte Bearbeitungsstand geladen. Dies funktioniert mit demselben Gerät und Browser. Das Löschen von Browserdaten oder ein privates Browserfenster kann diese örtliche Sicherung entfernen."
+          "{{portal_tf_help_content.text_a0be2150bb33}}"
         ],
         "steps": []
       },
       {
-        "title": "Endgültig übertragen",
+        "title": "{{portal_tf_help_content.text_68fce00d7ea3}}",
         "paragraphs": [],
         "steps": [
-          "Beende laufende GPS- und manuelle Erfassungen.",
-          "Ergänze fehlende Angaben und noch nicht eingetragene Ereignisse.",
-          "Prüfe die Listen und wähle Synchronisieren.",
-          "Warte die Rückmeldung ab und prüfe den Status in der Monatsliste."
+          "{{portal_tf_help_content.text_ce624f1a69aa}}",
+          "{{portal_tf_help_content.text_4e03801404c0}}",
+          "{{portal_tf_help_content.text_3d4e58f8b925}}",
+          "{{portal_tf_help_content.text_b88504e60714}}"
         ]
       },
       {
-        "title": "Löschen und unterschiedliche Stände",
+        "title": "{{portal_tf_help_content.text_9907acc0b8b0}}",
         "paragraphs": [
-          "Solange der Bericht noch nicht endgültig synchronisiert ist, kann er über Arbeitsbericht löschen oder in der Monatsliste gelöscht werden. Damit werden auch zugehörige lokale GPS-Daten und Belege entfernt. Bei fehlender Verbindung wird die Serverlöschung später nachgeholt. Bereits endgültig synchronisierte Berichte sind davor geschützt. Wenn ein Hinweis auf unterschiedliche Bearbeitungsstände erscheint, lade nicht unüberlegt einen anderen Stand: Lies die Meldung und wähle die gewünschte Fassung."
+          "{{portal_tf_help_content.text_bad14bbeae1a}}"
         ],
         "steps": []
       }
@@ -514,27 +535,27 @@ window.TfHelpPages=[
   },
   {
     "id": "belege",
-    "group": "Arbeitsbericht",
-    "title": "Belege hinzufügen",
-    "short": "Eine Quittung oder andere Datei zum Arbeitsbericht ablegen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_83f5f55f2c9b}}",
+    "short": "{{portal_tf_help_content.text_7cf4d9a64179}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Datei auswählen",
+        "title": "{{portal_tf_help_content.text_ba83c7629645}}",
         "paragraphs": [],
         "steps": [
-          "Öffne den Belegbereich, wenn er für Deine Eingabe angezeigt wird.",
-          "Wähle Belege wählen. Auf dem Gerät öffnet sich die Dateiauswahl.",
-          "Wähle die passende PDF-, JPEG- oder PNG-Datei. Eine Datei darf höchstens 10 MB groß sein.",
-          "Prüfe, ob die Datei in der Belegliste erscheint.",
-          "Speichere den Arbeitsbericht zwischen und synchronisiere ihn, wenn er vollständig ist."
+          "{{portal_tf_help_content.text_4a4aaf12c283}}",
+          "{{portal_tf_help_content.text_d86d32fcc1ec}}",
+          "{{portal_tf_help_content.text_361cb6953cd2}}",
+          "{{portal_tf_help_content.text_f0241622da89}}",
+          "{{portal_tf_help_content.text_b7d747adf46d}}"
         ]
       },
       {
-        "title": "Was bedeutet MB?",
+        "title": "{{portal_tf_help_content.text_9c2dd7d7a34e}}",
         "paragraphs": [
-          "MB ist eine Angabe für die Dateigröße. Ein sehr großes Foto kann zu groß sein. Die Anwendung meldet das. Nach der Serversynchronisation werden Belege entsprechend der Einrichtung automatisch versendet. Wähle daher nur Dateien aus, die zu diesem Bericht gehören."
+          "{{portal_tf_help_content.text_7dd496c066fb}}"
         ],
         "steps": []
       }
@@ -542,26 +563,26 @@ window.TfHelpPages=[
   },
   {
     "id": "monatsliste",
-    "group": "Arbeitsbericht",
-    "title": "Monatsliste und alte Arbeitsberichte",
-    "short": "Berichte eines Monats finden, ansehen und gezielt übertragen.",
+    "group": "{{portal_tf_help_content.text_363b42b18514}}",
+    "title": "{{portal_tf_help_content.text_ec747833a47d}}",
+    "short": "{{portal_tf_help_content.text_140ee254fcec}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Die Liste benutzen",
+        "title": "{{portal_tf_help_content.text_9c69ef468dd5}}",
         "paragraphs": [],
         "steps": [
-          "Wähle den gewünschten Monat in der Arbeitsberichtsliste.",
-          "Wähle eine Zeile, um den zugehörigen Bericht zu öffnen.",
-          "Prüfe die Kennzeichnung, ob der Bericht noch lokal oder bereits synchronisiert ist. Verlasse Dich nicht allein auf die Farbe.",
-          "Nutze die angebotene Synchronisieren-Schaltfläche für den gewünschten Bericht oder die Monatsauswahl."
+          "{{portal_tf_help_content.text_bc17c136c039}}",
+          "{{portal_tf_help_content.text_3aa3adb29804}}",
+          "{{portal_tf_help_content.text_0441c15273b2}}",
+          "{{portal_tf_help_content.text_0b31aa542d8e}}"
         ]
       },
       {
-        "title": "Ältere Berichte",
+        "title": "{{portal_tf_help_content.text_4239333c488c}}",
         "paragraphs": [
-          "Auch alte Zugfahrtdetails werden zeitlich sortiert angezeigt. Bereits übertragene oder gesperrte Angaben können geschützt sein. Eine ausgegraute Eingabe bedeutet dann nicht, dass Deine Daten verschwunden sind."
+          "{{portal_tf_help_content.text_b852c84f0fb8}}"
         ],
         "steps": []
       }
@@ -569,29 +590,29 @@ window.TfHelpPages=[
   },
   {
     "id": "lok",
-    "group": "Lokübergabebuch",
-    "title": "Triebfahrzeuge und Lokübergabebuch",
-    "short": "Ein Fahrzeug suchen, seinen Status ansehen und Protokolle finden.",
+    "group": "{{portal_tf_help_content.text_2f571b7ba8ad}}",
+    "title": "{{portal_tf_help_content.text_bce0a0c12238}}",
+    "short": "{{portal_tf_help_content.text_7828e9076a39}}",
     "path": "/tf/loco-handover",
     "aliases": [
       "/tf/lokuebergabebuch"
     ],
     "sections": [
       {
-        "title": "Ein Fahrzeug auswählen",
+        "title": "{{portal_tf_help_content.text_e5d676a5b6d1}}",
         "paragraphs": [],
         "steps": [
-          "Öffne Lokübergabebuch.",
-          "Nutze die angezeigte Fahrzeugübersicht oder Suche.",
-          "Wähle das passende Fahrzeug anhand der Nummer.",
-          "Prüfe Status, Fahrzeugangaben und vorhandene Übergabeprotokolle.",
-          "Über Zurück zur Übersicht gelangst Du zur Fahrzeugliste."
+          "{{portal_tf_help_content.text_8dc188120a13}}",
+          "{{portal_tf_help_content.text_a053035d8e23}}",
+          "{{portal_tf_help_content.text_048a74e79c59}}",
+          "{{portal_tf_help_content.text_157deb489d34}}",
+          "{{portal_tf_help_content.text_4349e3d604c8}}"
         ]
       },
       {
-        "title": "Status und verfügbare Funktionen",
+        "title": "{{portal_tf_help_content.text_eb82342a14be}}",
         "paragraphs": [
-          "Die Übersicht unterscheidet einsatzbereit, nicht einsatzbereit und eingeschränkt einsatzbereit. Bei Einschränkungen kann ein Hinweistext angezeigt werden. Schaltflächen wie PZB oder Störungen können noch nicht verfügbar sein. Eine graue Schaltfläche lässt sich dann nicht öffnen."
+          "{{portal_tf_help_content.text_7f34fad366f6}}"
         ],
         "steps": []
       }
@@ -599,28 +620,28 @@ window.TfHelpPages=[
   },
   {
     "id": "protokoll",
-    "group": "Lokübergabebuch",
-    "title": "Ein Übergabeprotokoll schreiben",
-    "short": "Dienst, Betriebsstelle, Zähler und Besonderheiten zum Fahrzeug erfassen.",
+    "group": "{{portal_tf_help_content.text_2f571b7ba8ad}}",
+    "title": "{{portal_tf_help_content.text_35e44112d56b}}",
+    "short": "{{portal_tf_help_content.text_0a0cb1ef833a}}",
     "path": null,
     "aliases": [],
     "sections": [
       {
-        "title": "Ein Protokoll anlegen",
+        "title": "{{portal_tf_help_content.text_5a0363ab2379}}",
         "paragraphs": [],
         "steps": [
-          "Wähle zuerst das richtige Fahrzeug.",
-          "Wähle Übergabeprotokoll, wenn die Schaltfläche für Dich verfügbar ist.",
-          "Ergänze die angebotenen Angaben zu Dienst, Zugnummer und Betriebsstelle. Die Betriebsstelle wird über DS100 oder Bahnhofsname gesucht.",
-          "Trage bei Bedarf die Zählerstände 1.8.0 und 2.8.0, den Kilometerstand und Besonderheiten ein.",
-          "Wähle bei Meldung an nur dann einen Empfänger, wenn eine Meldung gewünscht ist.",
-          "Prüfe alles und wähle Eintragen."
+          "{{portal_tf_help_content.text_34b35b983bf0}}",
+          "{{portal_tf_help_content.text_e104b99a8bd4}}",
+          "{{portal_tf_help_content.text_c6182a672724}}",
+          "{{portal_tf_help_content.text_b8c350705da1}}",
+          "{{portal_tf_help_content.text_c5b67d730ade}}",
+          "{{portal_tf_help_content.text_de007696df93}}"
         ]
       },
       {
-        "title": "Dateien und vorhandene Protokolle",
+        "title": "{{portal_tf_help_content.text_c95b6e5b00f5}}",
         "paragraphs": [
-          "Es sind PDF-, JPEG- und PNG-Dateien möglich: höchstens zehn Dateien, je 10 MB und zusammen 30 MB. Öffne ein vorhandenes Protokoll über seine Zeile. Dort kannst Du Angaben und angehängte Dateien ansehen. Abbrechen beendet eine noch laufende Eingabe."
+          "{{portal_tf_help_content.text_a3f0c17f39bb}}"
         ],
         "steps": []
       }
@@ -628,23 +649,23 @@ window.TfHelpPages=[
   },
   {
     "id": "leuna",
-    "group": "Leuna Übergabeprotokoll",
-    "title": "Leuna Übergabeprotokoll",
-    "short": "Was dieser Menüpunkt im aktuellen Stand bereits anbietet.",
+    "group": "{{portal_tf_help_content.text_26674402a8dd}}",
+    "title": "{{portal_tf_help_content.text_26674402a8dd}}",
+    "short": "{{portal_tf_help_content.text_bb83cb97477c}}",
     "path": "/tf/leuna-uebergabeprotokoll",
     "aliases": [],
     "sections": [
       {
-        "title": "Aktueller Stand",
+        "title": "{{portal_tf_help_content.text_6ad691638eb6}}",
         "paragraphs": [
-          "Dieser Menüpunkt zeigt derzeit den Hinweis Details folgen später. Hier ist noch keine eigene Protokollerfassung freigeschaltet. Du hast also keinen Eingabeschritt übersehen."
+          "{{portal_tf_help_content.text_dd9832142c4c}}"
         ],
         "steps": []
       },
       {
-        "title": "Bereits verfügbare Protokolle",
+        "title": "{{portal_tf_help_content.text_5f453ce2b0d5}}",
         "paragraphs": [
-          "Übergabeprotokolle zu Triebfahrzeugen findest Du im Lokübergabebuch beim jeweiligen Fahrzeug. Kehre dafür zum TF-Portal zurück und öffne dieses Modul."
+          "{{portal_tf_help_content.text_995693c71bb6}}"
         ],
         "steps": []
       }
@@ -652,33 +673,33 @@ window.TfHelpPages=[
   },
   {
     "id": "plan",
-    "group": "Arbeitsplan",
-    "title": "Arbeits- und Ruhetagsplan lesen",
-    "short": "Monat, Jahr und einzelne Tage im persönlichen Plan ansehen.",
+    "group": "{{portal_tf_help_content.text_dc27cf1a64cb}}",
+    "title": "{{portal_tf_help_content.text_d5a3977ff17a}}",
+    "short": "{{portal_tf_help_content.text_b496f772d89f}}",
     "path": "/tf/arbeitsplan",
     "aliases": [],
     "sections": [
       {
-        "title": "Einen Monat ansehen",
+        "title": "{{portal_tf_help_content.text_49a8af36f088}}",
         "paragraphs": [],
         "steps": [
-          "Öffne Arbeitsplan.",
-          "Wähle den Monat oder wechsle mit den Pfeilen. Aktualisieren lädt den Stand erneut.",
-          "Wähle einen Tag, um seine Angaben zu sehen.",
-          "Beachte die Legende: A steht für Arbeit, R für Ruhe, U für Urlaub, K für Krank und ? für ungeplant."
+          "{{portal_tf_help_content.text_fef1b9e339af}}",
+          "{{portal_tf_help_content.text_92473341dab7}}",
+          "{{portal_tf_help_content.text_dc9657dcf6f8}}",
+          "{{portal_tf_help_content.text_d9ba7fa0c568}}"
         ]
       },
       {
-        "title": "Jahresansicht",
+        "title": "{{portal_tf_help_content.text_2128f73b9126}}",
         "paragraphs": [
-          "Wähle das gewünschte Jahr und lade die Jahresansicht. Farben und Tagesangaben helfen bei der Übersicht. Planänderungen werden durch die Personalplanung vorgenommen; diese Seite dient zum Ansehen Deines eigenen Plans."
+          "{{portal_tf_help_content.text_d25402329417}}"
         ],
         "steps": []
       },
       {
-        "title": "Plan und Arbeitsbericht sind verschieden",
+        "title": "{{portal_tf_help_content.text_e2e9ef1dfdab}}",
         "paragraphs": [
-          "Der Plan zeigt die vorgesehenen Tage. Der Arbeitsbericht enthält Deine erfassten Zeiten. Eine Änderung im Arbeitsbericht schreibt den Plan nicht automatisch um."
+          "{{portal_tf_help_content.text_12252b3236dc}}"
         ],
         "steps": []
       }
@@ -686,35 +707,35 @@ window.TfHelpPages=[
   },
   {
     "id": "dokumente",
-    "group": "Dokumentenverwaltung",
-    "title": "Dokumente finden und herunterladen",
-    "short": "Ordner öffnen, Dateien suchen, eigene Dokumente hochladen.",
+    "group": "{{portal_tf_help_content.text_9f563d69ed14}}",
+    "title": "{{portal_tf_help_content.text_56b365034d66}}",
+    "short": "{{portal_tf_help_content.text_413379d8355e}}",
     "path": "/documents",
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Datei finden",
+        "title": "{{portal_tf_help_content.text_6518ed9c037c}}",
         "paragraphs": [],
         "steps": [
-          "Öffne links den gewünschten Ordner. Ein Ordner sammelt zusammengehörige Dateien.",
-          "Wähle bei der passenden Datei Herunterladen. Herunterladen bedeutet: Eine Kopie der Datei wird auf Dein Gerät übertragen.",
-          "Je nach Gerät wird die Datei geöffnet oder im Download-Ordner abgelegt.",
-          "Über Dokumente durchsuchen kannst Du nach Dateiname oder Ordner suchen. Aktualisieren lädt die Liste neu."
+          "{{portal_tf_help_content.text_fa5b3800d691}}",
+          "{{portal_tf_help_content.text_0405ece3fe8c}}",
+          "{{portal_tf_help_content.text_b0b0d534c213}}",
+          "{{portal_tf_help_content.text_abe5d5addc26}}"
         ]
       },
       {
-        "title": "Eine eigene Datei hochladen",
+        "title": "{{portal_tf_help_content.text_22ee38d4af1f}}",
         "paragraphs": [],
         "steps": [
-          "Wähle zuerst den passenden Ordner.",
-          "Wähle im Upload-Bereich eine Datei auf Deinem Gerät.",
-          "Wähle Hochladen und warte die Rückmeldung ab. Die Datei darf höchstens 10 MB groß sein."
+          "{{portal_tf_help_content.text_30ef493302ac}}",
+          "{{portal_tf_help_content.text_1dd1440dc645}}",
+          "{{portal_tf_help_content.text_898071157710}}"
         ]
       },
       {
-        "title": "Löschen und automatisch erstellte Dateien",
+        "title": "{{portal_tf_help_content.text_e182f92f527c}}",
         "paragraphs": [
-          "Nur Dateien mit angebotener Löschmöglichkeit kannst Du hier entfernen. Automatisch erstellte Dokumente sind geschützt. Die Anwendung zeigt nur die Dokumente, für die Dein Konto Zugriff hat."
+          "{{portal_tf_help_content.text_f8e4a5c70991}}"
         ],
         "steps": []
       }
@@ -722,41 +743,41 @@ window.TfHelpPages=[
   },
   {
     "id": "stationen",
-    "group": "Bahnhofsverzeichnis",
-    "title": "Bahnhöfe, Kontakte und Bahnhofspläne",
-    "short": "Eigene Bahnhofseinträge suchen, ergänzen und mit anderen TF teilen.",
+    "group": "{{portal_tf_help_content.text_1d23894f82ca}}",
+    "title": "{{portal_tf_help_content.text_9ea88c91514a}}",
+    "short": "{{portal_tf_help_content.text_67e0aa2cb655}}",
     "path": "/tf/bahnhoefe",
     "aliases": [],
     "sections": [
       {
-        "title": "Was ist DS100?",
+        "title": "{{portal_tf_help_content.text_2179d7fb4635}}",
         "paragraphs": [
-          "DS100 ist das kurze Kennzeichen einer Betriebsstelle oder eines Bahnhofs. Wenn Du das Kürzel nicht kennst, suche nach dem ausgeschriebenen Namen. Wähle aus den Vorschlägen den passenden Eintrag."
+          "{{portal_tf_help_content.text_6849d535928b}}"
         ],
         "steps": []
       },
       {
-        "title": "Eigene Angaben pflegen",
+        "title": "{{portal_tf_help_content.text_1cc92ebf96e4}}",
         "paragraphs": [],
         "steps": [
-          "Suche einen vorhandenen Bahnhof in Deiner Liste oder wähle Bahnhof hinzufügen.",
-          "Wähle den passenden Bahnhof aus dem Verzeichnis.",
-          "Ergänze Deine Kontakte und die angebotenen Hinweise, zum Beispiel Lokabstellung oder Züge sichern.",
-          "Lade bei Bedarf einen Bahnhofsplan als PDF, JPEG oder PNG hoch.",
-          "Wähle Bahnhof speichern."
+          "{{portal_tf_help_content.text_5c78dc12b503}}",
+          "{{portal_tf_help_content.text_2c341c928746}}",
+          "{{portal_tf_help_content.text_77315b03c081}}",
+          "{{portal_tf_help_content.text_5c407664cc50}}",
+          "{{portal_tf_help_content.text_aa6d4139138a}}"
         ]
       },
       {
-        "title": "Bahnhöfe teilen",
+        "title": "{{portal_tf_help_content.text_2014393dd1d5}}",
         "paragraphs": [
-          "Wähle die gewünschten Bahnhöfe und einen TF als Empfänger. Prüfe die Auswahl und bestätige das Senden. Empfangene Bahnhofseinträge liegen zunächst in Deiner Zwischenablage. Du entscheidest, was Du übernimmst. Leere Angaben können ergänzt werden; bestehende eigene Angaben bleiben beim vorgesehenen Zusammenführen erhalten."
+          "{{portal_tf_help_content.text_cb9f20a9c54f}}"
         ],
         "steps": []
       },
       {
-        "title": "Name oder Kürzel bereits vorhanden",
+        "title": "{{portal_tf_help_content.text_e6a75efc86fc}}",
         "paragraphs": [
-          "Falls eine Meldung auf einen doppelten Namen oder ein doppeltes Kürzel hinweist, ändere die Bezeichnung wie angeboten. Speichere erst, wenn der Hinweis geklärt ist."
+          "{{portal_tf_help_content.text_f922cfd11379}}"
         ],
         "steps": []
       }
@@ -764,34 +785,34 @@ window.TfHelpPages=[
   },
   {
     "id": "nachrichten",
-    "group": "Kurznachrichten",
-    "title": "Nachrichten lesen und schreiben",
-    "short": "Posteingang, Empfänger, Anhänge, Antworten und Weiterleiten.",
+    "group": "{{portal_tf_help_content.text_73e0cf4b6d15}}",
+    "title": "{{portal_tf_help_content.text_78ee4e5c53bb}}",
+    "short": "{{portal_tf_help_content.text_f867b96a12d1}}",
     "path": "/tf/nachrichten",
     "aliases": [],
     "sections": [
       {
-        "title": "Nachrichten lesen",
+        "title": "{{portal_tf_help_content.text_f0cc7ba215b0}}",
         "paragraphs": [
-          "Die Glocke zeigt die Anzahl ungelesener Nachrichten. Wähle im Modul Kurznachrichten eine Zeile, um die Nachricht zu öffnen. Zwischen Posteingang und Gesendete kannst Du umschalten. Mit Zurück und Weiter wechselst Du die Listenseite."
+          "{{portal_tf_help_content.text_2adb1ef163b0}}"
         ],
         "steps": []
       },
       {
-        "title": "Eine Nachricht schreiben",
+        "title": "{{portal_tf_help_content.text_632d3307cfc5}}",
         "paragraphs": [],
         "steps": [
-          "Wähle neue Nachricht schreiben.",
-          "Wähle einen oder mehrere Empfänger. Prüfe die Namen sorgfältig.",
-          "Trage Betreff und Nachricht ein. Der Text darf höchstens 1000 Zeichen haben. Die Anzeige daneben zählt den verfügbaren Platz.",
-          "Wenn nötig, wähle eine Datei als Anhang. Die Datei darf höchstens 10 MB groß sein.",
-          "Wähle Senden. Erst dadurch wird die Nachricht verschickt."
+          "{{portal_tf_help_content.text_69d36aa18734}}",
+          "{{portal_tf_help_content.text_89a1a7ba24ad}}",
+          "{{portal_tf_help_content.text_82f72337c924}}",
+          "{{portal_tf_help_content.text_6e5451b962a7}}",
+          "{{portal_tf_help_content.text_b341d58533ba}}"
         ]
       },
       {
-        "title": "Antworten, Weiterleiten und Löschen",
+        "title": "{{portal_tf_help_content.text_16ab3e0f022d}}",
         "paragraphs": [
-          "In einer geöffneten Nachricht kannst Du antworten oder weiterleiten. Wähle beim Weiterleiten die Empfänger noch einmal aus. Löschen entfernt die Nachricht aus Deiner Ansicht; die Ansicht anderer Empfänger wird dadurch nicht mitgelöscht. X schließt die geöffnete Nachricht."
+          "{{portal_tf_help_content.text_7bbd865c6185}}"
         ],
         "steps": []
       }
@@ -799,33 +820,33 @@ window.TfHelpPages=[
   },
   {
     "id": "konto",
-    "group": "Mein Konto",
-    "title": "Meine Daten, Unterschrift und Passwort",
-    "short": "Personaldaten ansehen und die eigene Unterschrift hinterlegen.",
+    "group": "{{portal_tf_help_content.text_5cf21c63b3d6}}",
+    "title": "{{portal_tf_help_content.text_e62e85b667a2}}",
+    "short": "{{portal_tf_help_content.text_4c4aa7c89da0}}",
     "path": "/tf/me",
     "aliases": [],
     "sections": [
       {
-        "title": "Meine gespeicherten Daten",
+        "title": "{{portal_tf_help_content.text_12c2b302b860}}",
         "paragraphs": [
-          "Hier siehst Du die für Dein Konto hinterlegten Daten, Adressen und gegebenenfalls Dein Foto. Nicht jedes Feld ist hier selbst änderbar. Melde unrichtige Personaldaten Deiner zuständigen Verwaltung."
+          "{{portal_tf_help_content.text_cfd6ca641731}}"
         ],
         "steps": []
       },
       {
-        "title": "Eine Unterschrift hinterlegen",
+        "title": "{{portal_tf_help_content.text_6102bc277221}}",
         "paragraphs": [],
         "steps": [
-          "Wähle Unterschrift hinzufügen, wenn dieser Bereich angeboten wird.",
-          "Zeichne mit Finger, Stift oder gedrückter Maustaste im weißen Feld.",
-          "Löschen leert die Zeichenfläche, damit Du neu beginnen kannst.",
-          "Wähle Speichern, wenn die Unterschrift richtig aussieht. Abbrechen oder X beendet die Eingabe ohne diese Speicherung."
+          "{{portal_tf_help_content.text_840ef1900d6a}}",
+          "{{portal_tf_help_content.text_653e24e9fd85}}",
+          "{{portal_tf_help_content.text_ae7ab85ce59d}}",
+          "{{portal_tf_help_content.text_df3a177dea84}}"
         ]
       },
       {
-        "title": "Passwort",
+        "title": "{{portal_tf_help_content.text_a36c101570cc}}",
         "paragraphs": [
-          "Über Passwort ändern gelangst Du zur Kontoseite. Folge dort den Feldbeschriftungen. Eine Passwortänderung kann eine erneute Anmeldung erforderlich machen."
+          "{{portal_tf_help_content.text_f03bf53efe10}}"
         ],
         "steps": []
       }
@@ -833,41 +854,41 @@ window.TfHelpPages=[
   },
   {
     "id": "bremszettel",
-    "group": "Bremszettel",
-    "title": "Internationalen Bremszettel ausfüllen",
-    "short": "Zugdaten eingeben, einen Entwurf sichern und die Vorschau prüfen.",
+    "group": "{{portal_tf_help_content.text_3309282eccb7}}",
+    "title": "{{portal_tf_help_content.text_a1785cba6c4c}}",
+    "short": "{{portal_tf_help_content.text_5d0286b2386c}}",
     "path": "/tf/bremszettel",
     "aliases": [],
     "sections": [
       {
-        "title": "Ein Formular beginnen",
+        "title": "{{portal_tf_help_content.text_c8b5e562a158}}",
         "paragraphs": [],
         "steps": [
-          "Wähle Neu hinzufügen.",
-          "Trage Aussteller-EVU, Datum, Zugnummern und die Bahnhöfe der Gültigkeit ein.",
-          "Wähle die arbeitenden Triebfahrzeuge und ergänze die angebotenen Fahrzeug- und Zugangaben aus Deinen Unterlagen.",
-          "Prüfe die Angaben in den Gruppen und die angezeigten fehlenden Felder.",
-          "Sichere bei Bedarf mit Entwurf speichern."
+          "{{portal_tf_help_content.text_ceaec4aa0492}}",
+          "{{portal_tf_help_content.text_102146750707}}",
+          "{{portal_tf_help_content.text_6732ef1c1f7b}}",
+          "{{portal_tf_help_content.text_50a69389a7b6}}",
+          "{{portal_tf_help_content.text_4f3ea5cc1a2f}}"
         ]
       },
       {
-        "title": "Vorschau und fertiges Dokument",
+        "title": "{{portal_tf_help_content.text_61e185a83ab3}}",
         "paragraphs": [
-          "Vorschau wird verfügbar, wenn die dafür nötigen Angaben vorhanden sind. Öffne die Vorschau und prüfe die Darstellung. Speichern erstellt das fertige Dokument. Entwurf speichern und Speichern in der Vorschau sind also unterschiedliche Schritte. Gespeicherte Dokumente findest Du auch in der Dokumentenverwaltung."
+          "{{portal_tf_help_content.text_8b7dcdc5bed0}}"
         ],
         "steps": []
       },
       {
-        "title": "Per E-Mail senden",
+        "title": "{{portal_tf_help_content.text_2c884aa7d96f}}",
         "paragraphs": [
-          "Speichern & senden bereitet das Dokument und eine E-Mail vor. Prüfe im folgenden Fenster Empfänger, Betreff, Nachricht und Anhang. Erst Senden verschickt die E-Mail. Wenn Du abbrichst, wird die vorbereitete E-Mail nicht versendet."
+          "{{portal_tf_help_content.text_a31f565076b4}}"
         ],
         "steps": []
       },
       {
-        "title": "Vorhandenen Entwurf öffnen",
+        "title": "{{portal_tf_help_content.text_45aff90b89f8}}",
         "paragraphs": [
-          "Wähle einen Eintrag unter Gespeicherte Entwürfe. Wenn Du zuvor noch ungespeicherte Änderungen gemacht hast, lies die Rückfrage zum Verwerfen dieser Änderungen."
+          "{{portal_tf_help_content.text_00bf4cb2a6cb}}"
         ],
         "steps": []
       }
@@ -875,34 +896,34 @@ window.TfHelpPages=[
   },
   {
     "id": "bremszettel-de",
-    "group": "Deutscher Bremszettel",
-    "title": "Deutschen Bremszettel ausfüllen",
-    "short": "Nationales Formular beginnen, prüfen und als Dokument speichern.",
+    "group": "{{portal_tf_help_content.text_f65c79ef7d2c}}",
+    "title": "{{portal_tf_help_content.text_16c216c16558}}",
+    "short": "{{portal_tf_help_content.text_ca3b2eff2c03}}",
     "path": "/tf/bremszettel-de",
     "aliases": [],
     "sections": [
       {
-        "title": "Das Formular ausfüllen",
+        "title": "{{portal_tf_help_content.text_657c0a8bf4ce}}",
         "paragraphs": [],
         "steps": [
-          "Wähle Neu hinzufügen.",
-          "Wähle die arbeitenden Triebfahrzeuge; bei Bedarf kannst Du ein zweites Tfz hinzufügen.",
-          "Trage Zugdaten, Bahnhöfe und die angebotenen Angaben zu Wagen, Bremsen und Zug ein. Nutze dafür Deine Unterlagen.",
-          "Prüfe rot markierte Felder und die Liste fehlender Angaben.",
-          "Sichere mit Entwurf speichern den Zwischenstand."
+          "{{portal_tf_help_content.text_ceaec4aa0492}}",
+          "{{portal_tf_help_content.text_7b8dea1cbe7c}}",
+          "{{portal_tf_help_content.text_ea116a4537c1}}",
+          "{{portal_tf_help_content.text_b49196c0b1b8}}",
+          "{{portal_tf_help_content.text_2247208f878d}}"
         ]
       },
       {
-        "title": "Vorschau und Speichern",
+        "title": "{{portal_tf_help_content.text_c0d754d6f67e}}",
         "paragraphs": [
-          "Vorschau zeigt den ausgefüllten Bremszettel, sobald die nötigen Angaben vollständig sind. Prüfe die Vorschau und wähle Speichern, um das Dokument anzulegen. Der angezeigte Download führt zum gespeicherten Dokument. Dieses ist auch in der Dokumentenverwaltung auffindbar."
+          "{{portal_tf_help_content.text_a0f3e490d7e8}}"
         ],
         "steps": []
       },
       {
-        "title": "Entwürfe wieder laden",
+        "title": "{{portal_tf_help_content.text_9408ca867fb8}}",
         "paragraphs": [
-          "Wähle unter Gespeicherte Entwürfe einen früheren Stand. Prüfe vor dem Wechsel, ob Du Änderungen am aktuellen Formular noch sichern möchtest."
+          "{{portal_tf_help_content.text_46c17a534c9c}}"
         ],
         "steps": []
       }
@@ -910,54 +931,54 @@ window.TfHelpPages=[
   },
   {
     "id": "notizen",
-    "group": "Notizen",
-    "title": "Persönliche Notizen erstellen und bearbeiten",
-    "short": "Titel und kurze Texte speichern, später lesen, ändern oder löschen.",
+    "group": "{{portal_tf_help_content.text_7800bd538c37}}",
+    "title": "{{portal_tf_help_content.text_5ee81e6304fd}}",
+    "short": "{{portal_tf_help_content.text_19a6a1b10d86}}",
     "path": "/tf/notizen",
     "aliases": [],
     "sections": [
       {
-        "title": "Eine Notiz hinzufügen",
+        "title": "{{portal_tf_help_content.text_c6abc507d04b}}",
         "paragraphs": [
-          "Deine Notizen gehören zu Deinem TF-Konto. Andere TF können sie nicht lesen. Zum Laden, Speichern und Löschen brauchst Du eine Verbindung zum Server."
+          "{{portal_tf_help_content.text_d3c76faca7c5}}"
         ],
         "steps": [
-          "Öffne das Modul Notizen und wähle Neu hinzufügen.",
-          "Gib einen kurzen Titel und Deinen Text ein. Der Titel darf bis zu 120 Zeichen haben.",
-          "Unter dem Text steht, wie viele der 1000 Zeichen noch frei sind. Auch Leerzeichen und Zeilenumbrüche zählen.",
-          "Wähle Speichern. Erst nach der Erfolgsmeldung ist Deine Notiz gespeichert. Abbrechen verwirft die neue Eingabe."
+          "{{portal_tf_help_content.text_d9b8fa9634cb}}",
+          "{{portal_tf_help_content.text_f120556e2863}}",
+          "{{portal_tf_help_content.text_12246baf49c0}}",
+          "{{portal_tf_help_content.text_e27cf4039be4}}"
         ]
       },
       {
-        "title": "Eine Notiz lesen oder ändern",
+        "title": "{{portal_tf_help_content.text_4125aa0cba1f}}",
         "paragraphs": [
-          "Die Liste zeigt Deine Notizen mit Titel und Erstelldatum. Das Format dd.mm.yy HH:MM bedeutet zum Beispiel 03.11.26 14:05. Die neueste Notiz steht oben. Die Uhrzeit wird für Deutschland angezeigt."
+          "{{portal_tf_help_content.text_974aace8ec4b}}"
         ],
         "steps": [
-          "Wähle die Zeile einer Notiz. Der vollständige Text wird angezeigt.",
-          "Wähle Bearbeiten, wenn Du Titel oder Text ändern möchtest.",
-          "Wähle Speichern, um Deine Änderungen zu übernehmen. Das ursprüngliche Erstelldatum bleibt erhalten.",
-          "Mit Abbrechen kommst Du ohne Speicherung zur Ansicht zurück."
+          "{{portal_tf_help_content.text_999e299b2989}}",
+          "{{portal_tf_help_content.text_9b19a87e7371}}",
+          "{{portal_tf_help_content.text_36b02c39970e}}",
+          "{{portal_tf_help_content.text_9af36fb18b1c}}"
         ]
       },
       {
-        "title": "Eine Notiz löschen",
+        "title": "{{portal_tf_help_content.text_b2996a640ec5}}",
         "paragraphs": [
-          "In jeder Listenzeile steht rechts der Papierkorb 🗑️. Löschen entfernt die ganze Notiz einschließlich Titel und Text."
+          "{{portal_tf_help_content.text_945d563cdd83}}"
         ],
         "steps": [
-          "Wähle den Papierkorb der richtigen Notiz.",
-          "Prüfe den Titel in der Rückfrage.",
-          "Wähle Löschen, um die Notiz endgültig zu entfernen. Mit Abbrechen bleibt sie erhalten."
+          "{{portal_tf_help_content.text_bd900fcec9ed}}",
+          "{{portal_tf_help_content.text_6af10f32691b}}",
+          "{{portal_tf_help_content.text_0655ad9f8882}}"
         ]
       },
       {
-        "title": "Wenn das Speichern nicht klappt",
+        "title": "{{portal_tf_help_content.text_33017a531d9c}}",
         "paragraphs": [
-          "Lass die Eingabe geöffnet und prüfe die Verbindung. Dein Text bleibt bei einem Fehler im Eingabefeld. Wenn die Notiz inzwischen auf einem anderen Gerät geändert wurde, wird sie nicht einfach überschrieben. Sichere Deinen Text bei Bedarf separat und lade die aktuelle Liste erneut."
+          "{{portal_tf_help_content.text_a90437771efc}}"
         ],
         "steps": []
       }
     ]
   }
-];
+]);

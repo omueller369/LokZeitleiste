@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from ..accounts.tf_profiles import daily_minutes
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Path
@@ -16,13 +17,13 @@ from .duties import duty_info, resolve_shift
 
 
 def create_router(admin_dependency):
-    router = APIRouter(prefix="/api/v1/admin/tf/{tf_id}/plan", tags=["Arbeitszeitplanung"],
+    router = APIRouter(prefix="/api/v1/admin/tf/{tf_id}/plan", tags=[_text_source('server_planning_api.text_67f08af53537')],
                        dependencies=[Depends(admin_dependency)])
 
     def profile_for(db, tf_id):
         user, profile = db.get(User, tf_id), db.get(TfProfile, tf_id)
         if not user or user.role != "tf" or not profile:
-            raise HTTPException(404, "Tf nicht gefunden")
+            raise HTTPException(404, _text_source('server_planning_api.text_a8c327fb1b2a'))
         return profile
 
     def mutate(db, tf_id, year, days, revisions, admin, source):
@@ -34,7 +35,7 @@ def create_router(admin_dependency):
             return changes
         except (RevisionConflict, IntegrityError) as exc:
             db.rollback()
-            raise HTTPException(409, "Plan wurde inzwischen geändert. Bitte neu laden.") from exc
+            raise HTTPException(409, _text_source('server_planning_api.text_69a979c93fbf')) from exc
         except ValueError as exc:
             db.rollback()
             raise HTTPException(422, str(exc)) from exc
@@ -68,7 +69,7 @@ def create_router(admin_dependency):
         profile = profile_for(db, tf_id)
         try:
             if not file.filename or not file.filename.lower().endswith(".xlsx"):
-                raise HTTPException(422, "Bitte eine XLSX-Datei auswählen")
+                raise HTTPException(422, _text_source('server_planning_api.text_878335408a09'))
             content = await file.read(MAX_FILE + 1)
             try:
                 days = parse_excel(content, year=year, personnel_number=profile.personnel_number)
@@ -85,7 +86,7 @@ def create_router(admin_dependency):
                                 **duty_info(item.date,item.kind,shift,holiday_info(item.date)["is_holiday"],daily_minutes(db,tf_id)),"previous_shift":old["shift"], "previous_kind": old["kind"],
                                 "previous_note": old["note"]})
             return {"days": updates, "expected_revisions": revisions,
-                    "rule": "Nur enthaltene Datumszeilen werden geändert. Ungeplant entfernt eine Tagesplanung."}
+                    "rule": _text_source('server_planning_api.text_691a6d7cc4a2')}
         finally:
             await file.close()
 
@@ -127,7 +128,7 @@ def create_router(admin_dependency):
                    month: int = Path(ge=1, le=12), admin: User = Depends(admin_dependency), db: Session = Depends(database_session)):
         profile_for(db, tf_id)
         if any(d.date.year != year or d.date.month != month for d in data.days):
-            raise HTTPException(422, "Alle Tage müssen zum ausgewählten Monat gehören")
+            raise HTTPException(422, _text_source('server_planning_api.text_61c4f9f88fea'))
         mutate(db, tf_id, year, data.days, {month: data.expected_revision}, admin, "manual")
         return get_month(db, tf_id, year, month)
 

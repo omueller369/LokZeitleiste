@@ -1,4 +1,5 @@
 """Account-owned navigation preferences; no module grant or target-user parameter."""
+from .localization import source as _text_source
 from pathlib import Path
 from typing import Literal
 from fastapi import APIRouter,Depends,HTTPException
@@ -28,11 +29,11 @@ def create_router(require_admin):
     def save(data:MenuPreferenceInput,user=Depends(require_admin),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         row=db.scalar(select(BackendMenuPreference).where(BackendMenuPreference.user_id==user.id).with_for_update())
-        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'Menüeinstellung wurde geändert. Bitte neu laden.')
+        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_backend_navigation.text_5ab689ef0e51'))
         if not row:row=BackendMenuPreference(user_id=user.id,variant=data.variant,revision=0);db.add(row)
         row.variant=data.variant;row.revision+=1
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Menüeinstellung wurde geändert. Bitte neu laden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_backend_navigation.text_5ab689ef0e51')) from exc
         return view(user,row)
     return router

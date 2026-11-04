@@ -44,6 +44,7 @@ class PortalPolicy(base: String) {
         "/my/worktime" -> "my-worktime.html"
         "/admin/portal.css" -> "portal.css"
         "/my/worktime.js" -> "my-worktime.js"
+        "/locales/messages.js" -> "messages.js"
         "/documents.js", "/documents.css", "/account.js", "/entry-form.js", "/responsive.css", "/i18n.js", "/android-portal.js" -> path.substringAfterLast('/')
         "/tf/portal.js" -> "tf-portal.js"
         "/tf/portal.css" -> "tf-portal.css"

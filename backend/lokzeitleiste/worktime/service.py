@@ -1,4 +1,5 @@
 """Arbeitszeitkorrekturen, Kalenderwochen und dauerhafte E-Mail-Aufträge."""
+from ..localization import source as _text_source
 import calendar
 import logging
 from datetime import date, datetime, time, timedelta
@@ -25,7 +26,7 @@ def validate_no_overlap(db, tf_id, entry):
     for other in others:
         other_begin, other_end = interval(other)
         if begin < other_end and other_begin < end:
-            raise ValueError("Der korrigierte Zeitraum überschneidet sich mit einer anderen Arbeitszeit.")
+            raise ValueError(_text_source('server_worktime_service.text_82f3fadb4c78'))
 
 
 def overview(db, tf_id, year, month, state, *, lock=False):
@@ -60,35 +61,31 @@ def clock(minutes):
 
 
 def change_body(profile, entry, old_start, old_end, reason, before, after):
-    lines = [f"Guten Tag {profile.first_name} {profile.last_name},", "",
-             f"Ihre Arbeitszeit am {entry.entry_date:%d.%m.%Y} ({entry.kind}) wurde administrativ angepasst.",
-             f"Arbeitsbeginn: {old_start} → {entry.start_time}",
-             f"Arbeitsende: {old_end} → {entry.end_time}",
-             f"Pause unverändert: {entry.pause_minutes} Minuten", f"Grund: {reason}", "",
-             "Neuberechnung (Vorher → Nachher):"]
+    lines = [f"{_text_source('server_worktime_service.text_64837f4186a2')}{profile.first_name} {profile.last_name},", "",
+             f"{_text_source('server_worktime_service.text_1209a630cbb4')}{entry.entry_date:%d.%m.%Y} ({entry.kind}{_text_source('server_worktime_service.text_d82ede17f3a1')}",
+             f"{_text_source('server_worktime_service.text_239bd0a9f785')}{old_start} → {entry.start_time}",
+             f"{_text_source('server_worktime_service.text_4efcfc7b4bd5')}{old_end} → {entry.end_time}",
+             f"{_text_source('server_worktime_service.text_75031d29a279')}{entry.pause_minutes}{_text_source('server_worktime_service.text_78d0e952adb5')}", f"{_text_source('server_worktime_service.text_8446867dbbc4')}{reason}", "",
+             _text_source('server_worktime_service.text_715ca508b0ea')]
     previous_days = {d["date"]: d for data in before.values() for d in data["days"]}
     new_days = {d["date"]: d for data in after.values() for d in data["days"]}
     for key in sorted(previous_days.keys() | new_days.keys()):
         old, new = previous_days.get(key, {}), new_days.get(key, {})
         if old != new:
-            lines.append(f"Tag {key}: Arbeitszeit {clock(old.get('work', 0))} → {clock(new.get('work', 0))}; "
-                         f"Gutschrift {clock(old.get('credited', 0))} → {clock(new.get('credited', 0))}")
+            lines.append(f"{_text_source('server_worktime_service.text_e1639a9be519')}{key}{_text_source('server_worktime_service.text_42205887883e')}{clock(old.get('work', 0))} → {clock(new.get('work', 0))}{_text_source('server_worktime_service.text_d3941960a4b5')}{clock(old.get('credited', 0))} → {clock(new.get('credited', 0))}")
     old_weeks = {(w["iso_year"], w["week"]): w for data in before.values() for w in data["weeks"]}
     new_weeks = {(w["iso_year"], w["week"]): w for data in after.values() for w in data["weeks"]}
     for key, new in sorted(new_weeks.items()):
         old = old_weeks[key]
         if old["totals"] != new["totals"]:
-            lines.append(f"KW {key[1]}/{key[0]} ({new['start']} bis {new['end']}): "
-                         f"Arbeitszeit {clock(old['totals']['work'])} → {clock(new['totals']['work'])}; "
-                         f"Gutschrift {clock(old['totals']['credited'])} → {clock(new['totals']['credited'])}")
+            lines.append(f"KW {key[1]}/{key[0]} ({new['start']}{_text_source('server_worktime_service.text_cffcbd9e175f')}{new['end']}{_text_source('server_worktime_service.text_69e49921fb80')}{clock(old['totals']['work'])} → {clock(new['totals']['work'])}{_text_source('server_worktime_service.text_d3941960a4b5')}{clock(old['totals']['credited'])} → {clock(new['totals']['credited'])}")
     for key, data in sorted(after.items()):
         old = before[key]
-        for label, field in (("Arbeitszeit", "work"), ("Gutschrift", "credited")):
-            lines.append(f"Monat {key[1]:02d}/{key[0]} · {label}: "
-                         f"{clock(sum(d[field] for d in old['days']))} → {clock(sum(d[field] for d in data['days']))}")
-    lines += ["", "Arbeitszeit enthält Gastfahrt und berücksichtigt Pausen. Die Gutschrift enthält die bestehende",
-              "Auffüllung auf acht Stunden sowie Urlaub/Krank. Bei Nachtarbeit wird auf Kalendertage aufgeteilt.",
-              "Alle Uhrzeiten sind lokale Zeiten wie in Ihrer Erfassung."]
+        for label, field in ((_text_source('server_worktime_service.text_b574d367e922'), "work"), (_text_source('server_worktime_service.text_a2791bb9b7dc'), "credited")):
+            lines.append(f"{_text_source('server_worktime_service.text_c8a7a86d527a')}{key[1]:02d}/{key[0]} · {label}: {clock(sum((d[field] for d in old['days'])))} → {clock(sum((d[field] for d in data['days'])))}")
+    lines += ["", _text_source('server_worktime_service.text_69a767809637'),
+              _text_source('server_worktime_service.text_8c07d33e2d40'),
+              _text_source('server_worktime_service.text_b3c984dc667a')]
     return "\n".join(lines)
 
 
@@ -104,7 +101,7 @@ def process_change(change_id):
         except Exception as exc:
             item.status = "failed"
             item.last_error = str(exc)[:500]
-            log.exception("Arbeitszeitbenachrichtigung fehlgeschlagen, Änderung %s", change_id)
+            log.exception(_text_source('server_worktime_service.text_e2f616498c72'), change_id)
         else:
             item.status = "sent"
             item.sent_at = now_utc()

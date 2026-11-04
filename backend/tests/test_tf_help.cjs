@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 let active;const events={};
 class Element{
  constructor(tag){this.tag=tag;this.children=[];this.dataset={};this.attrs={};this.value='';this.isConnected=true;this.classes=new Set();this.classList={add:name=>this.classes.add(name),remove:name=>this.classes.delete(name),contains:name=>this.classes.has(name)};}
@@ -24,7 +24,7 @@ assert(!/\b(?:Sie|Ihnen|Ihr(?:e|er|em|en|es)?)\b/u.test(JSON.stringify(pages)), 
 assert(!/\bSie\b/u.test(fs.readFileSync('backend/lokzeitleiste/static/tf-help.js','utf8')), 'Help reader uses Du');
 assert.equal(new Set(pages.map(p=>p.id)).size,pages.length);assert(pages.length>=20);
 for(const page of pages){assert(page.title&&page.short&&page.group);assert(page.sections.length);for(const section of page.sections)assert(section.title&&(section.paragraphs.length||section.steps.length));}
-const html=fs.readFileSync('backend/lokzeitleiste/static/tf-portal.html','utf8');for(const [,path]of html.matchAll(/<a class="module" href="([^"]+)"/g))assert(pages.some(p=>p.path===path||p.aliases.includes(path)),'Missing module help: '+path);
+const html=require('./localized-vm.cjs').resolveHtml(fs.readFileSync('backend/lokzeitleiste/static/tf-portal.html','utf8'));for(const [,path]of html.matchAll(/<a class="module" href="([^"]+)"/g))assert(pages.some(p=>p.path===path||p.aliases.includes(path)),'Missing module help: '+path);
 assert.equal(help.contextFor('/tf/lokuebergabebuch'),'lok');assert.equal(help.contextFor('/documents'),'dokumente');
 (async()=>{
  const opener=new Element('button'),privateInput=new Element('input');privateInput.value='PRIVATE_FORM_DATA';body.append(opener,privateInput);opener.focus();help.open('arbeit');const dialog=document.getElementById('tfHelpDialog');assert(dialog.open);const [heading,status,layout]=dialog.children,[close,title,printer]=heading.children;assert.equal(close.textContent,'X');assert.equal(active,close);assert(printer.getAttribute('aria-label').includes('Anleitung drucken'));assert.equal(title.textContent,pages.find(p=>p.id==='arbeit').title);

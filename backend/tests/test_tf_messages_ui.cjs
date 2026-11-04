@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 class E{constructor(tag='div'){this.tag=tag;this.children=[];this.attrs={};this.value='';this.files=[];this.selectedOptions=[];this.handlers={};}append(...nodes){this.children.push(...nodes);}prepend(n){this.children.unshift(n);}replaceChildren(){this.children=[];}setAttribute(k,v){this.attrs[k]=v;}addEventListener(k,fn){this.handlers[k]=fn;}showModal(){this.open=true;}close(){this.open=false;this.handlers.close?.();}reset(){}focus(){}}
 const nodes={},el=id=>nodes[id]??=new E(),calls=[],errors=[];let inbox=[{id:1,sender_name:'Anna Beispiel',subject:'Test',created_at:'2026-10-26T10:00:00Z',read:false,has_attachment:true}],bell=0;
 const response=(data,extra={})=>({ok:true,json:async()=>data,...extra});

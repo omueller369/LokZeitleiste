@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 class E{constructor(){this.children=[];this.classList={toggle(){}};}append(...n){this.children.push(...n);}replaceChildren(){this.children=[];}setAttribute(){} }
 const window={addEventListener(){}},context={window,document:{createElement:()=>new E()},console};vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/train-journeys.js','utf8'),context);
 const editor=Object.create(window.TrainJourneyEditor.prototype);editor.o={bounds:()=>({start:'2026-10-25T09:01',end:'2026-10-25T12:03'}),minute:value=>Date.parse(value)/60000,clock:n=>String(n),readonly:()=>true};

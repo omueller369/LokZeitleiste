@@ -1,0 +1,11 @@
+{
+  "text_1e1992d51ed6": "Only damage locations can be assigned to a category.",
+  "text_25b9ad8f3ac8": "A label is required.",
+  "text_49d3623ea7be": "This label already exists.",
+  "text_4a07125bae6a": "Please enter a valid email address.",
+  "text_5c5fa14fef76": "Selection value not found.",
+  "text_60fe685fe99d": "Selection value changed. Please reload.",
+  "text_dd2687e1946c": "Please select an existing category first.",
+  "text_e3e44fcea14c": "Email address is required.",
+  "text_f51e128a924b": "Category must not exceed 100 characters."
+}

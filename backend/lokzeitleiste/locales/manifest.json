@@ -1,0 +1,592 @@
+{
+  "backend_account": {
+    "de": "/locales/backend_account/de.json",
+    "en": "/locales/backend_account/en.json",
+    "pl": "/locales/backend_account/pl.json"
+  },
+  "backend_admin": {
+    "de": "/locales/backend_admin/de.json",
+    "en": "/locales/backend_admin/en.json",
+    "pl": "/locales/backend_admin/pl.json"
+  },
+  "backend_android_portal": {
+    "de": "/locales/backend_android_portal/de.json",
+    "en": "/locales/backend_android_portal/en.json",
+    "pl": "/locales/backend_android_portal/pl.json"
+  },
+  "backend_app_defaults": {
+    "de": "/locales/backend_app_defaults/de.json",
+    "en": "/locales/backend_app_defaults/en.json",
+    "pl": "/locales/backend_app_defaults/pl.json"
+  },
+  "backend_auth_session": {
+    "de": "/locales/backend_auth_session/de.json",
+    "en": "/locales/backend_auth_session/en.json",
+    "pl": "/locales/backend_auth_session/pl.json"
+  },
+  "backend_backend_nav": {
+    "de": "/locales/backend_backend_nav/de.json",
+    "en": "/locales/backend_backend_nav/en.json",
+    "pl": "/locales/backend_backend_nav/pl.json"
+  },
+  "backend_backend_start": {
+    "de": "/locales/backend_backend_start/de.json",
+    "en": "/locales/backend_backend_start/en.json",
+    "pl": "/locales/backend_backend_start/pl.json"
+  },
+  "backend_default_sort": {
+    "de": "/locales/backend_default_sort/de.json",
+    "en": "/locales/backend_default_sort/en.json",
+    "pl": "/locales/backend_default_sort/pl.json"
+  },
+  "backend_directory": {
+    "de": "/locales/backend_directory/de.json",
+    "en": "/locales/backend_directory/en.json",
+    "pl": "/locales/backend_directory/pl.json"
+  },
+  "backend_documents": {
+    "de": "/locales/backend_documents/de.json",
+    "en": "/locales/backend_documents/en.json",
+    "pl": "/locales/backend_documents/pl.json"
+  },
+  "backend_email": {
+    "de": "/locales/backend_email/de.json",
+    "en": "/locales/backend_email/en.json",
+    "pl": "/locales/backend_email/pl.json"
+  },
+  "backend_employee_mail": {
+    "de": "/locales/backend_employee_mail/de.json",
+    "en": "/locales/backend_employee_mail/en.json",
+    "pl": "/locales/backend_employee_mail/pl.json"
+  },
+  "backend_entry_form": {
+    "de": "/locales/backend_entry_form/de.json",
+    "en": "/locales/backend_entry_form/en.json",
+    "pl": "/locales/backend_entry_form/pl.json"
+  },
+  "backend_landing": {
+    "de": "/locales/backend_landing/de.json",
+    "en": "/locales/backend_landing/en.json",
+    "pl": "/locales/backend_landing/pl.json"
+  },
+  "backend_leasing": {
+    "de": "/locales/backend_leasing/de.json",
+    "en": "/locales/backend_leasing/en.json",
+    "pl": "/locales/backend_leasing/pl.json"
+  },
+  "backend_menu_designs": {
+    "de": "/locales/backend_menu_designs/de.json",
+    "en": "/locales/backend_menu_designs/en.json",
+    "pl": "/locales/backend_menu_designs/pl.json"
+  },
+  "backend_menu_preference": {
+    "de": "/locales/backend_menu_preference/de.json",
+    "en": "/locales/backend_menu_preference/en.json",
+    "pl": "/locales/backend_menu_preference/pl.json"
+  },
+  "backend_my_worktime": {
+    "de": "/locales/backend_my_worktime/de.json",
+    "en": "/locales/backend_my_worktime/en.json",
+    "pl": "/locales/backend_my_worktime/pl.json"
+  },
+  "backend_overtime_ui": {
+    "de": "/locales/backend_overtime_ui/de.json",
+    "en": "/locales/backend_overtime_ui/en.json",
+    "pl": "/locales/backend_overtime_ui/pl.json"
+  },
+  "backend_photo_ui": {
+    "de": "/locales/backend_photo_ui/de.json",
+    "en": "/locales/backend_photo_ui/en.json",
+    "pl": "/locales/backend_photo_ui/pl.json"
+  },
+  "backend_plan_colors": {
+    "de": "/locales/backend_plan_colors/de.json",
+    "en": "/locales/backend_plan_colors/en.json",
+    "pl": "/locales/backend_plan_colors/pl.json"
+  },
+  "backend_planning": {
+    "de": "/locales/backend_planning/de.json",
+    "en": "/locales/backend_planning/en.json",
+    "pl": "/locales/backend_planning/pl.json"
+  },
+  "backend_planning_overview": {
+    "de": "/locales/backend_planning_overview/de.json",
+    "en": "/locales/backend_planning_overview/en.json",
+    "pl": "/locales/backend_planning_overview/pl.json"
+  },
+  "backend_portal_theme": {
+    "de": "/locales/backend_portal_theme/de.json",
+    "en": "/locales/backend_portal_theme/en.json",
+    "pl": "/locales/backend_portal_theme/pl.json"
+  },
+  "backend_portal_ui": {
+    "de": "/locales/backend_portal_ui/de.json",
+    "en": "/locales/backend_portal_ui/en.json",
+    "pl": "/locales/backend_portal_ui/pl.json"
+  },
+  "backend_pwa_install": {
+    "de": "/locales/backend_pwa_install/de.json",
+    "en": "/locales/backend_pwa_install/en.json",
+    "pl": "/locales/backend_pwa_install/pl.json"
+  },
+  "backend_shifts": {
+    "de": "/locales/backend_shifts/de.json",
+    "en": "/locales/backend_shifts/en.json",
+    "pl": "/locales/backend_shifts/pl.json"
+  },
+  "backend_staff": {
+    "de": "/locales/backend_staff/de.json",
+    "en": "/locales/backend_staff/en.json",
+    "pl": "/locales/backend_staff/pl.json"
+  },
+  "backend_vehicles": {
+    "de": "/locales/backend_vehicles/de.json",
+    "en": "/locales/backend_vehicles/en.json",
+    "pl": "/locales/backend_vehicles/pl.json"
+  },
+  "backend_worktime": {
+    "de": "/locales/backend_worktime/de.json",
+    "en": "/locales/backend_worktime/en.json",
+    "pl": "/locales/backend_worktime/pl.json"
+  },
+  "portal_brake_sheet": {
+    "de": "/locales/portal_brake_sheet/de.json",
+    "en": "/locales/portal_brake_sheet/en.json",
+    "pl": "/locales/portal_brake_sheet/pl.json"
+  },
+  "portal_gps": {
+    "de": "/locales/portal_gps/de.json",
+    "en": "/locales/portal_gps/en.json",
+    "pl": "/locales/portal_gps/pl.json"
+  },
+  "portal_handover_protocols": {
+    "de": "/locales/portal_handover_protocols/de.json",
+    "en": "/locales/portal_handover_protocols/en.json",
+    "pl": "/locales/portal_handover_protocols/pl.json"
+  },
+  "portal_loco_handover": {
+    "de": "/locales/portal_loco_handover/de.json",
+    "en": "/locales/portal_loco_handover/en.json",
+    "pl": "/locales/portal_loco_handover/pl.json"
+  },
+  "portal_loco_handover_defaults": {
+    "de": "/locales/portal_loco_handover_defaults/de.json",
+    "en": "/locales/portal_loco_handover_defaults/en.json",
+    "pl": "/locales/portal_loco_handover_defaults/pl.json"
+  },
+  "portal_national_brake_sheet": {
+    "de": "/locales/portal_national_brake_sheet/de.json",
+    "en": "/locales/portal_national_brake_sheet/en.json",
+    "pl": "/locales/portal_national_brake_sheet/pl.json"
+  },
+  "portal_station_sharing": {
+    "de": "/locales/portal_station_sharing/de.json",
+    "en": "/locales/portal_station_sharing/en.json",
+    "pl": "/locales/portal_station_sharing/pl.json"
+  },
+  "portal_stations": {
+    "de": "/locales/portal_stations/de.json",
+    "en": "/locales/portal_stations/en.json",
+    "pl": "/locales/portal_stations/pl.json"
+  },
+  "portal_tf_help": {
+    "de": "/locales/portal_tf_help/de.json",
+    "en": "/locales/portal_tf_help/en.json",
+    "pl": "/locales/portal_tf_help/pl.json"
+  },
+  "portal_tf_help_content": {
+    "de": "/locales/portal_tf_help_content/de.json",
+    "en": "/locales/portal_tf_help_content/en.json",
+    "pl": "/locales/portal_tf_help_content/pl.json"
+  },
+  "portal_tf_hours": {
+    "de": "/locales/portal_tf_hours/de.json",
+    "en": "/locales/portal_tf_hours/en.json",
+    "pl": "/locales/portal_tf_hours/pl.json"
+  },
+  "portal_tf_messages": {
+    "de": "/locales/portal_tf_messages/de.json",
+    "en": "/locales/portal_tf_messages/en.json",
+    "pl": "/locales/portal_tf_messages/pl.json"
+  },
+  "portal_tf_notes": {
+    "de": "/locales/portal_tf_notes/de.json",
+    "en": "/locales/portal_tf_notes/en.json",
+    "pl": "/locales/portal_tf_notes/pl.json"
+  },
+  "portal_tf_portal": {
+    "de": "/locales/portal_tf_portal/de.json",
+    "en": "/locales/portal_tf_portal/en.json",
+    "pl": "/locales/portal_tf_portal/pl.json"
+  },
+  "portal_tf_profile": {
+    "de": "/locales/portal_tf_profile/de.json",
+    "en": "/locales/portal_tf_profile/en.json",
+    "pl": "/locales/portal_tf_profile/pl.json"
+  },
+  "portal_tf_profile_ui": {
+    "de": "/locales/portal_tf_profile_ui/de.json",
+    "en": "/locales/portal_tf_profile_ui/en.json",
+    "pl": "/locales/portal_tf_profile_ui/pl.json"
+  },
+  "portal_tf_return": {
+    "de": "/locales/portal_tf_return/de.json",
+    "en": "/locales/portal_tf_return/en.json",
+    "pl": "/locales/portal_tf_return/pl.json"
+  },
+  "portal_tf_shell": {
+    "de": "/locales/portal_tf_shell/de.json",
+    "en": "/locales/portal_tf_shell/en.json",
+    "pl": "/locales/portal_tf_shell/pl.json"
+  },
+  "portal_tf_signature": {
+    "de": "/locales/portal_tf_signature/de.json",
+    "en": "/locales/portal_tf_signature/en.json",
+    "pl": "/locales/portal_tf_signature/pl.json"
+  },
+  "portal_train_journeys": {
+    "de": "/locales/portal_train_journeys/de.json",
+    "en": "/locales/portal_train_journeys/en.json",
+    "pl": "/locales/portal_train_journeys/pl.json"
+  },
+  "portal_work_report": {
+    "de": "/locales/portal_work_report/de.json",
+    "en": "/locales/portal_work_report/en.json",
+    "pl": "/locales/portal_work_report/pl.json"
+  },
+  "portal_work_report_feedback": {
+    "de": "/locales/portal_work_report_feedback/de.json",
+    "en": "/locales/portal_work_report_feedback/en.json",
+    "pl": "/locales/portal_work_report_feedback/pl.json"
+  },
+  "server_accounts_access": {
+    "de": "/locales/server_accounts_access/de.json",
+    "en": "/locales/server_accounts_access/en.json",
+    "pl": "/locales/server_accounts_access/pl.json"
+  },
+  "server_accounts_api": {
+    "de": "/locales/server_accounts_api/de.json",
+    "en": "/locales/server_accounts_api/en.json",
+    "pl": "/locales/server_accounts_api/pl.json"
+  },
+  "server_accounts_photos": {
+    "de": "/locales/server_accounts_photos/de.json",
+    "en": "/locales/server_accounts_photos/en.json",
+    "pl": "/locales/server_accounts_photos/pl.json"
+  },
+  "server_accounts_schemas": {
+    "de": "/locales/server_accounts_schemas/de.json",
+    "en": "/locales/server_accounts_schemas/en.json",
+    "pl": "/locales/server_accounts_schemas/pl.json"
+  },
+  "server_accounts_tf_profiles": {
+    "de": "/locales/server_accounts_tf_profiles/de.json",
+    "en": "/locales/server_accounts_tf_profiles/en.json",
+    "pl": "/locales/server_accounts_tf_profiles/pl.json"
+  },
+  "server_app_defaults": {
+    "de": "/locales/server_app_defaults/de.json",
+    "en": "/locales/server_app_defaults/en.json",
+    "pl": "/locales/server_app_defaults/pl.json"
+  },
+  "server_backend_navigation": {
+    "de": "/locales/server_backend_navigation/de.json",
+    "en": "/locales/server_backend_navigation/en.json",
+    "pl": "/locales/server_backend_navigation/pl.json"
+  },
+  "server_backend_start": {
+    "de": "/locales/server_backend_start/de.json",
+    "en": "/locales/server_backend_start/en.json",
+    "pl": "/locales/server_backend_start/pl.json"
+  },
+  "server_brake_sheet_image": {
+    "de": "/locales/server_brake_sheet_image/de.json",
+    "en": "/locales/server_brake_sheet_image/en.json",
+    "pl": "/locales/server_brake_sheet_image/pl.json"
+  },
+  "server_brake_sheet_mail": {
+    "de": "/locales/server_brake_sheet_mail/de.json",
+    "en": "/locales/server_brake_sheet_mail/en.json",
+    "pl": "/locales/server_brake_sheet_mail/pl.json"
+  },
+  "server_brake_sheets": {
+    "de": "/locales/server_brake_sheets/de.json",
+    "en": "/locales/server_brake_sheets/en.json",
+    "pl": "/locales/server_brake_sheets/pl.json"
+  },
+  "server_default_order": {
+    "de": "/locales/server_default_order/de.json",
+    "en": "/locales/server_default_order/en.json",
+    "pl": "/locales/server_default_order/pl.json"
+  },
+  "server_documents_api": {
+    "de": "/locales/server_documents_api/de.json",
+    "en": "/locales/server_documents_api/en.json",
+    "pl": "/locales/server_documents_api/pl.json"
+  },
+  "server_documents_archive": {
+    "de": "/locales/server_documents_archive/de.json",
+    "en": "/locales/server_documents_archive/en.json",
+    "pl": "/locales/server_documents_archive/pl.json"
+  },
+  "server_documents_storage": {
+    "de": "/locales/server_documents_storage/de.json",
+    "en": "/locales/server_documents_storage/en.json",
+    "pl": "/locales/server_documents_storage/pl.json"
+  },
+  "server_employee_mail": {
+    "de": "/locales/server_employee_mail/de.json",
+    "en": "/locales/server_employee_mail/en.json",
+    "pl": "/locales/server_employee_mail/pl.json"
+  },
+  "server_gps": {
+    "de": "/locales/server_gps/de.json",
+    "en": "/locales/server_gps/en.json",
+    "pl": "/locales/server_gps/pl.json"
+  },
+  "server_gps_analysis": {
+    "de": "/locales/server_gps_analysis/de.json",
+    "en": "/locales/server_gps_analysis/en.json",
+    "pl": "/locales/server_gps_analysis/pl.json"
+  },
+  "server_handover_protocols": {
+    "de": "/locales/server_handover_protocols/de.json",
+    "en": "/locales/server_handover_protocols/en.json",
+    "pl": "/locales/server_handover_protocols/pl.json"
+  },
+  "server_leasing": {
+    "de": "/locales/server_leasing/de.json",
+    "en": "/locales/server_leasing/en.json",
+    "pl": "/locales/server_leasing/pl.json"
+  },
+  "server_loco_handover": {
+    "de": "/locales/server_loco_handover/de.json",
+    "en": "/locales/server_loco_handover/en.json",
+    "pl": "/locales/server_loco_handover/pl.json"
+  },
+  "server_loco_handover_defaults": {
+    "de": "/locales/server_loco_handover_defaults/de.json",
+    "en": "/locales/server_loco_handover_defaults/en.json",
+    "pl": "/locales/server_loco_handover_defaults/pl.json"
+  },
+  "server_mailbox_api": {
+    "de": "/locales/server_mailbox_api/de.json",
+    "en": "/locales/server_mailbox_api/en.json",
+    "pl": "/locales/server_mailbox_api/pl.json"
+  },
+  "server_mailbox_google": {
+    "de": "/locales/server_mailbox_google/de.json",
+    "en": "/locales/server_mailbox_google/en.json",
+    "pl": "/locales/server_mailbox_google/pl.json"
+  },
+  "server_mailbox_oauth": {
+    "de": "/locales/server_mailbox_oauth/de.json",
+    "en": "/locales/server_mailbox_oauth/en.json",
+    "pl": "/locales/server_mailbox_oauth/pl.json"
+  },
+  "server_mailbox_providers": {
+    "de": "/locales/server_mailbox_providers/de.json",
+    "en": "/locales/server_mailbox_providers/en.json",
+    "pl": "/locales/server_mailbox_providers/pl.json"
+  },
+  "server_mailbox_service": {
+    "de": "/locales/server_mailbox_service/de.json",
+    "en": "/locales/server_mailbox_service/en.json",
+    "pl": "/locales/server_mailbox_service/pl.json"
+  },
+  "server_main": {
+    "de": "/locales/server_main/de.json",
+    "en": "/locales/server_main/en.json",
+    "pl": "/locales/server_main/pl.json"
+  },
+  "server_national_brake_image": {
+    "de": "/locales/server_national_brake_image/de.json",
+    "en": "/locales/server_national_brake_image/en.json",
+    "pl": "/locales/server_national_brake_image/pl.json"
+  },
+  "server_national_brake_sheets": {
+    "de": "/locales/server_national_brake_sheets/de.json",
+    "en": "/locales/server_national_brake_sheets/en.json",
+    "pl": "/locales/server_national_brake_sheets/pl.json"
+  },
+  "server_notes": {
+    "de": "/locales/server_notes/de.json",
+    "en": "/locales/server_notes/en.json",
+    "pl": "/locales/server_notes/pl.json"
+  },
+  "server_overtime": {
+    "de": "/locales/server_overtime/de.json",
+    "en": "/locales/server_overtime/en.json",
+    "pl": "/locales/server_overtime/pl.json"
+  },
+  "server_planning_api": {
+    "de": "/locales/server_planning_api/de.json",
+    "en": "/locales/server_planning_api/en.json",
+    "pl": "/locales/server_planning_api/pl.json"
+  },
+  "server_planning_collective": {
+    "de": "/locales/server_planning_collective/de.json",
+    "en": "/locales/server_planning_collective/en.json",
+    "pl": "/locales/server_planning_collective/pl.json"
+  },
+  "server_planning_duties": {
+    "de": "/locales/server_planning_duties/de.json",
+    "en": "/locales/server_planning_duties/en.json",
+    "pl": "/locales/server_planning_duties/pl.json"
+  },
+  "server_planning_excel": {
+    "de": "/locales/server_planning_excel/de.json",
+    "en": "/locales/server_planning_excel/en.json",
+    "pl": "/locales/server_planning_excel/pl.json"
+  },
+  "server_planning_palette": {
+    "de": "/locales/server_planning_palette/de.json",
+    "en": "/locales/server_planning_palette/en.json",
+    "pl": "/locales/server_planning_palette/pl.json"
+  },
+  "server_planning_pdf": {
+    "de": "/locales/server_planning_pdf/de.json",
+    "en": "/locales/server_planning_pdf/en.json",
+    "pl": "/locales/server_planning_pdf/pl.json"
+  },
+  "server_planning_schemas": {
+    "de": "/locales/server_planning_schemas/de.json",
+    "en": "/locales/server_planning_schemas/en.json",
+    "pl": "/locales/server_planning_schemas/pl.json"
+  },
+  "server_planning_service": {
+    "de": "/locales/server_planning_service/de.json",
+    "en": "/locales/server_planning_service/en.json",
+    "pl": "/locales/server_planning_service/pl.json"
+  },
+  "server_portal": {
+    "de": "/locales/server_portal/de.json",
+    "en": "/locales/server_portal/en.json",
+    "pl": "/locales/server_portal/pl.json"
+  },
+  "server_pwa": {
+    "de": "/locales/server_pwa/de.json",
+    "en": "/locales/server_pwa/en.json",
+    "pl": "/locales/server_pwa/pl.json"
+  },
+  "server_records_api": {
+    "de": "/locales/server_records_api/de.json",
+    "en": "/locales/server_records_api/en.json",
+    "pl": "/locales/server_records_api/pl.json"
+  },
+  "server_records_service": {
+    "de": "/locales/server_records_service/de.json",
+    "en": "/locales/server_records_service/en.json",
+    "pl": "/locales/server_records_service/pl.json"
+  },
+  "server_reports_absence": {
+    "de": "/locales/server_reports_absence/de.json",
+    "en": "/locales/server_reports_absence/en.json",
+    "pl": "/locales/server_reports_absence/pl.json"
+  },
+  "server_reports_daily": {
+    "de": "/locales/server_reports_daily/de.json",
+    "en": "/locales/server_reports_daily/en.json",
+    "pl": "/locales/server_reports_daily/pl.json"
+  },
+  "server_reports_mailer": {
+    "de": "/locales/server_reports_mailer/de.json",
+    "en": "/locales/server_reports_mailer/en.json",
+    "pl": "/locales/server_reports_mailer/pl.json"
+  },
+  "server_reports_monthly": {
+    "de": "/locales/server_reports_monthly/de.json",
+    "en": "/locales/server_reports_monthly/en.json",
+    "pl": "/locales/server_reports_monthly/pl.json"
+  },
+  "server_reports_pdf": {
+    "de": "/locales/server_reports_pdf/de.json",
+    "en": "/locales/server_reports_pdf/en.json",
+    "pl": "/locales/server_reports_pdf/pl.json"
+  },
+  "server_reports_service": {
+    "de": "/locales/server_reports_service/de.json",
+    "en": "/locales/server_reports_service/en.json",
+    "pl": "/locales/server_reports_service/pl.json"
+  },
+  "server_schemas": {
+    "de": "/locales/server_schemas/de.json",
+    "en": "/locales/server_schemas/en.json",
+    "pl": "/locales/server_schemas/pl.json"
+  },
+  "server_signatures": {
+    "de": "/locales/server_signatures/de.json",
+    "en": "/locales/server_signatures/en.json",
+    "pl": "/locales/server_signatures/pl.json"
+  },
+  "server_station_sharing": {
+    "de": "/locales/server_station_sharing/de.json",
+    "en": "/locales/server_station_sharing/en.json",
+    "pl": "/locales/server_station_sharing/pl.json"
+  },
+  "server_stations": {
+    "de": "/locales/server_stations/de.json",
+    "en": "/locales/server_stations/en.json",
+    "pl": "/locales/server_stations/pl.json"
+  },
+  "server_tf_messages": {
+    "de": "/locales/server_tf_messages/de.json",
+    "en": "/locales/server_tf_messages/en.json",
+    "pl": "/locales/server_tf_messages/pl.json"
+  },
+  "server_tf_overview": {
+    "de": "/locales/server_tf_overview/de.json",
+    "en": "/locales/server_tf_overview/en.json",
+    "pl": "/locales/server_tf_overview/pl.json"
+  },
+  "server_tf_portal": {
+    "de": "/locales/server_tf_portal/de.json",
+    "en": "/locales/server_tf_portal/en.json",
+    "pl": "/locales/server_tf_portal/pl.json"
+  },
+  "server_vehicles": {
+    "de": "/locales/server_vehicles/de.json",
+    "en": "/locales/server_vehicles/en.json",
+    "pl": "/locales/server_vehicles/pl.json"
+  },
+  "server_work_reports_api": {
+    "de": "/locales/server_work_reports_api/de.json",
+    "en": "/locales/server_work_reports_api/en.json",
+    "pl": "/locales/server_work_reports_api/pl.json"
+  },
+  "server_work_reports_drafts": {
+    "de": "/locales/server_work_reports_drafts/de.json",
+    "en": "/locales/server_work_reports_drafts/en.json",
+    "pl": "/locales/server_work_reports_drafts/pl.json"
+  },
+  "server_work_reports_receipts": {
+    "de": "/locales/server_work_reports_receipts/de.json",
+    "en": "/locales/server_work_reports_receipts/en.json",
+    "pl": "/locales/server_work_reports_receipts/pl.json"
+  },
+  "server_work_reports_schemas": {
+    "de": "/locales/server_work_reports_schemas/de.json",
+    "en": "/locales/server_work_reports_schemas/en.json",
+    "pl": "/locales/server_work_reports_schemas/pl.json"
+  },
+  "server_work_reports_service": {
+    "de": "/locales/server_work_reports_service/de.json",
+    "en": "/locales/server_work_reports_service/en.json",
+    "pl": "/locales/server_work_reports_service/pl.json"
+  },
+  "server_worktime_api": {
+    "de": "/locales/server_worktime_api/de.json",
+    "en": "/locales/server_worktime_api/en.json",
+    "pl": "/locales/server_worktime_api/pl.json"
+  },
+  "server_worktime_service": {
+    "de": "/locales/server_worktime_service/de.json",
+    "en": "/locales/server_worktime_service/en.json",
+    "pl": "/locales/server_worktime_service/pl.json"
+  },
+  "shared_legacy": {
+    "de": "/locales/shared_legacy/de.json",
+    "en": "/locales/shared_legacy/en.json",
+    "pl": "/locales/shared_legacy/pl.json"
+  }
+}

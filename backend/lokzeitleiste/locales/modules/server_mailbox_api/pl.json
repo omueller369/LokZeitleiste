@@ -1,0 +1,23 @@
+{
+  "text_17fd9a9d1055": "Nie można zmienić statusu odczytu",
+  "text_218197693424": "From",
+  "text_3a0ab9df12bd": "Logowanie Microsoft nie powiodło się. Rozpocznij ponownie.",
+  "text_43fab6f1ffae": "(FLAGS BODY.PEEK[HEADER.FIELDS (FROM TO SUBJECT DATE)])",
+  "text_5933f12cbf78": "Nieprawidłowy wpis",
+  "text_68971283841a": "Subject",
+  "text_74aa2a5012a4": "Nieprawidłowy identyfikator wiadomości",
+  "text_84ff5eab31e4": "Logowanie Microsoft wygasło. Rozpocznij ponownie.",
+  "text_86b7e0ec6c9f": "Nieprawidłowy nagłówek",
+  "text_893040444042": "Nie znaleziono załącznika",
+  "text_918edb31339c": "Nieprawidłowy załącznik",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Załącznik",
+  "text_9ebb264e23eb": "Wyszukiwanie wiadomości nieudane",
+  "text_a1b88d76df99": "Logowanie Microsoft nie powiodło się.",
+  "text_a8c327fb1b2a": "Nie znaleziono maszynisty",
+  "text_affb643a20dc": "Nie skonfigurowano jeszcze skrzynki tego maszynisty.",
+  "text_d07f53ff8475": "Po zmianie konta lub serwera ponownie wpisz hasło skrzynki.",
+  "text_d27cb8248aa8": "Najpierw zapisz Microsoft jako dostawcę.",
+  "text_ef3778671a95": "Nie można odczytać folderów",
+  "text_f3a0c5d5531a": "Nieprawidłowa nazwa pliku"
+}

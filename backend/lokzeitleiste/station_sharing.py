@@ -1,4 +1,5 @@
 """Authenticated TF sharing of immutable station snapshots through a recipient-owned inbox."""
+from .localization import source as _text_source
 import hashlib
 import json
 import secrets
@@ -30,7 +31,7 @@ class ShareCreate(BaseModel):
     @field_validator('station_ids')
     @classmethod
     def unique(cls,value):
-        if len(value)!=len(set(value)) or any(n<1 for n in value):raise ValueError('Ungültige Bahnhofsauswahl.')
+        if len(value)!=len(set(value)) or any(n<1 for n in value):raise ValueError(_text_source('server_station_sharing.text_1bc2ef474b0a'))
         return value
 
 
@@ -48,7 +49,7 @@ class ShareImport(BaseModel):
     @field_validator('items')
     @classmethod
     def unique(cls,value):
-        if len({item.id for item in value})!=len(value):raise ValueError('Ungültige Bahnhofsauswahl.')
+        if len({item.id for item in value})!=len(value):raise ValueError(_text_source('server_station_sharing.text_1bc2ef474b0a'))
         return value
 
 
@@ -62,7 +63,7 @@ def create_router(driver):
     def shared(db,delivery_id,user,lock=False):
         query=select(TfStationDelivery).where(TfStationDelivery.id==delivery_id,TfStationDelivery.recipient_id==user.id)
         delivery=db.scalar(query.with_for_update() if lock else query)
-        if not delivery:raise HTTPException(404,'Zusendung nicht gefunden.')
+        if not delivery:raise HTTPException(404,_text_source('server_station_sharing.text_a96506fc6b18'))
         return db.get(TfStationShare,delivery.share_id)
 
     def available(db,user):
@@ -83,9 +84,9 @@ def create_router(driver):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         recipient=db.get(User,data.recipient_id)
         if not recipient or recipient.role!='tf' or not available(db,recipient) or recipient.id==user.id or not db.get(TfProfile,recipient.id):
-            raise HTTPException(422,'Bitte einen anderen aktiven TF auswählen.')
+            raise HTTPException(422,_text_source('server_station_sharing.text_54f6ecf479d6'))
         rows=db.scalars(select(TfStation).where(TfStation.owner_id==user.id,TfStation.id.in_(data.station_ids)).order_by(TfStation.code).with_for_update()).all()
-        if len(rows)!=len(data.station_ids):raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
+        if len(rows)!=len(data.station_ids):raise HTTPException(404,_text_source('server_station_sharing.text_41f90b727e22'))
         token=secrets.token_urlsafe(32)
         share=TfStationShare(owner_id=user.id,token_hash=hashlib.sha256(token.encode()).hexdigest(),expires_at=now_utc()+timedelta(days=30),revoked=False)
         db.add(share);db.flush();total=0
@@ -95,7 +96,7 @@ def create_router(driver):
             content=plan.content if plan else None
             total+=len(content) if content else 0
             if (content and len(content)>MAX_FILE) or total>MAX_PLANS:
-                raise HTTPException(413,'Bahnhofspläne zusammen höchstens 20 MB; Auswahl verkleinern oder ohne Pläne teilen.')
+                raise HTTPException(413,_text_source('server_station_sharing.text_bd80f341b74b'))
             item=TfStationShareItem(share_id=share.id,code=row.code,name=row.name,contacts_json=contacts_json(contacts),
                 plan_filename=plan.filename if plan else None,plan_mime_type=plan.mime_type if plan else None,plan_content=content)
             db.add(item);db.flush()
@@ -136,7 +137,7 @@ def create_router(driver):
     def plan(item_id:int,delivery_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         share=shared(db,delivery_id,user)
         row=db.scalar(select(TfStationShareItem).where(TfStationShareItem.id==item_id,TfStationShareItem.share_id==share.id))
-        if not row or not row.plan_content:raise HTTPException(404,'Kein Bahnhofsplan vorhanden.')
+        if not row or not row.plan_content:raise HTTPException(404,_text_source('server_station_sharing.text_4205d5c216a8'))
         return Response(row.plan_content,media_type=row.plan_mime_type,headers={
             'Content-Disposition':"attachment; filename*=UTF-8''"+quote(row.plan_filename,safe=''),
             'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
@@ -146,7 +147,7 @@ def create_router(driver):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         share=shared(db,delivery_id,user,True)
         rows=db.scalars(select(TfStationShareItem).where(TfStationShareItem.share_id==share.id,TfStationShareItem.id.in_([item.id for item in data.items])).order_by(TfStationShareItem.code)).all()
-        if len(rows)!=len(data.items):raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
+        if len(rows)!=len(data.items):raise HTTPException(404,_text_source('server_station_sharing.text_41f90b727e22'))
         revisions={item.id:item.expected_revision for item in data.items}
         targets={item.id:item.target_station_id for item in data.items}
         used=set()
@@ -154,12 +155,12 @@ def create_router(driver):
         for source in rows:
             condition=TfStation.id==targets[source.id] if targets[source.id] else TfStation.code==source.code
             target=db.scalar(select(TfStation).where(TfStation.owner_id==user.id,condition).with_for_update())
-            if targets[source.id] and not target:raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
+            if targets[source.id] and not target:raise HTTPException(404,_text_source('server_station_sharing.text_41f90b727e22'))
             destination=('id',target.id) if target else ('code',source.code)
-            if destination in used:raise HTTPException(422,'Jeden Zielbahnhof nur einmal pro Übernahme auswählen.')
+            if destination in used:raise HTTPException(422,_text_source('server_station_sharing.text_d7d19f6de978'))
             used.add(destination)
             if (target.revision if target else 0)!=revisions[source.id]:
-                raise HTTPException(409,'Eigene Bahnhofsliste wurde geändert. Freigabe erneut laden.')
+                raise HTTPException(409,_text_source('server_station_sharing.text_c20c9cabae31'))
             if target and data.mode=='new_only':result['skipped']+=1;continue
             existing=json.loads(target.contacts_json) if target else []
             incoming=json.loads(source.contacts_json)
@@ -167,7 +168,7 @@ def create_router(driver):
             for contact in incoming:
                 key=contact_key(contact)
                 if key not in seen:merged.append(contact);seen.add(key)
-            if len(merged)>100:raise HTTPException(409,'Ergänzung überschreitet 100 Nummern; Bahnhof einzeln prüfen.')
+            if len(merged)>100:raise HTTPException(409,_text_source('server_station_sharing.text_a88493f6b7ce'))
             encoded=contacts_json([StationContact.model_validate(contact) for contact in merged])
             created=target is None;changed=created or encoded!=(target.contacts_json if target else '')
             if created:

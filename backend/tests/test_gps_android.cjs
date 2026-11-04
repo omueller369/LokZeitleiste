@@ -1,5 +1,5 @@
 // Simulated browser contract test; no real GPS hardware or installed browser required.
-const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const fs=require('fs'),vm=require('./localized-vm.cjs'),assert=require('assert');
 class Element{
  constructor(tag){this.tag=tag;this.children=[];this.attributes={};this.value='';this.events={};}
  addEventListener(k,f){this.events[k]=f;}

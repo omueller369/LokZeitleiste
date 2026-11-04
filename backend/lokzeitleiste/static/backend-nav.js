@@ -1,5 +1,5 @@
 (async()=>{try{
-const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok){window.BackendNavigation?.destroy();return;}const me=await response.json(),p=me.permissions;let preference={user_id:me.id,variant:'sidebar'};try{const r=await fetch('/api/v1/admin/menu-preference',{credentials:'same-origin',cache:'no-store'});if(r.ok)preference=await r.json();}catch(_){}const variants=['sidebar','compact','sections'];let variant=variants.includes(preference.variant)?preference.variant:'sidebar';const fingerprint=JSON.stringify({role:me.role,permissions:p}),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261025-year-fit-14'&&existing.dataset.variant===variant&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint&&window.BackendNavigation&&document.getElementById('backend-sidebar'))return;window.BackendNavigation?.destroy();existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label','Backend-Menü');nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
+const response=await fetch('/api/v1/admin/me',{credentials:'same-origin',cache:'no-store'});if(!response.ok){window.BackendNavigation?.destroy();return;}const me=await response.json(),p=me.permissions;let preference={user_id:me.id,variant:'sidebar'};try{const r=await fetch('/api/v1/admin/menu-preference',{credentials:'same-origin',cache:'no-store'});if(r.ok)preference=await r.json();}catch(_){}const variants=['sidebar','compact','sections'];let variant=variants.includes(preference.variant)?preference.variant:'sidebar';const fingerprint=JSON.stringify({role:me.role,permissions:p}),existing=document.querySelector('.backend-menu-control');if(existing?.dataset.menuRevision==='20261025-year-fit-14'&&existing.dataset.variant===variant&&existing.dataset.accountId===String(me.id)&&existing.dataset.permissions===fingerprint&&window.BackendNavigation&&document.getElementById('backend-sidebar'))return;window.BackendNavigation?.destroy();existing?.remove();let nav=document.getElementById('navigation');if(!nav){nav=document.createElement('nav');nav.className='card';nav.id='navigation';document.querySelector('main').prepend(nav);}nav.setAttribute('aria-label',globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391"));nav.hidden=true;nav.classList.add('backend-menu');nav.replaceChildren();const list=document.createElement('ul');list.className='menu-tree';nav.append(list);
 let groupCount=0;
 function group(label,parent=list,href=null,allowed=true){
  const item=document.createElement('li'),row=document.createElement('div'),heading=document.createElement(href?'a':'button'),children=document.createElement('ul'),toggle=href?document.createElement('button'):heading;
@@ -7,58 +7,58 @@ function group(label,parent=list,href=null,allowed=true){
  children.id='backend-submenu-'+(++groupCount);children.hidden=true;
  toggle.type='button';toggle.classList.add('menu-submenu-toggle');toggle.setAttribute('aria-controls',children.id);toggle.setAttribute('aria-expanded','false');
  toggle.onclick=()=>{children.hidden=!children.hidden;toggle.setAttribute('aria-expanded',String(!children.hidden));};
- if(href){heading.href=href;heading.id=children.id+'-label';toggle.setAttribute('aria-labelledby',heading.id);if(!allowed)heading.title='Freigabe erforderlich';markCurrent(heading,href);row.append(heading,toggle);}else row.append(heading);
+ if(href){heading.href=href;heading.id=children.id+'-label';toggle.setAttribute('aria-labelledby',heading.id);if(!allowed)heading.title=globalThis.CtlText.source("backend_backend_nav.text_08597f7b8e11");markCurrent(heading,href);row.append(heading,toggle);}else row.append(heading);
  item.append(row,children);parent.append(item);return children;
 }
 function markCurrent(anchor,href){const target=new URL(href,location.href);if(location.pathname!==target.pathname)return;if(target.pathname==='/admin/planning'&&['readonly','overview'].some(key=>target.searchParams.get(key)!==new URLSearchParams(location.search).get(key)))return;anchor.setAttribute('aria-current','page');}
-function link(box,label,href,allowed=true){const li=document.createElement('li'),anchor=document.createElement('a');anchor.textContent=label;anchor.href=href;if(!allowed)anchor.title='Freigabe erforderlich';markCurrent(anchor,href);li.append(anchor);box.append(li);return anchor;}
+function link(box,label,href,allowed=true){const li=document.createElement('li'),anchor=document.createElement('a');anchor.textContent=label;anchor.href=href;if(!allowed)anchor.title=globalThis.CtlText.source("backend_backend_nav.text_08597f7b8e11");markCurrent(anchor,href);li.append(anchor);box.append(li);return anchor;}
 function placeholder(box,label){const item=document.createElement('li'),text=document.createElement('span');text.className='menu-placeholder';text.textContent=label;text.setAttribute('aria-disabled','true');item.append(text);box.append(item);}
 const hasEmployees=['employees','planning','worktime','reports','directory','shifts','email'].some(module=>p[module]);
 const modules=[
- ['directory','Alle Mitarbeiter','/admin/directory',!!p.directory],
- ['tf','TFs (Liste)','/admin/tf',hasEmployees],
- ['tfNew','TF anlegen','/admin/tf/new',p.employees===3],
- ['staff','Verwaltungsmitarbeiter (Liste)','/admin/staff',!!p.staff],
- ['staffNew','Verwaltungsmitarbeiter anlegen','/admin/staff/new',p.staff===3],
- ['planning','Arbeitszeitplanung','/admin/planning',!!p.planning],
- ['shifts','Schichtplan','/admin/shifts',!!p.shifts],
- ['overview','Ruhetagsplan aller TF','/admin/rest-plans',!!p.planning],
- ['app_defaults','App Grundwerte','/admin/app-defaults',me.role==='admin'||!!p.app_defaults],
- ['loco_handover','Lokübergabebuch','/admin/loco-handover',me.role==='admin'||!!p.loco_handover],
- ['leasing','Lok-Leasing','/admin/leasing',me.role==='admin'||!!p.leasing],
- ['vehicles','Triebfahrzeuge','/admin/vehicles',me.role==='admin'||!!p.vehicles],
- ['roster','Dienstplan','/admin/planning?readonly=1',!!p.planning],
- ['hours','Dienstzeit','/admin/tf/hours',!!p.planning&&!!(p.worktime||p.reports)],
- ['worktime','Arbeitszeiterfassung und Korrekturen','/admin/worktime',!!p.worktime],
- ['messages','Kurznachrichten','/admin/messages',true],
- ['email','Email','/admin/email',!!p.email],
- ['documents','Meine Dokumente','/documents',true],
- ['password','Mein Konto / Passwort','/admin/me',true]
+ ['directory',globalThis.CtlText.source("backend_backend_nav.text_143327b1cce7"),'/admin/directory',!!p.directory],
+ ['tf',globalThis.CtlText.source("backend_backend_nav.text_e9820ba217c3"),'/admin/tf',hasEmployees],
+ ['tfNew',globalThis.CtlText.source("backend_backend_nav.text_e309cc217ad9"),'/admin/tf/new',p.employees===3],
+ ['staff',globalThis.CtlText.source("backend_backend_nav.text_20e987b4a823"),'/admin/staff',!!p.staff],
+ ['staffNew',globalThis.CtlText.source("backend_backend_nav.text_0f51c3a734c4"),'/admin/staff/new',p.staff===3],
+ ['planning',globalThis.CtlText.source("backend_backend_nav.text_67f08af53537"),'/admin/planning',!!p.planning],
+ ['shifts',globalThis.CtlText.source("backend_backend_nav.text_77ecaf5660bb"),'/admin/shifts',!!p.shifts],
+ ['overview',globalThis.CtlText.source("backend_backend_nav.text_8d19db2dc6b2"),'/admin/rest-plans',!!p.planning],
+ ['app_defaults',globalThis.CtlText.source("backend_backend_nav.text_cb5129c1d8f0"),'/admin/app-defaults',me.role==='admin'||!!p.app_defaults],
+ ['loco_handover',globalThis.CtlText.source("backend_backend_nav.text_2f571b7ba8ad"),'/admin/loco-handover',me.role==='admin'||!!p.loco_handover],
+ ['leasing',globalThis.CtlText.source("backend_backend_nav.text_a23174dc39c0"),'/admin/leasing',me.role==='admin'||!!p.leasing],
+ ['vehicles',globalThis.CtlText.source("backend_backend_nav.text_e76efaf41a3e"),'/admin/vehicles',me.role==='admin'||!!p.vehicles],
+ ['roster',globalThis.CtlText.source("backend_backend_nav.text_4c6e6372b010"),'/admin/planning?readonly=1',!!p.planning],
+ ['hours',globalThis.CtlText.source("backend_backend_nav.text_09d2cf5dc984"),'/admin/tf/hours',!!p.planning&&!!(p.worktime||p.reports)],
+ ['worktime',globalThis.CtlText.source("backend_backend_nav.text_dd4fd942cb88"),'/admin/worktime',!!p.worktime],
+ ['messages',globalThis.CtlText.source("backend_backend_nav.text_73e0cf4b6d15"),'/admin/messages',true],
+ ['email',globalThis.CtlText.source("backend_backend_nav.text_969ccbd3cf63"),'/admin/email',!!p.email],
+ ['documents',globalThis.CtlText.source("backend_backend_nav.text_52b5952bea66"),'/documents',true],
+ ['password',globalThis.CtlText.source("backend_backend_nav.text_b4d616199968"),'/admin/me',true]
 ];
-if(me.role==='staff')modules.push(['ownTime','Meine Arbeitszeiten','/my/worktime',true]);
+if(me.role==='staff')modules.push(['ownTime',globalThis.CtlText.source("backend_backend_nav.text_e71e0296d76b"),'/my/worktime',true]);
 function moduleLink(parent,id,label=null){const module=modules.find(item=>item[0]===id);return link(parent,label||module[1],module[2],module[3]);}
-const home=document.createElement('li'),homeLink=document.createElement('a');home.style.gridColumn='1 / -1';homeLink.textContent='Startseite';homeLink.href='/admin/start';markCurrent(homeLink,homeLink.href);home.append(homeLink);list.append(home);
-link(list,'Menü anpassen','/admin/menu-designs');
-if(me.role==='admin'){const administration=group('Administration');for(const module of modules)link(administration,module[1],module[2],module[3]);}
-const management=group('Verwaltung'),employees=group('Mitarbeiter',management);
-const drivers=group('TFs',employees,'/admin/tf',hasEmployees);moduleLink(drivers,'tfNew','anlegen');
-const office=group('Verwaltung',employees,'/admin/staff',!!p.staff);moduleLink(office,'staffNew','anlegen');
-const planning=group('Personalplanung');for(const id of ['planning','shifts','overview'])moduleLink(planning,id);
-const other=group('Sonstiges'),master=group('Stammdaten',other);moduleLink(other,'messages');moduleLink(master,'leasing');moduleLink(master,'vehicles');moduleLink(master,'app_defaults');
+const home=document.createElement('li'),homeLink=document.createElement('a');home.style.gridColumn='1 / -1';homeLink.textContent=globalThis.CtlText.source("backend_backend_nav.text_e04d24c52b3d");homeLink.href='/admin/start';markCurrent(homeLink,homeLink.href);home.append(homeLink);list.append(home);
+link(list,globalThis.CtlText.source("backend_backend_nav.text_e3e8b2523e66"),'/admin/menu-designs');
+if(me.role==='admin'){const administration=group(globalThis.CtlText.source("backend_backend_nav.text_4b42c6690ebe"));for(const module of modules)link(administration,module[1],module[2],module[3]);}
+const management=group(globalThis.CtlText.source("backend_backend_nav.text_2456bb8ed72f")),employees=group(globalThis.CtlText.source("backend_backend_nav.text_f4cb6891b9e5"),management);
+const drivers=group(globalThis.CtlText.source("backend_backend_nav.text_0378d440ff8d"),employees,'/admin/tf',hasEmployees);moduleLink(drivers,'tfNew',globalThis.CtlText.source("backend_backend_nav.text_5c1058aea6bf"));
+const office=group(globalThis.CtlText.source("backend_backend_nav.text_2456bb8ed72f"),employees,'/admin/staff',!!p.staff);moduleLink(office,'staffNew',globalThis.CtlText.source("backend_backend_nav.text_5c1058aea6bf"));
+const planning=group(globalThis.CtlText.source("backend_backend_nav.text_b702020127a6"));for(const id of ['planning','shifts','overview'])moduleLink(planning,id);
+const other=group(globalThis.CtlText.source("backend_backend_nav.text_9f3d5f8d94cf")),master=group(globalThis.CtlText.source("backend_backend_nav.text_c78f95997238"),other);moduleLink(other,'messages');moduleLink(master,'leasing');moduleLink(master,'vehicles');moduleLink(master,'app_defaults');
 for(const id of ['loco_handover','directory','roster','hours','worktime','email','documents','password',...(me.role==='staff'?['ownTime']:[])])moduleLink(other,id);
-const logoutItem=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent='Abmelden';logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error('Abmelden fehlgeschlagen');location.href='/admin';}catch(error){logout.disabled=false;alert(error.message);}};logoutItem.className='menu-logout';logoutItem.append(logout);list.append(logoutItem);
+const logoutItem=document.createElement('li'),logout=document.createElement('button');logout.type='button';logout.textContent=globalThis.CtlText.source("backend_backend_nav.text_545f8be33bf0");logout.onclick=async()=>{logout.disabled=true;try{const result=await fetch('/api/v1/admin/logout',{method:'POST',credentials:'same-origin'});if(!result.ok)throw Error(globalThis.CtlText.source("backend_backend_nav.text_bb4cafe08860"));location.href='/admin';}catch(error){logout.disabled=false;alert(error.message);}};logoutItem.className='menu-logout';logoutItem.append(logout);list.append(logoutItem);
 const stylesheet=document.querySelector('link[href^="/responsive.css"]');if(stylesheet)stylesheet.href='/responsive.css?v=20261025-year-fit-14';
 if(!document.querySelector('link[data-backend-sidebar]')){const style=document.createElement('link');style.rel='stylesheet';style.href='/admin/backend-nav.css?v=20261025-year-fit-14';style.dataset.backendSidebar='true';document.head.append(style);}
 const header=document.querySelector('header');if(!header)return;
 const t=value=>window.I18n?.t(value)||value;
 const control=document.createElement('div');control.className='backend-menu-control';control.dataset.menuRevision='20261025-year-fit-14';control.dataset.accountId=String(me.id);control.dataset.permissions=fingerprint;
-const toggle=document.createElement('button');toggle.type='button';toggle.className='backend-menu-toggle';toggle.textContent='☰';toggle.setAttribute('aria-label',t('Backend-Menü'));toggle.setAttribute('title',t('Backend-Menü'));toggle.setAttribute('aria-controls','backend-sidebar');toggle.setAttribute('aria-expanded','false');control.append(toggle);(header.querySelector('.app-shell-tools')||header).append(control);
+const toggle=document.createElement('button');toggle.type='button';toggle.className='backend-menu-toggle';toggle.textContent='☰';toggle.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391")));toggle.setAttribute('title',t(globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391")));toggle.setAttribute('aria-controls','backend-sidebar');toggle.setAttribute('aria-expanded','false');control.append(toggle);(header.querySelector('.app-shell-tools')||header).append(control);
 const sidebar=document.createElement('aside');sidebar.id='backend-sidebar';sidebar.className='backend-sidebar-panel';sidebar.hidden=true;sidebar.setAttribute('aria-labelledby','backend-sidebar-title');
-const top=document.createElement('div');top.className='backend-sidebar-header';const title=document.createElement('h2');title.id='backend-sidebar-title';title.textContent='Backend-Menü';
-const closeButton=document.createElement('button');closeButton.type='button';closeButton.className='backend-sidebar-close';closeButton.textContent='×';closeButton.setAttribute('data-i18n-ignore','');closeButton.setAttribute('aria-label',t('Menü schließen'));top.append(title,closeButton);nav.hidden=false;sidebar.append(top,nav);
-const overlay=document.createElement('button');overlay.type='button';overlay.className='backend-sidebar-overlay';overlay.hidden=true;overlay.tabIndex=-1;overlay.setAttribute('aria-label',t('Menü schließen'));
+const top=document.createElement('div');top.className='backend-sidebar-header';const title=document.createElement('h2');title.id='backend-sidebar-title';title.textContent=globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391");
+const closeButton=document.createElement('button');closeButton.type='button';closeButton.className='backend-sidebar-close';closeButton.textContent='×';closeButton.setAttribute('data-i18n-ignore','');closeButton.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_48700e16fc0c")));top.append(title,closeButton);nav.hidden=false;sidebar.append(top,nav);
+const overlay=document.createElement('button');overlay.type='button';overlay.className='backend-sidebar-overlay';overlay.hidden=true;overlay.tabIndex=-1;overlay.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_48700e16fc0c")));
 document.body.append(overlay,sidebar);
-const bar=document.createElement('nav');bar.className='backend-section-bar';bar.setAttribute('aria-label','Hauptbereiche');for(const [label,href]of [['Startseite','/admin/start'],['Verwaltung','/admin/start?section=management'],['Personalplanung','/admin/start?section=planning']]){if(label==='Verwaltung'&&!hasEmployees&&!p.staff)continue;if(label==='Personalplanung'&&!p.planning&&!p.shifts)continue;const a=document.createElement('a');a.textContent=label;a.href=href;bar.append(a);}const more=document.createElement('button');more.type='button';more.textContent='Mehr';more.setAttribute('aria-controls','backend-sidebar');bar.append(more);header.after(bar);
+const bar=document.createElement('nav');bar.className='backend-section-bar';bar.setAttribute('aria-label',globalThis.CtlText.source("backend_backend_nav.text_475272e55948"));for(const [label,href]of [[globalThis.CtlText.source("backend_backend_nav.text_e04d24c52b3d"),'/admin/start'],[globalThis.CtlText.source("backend_backend_nav.text_2456bb8ed72f"),'/admin/start?section=management'],[globalThis.CtlText.source("backend_backend_nav.text_b702020127a6"),'/admin/start?section=planning']]){if(label===globalThis.CtlText.source("backend_backend_nav.text_2456bb8ed72f")&&!hasEmployees&&!p.staff)continue;if(label===globalThis.CtlText.source("backend_backend_nav.text_b702020127a6")&&!p.planning&&!p.shifts)continue;const a=document.createElement('a');a.textContent=label;a.href=href;bar.append(a);}const more=document.createElement('button');more.type='button';more.textContent=globalThis.CtlText.source("backend_backend_nav.text_80dc77bcf4ca");more.setAttribute('aria-controls','backend-sidebar');bar.append(more);header.after(bar);
 function permanent(){return variant==='sidebar'&&media.matches;}
 const media=window.matchMedia('(min-width:1100px)'),cleanups=[];let opened=false,locked=false,restoreTarget=null,inertElements=[],previousOverflow='';
 function on(target,event,handler){target.addEventListener(event,handler);cleanups.push(()=>target.removeEventListener(event,handler));}
@@ -72,9 +72,9 @@ on(sidebar,'click',event=>{if(!permanent()&&event.target.closest('a'))close(fals
 on(document,'keydown',event=>{if(!opened)return;if(event.key==='Escape'){event.preventDefault();close(true);return;}if(event.key!=='Tab'||!locked)return;const items=focusable(),first=items[0],last=items.at(-1);if(!first){event.preventDefault();closeButton.focus();return;}if(!sidebar.contains(document.activeElement)||(event.shiftKey&&document.activeElement===first)){event.preventDefault();(event.shiftKey?last:first).focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}});
 on(window,'backendmenuchange',event=>{const value=event.detail;if(value?.user_id!==me.id||!variants.includes(value.variant))return;variant=value.variant;layout();});
 on(document,'pointerdown',event=>{if(opened&&!locked&&!sidebar.contains(event.target)&&!control.contains(event.target)&&!bar.contains(event.target))close(false);});
-on(window,'languagechange',()=>{toggle.setAttribute('aria-label',t('Backend-Menü'));toggle.setAttribute('title',t('Backend-Menü'));closeButton.setAttribute('aria-label',t('Menü schließen'));overlay.setAttribute('aria-label',t('Menü schließen'));});
+on(window,'languagechange',()=>{toggle.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391")));toggle.setAttribute('title',t(globalThis.CtlText.source("backend_backend_nav.text_d2fea9300391")));closeButton.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_48700e16fc0c")));overlay.setAttribute('aria-label',t(globalThis.CtlText.source("backend_backend_nav.text_48700e16fc0c")));});
 if(media.addEventListener){media.addEventListener('change',layout);cleanups.push(()=>media.removeEventListener('change',layout));}else{media.addListener(layout);cleanups.push(()=>media.removeListener(layout));}
 window.BackendNavigation={destroy(){release();for(const cleanup of cleanups)cleanup();control.remove();sidebar.remove();overlay.remove();bar.remove();document.body.classList.remove('backend-sidebar-desktop','backend-sections-layout');if(window.BackendNavigation===this)delete window.BackendNavigation;}};
 layout();
 if(!window.AppShellReady){const shell=document.createElement('script');shell.src='/tf/shell.js?v=20261026-message-poll-1';document.head.append(shell);}
-}catch(e){console.error('Backend-Menü konnte nicht geladen werden',e);}})();
+}catch(e){console.error(globalThis.CtlText.source("backend_backend_nav.text_a4bd23483387"),e);}})();

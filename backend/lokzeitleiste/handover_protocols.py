@@ -1,4 +1,5 @@
 """Vehicle handover protocols with atomic attachment storage and snapshot details."""
+from .localization import source as _text_source
 import json,logging
 from datetime import datetime
 from typing import Literal
@@ -22,7 +23,7 @@ log=logging.getLogger(__name__)
 
 class ProtocolInput(BaseModel):
     occurred_at:datetime
-    duty:Literal['keiner','V1','V3','A1','A1A','A2','A3']='keiner'
+    duty:Literal['keiner','V1','V3','A1','A1A','A2','A3']=_text_source('server_handover_protocols.text_298e1336de5c')
     train_number:str=Field(default='',pattern=r'^[0-9]{0,6}$')
     station_code:str=Field(min_length=1,max_length=10)
     notes:str=Field(default='',max_length=1000)
@@ -34,7 +35,7 @@ class ProtocolInput(BaseModel):
     @field_validator('occurred_at')
     @classmethod
     def local_time(cls,value):
-        if value.tzinfo is not None:raise ValueError('Bitte lokale Datum/Uhrzeit ohne Zeitzone eingeben.')
+        if value.tzinfo is not None:raise ValueError(_text_source('server_handover_protocols.text_636f3ac5dff1'))
         return value
     @field_validator('station_code')
     @classmethod
@@ -44,12 +45,12 @@ from .vehicles import is_retired
 
 def vehicle(db,vehicle_id):
     row=db.get(RailwayVehicle,vehicle_id)
-    if not row or is_retired(db,vehicle_id):raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+    if not row or is_retired(db,vehicle_id):raise HTTPException(404,_text_source('server_handover_protocols.text_d0713be2fe85'))
     return row
 
 def protocol(db,vehicle_id,protocol_id):
     row=db.get(Protocol,protocol_id)
-    if not row or row.vehicle_id!=vehicle_id:raise HTTPException(404,'Übergabeprotokoll nicht gefunden.')
+    if not row or row.vehicle_id!=vehicle_id:raise HTTPException(404,_text_source('server_handover_protocols.text_e23ac9e00ec8'))
     return row
 
 def view(row):return dict(id=row.id,vehicle_id=row.vehicle_id,author_name=row.author_name,occurred_at=row.occurred_at.isoformat(timespec='minutes'),**{'locomotive_data':False,**json.loads(row.payload_json)})
@@ -74,21 +75,21 @@ def create_router(require_admin,require_account):
         async def create(vehicle_id:int,payload:str=Form(max_length=10000),files:list[UploadFile]=File(default=[]),user=Depends(access),db:Session=Depends(database_session)):
             loco=vehicle(db,vehicle_id)
             try:data=ProtocolInput.model_validate_json(payload)
-            except ValidationError as exc:raise HTTPException(422,'Bitte die Eingaben und Pflichtfelder prüfen.') from exc
+            except ValidationError as exc:raise HTTPException(422,_text_source('server_handover_protocols.text_67e48cf44576')) from exc
             station=db.get(RailwayStation,data.station_code)
-            if not station:raise HTTPException(422,'Bitte einen Bahnhof aus den Suchvorschlägen auswählen.')
+            if not station:raise HTTPException(422,_text_source('server_handover_protocols.text_9829a55f8030'))
             recipient=db.get(LocoHandoverDefault,data.recipient_id) if data.recipient_id else None
-            if data.recipient_id and (not recipient or recipient.kind!='recipient'):raise HTTPException(422,'Bitte einen gültigen Meldungsempfänger auswählen.')
-            if len(files)>10:raise HTTPException(422,'Maximal 10 Dateien pro Übergabeprotokoll.')
+            if data.recipient_id and (not recipient or recipient.kind!='recipient'):raise HTTPException(422,_text_source('server_handover_protocols.text_982e72482702'))
+            if len(files)>10:raise HTTPException(422,_text_source('server_handover_protocols.text_b3a5bb5425b5'))
             attachments=[];total=0
             for file in files:
                 content=await file.read(MAX_FILE+1);await file.close();total+=len(content)
-                if total>30*1024*1024:raise HTTPException(422,'Dateien dürfen zusammen höchstens 30 MB groß sein.')
+                if total>30*1024*1024:raise HTTPException(422,_text_source('server_handover_protocols.text_4818b8099cd1'))
                 try:name,mime,_=validate_receipt(file.filename,content)
                 except ValueError as exc:raise HTTPException(422,str(exc)) from exc
                 attachments.append((name,mime,content))
             profile=db.get(TfProfile,user.id) if user.role=='tf' else db.get(StaffProfile,user.id)
-            author=(' '.join([profile.first_name,profile.last_name]).strip() if profile else ('Triebfahrzeugführer' if user.role=='tf' else user.username))
+            author=(' '.join([profile.first_name,profile.last_name]).strip() if profile else (_text_source('server_handover_protocols.text_3674b4bb4d92') if user.role=='tf' else user.username))
             snapshot=data.model_dump(mode='json',exclude={'occurred_at'})
             snapshot.update(station_name=station.name,recipient_name=recipient.label if recipient else '',recipient_email=recipient.email if recipient else '',vehicle_number=loco.vehicle_number,vehicle_status=loco.status,vehicle_status_label=VEHICLE_STATUSES[loco.status][0])
             try:
@@ -100,8 +101,8 @@ def create_router(require_admin,require_account):
                         db.flush()
                 db.commit()
             except SQLAlchemyError as exc:
-                db.rollback();log.error('Übergabeprotokoll konnte nicht gespeichert werden (Fahrzeug %s, Fehlerklasse %s).',vehicle_id,type(exc).__name__)
-                raise HTTPException(503,'Speichern fehlgeschlagen. Protokoll und Dateien wurden nicht gespeichert. Bitte erneut versuchen.') from exc
+                db.rollback();log.error(_text_source('server_handover_protocols.text_6623fc439bf5'),vehicle_id,type(exc).__name__)
+                raise HTTPException(503,_text_source('server_handover_protocols.text_7969d251ea74')) from exc
             return view(row)
         @sub.get('/vehicles/{vehicle_id}/protocols/{protocol_id}')
         def details(vehicle_id:int,protocol_id:int,user=Depends(access),db:Session=Depends(database_session)):
@@ -110,10 +111,10 @@ def create_router(require_admin,require_account):
         @sub.get('/vehicles/{vehicle_id}/protocols/{protocol_id}/files/{file_id}')
         def download(vehicle_id:int,protocol_id:int,file_id:int,preview:bool=False,user=Depends(access),db:Session=Depends(database_session)):
             protocol(db,vehicle_id,protocol_id);file=db.get(Attachment,file_id)
-            if not file or file.protocol_id!=protocol_id:raise HTTPException(404,'Datei nicht gefunden.')
+            if not file or file.protocol_id!=protocol_id:raise HTTPException(404,_text_source('server_handover_protocols.text_8a18a03defcc'))
             content=file.content or b''.join(db.scalars(select(Chunk.content).where(Chunk.attachment_id==file.id).order_by(Chunk.position)))
             disposition='inline' if preview and file.mime_type in ('image/jpeg','image/png') else 'attachment'
-            return Response(content,media_type=file.mime_type,headers={'Content-Disposition':disposition+"; filename*=UTF-8''"+quote(file.filename,safe=''),'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
+            return Response(content,media_type=file.mime_type,headers={'Content-Disposition':disposition+_text_source('server_handover_protocols.text_dbb82b86ccfe')+quote(file.filename,safe=''),'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'})
         router.include_router(sub)
     routes('/api/v1/admin/loco-handover',require_admin)
     routes('/api/v1/tf/loco-handover',driver_dependency(require_account))

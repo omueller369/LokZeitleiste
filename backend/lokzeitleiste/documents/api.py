@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import re
 import hashlib
 import mimetypes
@@ -31,7 +32,7 @@ class DocumentUploadLimit:
         async def reject():
             from ..i18n import translate,language
             lang=language(headers.get(b'accept-language',b'de').decode('latin1'))
-            await JSONResponse({'detail':translate('Dokument darf höchstens 10 MB groß sein.',lang)},status_code=413)(scope,receive,send)
+            await JSONResponse({'detail':translate(_text_source('server_documents_api.text_17a7a5960b60'),lang)},status_code=413)(scope,receive,send)
         try:declared=int(headers.get(b'content-length',b'0'))
         except ValueError:declared=0
         if declared>limit:return await reject()
@@ -85,7 +86,7 @@ def create_router(require_account):
     async def upload(folder:str=Form(...),file:UploadFile=File(...),user:User=Depends(owner),db:Session=Depends(database_session)):
         try:content=await file.read(MAX_FILE+1)
         finally:await file.close()
-        if not content or len(content)>MAX_FILE:raise HTTPException(413,'Dokument darf höchstens 10 MB groß sein.')
+        if not content or len(content)>MAX_FILE:raise HTTPException(413,_text_source('server_documents_api.text_17a7a5960b60'))
         name=clean_name(file.filename)
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         parent=safe_path(user,folder,directory=True);path=parent/name
@@ -105,7 +106,7 @@ def create_router(require_account):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         row=db.scalar(select(DocumentFile).where(DocumentFile.owner_id==user.id,DocumentFile.relative_path==path))
         if not row or row.uploader_id!=user.id or row.source_key:
-            raise HTTPException(403,'Nur selbst hochgeladene Dokumente dürfen gelöscht werden.')
+            raise HTTPException(403,_text_source('server_documents_api.text_7277e75311e5'))
         target=safe_path(user,path);temporary=target.with_name('.delete-'+uuid4().hex)
         target.rename(temporary);db.delete(row)
         try:db.commit()

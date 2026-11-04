@@ -9,7 +9,7 @@ function icon(dark){
  else {const moon=document.createElementNS(ns,'path');moon.setAttribute('d','M20.4 14A8.8 8.8 0 0 1 10 3.6 8.8 8.8 0 1 0 20.4 14Z');svg.append(moon);}return svg;
 }
 function refresh(){
- if(button){const label=t(mode==='dark'?'Tagmodus einschalten':'Nachtmodus einschalten');button.replaceChildren(icon(mode==='dark'));button.title=label;button.setAttribute('aria-label',t('Nachtmodus'));button.setAttribute('aria-description',label);button.setAttribute('aria-pressed',String(mode==='dark'));}
+ if(button){const label=t(mode==='dark'?globalThis.CtlText.source("backend_portal_theme.text_9ea399c12892"):globalThis.CtlText.source("backend_portal_theme.text_bd11267a8c6d"));button.replaceChildren(icon(mode==='dark'));button.title=label;button.setAttribute('aria-label',t(globalThis.CtlText.source("backend_portal_theme.text_f77464c4c39d")));button.setAttribute('aria-description',label);button.setAttribute('aria-pressed',String(mode==='dark'));}
  let meta=document.querySelector('meta[name="theme-color"]');if(!meta){meta=document.createElement('meta');meta.name='theme-color';document.head.append(meta);}meta.content=mode==='dark'?'#0d1722':'#132c40';
 }
 function set(value,persist=true){mode=value==='dark'?'dark':'light';root.dataset.theme=mode;root.style.colorScheme=mode;if(persist)try{localStorage.setItem(key,mode);}catch{}refresh();window.dispatchEvent(new Event('portalthemechange'));return mode;}

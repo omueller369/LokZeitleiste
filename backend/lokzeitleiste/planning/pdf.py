@@ -1,4 +1,5 @@
 """Farbige Monatskalender und Jahresmatrix für den administrativen Plan."""
+from ..localization import source as _text_source
 import calendar
 from datetime import date
 from pathlib import Path
@@ -15,8 +16,8 @@ from ..version import SOFTWARE_TITLE, SOFTWARE_VERSION
 from .palette import COLORS,base_key,background_key
 from .calendar_layout import YEAR_COLUMNS,year_slots
 
-MONTHS = ["", "Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
-CODES = {"Arbeitstag": "A", "Urlaub": "U", "Ruhetag": "R", "Ungeplant": "?", "Feiertag":"F", "Wochenende":"WE"}
+MONTHS = ["", _text_source('server_planning_pdf.text_e3e144a75b27'), _text_source('server_planning_pdf.text_742d257d7283'), _text_source('server_planning_pdf.text_86ac4d676251'), _text_source('server_planning_pdf.text_4afe6ea150d5'), _text_source('server_planning_pdf.text_d77b6bd0886e'), _text_source('server_planning_pdf.text_130d0a280e7e'), _text_source('server_planning_pdf.text_161f3271aeb4'), _text_source('server_planning_pdf.text_a66d8970e569'), _text_source('server_planning_pdf.text_cd559ea0abca'), _text_source('server_planning_pdf.text_4e1056bfe86b'), _text_source('server_planning_pdf.text_9de6fe1d7265'), _text_source('server_planning_pdf.text_4bd7dd175722')]
+CODES = {_text_source('server_planning_pdf.text_eb8f579b6931'): "A", _text_source('server_planning_pdf.text_35d3a889824d'): "U", _text_source('server_planning_pdf.text_e79aa42d7d18'): "R", _text_source('server_planning_pdf.text_52e37a639da5'): "?", _text_source('server_planning_pdf.text_ecda07db6e0b'):"F", _text_source('server_planning_pdf.text_fd7058ac0c38'):"WE"}
 DARK = colors.HexColor("#173E55")
 
 from ..pdf_locale import register_fonts, LocalizedParagraph as Paragraph
@@ -54,33 +55,33 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     buffer = BytesIO()
     page = landscape(A3) if yearly else A4
     doc = SimpleDocTemplate(buffer, pagesize=page, rightMargin=30, leftMargin=30,
-                            topMargin=30, bottomMargin=42, title="Arbeitszeitplan")
+                            topMargin=30, bottomMargin=42, title=_text_source('server_planning_pdf.text_af6151b026c9'))
     styles = getSampleStyleSheet()
     for style in styles.byName.values():
         if hasattr(style, "fontName"):
             style.fontName = "PlanSans-Bold" if style.fontName == "Helvetica-Bold" else "PlanSans"
     styles.add(ParagraphStyle("PlanHeader", fontName="PlanSans-Bold", fontSize=8, leading=11, textColor=colors.white))
     styles.add(ParagraphStyle("PlanCell", fontName="PlanSans", fontSize=8, leading=10, textColor=DARK))
-    title = f"Jahresplan {plan['year']}" if yearly else f"Monatsplan {MONTHS[plan['month']]} {plan['year']}"
+    title = f"{_text_source('server_planning_pdf.text_d95c5b67c2c6')}{plan['year']}" if yearly else f"{_text_source('server_planning_pdf.text_7389dea602ec')}{MONTHS[plan['month']]} {plan['year']}"
     metadata=Table([[Paragraph(title,styles['Heading2'])],
-                    [Paragraph(f'Tf {escape(name)} · Personalnummer {escape(personnel_number)}',styles['Normal'])]],colWidths=[doc.width])
+                    [Paragraph(f"Tf {escape(name)}{_text_source('server_planning_pdf.text_5bfdf41234f1')}{escape(personnel_number)}",styles[_text_source('server_planning_pdf.text_a7248eeb45eb')])]],colWidths=[doc.width])
     metadata.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8)]))
     story=[metadata,Spacer(1,12)]
     sums = plan["totals"] if yearly else plan
-    summary = [["Erforderliche Arbeitstage", "Urlaubstage", "Ruhetage"],
+    summary = [[_text_source('server_planning_pdf.text_aa40f92f3d03'), _text_source('server_planning_pdf.text_be197acfa59b'), _text_source('server_planning_pdf.text_3c1bdf2670ef')],
                [str(sums["work_days"]), str(sums["vacation_days"]), str(sums["rest_days"])],
-               ["Arbeitssoll", "Urlaubsgutschrift", "Soll inkl. Urlaub"],
+               [_text_source('server_planning_pdf.text_06e66d1ebcb5'), _text_source('server_planning_pdf.text_4b015cafb095'), _text_source('server_planning_pdf.text_38d7ebf3d44e')],
                [clock(sums["work_target_minutes"]) + " h", clock(sums["vacation_minutes"]) + " h",
                 clock(sums["target_minutes"]) + " h"]]
-    summary=[[Paragraph(str(value),styles['Normal']) for value in row] for row in summary]
+    summary=[[Paragraph(str(value),styles[_text_source('server_planning_pdf.text_a7248eeb45eb')]) for value in row] for row in summary]
     summary_table = Table(summary, colWidths=[doc.width / 3] * 3)
     summary_table.setStyle(TableStyle([("FONTNAME", (0, 0), (-1, -1), "PlanSans"),("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#EEF4F8")),
                                       ("TEXTCOLOR", (0, 0), (-1, -1), DARK), ("FONTSIZE", (0, 0), (-1, -1), 10),
                                       ("FONTNAME", (0, 1), (-1, 1), "PlanSans-Bold"),
                                       ("FONTNAME", (0, 3), (-1, 3), "PlanSans-Bold"),
                                       ("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 8)]))
-    story += [summary_table,Spacer(1,6),Paragraph(display("Planstatus")+": "+display("Vollständig" if plan["complete"] else "Unvollständig"),styles["Normal"]),Spacer(1,12)]
-    legend_kinds=[k for k in CODES if k!="Ungeplant"]
+    story += [summary_table,Spacer(1,6),Paragraph(display(_text_source('server_planning_pdf.text_57810709233e'))+": "+display(_text_source('server_planning_pdf.text_9eae8e7efb47') if plan["complete"] else _text_source('server_planning_pdf.text_dc064924c3bb')),styles[_text_source('server_planning_pdf.text_a7248eeb45eb')]),Spacer(1,12)]
+    legend_kinds=[k for k in CODES if k!=_text_source('server_planning_pdf.text_52e37a639da5')]
     legend = [[Paragraph(f"{CODES[k]} - {k}",styles["PlanCell"]) for k in legend_kinds]]
     table = Table(legend, colWidths=[doc.width / len(legend_kinds)] * len(legend_kinds), rowHeights=34)
     table.setStyle(TableStyle([("BACKGROUND", (i, 0), (i, 0), colors.HexColor("#" + COLORS[k])) for i, k in enumerate(legend_kinds)] + [("FONTNAME", (0, 0), (-1, -1), "PlanSans")] +
@@ -89,7 +90,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
     story += [table, Spacer(1, 14)]
     if yearly:
         styles.add(ParagraphStyle("YearCell",parent=styles["PlanCell"],fontSize=7,leading=8,alignment=1))
-        header = ["Monat"] + [str(i+1) for i in range(YEAR_COLUMNS)] + ["A", "U", "R", "Soll h"]
+        header = [_text_source('server_planning_pdf.text_2933070469a2')] + [str(i+1) for i in range(YEAR_COLUMNS)] + ["A", "U", "R", _text_source('server_planning_pdf.text_6e96b1407290')]
         rows = [header]
         fills = []
         diagonal = {}
@@ -97,15 +98,15 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
             cells = [MONTHS[month["month"]]]
             for column,item in enumerate(year_slots(month),start=1):
                 if item:
-                    kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                    code=("GT" if item.get("shift")=="border_day" and kind=="Arbeitstag" else "GN" if item.get("shift")=="border_night" and kind=="Arbeitstag" else CODES[kind])+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
+                    kind = _text_source('server_planning_pdf.text_ecda07db6e0b') if item.get("is_holiday") else item["kind"]
+                    code=("GT" if item.get("shift")=="border_day" and kind==_text_source('server_planning_pdf.text_eb8f579b6931') else "GN" if item.get("shift")=="border_night" and kind==_text_source('server_planning_pdf.text_eb8f579b6931') else CODES[kind])+("/"+CODES[item["kind"]] if kind==_text_source('server_planning_pdf.text_ecda07db6e0b') and item["kind"]!=_text_source('server_planning_pdf.text_52e37a639da5') else "")
                     note=' '.join(item.get('note','').split())
                     available=(doc.width-223)/YEAR_COLUMNS-2
                     while note and pdfmetrics.stringWidth(note,'PlanSans',7)>available:
                         note=note[:-2].rstrip()+'…' if len(note)>1 else ''
-                    weekday=display(('Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag')[date.fromisoformat(item['date']).weekday()])[:2]
+                    weekday=display((_text_source('server_planning_pdf.text_b703fc6aeb9c'),_text_source('server_planning_pdf.text_c2e102ca1f11'),_text_source('server_planning_pdf.text_76c93ad154a5'),_text_source('server_planning_pdf.text_b15c4daa80ba'),_text_source('server_planning_pdf.text_5815ddf1ffb1'),_text_source('server_planning_pdf.text_7c22aad82322'),_text_source('server_planning_pdf.text_a5984592501e'))[date.fromisoformat(item['date']).weekday()])[:2]
                     cells.append(Paragraph(code+'<br/>'+escape(weekday)+'<br/>'+escape(note or '______'),styles["YearCell"]))
-                    if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(column,row)]=base_key(item)
+                    if kind==_text_source('server_planning_pdf.text_ecda07db6e0b') and item["kind"]!=_text_source('server_planning_pdf.text_52e37a639da5'):diagonal[(column,row)]=base_key(item)
                     fills.append(("BACKGROUND", (column, row), (column, row), colors.HexColor("#" + COLORS[background_key(item)])))
                 else:
                     cells.append("")
@@ -123,7 +124,7 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                    ("GRID", (0, 0), (-1, -1), .4, colors.white)]))
         story.append(table)
     else:
-        rows = [["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]]
+        rows = [[_text_source('server_planning_pdf.text_b703fc6aeb9c'), _text_source('server_planning_pdf.text_c2e102ca1f11'), _text_source('server_planning_pdf.text_76c93ad154a5'), _text_source('server_planning_pdf.text_b15c4daa80ba'), _text_source('server_planning_pdf.text_5815ddf1ffb1'), _text_source('server_planning_pdf.text_7c22aad82322'), _text_source('server_planning_pdf.text_a5984592501e')]]
         fills = []
         diagonal = {}
         for row, week in enumerate(calendar.Calendar().monthdayscalendar(plan["year"], plan["month"]), start=1):
@@ -133,10 +134,10 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                     cells.append("")
                     continue
                 item = plan["days"][day - 1]
-                kind = "Feiertag" if item.get("is_holiday") else item["kind"]
-                if kind=="Feiertag" and item["kind"]!="Ungeplant":diagonal[(col,row)]=base_key(item)
-                status=CODES[kind]+("/"+CODES[item["kind"]] if kind=="Feiertag" and item["kind"]!="Ungeplant" else "")
-                hours = clock(item["target_minutes"])+" h" if item["target_minutes"] else "0:00 h" if kind in ("Ruhetag","Feiertag") else "Offen"
+                kind = _text_source('server_planning_pdf.text_ecda07db6e0b') if item.get("is_holiday") else item["kind"]
+                if kind==_text_source('server_planning_pdf.text_ecda07db6e0b') and item["kind"]!=_text_source('server_planning_pdf.text_52e37a639da5'):diagonal[(col,row)]=base_key(item)
+                status=CODES[kind]+("/"+CODES[item["kind"]] if kind==_text_source('server_planning_pdf.text_ecda07db6e0b') and item["kind"]!=_text_source('server_planning_pdf.text_52e37a639da5') else "")
+                hours = clock(item["target_minutes"])+" h" if item["target_minutes"] else "0:00 h" if kind in (_text_source('server_planning_pdf.text_e79aa42d7d18'),_text_source('server_planning_pdf.text_ecda07db6e0b')) else _text_source('server_planning_pdf.text_64509e1af49c')
                 duty=("<br/>GT 09:00-21:00" if item.get("shift")=="border_day" else "<br/>GN 21:00-09:00 +1" if item.get("shift")=="border_night" else "")
                 cells.append(Paragraph(f"<b>{day:02d}</b><br/>{status} - {kind}<br/>{hours}{duty}", styles["PlanCell"]))
                 fills.append(("BACKGROUND", (col, row), (col, row), colors.HexColor("#" + COLORS[background_key(item)])))
@@ -148,12 +149,12 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
                    ("LEFTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), 6),
                    ("GRID", (0, 0), (-1, -1), 1, colors.white)]))
         story.append(table)
-    information=[['Feiertag','Berliner gesetzliche Feiertage = 0 h Soll, auch bei eingetragenem Arbeitstag oder Urlaub. Diagonale Farbe: Feiertag und gespeicherte Tagesart (F/A, F/U, F/R). Sonst: Urlaub = 8 h, Ruhetag = 0 h. Ungeplante Nichtfeiertage bleiben offen.'],
-                 ['Grenzdienst','GT = Grenzdienst Tag 09:00-21:00; GN = Grenzdienst Nacht 21:00-09:00 am Folgetag. Grenzdienst = 12 h Plansoll, Streckendienst = 8 h. Die Nachtschicht zählt zum Startdatum.'],
-                 ['Feiertage Berlin',f"{sums['holiday_days']} Tage mit 0 h Soll."]]
+    information=[[_text_source('server_planning_pdf.text_ecda07db6e0b'),_text_source('server_planning_pdf.text_15af5090e04b')],
+                 [_text_source('server_planning_pdf.text_d1e972bc4bd8'),_text_source('server_planning_pdf.text_becfda4ee0af')],
+                 [_text_source('server_planning_pdf.text_98deca758e26'),f"{sums['holiday_days']}{_text_source('server_planning_pdf.text_f6131d43a16f')}"]]
     if not yearly:
         for item in plan['days']:
-            if item.get('is_holiday'):information.append([item['date'],f"Feiertag - {item['holiday_name']} (0 h Soll)"])
+            if item.get('is_holiday'):information.append([item['date'],f"{_text_source('server_planning_pdf.text_6ae474f9b0ec')}{item['holiday_name']}{_text_source('server_planning_pdf.text_862ada3acf12')}"])
             if item.get('note'):information.append([item['date'],item['note']])
     info=Table([[Paragraph(escape(str(value)),styles['PlanCell']) for value in row] for row in information],colWidths=[doc.width*.22,doc.width*.78],splitInRow=1)
     info.setStyle(TableStyle([('GRID',(0,0),(-1,-1),.4,colors.HexColor('#bdcdd7')),('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(0,-1),colors.HexColor('#EEF4F8')),('TOPPADDING',(0,0),(-1,-1),6),('BOTTOMPADDING',(0,0),(-1,-1),6)]))
@@ -162,11 +163,11 @@ def render_plan_pdf(plan: dict, *, name: str, personnel_number: str, yearly=Fals
         canvas.saveState()
         canvas.setFont("PlanSans",8)
         canvas.setFillColor(colors.HexColor('#A0A0A0'))
-        canvas.drawCentredString(page[0]/2,29,SOFTWARE_TITLE+' · '+display('Version')+' '+SOFTWARE_VERSION)
+        canvas.drawCentredString(page[0]/2,29,SOFTWARE_TITLE+' · '+display(_text_source('server_planning_pdf.text_dd167905de0d'))+' '+SOFTWARE_VERSION)
         canvas.restoreState()
         canvas.setFont("PlanSans", 8)
         canvas.setFillColor(DARK)
-        canvas.drawString(30, 16, display("Administrativer Plan · aktueller gespeicherter Stand"))
-        canvas.drawRightString(page[0] - 30, 16, display(f"Seite {document.page}"))
+        canvas.drawString(30, 16, display(_text_source('server_planning_pdf.text_8c3009c767ed')))
+        canvas.drawRightString(page[0] - 30, 16, display(f"{_text_source('server_planning_pdf.text_e00b871f85fd')}{document.page}"))
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
     return buffer.getvalue()

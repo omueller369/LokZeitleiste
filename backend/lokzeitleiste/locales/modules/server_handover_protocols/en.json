@@ -1,0 +1,16 @@
+{
+  "text_298e1336de5c": "None",
+  "text_3674b4bb4d92": "Train drivers",
+  "text_4818b8099cd1": "Files must not exceed 30 MB in total.",
+  "text_636f3ac5dff1": "Enter the local date/time without a time zone.",
+  "text_6623fc439bf5": "Handover report could not be saved (vehicle %s, error class %s).",
+  "text_67e48cf44576": "Please check your entries and required fields.",
+  "text_7969d251ea74": "Saving failed. The protocol and files were not saved. Please try again.",
+  "text_8a18a03defcc": "File not found.",
+  "text_9829a55f8030": "Please select a station from the suggestions.",
+  "text_982e72482702": "Please select a valid report recipient.",
+  "text_b3a5bb5425b5": "Maximum 10 files per handover protocol.",
+  "text_d0713be2fe85": "Locomotive not found.",
+  "text_dbb82b86ccfe": "; filename*=UTF-8''",
+  "text_e23ac9e00ec8": "Handover protocol not found."
+}

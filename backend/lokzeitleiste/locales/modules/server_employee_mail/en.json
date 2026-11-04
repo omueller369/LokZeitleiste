@@ -1,0 +1,18 @@
+{
+  "text_1185c0bcf6bc": "Mailbox is not yet ready to send or not externally connected.",
+  "text_1c05527cb669": "Domain is not in the list",
+  "text_2456bb8ed72f": "Employee management",
+  "text_363f9338c4a1": "Invalid date of birth",
+  "text_4a5f61932242": "Domain is already in use",
+  "text_5487fa730d39": "Mailbox and employee address do not match.",
+  "text_6f8c1a2585d6": "An existing local mailbox cannot be renamed through a profile change.",
+  "text_9c5811a9189f": "For local mailboxes, use only lowercase letters, numbers, dots, hyphens, underscores and plus signs.",
+  "text_c16bc82bf1f0": "Sent",
+  "text_cd25712ac103": "Domain not found",
+  "text_d4740aa2d546": "Invalid domain",
+  "text_dbf32cda349c": "Email address already assigned. Refresh the suggestion.",
+  "text_de88809a412a": "The initial password must not contain control characters.",
+  "text_e0b78e477033": "Domain already exists",
+  "text_e8a4741b1e30": "Local mailbox creation is not configured yet. Update the setup.",
+  "text_f2b47b492704": "No available email address found."
+}

@@ -1,0 +1,15 @@
+{
+  "text_0f713dfb6090": "Google sign-in requires HTTPS.",
+  "text_35e5a9632e18": "Bearer ",
+  "text_6ee3ffc8472a": "Google sign-in canceled.",
+  "text_89713b9c9c1b": "Accept",
+  "text_935382ae5851": "Administrator login required",
+  "text_98f7c735f872": "Google sign-in expired. Start again.",
+  "text_9e02095f3468": "Reconnect the Google account.",
+  "text_a8c327fb1b2a": "Train driver not found",
+  "text_ae943493dff8": "Mailbox settings changed. Reconnect.",
+  "text_ca5839e38a15": "Authorization",
+  "text_ca5ad8a8496a": "Google sign-in failed. Please reconnect.",
+  "text_dda8e24fe781": "Configure the Google app credentials and public server address.",
+  "text_faf26cfe475a": "Google sign-in does not belong to this session."
+}

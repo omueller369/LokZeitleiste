@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),window={};
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict'),window={};
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/train-journeys.js','utf8'),{window,Intl,Date});
 const editor=Object.create(window.TrainJourneyEditor.prototype),item={id:'journey',editing:'event',suggestedTimes:{start_at:'2026-10-31T09:00'},eventFields:Object.fromEntries(Object.entries({station:'BBB · Berlin Beispiel',reason:'sonstiges',reason_detail:'Noch nicht eingetragen',cause:'CTL',start_at:'2026-10-31T09:00',end_at:'2026-10-31T09:07'}).map(([k,value])=>[k,{value}])),submit:{},cancel:{},deleteEvent:{}};editor.items=[item];editor.details=()=>{};editor.pendingEvent=()=>true;
 const snapshot=editor.captureEditing();for(const field of Object.values(item.eventFields))field.value='';item.editing=null;editor.restoreEditing(snapshot);

@@ -1,0 +1,16 @@
+{
+  "text_03c75e2c4ace": "No closed month exists.",
+  "text_0595ec3c6b47": "Overtime account is not enabled for this month.",
+  "text_0fe5137fab5c": "Reason for change required",
+  "text_2472b835f6c0": "Invalid duty time in overtime account.",
+  "text_4c8ec385d577": "Overtime account changed. Please reload.",
+  "text_4f22aac12893": "Reopen affected monthly closings first.",
+  "text_52c5d4a0445b": "Train journey",
+  "text_75be4489f84a": "Month is already closed.",
+  "text_8c01ed2e16ed": "Month can only be closed after it has ended.",
+  "text_9fc48529d452": "Invalid overtime account balance.",
+  "text_bf05717abd04": "Review and reopen changed monthly closings first.",
+  "text_c6ef72ca00bb": "Invalid month",
+  "text_d425970b74c9": "Employee not found",
+  "text_f31b8681bfca": "Other time entry"
+}

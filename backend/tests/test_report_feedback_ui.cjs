@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 let active=null;class E{constructor(tag){this.tag=tag;this.children=[];this.attrs={};this.events={};this.isConnected=true;}append(...nodes){this.children.push(...nodes);}setAttribute(k,v){this.attrs[k]=v;}getAttribute(k){return this.attrs[k];}addEventListener(k,fn){this.events[k]=fn;}focus(){active=this;}showModal(){this.open=true;}close(){this.open=false;this.events.close?.();}}
 const body=new E('body'),workReport=new E('section'),window={},document={body,get activeElement(){return active;},createElement:tag=>new E(tag),getElementById:id=>id==='workReport'?workReport:null},timers=[];
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/work-report-feedback.js','utf8'),{window,document,location:{pathname:'/tf/arbeitsbericht'},clearTimeout(){},setTimeout:(fn,ms)=>{timers.push(fn);fn.delay=ms;return timers.length;}});

@@ -1,4 +1,5 @@
 """Administrative handover vocabulary, with category-owned damage locations."""
+from .localization import source as _text_source
 import re
 from typing import Literal
 from pathlib import Path
@@ -27,14 +28,14 @@ class Input(BaseModel):
     @field_validator('label')
     @classmethod
     def nonempty(cls,value):
-        if not value:raise ValueError('Bezeichnung ist erforderlich.')
+        if not value:raise ValueError(_text_source('server_loco_handover_defaults.text_25b9ad8f3ac8'))
         return value
     @field_validator('email','hotline_email')
     @classmethod
     def valid_email(cls,value):
         if value:
             try:return str(TypeAdapter(EmailStr).validate_python(value))
-            except ValueError:raise ValueError('Bitte eine gültige Emailadresse eingeben.')
+            except ValueError:raise ValueError(_text_source('server_loco_handover_defaults.text_4a07125bae6a'))
         return value
 
 class Update(Input):
@@ -44,12 +45,12 @@ def view(row):
     return {key:getattr(row,key) for key in ('id','kind','label','email','hotline_name','hotline_email','parent_id','revision')}
 
 def apply(db,row,data):
-    if row.kind=='category' and len(data.label)>100:raise HTTPException(422,'Kategorie darf maximal 100 Zeichen enthalten.')
-    if row.kind=='recipient' and not data.email:raise HTTPException(422,'Emailadresse ist erforderlich.')
+    if row.kind=='category' and len(data.label)>100:raise HTTPException(422,_text_source('server_loco_handover_defaults.text_f51e128a924b'))
+    if row.kind=='recipient' and not data.email:raise HTTPException(422,_text_source('server_loco_handover_defaults.text_e3e44fcea14c'))
     if row.kind=='damage':
         parent=db.scalar(select(Value).where(Value.id==data.parent_id,Value.kind=='category').with_for_update())
-        if not parent:raise HTTPException(422,'Bitte zuerst eine vorhandene Kategorie auswählen.')
-    elif data.parent_id is not None:raise HTTPException(422,'Eine Kategoriezuordnung ist nur für Schadstellen zulässig.')
+        if not parent:raise HTTPException(422,_text_source('server_loco_handover_defaults.text_dd2687e1946c'))
+    elif data.parent_id is not None:raise HTTPException(422,_text_source('server_loco_handover_defaults.text_1e1992d51ed6'))
     row.label=data.label;row.label_key=data.label.casefold()
     row.parent_id=data.parent_id if row.kind=='damage' else None;row.scope_id=row.parent_id or 0
     row.email=data.email if row.kind=='recipient' else ''
@@ -61,7 +62,7 @@ def apply(db,row,data):
 def save(db,row):
     try:db.commit()
     except IntegrityError as exc:
-        db.rollback();raise HTTPException(409,'Bezeichnung ist bereits vorhanden.') from exc
+        db.rollback();raise HTTPException(409,_text_source('server_loco_handover_defaults.text_49d3623ea7be')) from exc
     return view(row)
 
 def create_router(require_admin):
@@ -77,7 +78,7 @@ def create_router(require_admin):
     @router.put(BASE+'/value/{value_id}',dependencies=[Depends(require_admin)])
     def update(value_id:int,data:Update,db:Session=Depends(database_session)):
         row=db.scalar(select(Value).where(Value.id==value_id).with_for_update())
-        if not row:raise HTTPException(404,'Auswahlwert nicht gefunden.')
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Auswahlwert wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_loco_handover_defaults.text_5c5fa14fef76'))
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_loco_handover_defaults.text_60fe685fe99d'))
         apply(db,row,data);row.revision+=1;return save(db,row)
     return router

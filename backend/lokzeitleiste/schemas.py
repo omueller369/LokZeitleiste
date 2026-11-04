@@ -1,3 +1,4 @@
+from .localization import source as _text_source
 from datetime import date, time, datetime, timedelta
 from typing import Literal
 from uuid import UUID
@@ -8,7 +9,7 @@ from pydantic import BaseModel, EmailStr, Field, model_validator, field_validato
 FederalState = Literal["BB", "BE", "BW", "BY", "HB", "HE", "HH", "MV", "NI", "NW", "RP", "SH", "SL", "SN", "ST", "TH"]
 
 
-EntryKind = Literal["Rufbereitschaft", "Bereitschaft", "Zugfahrt", "Ausfallschicht", "Krank", "Urlaub", "Sonstige Erfassung"]
+EntryKind = Literal[_text_source('server_schemas.text_bfe022ddd1f8'), _text_source('server_schemas.text_a88b0d6dfef3'), _text_source('server_schemas.text_52c5d4a0445b'), _text_source('server_schemas.text_98a9c4972272'), _text_source('server_schemas.text_be1600b499c6'), _text_source('server_schemas.text_35d3a889824d'), _text_source('server_schemas.text_f31b8681bfca')]
 
 
 class Credentials(BaseModel):
@@ -28,7 +29,7 @@ class TfAddressIn(BaseModel):
     @field_validator('street', 'house_number', 'postal_code', 'city')
     @classmethod
     def clean(cls, value):
-        if not value.strip(): raise ValueError('Pflichtfeld darf nicht leer sein')
+        if not value.strip(): raise ValueError(_text_source('server_schemas.text_a54f48a13bbb'))
         return value.strip()
 
 
@@ -36,7 +37,7 @@ class TfDetails(BaseModel):
     @field_validator('gender',mode='before')
     @classmethod
     def normalize_gender(cls,value):
-        return {'männlich':'male','weiblich':'female','divers':'diverse','keine Angabe':'unspecified'}.get(value,value) if isinstance(value,str) else value
+        return {_text_source('server_schemas.text_c1e0a9a9f71d'):'male','weiblich':'female','divers':'diverse',_text_source('server_schemas.text_3e0b1cbc7525'):'unspecified'}.get(value,value) if isinstance(value,str) else value
 
     gender: Literal["male","female","diverse","unspecified"] | None = None
     weekly_minutes: int | None = Field(default=None, ge=0, le=168*60)
@@ -52,9 +53,9 @@ class TfDetails(BaseModel):
         if self.addresses is not None:
             if len(self.addresses) == 1: self.addresses[0].is_postal = True
             if sum(a.is_postal for a in self.addresses) != 1:
-                raise ValueError('Genau eine Postanschrift erforderlich.')
+                raise ValueError(_text_source('server_schemas.text_c48c100d178f'))
         if self.entry_date and self.exit_date and self.exit_date < self.entry_date:
-            raise ValueError('Austrittsdatum darf nicht vor dem Beitrittsdatum liegen.')
+            raise ValueError(_text_source('server_schemas.text_547153433a04'))
         return self
 
 
@@ -98,36 +99,36 @@ class EntryIn(BaseModel):
     def validate_times(self):
         if (self.start.second or self.end.second or self.start.microsecond or self.end.microsecond
                 or self.start.tzinfo or self.end.tzinfo):
-            raise ValueError("Uhrzeiten müssen lokale Stunden und Minuten ohne Sekunden enthalten")
+            raise ValueError(_text_source('server_schemas.text_28bd63ce0341'))
         begin = self.start.hour * 60 + self.start.minute
         finish = self.end.hour * 60 + self.end.minute
         if self.end_date is not None:
             if self.end_date<self.date or not 2000<=self.date.year<=self.end_date.year<=2100:
-                raise ValueError("Enddatum muss am oder nach dem Beginn liegen (2000 bis 2100)")
+                raise ValueError(_text_source('server_schemas.text_d06749bae264'))
             span=(self.end_date-self.date).days*1440+finish-begin
-            if span<=0:raise ValueError("Arbeitsende muss nach dem Arbeitsbeginn liegen")
-            if self.kind in ("Urlaub","Krank") and self.end_date!=self.date:
-                raise ValueError("Urlaub und Krank werden je Tag einzeln erfasst")
+            if span<=0:raise ValueError(_text_source('server_schemas.text_650e910feb9c'))
+            if self.kind in (_text_source('server_schemas.text_35d3a889824d'),_text_source('server_schemas.text_be1600b499c6')) and self.end_date!=self.date:
+                raise ValueError(_text_source('server_schemas.text_abe35922b3e1'))
         else:
             span = finish - begin if finish > begin else finish + 1440 - begin
-        if self.kind == "Rufbereitschaft":
+        if self.kind == _text_source('server_schemas.text_bfe022ddd1f8'):
             if begin < 480 or finish > 1200 or finish <= begin or span > 480:
-                raise ValueError("Rufbereitschaft: 08:00–20:00 Uhr, höchstens acht Stunden")
-        elif self.kind in ("Bereitschaft","Ausfallschicht") and span > 480:
-            raise ValueError("Bereitschaft/Ausfallschicht: höchstens acht Stunden")
-        if self.kind in ("Rufbereitschaft", "Bereitschaft"):
+                raise ValueError(_text_source('server_schemas.text_47bc9db0ded4'))
+        elif self.kind in (_text_source('server_schemas.text_a88b0d6dfef3'),_text_source('server_schemas.text_98a9c4972272')) and span > 480:
+            raise ValueError(_text_source('server_schemas.text_0091b51ccc5f'))
+        if self.kind in (_text_source('server_schemas.text_bfe022ddd1f8'), _text_source('server_schemas.text_a88b0d6dfef3')):
             if self.pause >= span or self.guest > span:
-                raise ValueError("Pause und Gastfahrt müssen in den Zeitraum passen")
+                raise ValueError(_text_source('server_schemas.text_be06a5487ee0'))
             if self.note:
-                raise ValueError("Bereitschaft enthält nur Zeitraum und Unterkunft")
-            if self.away and (not self.accommodation or (self.accommodation == "Hotel" and not self.hotel_name.strip())):
-                raise ValueError("Auswärtige Bereitschaft benötigt Unterkunft und ggf. Hotelnamen")
+                raise ValueError(_text_source('server_schemas.text_a0e9e3f1a79c'))
+            if self.away and (not self.accommodation or (self.accommodation == _text_source('server_schemas.text_509b3c4e5dad') and not self.hotel_name.strip())):
+                raise ValueError(_text_source('server_schemas.text_960c0e668795'))
             if not self.away and (self.accommodation or self.hotel_name):
-                raise ValueError("Unterkunft nur bei auswärtigem Aufenthalt")
+                raise ValueError(_text_source('server_schemas.text_44a62e41a3db'))
         elif self.away or self.accommodation or self.hotel_name:
-            raise ValueError("Unterkunft ist derzeit nur bei Bereitschaft erfasst")
+            raise ValueError(_text_source('server_schemas.text_7ff539a59c19'))
         elif self.pause >= span or self.guest > span:
-            raise ValueError("Pause und Gastfahrt müssen in den Zeitraum passen")
+            raise ValueError(_text_source('server_schemas.text_be06a5487ee0'))
         return self
 
 
@@ -138,7 +139,7 @@ class EntryBatch(BaseModel):
     def unique_ids(self):
         ids = [entry.client_id for entry in self.entries]
         if len(ids) != len(set(ids)):
-            raise ValueError("client_id darf im selben Paket nur einmal vorkommen")
+            raise ValueError(_text_source('server_schemas.text_25c938203a5d'))
         return self
 
 

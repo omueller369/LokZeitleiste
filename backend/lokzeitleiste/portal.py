@@ -1,4 +1,5 @@
 """Combined employee directory and reusable shift cycles."""
+from .localization import source as _text_source
 import json
 from datetime import date, timedelta
 from typing import Literal
@@ -23,7 +24,7 @@ class CycleBlock(BaseModel):
 
     @model_validator(mode="after")
     def rest_shift(self):
-        if self.kind=="Ruhetag":self.shift="standard"
+        if self.kind==_text_source('server_portal.text_e79aa42d7d18'):self.shift="standard"
         return self
 
 
@@ -36,7 +37,7 @@ class ModelInput(BaseModel):
     def valid_cycle(self):
         self.name = self.name.strip()
         if not self.name or sum(b.days for b in self.blocks) > 366:
-            raise ValueError('Name erforderlich; ein Zyklus darf höchstens 366 Tage lang sein.')
+            raise ValueError(_text_source('server_portal.text_20a5783654bf'))
         return self
 
 
@@ -53,9 +54,9 @@ class AssignmentInput(BaseModel):
     @model_validator(mode='after')
     def valid_dates(self):
         if not (2000 <= self.start.year <= 2100 and 2000 <= self.end.year <= 2100 and 2000 <= self.cycle_start.year <= 2100):
-            raise ValueError('Jahre müssen zwischen 2000 und 2100 liegen.')
+            raise ValueError(_text_source('server_portal.text_96e398425db2'))
         if self.end < self.start or (self.end-self.start).days > 1830:
-            raise ValueError('Zeitraum muss vorwärts liegen und darf höchstens fünf Jahre umfassen.')
+            raise ValueError(_text_source('server_portal.text_1ef574f58e7c'))
         return self
 
 
@@ -67,9 +68,9 @@ def assignment_preview(db, data):
     model = db.scalar(select(ShiftModel).where(ShiftModel.id == data.model_id).with_for_update())
     user = db.get(User, data.tf_id)
     if not model or not user or user.role != 'tf':
-        raise HTTPException(404, 'Schichtmodell oder Tf nicht gefunden')
+        raise HTTPException(404, _text_source('server_portal.text_720039485f67'))
     if model.revision != data.expected_model_revision:
-        raise HTTPException(409, 'Schichtmodell wurde geändert. Bitte neu laden.')
+        raise HTTPException(409, _text_source('server_portal.text_544cd24912ce'))
     cycle = [b for b in json.loads(model.blocks) for _ in range(b['days'])]
     periods, revisions, days = {}, {}, []
     cursor = data.start
@@ -83,7 +84,7 @@ def assignment_preview(db, data):
         block=cycle[(cursor-data.cycle_start).days % len(cycle)];kind=block['kind']
         try:shift=resolve_shift(db,data.tf_id,kind,block.get('shift','standard'))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
-        eligible = data.overwrite or previous['kind'] == 'Ungeplant'
+        eligible = data.overwrite or previous['kind'] == _text_source('server_portal.text_52e37a639da5')
         if not eligible:
             skipped += 1
         days.append(dict(previous, previous_kind=previous['kind'],previous_shift=previous['shift'], new_kind=kind,apply=eligible,**{('new_'+key):value for key,value in duty_info(cursor,kind,shift,previous['is_holiday'],daily_minutes(db,data.tf_id)).items()}))
@@ -117,22 +118,22 @@ def create_router(require_admin):
         try:
             db.commit()
         except IntegrityError as exc:
-            db.rollback(); raise HTTPException(409, 'Modellname bereits vorhanden') from exc
+            db.rollback(); raise HTTPException(409, _text_source('server_portal.text_bce51f8460ec')) from exc
         return model_dict(model)
 
     @router.put('/api/v1/admin/shifts/models/{model_id}')
     def update_model(model_id: int, data: ModelInput, db: Session = Depends(database_session)):
         model = db.scalar(select(ShiftModel).where(ShiftModel.id == model_id).with_for_update())
         if not model:
-            raise HTTPException(404, 'Schichtmodell nicht gefunden')
+            raise HTTPException(404, _text_source('server_portal.text_5c3186377b14'))
         if model.revision != data.expected_revision:
-            raise HTTPException(409, 'Modell wurde zwischenzeitlich geändert. Bitte neu laden.')
+            raise HTTPException(409, _text_source('server_portal.text_0b2cedf9699a'))
         model.name, model.blocks = data.name, json.dumps([b.model_dump() for b in data.blocks])
         model.revision += 1
         try:
             db.commit()
         except IntegrityError as exc:
-            db.rollback(); raise HTTPException(409, 'Modellname bereits vorhanden') from exc
+            db.rollback(); raise HTTPException(409, _text_source('server_portal.text_bce51f8460ec')) from exc
         return model_dict(model)
 
     @router.post('/api/v1/admin/shifts/preview')
@@ -144,8 +145,8 @@ def create_router(require_admin):
         try:
             preview = assignment_preview(db, data)
             if preview['expected_revisions'] != data.expected_revisions:
-                raise RevisionConflict('Plan zwischenzeitlich geändert')
-            selected = [DayInput(date=date.fromisoformat(d['date']), kind=d['new_kind'], note='Schichtmodell: '+preview['model']['name'],shift=d['new_shift']) for d in preview['days'] if d['apply']]
+                raise RevisionConflict(_text_source('server_portal.text_5acaadc6e827'))
+            selected = [DayInput(date=date.fromisoformat(d['date']), kind=d['new_kind'], note=_text_source('server_portal.text_286d62fe23cf')+preview['model']['name'],shift=d['new_shift']) for d in preview['days'] if d['apply']]
             count = 0
             for year in sorted({d.date.year for d in selected}):
                 days = [d for d in selected if d.date.year == year]
@@ -157,7 +158,7 @@ def create_router(require_admin):
             db.commit()
             return dict(changed_days=count, skipped_days=preview['skipped_days'])
         except (RevisionConflict, IntegrityError) as exc:
-            db.rollback(); raise HTTPException(409, 'Plan wurde geändert. Vorschau erneut laden.') from exc
+            db.rollback(); raise HTTPException(409, _text_source('server_portal.text_1f729bdb88a7')) from exc
 
     @router.get('/api/v1/admin/shifts/assignments')
     def assignments(db: Session = Depends(database_session)):

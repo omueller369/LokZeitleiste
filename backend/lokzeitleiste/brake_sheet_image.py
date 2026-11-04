@@ -1,4 +1,5 @@
 """Deterministic raster preview on the clean bilingual international form template."""
+from .localization import source as _text_source
 import io,os,re
 from decimal import Decimal
 from functools import lru_cache
@@ -60,7 +61,7 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
                 lines.append(current)
             step=round(logical*sy*1.22)
             if len(lines)*step<=height and all(draw.textlength(line,font=f)<=width for line in lines):break
-        else:raise ValueError('Text passt nicht in das Formularfeld. Bitte die Eingabe kürzen.')
+        else:raise ValueError(_text_source('server_brake_sheet_image.text_c50dc5b8d479'))
         top=y1+2 if valign=='top' else y1+(height-len(lines)*step)//2+2
         for line in lines:
             left=x1+3 if align=='left' else x2-3-draw.textlength(line,font=f) if align=='right' else x1+(x2-x1-draw.textlength(line,font=f))/2
@@ -144,5 +145,5 @@ def render_pdf(sheet,result,created_at,created_by,signature=None,signature_posit
     document.showPage();document.save();overlay.seek(0)
     source=PdfReader(TEMPLATE.with_suffix('.pdf'));writer=PdfWriter();writer.clone_document_from_reader(source)
     writer.pages[0].merge_page(PdfReader(overlay).pages[0])
-    writer.add_metadata({'/Title':'Bremszettel '+sheet.train_numbers[0],'/Author':created_by,'/CreationDate':created_at.strftime('D:%Y%m%d%H%M%SZ')})
+    writer.add_metadata({'/Title':_text_source('server_brake_sheet_image.text_af4bffc07380')+sheet.train_numbers[0],'/Author':created_by,'/CreationDate':created_at.strftime('D:%Y%m%d%H%M%SZ')})
     output=io.BytesIO();writer.write(output);return output.getvalue()

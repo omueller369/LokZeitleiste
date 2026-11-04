@@ -1,4 +1,5 @@
 """Monthly overtime per duty; immutable closing snapshots with explicit reopening."""
+from .localization import source as _text_source
 import hashlib
 import json
 from datetime import date, datetime
@@ -15,7 +16,7 @@ from .models import User, TfProfile, WorkEntry, WorkEntryDates, WorkMonth, Overt
 from .reports.intervals import interval
 
 CAP = 40 * 60
-SHIFT_KINDS = {'Sonstige Erfassung', 'Zugfahrt'}
+SHIFT_KINDS = {_text_source('server_overtime.text_f31b8681bfca'), _text_source('server_overtime.text_52c5d4a0445b')}
 
 
 def current_month():
@@ -24,7 +25,7 @@ def current_month():
 
 def month_date(year, month):
     if not 2000 <= year <= 2100 or not 1 <= month <= 12:
-        raise HTTPException(422, 'Ungültiger Monat')
+        raise HTTPException(422, _text_source('server_overtime.text_c6ef72ca00bb'))
     return date(year, month, 1)
 
 
@@ -38,7 +39,7 @@ def tf_user(db, tf_id, lock=False):
         query = query.with_for_update()
     user = db.scalar(query)
     if not user or user.role != 'tf':
-        raise HTTPException(404, 'Mitarbeiter nicht gefunden')
+        raise HTTPException(404, _text_source('server_overtime.text_d425970b74c9'))
     return user
 
 
@@ -60,7 +61,7 @@ def duty_rows(db, tf_id, month, lock=False):
         begin, end = interval(entry)
         duration = int((end - begin).total_seconds() // 60)
         if duration <= 0:
-            raise HTTPException(409, 'Ungültige Dienstzeit im Überstundenkonto.')
+            raise HTTPException(409, _text_source('server_overtime.text_2472b835f6c0'))
         rows.append(dict(entry_id=entry.id,kind=entry.kind,start_at=begin.isoformat(),end_at=end.isoformat(),
                          duration_minutes=duration,overtime_minutes=max(0,duration-480) if entry.kind in SHIFT_KINDS else 0))
     return rows
@@ -107,7 +108,7 @@ def audit(db,tf_id,month,actor,action,snapshot):
 
 def allocate(total, balance, mode):
     if total < 0 or balance < 0 or balance > CAP:
-        raise HTTPException(409,'Ungültiger Kontostand im Überstundenkonto.')
+        raise HTTPException(409,_text_source('server_overtime.text_9fc48529d452'))
     annual = min(total,CAP-balance) if mode=='annual' else 0
     return annual,total-annual
 
@@ -159,11 +160,11 @@ def create_router(require_admin):
         day=month_date(year,month)
         before=view(db,tf_id,day,True)
         if data.expected_token!=before['token']:
-            raise HTTPException(409,'Überstundenkonto wurde geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_overtime.text_4c8ec385d577'))
         if before['enabled']==data.enabled:
             return before
         if any(row.month>=day for row in booked(db,tf_id,True)):
-            raise HTTPException(409,'Zuerst betroffene Monatsabschlüsse wieder öffnen.')
+            raise HTTPException(409,_text_source('server_overtime.text_4f22aac12893'))
         row=db.get(OvertimePolicy,(tf_id,day))
         if not row:
             row=OvertimePolicy(tf_user_id=tf_id,month=day,enabled=data.enabled,actor_id=actor.id)
@@ -184,16 +185,16 @@ def create_router(require_admin):
         day=month_date(year,month)
         before=view(db,tf_id,day,True)
         if before['closing'] and before['closing']['status']=='closed':
-            raise HTTPException(409,'Monat ist bereits abgeschlossen.')
+            raise HTTPException(409,_text_source('server_overtime.text_75be4489f84a'))
         if data.expected_token!=before['token']:
-            raise HTTPException(409,'Überstundenkonto wurde geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_overtime.text_4c8ec385d577'))
         if not before['enabled']:
-            raise HTTPException(409,'Überstundenkonto ist für diesen Monat nicht aktiviert.')
+            raise HTTPException(409,_text_source('server_overtime.text_0595ec3c6b47'))
         if not before['can_close']:
-            raise HTTPException(409,'Monatsabschluss erst nach Monatsende möglich.')
+            raise HTTPException(409,_text_source('server_overtime.text_8c01ed2e16ed'))
         for item in booked(db,tf_id,True):
             if item.fingerprint!=digest(duty_rows(db,tf_id,item.month,True)):
-                raise HTTPException(409,'Geänderte Monatsabschlüsse zuerst prüfen und wieder öffnen.')
+                raise HTTPException(409,_text_source('server_overtime.text_bf05717abd04'))
         annual,payout=allocate(before['total_minutes'],before['bank_balance_minutes'],data.mode)
         row=db.get(OvertimeClosing,(tf_id,day))
         if not row:
@@ -220,12 +221,12 @@ def create_router(require_admin):
         day=month_date(year,month)
         before=view(db,tf_id,day,True)
         if data.expected_token!=before['token']:
-            raise HTTPException(409,'Überstundenkonto wurde geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_overtime.text_4c8ec385d577'))
         row=db.get(OvertimeClosing,(tf_id,day))
         if not row or row.status!='closed':
-            raise HTTPException(409,'Kein abgeschlossener Monat vorhanden.')
+            raise HTTPException(409,_text_source('server_overtime.text_03c75e2c4ace'))
         if not data.reason.strip():
-            raise HTTPException(422,'Änderungsgrund erforderlich')
+            raise HTTPException(422,_text_source('server_overtime.text_0fe5137fab5c'))
         audit(db,tf_id,day,actor,'reopen',dict(before=closing_dict(row),reason=data.reason.strip()))
         row.status='open'
         row.revision+=1

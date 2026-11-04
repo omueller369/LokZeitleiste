@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from datetime import date, datetime
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field, ValidationError
@@ -28,7 +29,7 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
     def target(db,user_id):
         user=db.get(User,user_id)
         if not user or user.role not in ('tf','staff'):
-            raise HTTPException(404,'Mitarbeiter nicht gefunden')
+            raise HTTPException(404,_text_source('server_records_api.text_d425970b74c9'))
         return user
 
     def check_periods(db,user,entry,entry_dict,month_summary):
@@ -37,7 +38,7 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
 
     def create(db,actor,user,item,tasks):
         if not 2000 <= item.date.year <= 2100:
-            raise HTTPException(422,'Datum muss zwischen 2000 und 2100 liegen')
+            raise HTTPException(422,_text_source('server_records_api.text_4a0dfebdbf98'))
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         existing=db.scalar(select(WorkEntry).join(WorkMonth).where(
             WorkMonth.tf_user_id==user.id,WorkEntry.client_id==str(item.client_id)).with_for_update())
@@ -45,7 +46,7 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
         normalized['start']=item.start.strftime('%H:%M');normalized['end']=item.end.strftime('%H:%M')
         if existing:
             if entry_dict(existing)!=normalized:
-                raise HTTPException(409,'Diese Erfassung existiert bereits mit anderen Daten. Bitte neu laden.')
+                raise HTTPException(409,_text_source('server_records_api.text_6acb1f585029'))
             return entry_view(db,existing,entry_dict)
         if user.role=='tf':
             # Bestehender Eingang mit PDF-Quittung bleibt auch bei manueller Erfassung erhalten.
@@ -94,23 +95,23 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
 
     def change_time(db,actor,entry_id,data,owner_id=None):
         owner=db.scalar(select(WorkMonth.tf_user_id).join(WorkEntry).where(WorkEntry.id==entry_id))
-        if owner is None or (owner_id is not None and owner!=owner_id):raise HTTPException(404,'Eintrag nicht gefunden')
+        if owner is None or (owner_id is not None and owner!=owner_id):raise HTTPException(404,_text_source('server_records_api.text_266b4c60d07e'))
         db.scalar(select(User).where(User.id==owner).with_for_update())
         user=target(db,owner)
         if owner_id is None and user.role=='tf':
-            raise HTTPException(422,'Tf-Korrekturen bitte über den bestehenden Korrektureinstieg mit E-Mail vornehmen')
+            raise HTTPException(422,_text_source('server_records_api.text_9031870753f4'))
         entry=db.scalar(select(WorkEntry).where(WorkEntry.id==entry_id).with_for_update())
-        if entry.kind not in WORK_KINDS:raise HTTPException(422,'Diese Erfassungsart enthält keine editierbare Arbeitszeit')
+        if entry.kind not in WORK_KINDS:raise HTTPException(422,_text_source('server_records_api.text_0b13c5466b10'))
         assert_unlocked(db,entry_id)
         if data.expected_updated_at.tzinfo or data.expected_updated_at!=entry.updated_at:
-            raise HTTPException(409,'Eintrag wurde inzwischen geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_records_api.text_67bd5cf60cd3'))
         if user.role=='tf' and db.scalar(select(WorkTimeChange.id).where(WorkTimeChange.entry_id==entry_id).limit(1)):
-            raise HTTPException(409,'Administrativ korrigierte Zeiten können nur durch die Verwaltung geändert werden')
+            raise HTTPException(409,_text_source('server_records_api.text_5597fe4612fd'))
         try:
             item=EntryIn.model_validate(dict(entry_dict(entry),start=data.start,end=data.end,**({"end_date":data.end_date} if "end_date" in data.model_fields_set else {})))
         except ValidationError as exc:raise HTTPException(422,exc.errors()[0]['msg']) from exc
         reason=data.reason.strip()
-        if not reason:raise HTTPException(422,'Änderungsgrund erforderlich')
+        if not reason:raise HTTPException(422,_text_source('server_records_api.text_0fe5137fab5c'))
         old=(entry.start_time,entry.end_time,entry.explicit_end_date)
         entry.start_time,entry.end_time=item.start.strftime('%H:%M'),item.end.strftime('%H:%M')
         set_end_date(entry,item.end_date)
@@ -147,13 +148,13 @@ def create_router(require_account,require_admin,entry_dict,month_summary,upload_
     def lock(entry_id:int,data:LockInput,actor:User=Depends(require_admin),db:Session=Depends(database_session)):
         demand(db,actor,'worktime',2 if data.locked else 3)
         owner=db.scalar(select(WorkMonth.tf_user_id).join(WorkEntry).where(WorkEntry.id==entry_id))
-        if owner is None:raise HTTPException(404,'Eintrag nicht gefunden')
+        if owner is None:raise HTTPException(404,_text_source('server_records_api.text_266b4c60d07e'))
         db.scalar(select(User).where(User.id==owner).with_for_update())
         entry=db.scalar(select(WorkEntry).where(WorkEntry.id==entry_id).with_for_update())
         if data.expected_updated_at.tzinfo or data.expected_updated_at!=entry.updated_at:
-            raise HTTPException(409,'Eintrag wurde inzwischen geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_records_api.text_67bd5cf60cd3'))
         reason=data.reason.strip()
-        if not reason:raise HTTPException(422,'Begründung erforderlich')
+        if not reason:raise HTTPException(422,_text_source('server_records_api.text_b755a8d1422f'))
         item=db.get(WorkEntryLock,entry_id)
         if not item:item=WorkEntryLock(entry_id=entry_id);db.add(item)
         item.locked,item.actor_id,item.reason,item.updated_at=data.locked,actor.id,reason,now_utc()

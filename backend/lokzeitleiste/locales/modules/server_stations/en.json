@@ -1,0 +1,14 @@
+{
+  "text_04bd3c41d7f4": "Station entry changed. Please reload.",
+  "text_17a7a5960b60": "Document must not exceed 10 MB.",
+  "text_1e37397451a4": "Too much contact data for one station.",
+  "text_3822edba2c56": "Name and DS100 must not be empty.",
+  "text_41f90b727e22": "Station entry not found.",
+  "text_4205d5c216a8": "No station plan available.",
+  "text_4c006d60605f": "Station is already in your list.",
+  "text_5b870b2fe485": "Station plan must be a valid PDF, JPEG or PNG file.",
+  "text_9829a55f8030": "Please select a station from the suggestions.",
+  "text_a2c5ee1e5057": "Description and number required.",
+  "text_c1df98b85acb": "The name or DS100 already exists in your station list. Please choose another name or DS100.",
+  "text_c2f01df1b542": "Invalid name or DS100."
+}

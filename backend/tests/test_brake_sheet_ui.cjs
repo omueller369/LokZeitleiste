@@ -1,7 +1,7 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 const nodes={},all=[],events={};
 class E{constructor(tag='div'){this.tag=tag;this.children=[];this.value='';this.checked=false;this.handlers={};this.attrs={};all.push(this);}set id(v){this._id=v;nodes[v]=this;}get id(){return this._id;}append(...ns){for(const n of ns)n.parent=this;this.children.push(...ns);}after(){}replaceChildren(...ns){this.children=ns;}setAttribute(k,v){this.attrs[k]=v;}getAttribute(k){return this.attrs[k];}removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src;}showModal(){this.open=true;}close(){const was=this.open;this.open=false;if(was)this.handlers.close?.();}addEventListener(k,f){this.handlers[k]=f;}remove(){}focus(){}get parentElement(){return this.parent||{hidden:false};}}
-const html=fs.readFileSync('backend/lokzeitleiste/static/brake-sheet.html','utf8');for(const m of html.matchAll(/<([a-z]+)[^>]*id="([^"]+)"[^>]*>/g)){const e=new E(m[1]);e.id=m[2];}
+const html=require('./localized-vm.cjs').resolveHtml(fs.readFileSync('backend/lokzeitleiste/static/brake-sheet.html','utf8'));for(const m of html.matchAll(/<([a-z]+)[^>]*id="([^"]+)"[^>]*>/g)){const e=new E(m[1]);e.id=m[2];}
 let revoked=0;let calculations=[],stored=new Map(),requests=[],number=0;const window={addEventListener:(e,f)=>events[e]=f,ReportFeedback:{error:m=>{throw Error(m);}}};
 const vehicles=[{id:1,revision:1,vehicle_number:'91 80 6185 001-2',series:'185',name:'Lok',length_m:18.95,weight_kg:84500,axle_count:4,brake_shoe:'D',brake_g:101,brake_g_25:75,brake_p:111,brake_r:123,spring_brake:55,spring_unit:'kN'}];
 const result={lines:vehicles,a:{count:1,length:18.95,holding:null,brake:75,weight:84.5},total:{count:1,length:18.95,holding:null,brake:75,weight:84.5},available:88,missing:-12};
