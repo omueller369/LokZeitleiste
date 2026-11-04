@@ -13,10 +13,10 @@ CHECKS=r'''
 (async()=>{
  const assert=(ok,message)=>{if(!ok)throw Error(message);},tick=()=>new Promise(r=>setTimeout(r,0));
  for(let i=0;i<100&&!document.getElementById('wagon_count');i++)await tick();
- const file=document.getElementById('brakeImportFile'),transfer=new DataTransfer();transfer.items.add(new File(['synthetic'],'wagons.xlsx'));file.files=transfer.files;await file.onchange();
+ const file=document.getElementById('brakeImportFile');const pick=async()=>{const transfer=new DataTransfer();transfer.items.add(new File(['synthetic'],'wagons.xlsx'));file.files=transfer.files;await file.onchange();};await pick();
  const dialog=document.getElementById('brakeImportDialog');assert(dialog.open,'Import preview opens');assert(document.getElementById('station_to').value==='','No fields overwritten before applying');assert(dialog.textContent.includes('FIRST'),'Recognized destination shown');
  document.getElementById('brakeImportCancel').click();await tick();assert(!dialog.open,'Cancel closes preview');assert(document.getElementById('wagon_count').value==='','Cancel preserves form');
- file.files=transfer.files;await file.onchange();assert(document.getElementById('brakeImportApply').getBoundingClientRect().height>=44,'Touch target');assert(dialog.getBoundingClientRect().width<=innerWidth,'Preview fits viewport');document.getElementById('brakeImportApply').click();await tick();
+ await pick();assert(dialog.open,'Second import preview opens: '+document.getElementById('brakeStatus').textContent);assert(document.getElementById('brakeImportApply').getBoundingClientRect().height>=44,'Touch target');assert(dialog.getBoundingClientRect().width<=innerWidth,'Preview fits viewport');document.getElementById('brakeImportApply').click();await tick();
  assert(!dialog.open,'Apply closes preview');assert(document.getElementById('station_from').value==='Origin','Origin applied');assert(document.getElementById('station_to').value==='FIRST','First word destination applied');
  assert(document.getElementById('section_to').value==='FIRST','Section destination copied');assert(document.getElementById('wagon_count').value==='8','Dynamic wagon count applied');assert(document.getElementById('wagon_brake').value==='472','Brake sum applied');
  const saved=JSON.parse(localStorage.getItem('lokzeitleiste.brake-sheet.1'));assert(saved.sheet.wagon_import.rows.length===8,'Source rows saved with local draft');
