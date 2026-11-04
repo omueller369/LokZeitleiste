@@ -1,4 +1,4 @@
-# LokZeitleiste v0.26.8
+# LokZeitleiste v0.26.9
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 
@@ -130,7 +130,7 @@ Nach Aktualisierung des Branches müssen die Servercontainer neu gebaut und gest
 
 Das Geschlechtsfeld bietet „Männlich“, „Weiblich“, „Divers“ und „Keine Angabe“ beim Anlegen, Bearbeiten und Ansehen. Bestehende Profile ohne Angaben werden als „Keine Angabe“ angezeigt. Die neue Tabelle `tf_identity` wird vom regulären Datenbankinitialisierungsschritt angelegt.
 
-Eine ausdrücklich aufrufbare [Testdatenroutine](backend/lokzeitleiste/accounts/demo_tf/README.md) ersetzt alle TF einschließlich abhängiger Daten durch 20 fiktive Personen mit individuellen KI-Profilbildern. Die Routine erzeugt die gewünschten Geschlechts-/TF-Typen und BahnCard-Verteilungen, 40 Wochenstunden, 30 Urlaubstage, 787xxx-Logins, fünfstellige Personalnummern, fiktive Adressen und die gemeinsame E-Mail-Adresse. Initialpasswort: `tomcom123456`, anschließend verpflichtender Passwortwechsel. Die Ablaufdaten der BahnCards werden relativ zum Ausführungstag gewählt.
+Eine ausdrücklich aufrufbare [Testdatenroutine](backend/lokzeitleiste/accounts/demo_tf/README.md) ersetzt alle TF einschließlich abhängiger Daten durch 20 fiktive Personen mit individuellen KI-Profilbildern. Die Routine erzeugt die gewünschten Geschlechts-/TF-Typen und BahnCard-Verteilungen, 40 Wochenstunden, 30 Urlaubstage, 787xxx-Logins, fünfstellige Personalnummern, fiktive Adressen und die gemeinsame E-Mail-Adresse. Initialpasswort: `[eigenes sicheres Passwort]`, anschließend verpflichtender Passwortwechsel. Die Ablaufdaten der BahnCards werden relativ zum Ausführungstag gewählt.
 
 Die tatsächliche Serverdatenbank wird erst durch `bash backend/testenv/control.sh demo-tf` zurückgesetzt. Normale Starts/Updates löschen keine TF. Ausführung, Sicherung, Verteilung und Bildprompts sind in der Anleitung dokumentiert.
 

@@ -25,10 +25,28 @@ class WagonImport(BaseModel):
     weight_total: Decimal | None = Field(default=None, gt=0, le=5000, decimal_places=3, allow_inf_nan=False)
     g_total: Decimal | None = Field(default=None, ge=0, le=5000, decimal_places=3, allow_inf_nan=False)
     p_total: Decimal | None = Field(default=None, ge=0, le=5000, decimal_places=3, allow_inf_nan=False)
+    reported_g_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
+    reported_p_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
     sheet: str = Field(max_length=100)
     first_row: int = Field(ge=1, le=2000)
     last_row: int = Field(ge=1, le=2000)
     total_row: int | None = Field(default=None, ge=1, le=2000)
+
+    def detected_mode(self):
+        g_only=lambda row:row.g is not None and row.p is None
+        p_only=lambda row:row.p is not None and row.g is None
+        if all(g_only(row) for row in self.rows):return 'G'
+        if all(p_only(row) for row in self.rows):return 'P'
+        if len(self.rows)>5 and all(g_only(row) for row in self.rows[:5]) and all(p_only(row) for row in self.rows[5:]):return 'G+P'
+        return None
+
+    def summary_differences(self):
+        differences=[]
+        for field in ('g','p'):
+            reported=getattr(self,'reported_'+field+'_total');computed=getattr(self,field+'_total')
+            if reported is not None and (computed is None or reported.to_integral_value(rounding=ROUND_CEILING)!=computed.to_integral_value(rounding=ROUND_CEILING)):
+                differences.append(dict(column=field.upper(),reported=reported,computed=computed))
+        return differences
 
     def values(self, mode):
         if mode not in ('G', 'P', 'G+P'):
@@ -133,6 +151,12 @@ def parse(content):
             result.sort(key=lambda item:item[0])
             if [p for p,_ in result] != list(range(1,len(result)+1)) or len({r.number for _,r in result}) != len(result): raise ImportError('format')
             totals = {key+'_total':number(cell(total,cols[key]),True) if total is not None else None for key in ('length','weight','g','p')}
+            # Excel SUM can omit numbers stored as text. Use all parsed individual
+            # brake values; retain the source summaries for explicit preview warnings.
+            for field in ('g','p'):
+                totals['reported_'+field+'_total']=totals[field+'_total']
+                present=[getattr(row,field) for _,row in result if getattr(row,field) is not None]
+                totals[field+'_total']=sum(present,Decimal(0)) if present else None
             imported = WagonImport(rows=[row for _,row in result],sheet=title,first_row=min(source_rows),last_row=max(source_rows),total_row=total_index,**totals)
             return dict(**stations,first_vehicle=imported.rows[0].number,last_vehicle=imported.rows[-1].number,wagon_import=imported)
         finally:

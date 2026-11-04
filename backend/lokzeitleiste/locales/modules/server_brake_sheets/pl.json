@@ -46,5 +46,8 @@
   "text_47d309426a1c": "Ta wersja odcinkowa jest tworzona automatycznie. Zmień źródłową kartę.",
   "text_62ef2abc71ed": "Ta wersja odcinka została zastąpiona nowym planem. Otwórz aktualną wersję.",
   "text_08720ebebab9": "Pole 9 z automatyczną uwagą przekracza 500 znaków. Skróć dodatkowe uwagi lub nazwy stacji.",
-  "text_2f1639602f6f": "Holowane pojazdy {numbers} tylko do {station}."
+  "text_2f1639602f6f": "Holowane pojazdy {numbers} tylko do {station}.",
+  "text_0ac0b51d459a": "Lista wagonów odpowiada {detected}, w formularzu wybrano {requested}. Sprawdź rzeczywiste położenie hamulca: zastosowanie wartości zmieni pole 15 na {detected}.",
+  "text_a2d61c07db1c": "Inna suma Excel dla {column}: {reported} t. Suma pojedynczych wagonów wynosi {computed} t. Po potwierdzeniu zostaną użyte wartości pojedynczych wagonów.",
+  "text_0b22cbff963e": "Wiersz sumy Excel zawiera {reported} t dla {column}, ale brak odpowiednich wartości wagonów. Ta komórka nie jest używana jako masa hamująca."
 }

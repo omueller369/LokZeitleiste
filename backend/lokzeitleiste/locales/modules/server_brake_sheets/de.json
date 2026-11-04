@@ -46,5 +46,8 @@
   "text_47d309426a1c": "Diese Abschnittsversion wird automatisch erstellt. Bitte ändere den Ausgangsbremszettel.",
   "text_62ef2abc71ed": "Diese Abschnittsversion wurde durch eine neue Planung ersetzt. Öffne die aktuelle Version.",
   "text_08720ebebab9": "Feld 9 mit automatischem Tfz-Hinweis überschreitet 500 Zeichen. Kürze Deine zusätzlichen Bemerkungen oder die Bahnhofseinträge.",
-  "text_2f1639602f6f": "Mitgeführte Tfz {numbers} nur bis {station}."
+  "text_2f1639602f6f": "Mitgeführte Tfz {numbers} nur bis {station}.",
+  "text_0ac0b51d459a": "Die Wagenliste passt zu {detected}, im Formular ist {requested} gewählt. Prüfe die tatsächliche Bremsstellung: „Werte übernehmen“ stellt Feld 15 auf {detected}.",
+  "text_a2d61c07db1c": "Abweichende Excel-Summe für {column}: {reported} t. Aus den Einzelwagen ergeben sich {computed} t. Nach Deiner Bestätigung werden die Einzelwagenwerte verwendet.",
+  "text_0b22cbff963e": "Die Excel-Summenzeile enthält {reported} t für {column}, aber keine zugehörigen Einzelwagenwerte. Diese Summenzelle wird nicht als Bremsgewicht verwendet."
 }
