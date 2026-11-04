@@ -66,6 +66,13 @@ jobs:
         with:
           name: i18n-ui
           path: ${{ runner.temp }}/i18n-ui/
+      - name: Header controls layout
+        run: python backend/tests/check_header_controls_ui.py --output-dir "$RUNNER_TEMP/header-controls-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: header-controls-ui
+          path: ${{ runner.temp }}/header-controls-ui/
       - name: Compose configuration
         working-directory: backend
         run: |

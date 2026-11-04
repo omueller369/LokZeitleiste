@@ -7,3 +7,11 @@ header.tf-shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) m
 .tf-shell-title{text-align:center;min-width:0;width:100%}.tf-shell-brand{justify-self:start;max-width:100%}.tf-shell .tf-bell{justify-self:end}
 
 .app-shell-tools{display:flex;align-items:center;justify-content:flex-end;gap:10px}.app-shell-tools .backend-menu-control{position:static;margin:0}.app-shell-tools .tf-bell{position:relative}.app-shell-tools .backend-menu-control[hidden]{display:none!important}@media(max-width:600px){.app-shell-tools{grid-column:2;grid-row:1;flex-wrap:wrap}}
+
+/* Keep identity at the centre and the three utility controls at the far right. */
+header.tf-shell{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto auto}
+.tf-shell-controls{grid-column:4;display:flex;align-items:center;justify-content:flex-end;gap:8px;justify-self:end;min-width:0}
+.tf-shell-theme,.tf-shell-language{display:flex;align-items:center;flex:none}
+.tf-shell-help{width:44px;padding:9px!important;font-weight:700}
+@media(max-width:700px){header.tf-shell{grid-template-columns:minmax(0,1fr) auto}.tf-shell-brand{grid-column:1;grid-row:1}.tf-shell-controls{grid-column:2;grid-row:1}.tf-shell-title{grid-column:1/-1;grid-row:2}.tf-shell>.tf-bell,.tf-shell>.app-shell-tools{grid-column:2;grid-row:3}.tf-shell-brand img{width:72px;height:48px}.tf-shell-brand{gap:6px}.tf-shell-brand button{padding:9px 7px}.tf-shell-controls{gap:5px}.tf-shell-language select{max-width:122px;padding:7px 4px}}
+@media(max-width:360px){header.tf-shell{padding:10px 8px;gap:8px}.tf-shell-brand img{width:60px;height:44px}.tf-shell-controls{gap:3px}.tf-shell-language select{max-width:105px}}
