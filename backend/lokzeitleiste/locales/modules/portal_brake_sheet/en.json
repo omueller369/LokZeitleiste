@@ -138,5 +138,6 @@
   "text_aa34155bd848": "Brake sheets for journey sections",
   "text_c751dda21c5e": "Edit original brake sheet",
   "text_a092f73716ce": "Automatic note for field 9",
-  "text_61dff2d93907": "Import the wagon list first. Towed locomotives are counted as additional wagons. Assign unique positions in the entire wagon train. The same drop-off station must use the same order number. Make changes in the original brake sheet; saving regenerates section versions."
+  "text_61dff2d93907": "Import the wagon list first. Towed locomotives are counted as additional wagons. Assign unique positions in the entire wagon train. The same drop-off station must use the same order number. Make changes in the original brake sheet; saving regenerates section versions.",
+  "text_8849bbb7f2b4": "Recalculated column total"
 }

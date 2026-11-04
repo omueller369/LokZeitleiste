@@ -199,7 +199,7 @@ def create_router(require_account):
                 notices.append(_localized_text(notice,request_language.get(),**difference))
         except WagonImportError as error:
             raise HTTPException(422,_text_source(IMPORT_ERRORS[str(error)])) from error
-        return dict(**imported,wagon=values,brake_mode=selected_mode,requested_brake_mode=mode,notices=notices)
+        return dict(**imported,wagon=values,brake_mode=selected_mode,requested_brake_mode=mode,notices=notices,column_totals=source.column_totals())
     @router.get('/api/v1/tf/brake-sheets/vehicles')
     def vehicles(user=Depends(driver),db:Session=Depends(database_session)):
         return [public_vehicle(r) for r in db.scalars(select(RailwayVehicle).where(~RailwayVehicle.id.in_(select(VehicleRetirement.vehicle_id))).order_by(RailwayVehicle.vehicle_number))]

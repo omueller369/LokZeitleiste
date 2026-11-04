@@ -6,6 +6,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from pydantic import BaseModel, Field
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 
 MAX_UPLOAD = 5 * 1024 * 1024
 
@@ -16,6 +17,7 @@ class WagonRow(BaseModel):
     number: str = Field(pattern=r'^[0-9]{12}$')
     length: Decimal = Field(gt=0, le=100, decimal_places=3, allow_inf_nan=False)
     weight: Decimal = Field(ge=0, le=1000, decimal_places=3, allow_inf_nan=False)
+    cargo: Decimal | None = Field(default=None, ge=0, le=1000, decimal_places=3, allow_inf_nan=False)
     g: Decimal | None = Field(default=None, ge=0, le=1000, decimal_places=3, allow_inf_nan=False)
     p: Decimal | None = Field(default=None, ge=0, le=1000, decimal_places=3, allow_inf_nan=False)
 
@@ -25,6 +27,11 @@ class WagonImport(BaseModel):
     weight_total: Decimal | None = Field(default=None, gt=0, le=5000, decimal_places=3, allow_inf_nan=False)
     g_total: Decimal | None = Field(default=None, ge=0, le=5000, decimal_places=3, allow_inf_nan=False)
     p_total: Decimal | None = Field(default=None, ge=0, le=5000, decimal_places=3, allow_inf_nan=False)
+    cargo_total: Decimal | None = Field(default=None, ge=0, le=5000, decimal_places=3, allow_inf_nan=False)
+    reported_length_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
+    reported_weight_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
+    reported_cargo_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
+    columns: dict[str, str] = Field(default_factory=dict)
     reported_g_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
     reported_p_total: Decimal | None = Field(default=None, ge=0, max_digits=15, decimal_places=3, allow_inf_nan=False)
     sheet: str = Field(max_length=100)
@@ -42,11 +49,15 @@ class WagonImport(BaseModel):
 
     def summary_differences(self):
         differences=[]
-        for field in ('g','p'):
+        for field in ('length','cargo','weight','p','g'):
             reported=getattr(self,'reported_'+field+'_total');computed=getattr(self,field+'_total')
             if reported is not None and (computed is None or reported.to_integral_value(rounding=ROUND_CEILING)!=computed.to_integral_value(rounding=ROUND_CEILING)):
-                differences.append(dict(column=field.upper(),reported=reported,computed=computed))
+                differences.append(dict(column=field.upper() if field in ('g','p') else self.columns.get(field,field),unit='m' if field=='length' else 't',reported=reported,computed=computed))
         return differences
+
+    def column_totals(self):
+        return [dict(column=self.columns[field],unit='m' if field=='length' else 't',total=getattr(self,field+'_total'))
+                for field in ('length','cargo','weight','p','g') if field in self.columns]
 
     def values(self, mode):
         if mode not in ('G', 'P', 'G+P'):
@@ -88,7 +99,13 @@ def number(value, optional=False):
         if optional: return None
         raise ImportError('format')
     try:
-        result = Decimal(str(value).strip().replace('\u00a0', '').replace(' ', '').replace(',', '.'))
+        text=re.sub(r'\s','',str(value))
+        if ',' in text and '.' in text:
+            grouping='.' if text.rfind(',')>text.rfind('.') else ','
+            decimal=',' if grouping=='.' else '.'
+            if not re.fullmatch(r'[+]?\d{1,3}(?:'+re.escape(grouping)+r'\d{3})+'+re.escape(decimal)+r'\d+',text):raise ImportError('format')
+            text=text.replace(grouping,'')
+        result = Decimal(text.replace(',', '.'))
     except InvalidOperation:
         raise ImportError('format')
     if not result.is_finite() or result < 0: raise ImportError('format')
@@ -120,6 +137,9 @@ def parse(content):
                     if all(v is not None for v in columns.values()): candidates.append((sheet.title, rows, idx, columns))
             if len(candidates) != 1: raise ImportError('format')
             title, rows, header, cols = candidates[0]
+            cargo_columns=[i for i,v in enumerate(rows[header]) if re.search(r'ladungs\s*-?\s*gewicht|masa ładunku',normalized(v))]
+            if len(cargo_columns)>1:raise ImportError('format')
+            if cargo_columns:cols['cargo']=cargo_columns[0]
             if header + 1 >= len(rows): raise ImportError('format')
             sub = [str(v or '').strip().upper() for v in rows[header+1]]
             if sub.count('G') != 1 or sub.count('P') != 1: raise ImportError('format')
@@ -145,19 +165,20 @@ def parse(content):
                 position = int(pos)
                 digits = re.sub(r'[\s-]', '', str(vehicle or ''))
                 if not re.fullmatch(r'[0-9]{12}', digits): raise ImportError('format')
-                result.append((position, WagonRow(number=digits, **{key:number(cell(row,cols[key]), key in ('g','p')) for key in ('length','weight','g','p')})))
+                result.append((position, WagonRow(number=digits, **{key:number(cell(row,cols[key]), key in ('g','p','cargo')) for key in ('length','weight','g','p','cargo') if key in cols})))
                 source_rows.append(i+1)
             if not result or len(result) > 50: raise ImportError('range')
             result.sort(key=lambda item:item[0])
             if [p for p,_ in result] != list(range(1,len(result)+1)) or len({r.number for _,r in result}) != len(result): raise ImportError('format')
-            totals = {key+'_total':number(cell(total,cols[key]),True) if total is not None else None for key in ('length','weight','g','p')}
+            totals = {key+'_total':number(cell(total,cols[key]),True) if total is not None else None for key in ('length','weight','g','p','cargo') if key in cols}
             # Excel SUM can omit numbers stored as text. Use all parsed individual
-            # brake values; retain the source summaries for explicit preview warnings.
-            for field in ('g','p'):
+            # numeric values; retain the source summaries for explicit preview warnings.
+            for field in ('length','cargo','weight','p','g'):
+                if field not in cols:continue
                 totals['reported_'+field+'_total']=totals[field+'_total']
                 present=[getattr(row,field) for _,row in result if getattr(row,field) is not None]
-                totals[field+'_total']=sum(present,Decimal(0)) if present else None
-            imported = WagonImport(rows=[row for _,row in result],sheet=title,first_row=min(source_rows),last_row=max(source_rows),total_row=total_index,**totals)
+                totals[field+'_total']=sum(present,Decimal(0)) if present or field=='cargo' else None
+            imported = WagonImport(rows=[row for _,row in result],columns={field:get_column_letter(cols[field]+1) for field in ('length','cargo','weight','p','g') if field in cols},sheet=title,first_row=min(source_rows),last_row=max(source_rows),total_row=total_index,**totals)
             return dict(**stations,first_vehicle=imported.rows[0].number,last_vehicle=imported.rows[-1].number,wagon_import=imported)
         finally:
             workbook.close()

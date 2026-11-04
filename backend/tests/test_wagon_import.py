@@ -2,8 +2,8 @@
 from io import BytesIO
 from decimal import Decimal
 import unittest
-from openpyxl import Workbook
-from lokzeitleiste.wagon_import import parse, ImportError
+from openpyxl import Workbook, load_workbook
+from lokzeitleiste.wagon_import import parse, number, ImportError
 import test_brake_sheets
 
 
@@ -43,7 +43,22 @@ def p_text_workbook():
             target.writestr(item,content)
     return out.getvalue()
 
+def all_text_workbook(count=8,offset=0,total=True):
+    book=load_workbook(BytesIO(workbook(count,offset,total=total)));sheet=book.active
+    sheet.cell(8+offset,5,'Ladungs- gewicht \\ Masa ładunku [t]')
+    values={4:'15,01',5:'24,50',6:'80,01',8:'70',9:'59'}
+    for i in range(count):
+        for column,value in values.items():sheet.cell(10+offset+i,column,float(value.replace(',','.')) if i<2 else '\u00a0'+value+' ')
+    if total:
+        for column,value in values.items():sheet.cell(10+offset+count,column,float(Decimal(value.replace(',','.'))*2))
+    out=BytesIO();book.save(out);book.close();return out.getvalue()
+
 class WagonImportTest(unittest.TestCase):
+    def test_numeric_text_formats(self):
+        for text in ['2640,08','2640.08','2.640,08','2,640.08','2\u202f640,08']:
+            self.assertEqual(number(text),Decimal('2640.08'))
+        for text in ['unknown','NaN','Infinity','-1','=SUM(D10:D17)','1.2,3','1,23.4']:
+            with self.assertRaises(ImportError):number(text)
     def test_dynamic_rows_and_first_word(self):
         for count,offset in [(2,0),(8,3),(30,5)]:
             result=parse(workbook(count,offset));source=result['wagon_import'];values=source.values('G')
@@ -75,6 +90,22 @@ class WagonImportTest(unittest.TestCase):
             if index<5:row.p=None
             else:row.g=None
         self.assertEqual(source.detected_mode(),'G+P');self.assertEqual(source.values('G+P')['brake'],432)
+
+    def test_all_numeric_columns_recomputed_from_text(self):
+        for count,offset,total in [(8,0,True),(12,3,True),(30,5,False)]:
+            source=parse(all_text_workbook(count,offset,total))['wagon_import'];values=source.values('G')
+            for field,per_wagon in [('length','15.01'),('cargo','24.50'),('weight','80.01'),('p','70'),('g','59')]:
+                self.assertEqual(getattr(source,field+'_total'),Decimal(per_wagon)*count)
+            self.assertEqual(values['weight'],int((Decimal('80.01')*count).to_integral_value(rounding='ROUND_CEILING')))
+            self.assertEqual([c['column'] for c in source.column_totals()],['D','E','F','H','I'])
+            self.assertEqual(len(source.summary_differences()),5 if total else 0)
+            self.assertEqual(source.reported_length_total,Decimal('30.02') if total else None)
+    def test_non_numeric_text_and_tampered_totals_are_rejected(self):
+        book=load_workbook(BytesIO(all_text_workbook()));book.active['F10']='unknown';out=BytesIO();book.save(out);book.close()
+        with self.assertRaisesRegex(ImportError,'format'):parse(out.getvalue())
+        for field in ('length_total','weight_total'):
+            source=parse(all_text_workbook())['wagon_import'];setattr(source,field,Decimal(400))
+            with self.assertRaisesRegex(ImportError,'format'):source.values('G')
 
     def test_invalid_file_and_mode(self):
         for content in [b'not xlsx',b'x'*(5*1024*1024+1)]:
@@ -113,3 +144,20 @@ class WagonImportApiTest(unittest.TestCase):
     def test_upload_validation(self):
         for name,content,mode in [('file.xls',workbook(),'G'),('file.xlsx',b'broken','G')]:
             response=self.driver.post(self.base+'/import-wagons',files={'file':(name,content)},data={'mode':mode});self.assertEqual(response.status_code,422,response.text)
+
+    def test_all_column_totals_preview_and_saved_calculation(self):
+        response=self.driver.post(self.base+'/import-wagons',files={'file':('text.xlsx',all_text_workbook())},data={'mode':'G'})
+        self.assertEqual(response.status_code,200,response.text);payload=response.json()
+        self.assertEqual(len(payload['notices']),5);self.assertTrue(any('30.02 m' in n and '120.08 m' in n for n in payload['notices']))
+        totals={c['column']:Decimal(str(c['total'])) for c in payload['column_totals']}
+        self.assertEqual(totals,{'D':Decimal('120.08'),'E':Decimal('196'),'F':Decimal('640.08'),'H':Decimal('560'),'I':Decimal('472')})
+        data=self.sheet(wagon_import=payload['wagon_import'],wagon=payload['wagon'],brake_mode='G')
+        result=self.driver.post(self.base+'/calculate',json=data);self.assertEqual(result.status_code,200,result.text)
+        self.assertEqual(result.json()['b']['weight'],641);self.assertEqual(result.json()['b']['length'],121)
+        self.assertEqual(result.json()['b']['brake'],472)
+        from uuid import uuid4
+        saved=self.driver.put(self.base+'/'+str(uuid4()),json={'expected_revision':0,'sheet':data})
+        self.assertEqual(saved.status_code,200,saved.text)
+        restored=self.driver.get(self.base+'/'+saved.json()['id']).json()
+        self.assertEqual(Decimal(str(restored['sheet']['wagon_import']['cargo_total'])),Decimal('196'))
+        self.assertEqual(restored['calculation']['b']['weight'],641)
