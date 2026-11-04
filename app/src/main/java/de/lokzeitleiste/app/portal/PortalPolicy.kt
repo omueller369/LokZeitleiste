@@ -35,6 +35,7 @@ class PortalPolicy(base: String) {
         "/tf/signature.js" -> "tf-signature.js"
         "/tf/signature.css" -> "tf-signature.css"
         "/tf/messages.js" -> "tf-messages.js"
+        "/tf/rail-software-logo.png" -> "rail-software-logo.png"
         "/tf/ctl-logistics-logo.jpg" -> "ctl-logistics-logo.jpg"
         "/tf/lokuebergabebuch", "/tf/loco-handover" -> "loco-handover.html"
         "/tf/handover-protocols.js" -> "handover-protocols.js"

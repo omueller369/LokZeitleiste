@@ -13,7 +13,8 @@ window.TfHelpPages=globalThis.CtlText.restore([
         "title": "{{portal_tf_help_content.text_ef3f57d0a165}}",
         "paragraphs": [
           "{{portal_tf_help_content.text_af8f9518bcd4}}",
-          "{{portal_tf_help_content.text_2a38441413a0}}"
+          "{{portal_tf_help_content.text_2a38441413a0}}",
+          "{{portal_tf_help_content.rail_brand_intro}}"
         ],
         "steps": []
       },
@@ -978,6 +979,29 @@ window.TfHelpPages=globalThis.CtlText.restore([
           "{{portal_tf_help_content.text_a90437771efc}}"
         ],
         "steps": []
+      }
+    ]
+  },
+  {
+    "id": "tf-admin",
+    "group": "{{portal_tf_help_content.tf_admin_group}}",
+    "title": "{{portal_tf_help_content.tf_admin_title}}",
+    "short": "{{portal_tf_help_content.tf_admin_short}}",
+    "path": "/admin/tf",
+    "aliases": [
+      "/admin/tf/new"
+    ],
+    "sections": [
+      {
+        "title": "{{portal_tf_help_content.tf_admin_list}}",
+        "paragraphs": [
+          "{{portal_tf_help_content.tf_admin_intro}}"
+        ],
+        "steps": [
+          "{{portal_tf_help_content.tf_admin_step1}}",
+          "{{portal_tf_help_content.tf_admin_step2}}",
+          "{{portal_tf_help_content.tf_admin_step3}}"
+        ]
       }
     ]
   }

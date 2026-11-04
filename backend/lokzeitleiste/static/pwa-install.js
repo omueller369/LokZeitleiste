@@ -5,7 +5,8 @@ window.ctlPwaInitialized=true;
 const area=path.startsWith('/tf')?'tf':path.startsWith('/admin')?'backend':new URLSearchParams(location.search).get('area')||sessionStorage.getItem('ctl.area')||'backend';
 const tf=area==='tf',name=tf?globalThis.CtlText.source("backend_pwa_install.text_8c5b14a82fad"):globalThis.CtlText.source("backend_pwa_install.text_2456bb8ed72f"),start=tf?'/tf':'/admin/start',t=s=>window.I18n?.t(s)||s,node=(tag,value)=>{const n=document.createElement(tag);if(value!==undefined)n.textContent=t(value);return n;};
 if(!document.getElementById('ctlPwaManifest')){const manifest=node('link');manifest.id='ctlPwaManifest';manifest.rel='manifest';manifest.href='/pwa/'+area+'/manifest.webmanifest';document.head.append(manifest);}
-const touch=node('link');touch.rel='apple-touch-icon';touch.href='/pwa/'+area+'/icon-180.png?v=20261026-ctl';document.head.append(touch);
+const touch=node('link');touch.rel='apple-touch-icon';touch.href='/pwa/'+area+'/icon-180.png?v=20261104-rail-0263';document.head.append(touch);
+const favicon=node('link');favicon.rel='icon';favicon.type='image/png';favicon.href='/pwa/'+area+'/icon-192.png?v=20261104-rail-0263';document.head.append(favicon);
 for(const [key,value]of [['theme-color',tf?'#117d83':'#17445b'],['mobile-web-app-capable','yes'],['apple-mobile-web-app-capable','yes'],['apple-mobile-web-app-title',name],['apple-mobile-web-app-status-bar-style','default']]){const meta=node('meta');meta.name=key;meta.content=value;document.head.append(meta);}
 const css=node('link');css.rel='stylesheet';css.href='/pwa/install.css?v=20261025-1';document.head.append(css);
 if(window.isSecureContext&&'serviceWorker' in navigator)navigator.serviceWorker.register('/pwa-sw.js',{scope:'/',updateViaCache:'none'}).catch(()=>{});

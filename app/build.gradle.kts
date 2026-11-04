@@ -20,7 +20,7 @@ android {
         applicationId = "de.lokzeitleiste.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("28").get().toInt()
+        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("29").get().toInt()
         versionName = providers.gradleProperty("lokzeitleisteVersionName").orElse(softwareVersion).get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
     }
@@ -52,7 +52,7 @@ dependencies {
 val portalAssets = layout.buildDirectory.dir("generated/portalAssets")
 val prepareTfPortal by tasks.registering(Sync::class) {
     from(rootProject.file("backend/lokzeitleiste/static")) {
-        include("messages.js", "national-brake-sheet.*", "brake-sheet.*", "tf-shell.*", "portal-theme.*", "plan-colors.js", "auth-session.js", "tf-help*", "tf-notes.*", "tf-messages.*", "tf-profile.*", "tf-signature.*", "ctl-logistics-logo.jpg", "handover-protocols.js", "loco-handover.*", "tf-portal.*", "work-report.*", "work-report-feedback.js", "train-journeys.js", "gps.js", "stations.js",
+        include("messages.js", "national-brake-sheet.*", "brake-sheet.*", "tf-shell.*", "portal-theme.*", "plan-colors.js", "auth-session.js", "tf-help*", "tf-notes.*", "tf-messages.*", "tf-profile.*", "tf-signature.*", "ctl-logistics-logo.jpg", "rail-software-*.png", "handover-protocols.js", "loco-handover.*", "tf-portal.*", "work-report.*", "work-report-feedback.js", "train-journeys.js", "gps.js", "stations.js",
             "station-sharing.js", "tf-return.js", "documents.*", "account.*", "my-worktime.*",
             "entry-form.js", "portal.css", "responsive.css", "i18n.js", "android-portal.js")
     }

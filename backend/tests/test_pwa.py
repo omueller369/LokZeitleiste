@@ -19,7 +19,7 @@ class PwaTest(unittest.TestCase):
                 image=Image.open(io.BytesIO(image_response.content));size=int(item['sizes'].split('x')[0]);self.assertEqual(image.size,(size,size));self.assertEqual(image.format,'PNG')
                 if size==192:icons.append(image_response.content)
             self.assertEqual(self.client.get(f'/pwa/{area}/icon-180.png').status_code,200)
-        self.assertNotEqual(*ids);self.assertNotEqual(*icons)
+        self.assertNotEqual(*ids);self.assertEqual(*icons)  # distinct apps, common Rail Software brand
         self.assertEqual(self.client.get('/pwa/tf/icon-999.png').status_code,404)
     def test_public_installation_pages_and_worker(self):
         for path in ['/tf/install','/admin/install']:
