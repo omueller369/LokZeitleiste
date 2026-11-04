@@ -25,6 +25,8 @@ jobs:
           bash setup/tests/test-platform.sh
           bash setup/tests/test-auto-admin.sh
           for script in backend/lokzeitleiste/static/*.js; do node --check "$script"; done
+      - name: Translation catalogue reproducibility
+        run: python tools/build-translations.py --check
       - name: JavaScript regression tests
         run: for test in backend/tests/*.cjs; do node "$test" || exit 1; done
       - name: Responsive work report layout
@@ -57,6 +59,13 @@ jobs:
         with:
           name: portal-theme-ui
           path: ${{ runner.temp }}/portal-theme-ui/
+      - name: Module language browser checks
+        run: python backend/tests/check_i18n_ui.py --output-dir "$RUNNER_TEMP/i18n-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: i18n-ui
+          path: ${{ runner.temp }}/i18n-ui/
       - name: Compose configuration
         working-directory: backend
         run: |

@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 class E{constructor(){this.value='';this.rows=[];}addEventListener(){} }
 const source=fs.readFileSync('backend/lokzeitleiste/static/work-report.js','utf8').split('// Keep collapse buttons')[0].replace(/\}\)\(\);\s*$/,`window.testCloud={syncDrafts,useServerDraft,setup(rows){pending=structuredClone(rows);state={client_id:'other'};user={id:1};key='test';month=async()=>{};freeze=renderMonth=storeDraft=()=>{};files=async()=>[];loadReport=async(id,discard)=>window.loaded={id,discard};},edit(fn){persistPending(pending.map(fn));},rows:()=>pending};})();`);
 const server=new Map(),calls=[],finalized=[];

@@ -1,4 +1,4 @@
-const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const fs=require('fs'),vm=require('./localized-vm.cjs'),assert=require('assert');
 class Element{
  constructor(tag,text=''){this.tag=tag;this.textContent=text;this.children=[];this.value='';this.dataset={};this.disabled=false;this.hidden=false;}
  append(...nodes){for(const child of nodes){child.parentElement?.removeChild(child);this.children.push(child);child.parentElement=this;}}

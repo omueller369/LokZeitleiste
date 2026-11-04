@@ -1,0 +1,17 @@
+{
+  "text_05150731716a": "Message including attachments must not exceed 10 MiB.",
+  "text_218197693424": "From",
+  "text_22306b124a93": "Please complete the required data: ",
+  "text_33b9b0349ead": "Email sending failed. Check sent mail before sending again.",
+  "text_5a7be4591f8a": "The brake sheet changed on another device. Please reload.",
+  "text_68971283841a": "Subject",
+  "text_75c42298154a": "Attached is the brake sheet for train ",
+  "text_83146ef071d3": " dated ",
+  "text_86b7e0ec6c9f": "Invalid header",
+  "text_99c40ab40592": "Date",
+  "text_af4bffc07380": "Brake sheet ",
+  "text_b1cc93fb59b2": "Brake-sheet-",
+  "text_bd6f5600c02a": "Sending has already started. Check sent mail before sending again.",
+  "text_c5d2307ed28b": "Brake sheet not found.",
+  "text_f85be3c70c98": "The administrator mailbox is not ready to send. The PDF has been saved."
+}

@@ -2,7 +2,7 @@
 (()=>{
 if(!window.NativePortal)return;
 let serial=0;const waiting=new Map();
-NativePortal.onmessage=event=>{let reply;try{reply=JSON.parse(event.data);}catch(_){return;}const job=waiting.get(reply.id);if(!job)return;waiting.delete(reply.id);reply.ok?job.resolve(reply.value):job.reject(Error(reply.error||'App-Anfrage fehlgeschlagen.'));};
+NativePortal.onmessage=event=>{let reply;try{reply=JSON.parse(event.data);}catch(_){return;}const job=waiting.get(reply.id);if(!job)return;waiting.delete(reply.id);reply.ok?job.resolve(reply.value):job.reject(Error(reply.error||globalThis.CtlText.source("backend_android_portal.text_c7a2a716bb01")));};
 function request(method,values={}){return new Promise((resolve,reject)=>{const id=String(++serial);waiting.set(id,{resolve,reject});try{NativePortal.postMessage(JSON.stringify({id,method,...values}));}catch(error){waiting.delete(id);reject(error);}});}
 const session=request('session'),originalFetch=window.fetch.bind(window);
 function cacheable(path){if(path.startsWith('/api/v1/tf/me/signature'))return false;if(path.startsWith('/api/v1/tf/national-brake-sheets'))return false;if(path.startsWith('/api/v1/tf/brake-sheet-mail')||path.startsWith('/api/v1/tf/brake-sheets')||path.startsWith('/api/v1/tf/messages')||path==='/api/v1/tf/shell'||path==='/api/v1/tf/me'||path.startsWith('/api/v1/tf/me/')||path.startsWith('/api/v1/tf/gps/')||path.startsWith('/api/v1/tf/work-report'))return false;return path==='/api/v1/account/me'||path==='/api/v1/account/locale'||path.startsWith('/api/v1/tf/')||path==='/api/v1/documents/tree';}

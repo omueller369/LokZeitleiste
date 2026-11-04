@@ -1,4 +1,5 @@
 """Conservative GPS stop detection. Missing fixes never imply a stop."""
+from .localization import source as _text_source
 import math
 
 MAX_GAP=30_000
@@ -17,13 +18,13 @@ def analyse(points,preserved_starts=(),legacy=False,version2=False):
     rows=[];gaps=[];run=[];last=None
     def finish():
         if len(run)>1 and (run[-1]['t']-run[0]['t']>300_000 if legacy else run[-1]['t']-run[0]['t']>=240_000):
-            rows.append(dict(key='s'+str(len(rows)),kind='Halt',start=run[0]['t'],end=run[-1]['t'],lat=run[0]['lat'],lon=run[0]['lon'],index=points.index(run[0])))
+            rows.append(dict(key='s'+str(len(rows)),kind=_text_source('server_gps_analysis.text_0fd998791d67'),start=run[0]['t'],end=run[-1]['t'],lat=run[0]['lat'],lon=run[0]['lon'],index=points.index(run[0])))
         run.clear()
     for index,point in enumerate(points):
         if last and point['t']-last['t']>MAX_GAP:
-            finish();gaps.append(dict(start=last['t'],end=point['t'],reason='GPS-Lücke'))
+            finish();gaps.append(dict(start=last['t'],end=point['t'],reason=_text_source('server_gps_analysis.text_a0e0d0ecf632')))
         if point['accuracy']>MAX_ACCURACY:
-            finish();gaps.append(dict(start=point['t'],end=point['t'],reason='GPS ungenau'));last=point;continue
+            finish();gaps.append(dict(start=point['t'],end=point['t'],reason=_text_source('server_gps_analysis.text_984f679d9207')));last=point;continue
         if version2 and run and 'live-'+str(point['t']) in preserved_starts:finish()
         speed=point.get('speed')
         if speed is None and last and last['accuracy']<=MAX_ACCURACY and 0<point['t']-last['t']<=MAX_GAP:
@@ -40,7 +41,7 @@ def analyse(points,preserved_starts=(),legacy=False,version2=False):
     good=[(i,p) for i,p in enumerate(points) if p['accuracy']<=MAX_ACCURACY]
     if good:
         first,last=good[0],good[-1]
-        rows=[dict(key='start',kind='Start',start=first[1]['t'],end=first[1]['t'],lat=first[1]['lat'],lon=first[1]['lon'],index=first[0])]+rows+[dict(key='end',kind='Ende',start=last[1]['t'],end=last[1]['t'],lat=last[1]['lat'],lon=last[1]['lon'],index=last[0])]
+        rows=[dict(key='start',kind=_text_source('server_gps_analysis.text_e4bb9f1ece9a'),start=first[1]['t'],end=first[1]['t'],lat=first[1]['lat'],lon=first[1]['lon'],index=first[0])]+rows+[dict(key='end',kind=_text_source('server_gps_analysis.text_2ddcd606c872'),start=last[1]['t'],end=last[1]['t'],lat=last[1]['lat'],lon=last[1]['lon'],index=last[0])]
     for row in rows:
         index=row.pop('index');origin=points[index];previous=next((p for p in reversed(points[:index]) if p['accuracy']<=MAX_ACCURACY and distance(p,origin)>=50),None)
         following=next((p for p in points[index+1:] if p['accuracy']<=MAX_ACCURACY and distance(origin,p)>=50),None)

@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import io
 import base64
 import binascii
@@ -20,9 +21,9 @@ def normalize(content):
             warnings.simplefilter('error',Image.DecompressionBombWarning)
             with Image.open(io.BytesIO(content)) as source:
                 if source.format not in ('JPEG','PNG','WEBP') or getattr(source,'n_frames',1)!=1:
-                    raise ValueError('Bitte ein einzelnes JPEG-, PNG- oder WebP-Foto wählen')
+                    raise ValueError(_text_source('server_accounts_photos.text_bfabfb15a702'))
                 if source.width*source.height>12_000_000:
-                    raise ValueError('Foto darf höchstens 12 Megapixel enthalten')
+                    raise ValueError(_text_source('server_accounts_photos.text_bef405a162b1'))
                 source.load()
                 image=ImageOps.exif_transpose(source).convert('RGBA')
                 image.thumbnail((640,640))
@@ -30,14 +31,14 @@ def normalize(content):
                 result=io.BytesIO();background.save(result,format='JPEG',quality=85)
                 return result.getvalue()
     except (UnidentifiedImageError,OSError,Image.DecompressionBombError,Image.DecompressionBombWarning,ValueError) as exc:
-        raise HTTPException(422,str(exc) if isinstance(exc,ValueError) else 'Ungültiges oder zu großes Foto') from exc
+        raise HTTPException(422,str(exc) if isinstance(exc,ValueError) else _text_source('server_accounts_photos.text_2f8803f0996c')) from exc
 
 
 def decode_photo(value):
     if value is None:return None
     try:content=base64.b64decode(value,validate=True)
-    except (binascii.Error,ValueError) as exc:raise HTTPException(422,'Ungültiges Fotoformat') from exc
-    if len(content)>MAX_BYTES:raise HTTPException(413,'Foto darf höchstens 5 MB groß sein')
+    except (binascii.Error,ValueError) as exc:raise HTTPException(422,_text_source('server_accounts_photos.text_2976a3624c72')) from exc
+    if len(content)>MAX_BYTES:raise HTTPException(413,_text_source('server_accounts_photos.text_511b9dcb0f51'))
     return normalize(content)
 
 
@@ -53,12 +54,12 @@ def create_router(require_admin):
 
     def target(db,user_id,role):
         user=db.get(User,user_id)
-        if not user or user.role!=role:raise HTTPException(404,'Mitarbeiter nicht gefunden')
+        if not user or user.role!=role:raise HTTPException(404,_text_source('server_accounts_photos.text_d425970b74c9'))
         return user
 
     def get(db,user_id,role):
         target(db,user_id,role);photo=db.get(ProfilePhoto,user_id)
-        if not photo:raise HTTPException(404,'Kein Foto vorhanden')
+        if not photo:raise HTTPException(404,_text_source('server_accounts_photos.text_689fa5701f2b'))
         return Response(photo.image_data,media_type='image/jpeg',headers={
             'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
 
@@ -67,7 +68,7 @@ def create_router(require_admin):
         if role=='staff' and user.id!=actor.id:check_delegation(db,actor,{},user)
         try:content=await file.read(MAX_BYTES+1)
         finally:await file.close()
-        if len(content)>MAX_BYTES:raise HTTPException(413,'Foto darf höchstens 5 MB groß sein')
+        if len(content)>MAX_BYTES:raise HTTPException(413,_text_source('server_accounts_photos.text_511b9dcb0f51'))
         image=normalize(content)
         db.scalar(select(User).where(User.id==user_id).with_for_update())
         photo=db.get(ProfilePhoto,user_id)

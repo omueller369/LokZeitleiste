@@ -1,0 +1,16 @@
+{
+  "text_0e0bcc5b5bfd": "Please choose PDF, JPEG or PNG for the receipt.",
+  "text_235289ff07e2": "Invalid or encrypted PDF receipt.",
+  "text_31e50e289d08": "Invalid image receipt.",
+  "text_33abe22453a7": "Invalid receipt filename.",
+  "text_363b42b18514": "Work report",
+  "text_3f8f3edb2657": "Receipt delivery failed, receipt ID %s",
+  "text_52947d0640c2": "Receipt",
+  "text_68971283841a": "Subject",
+  "text_924dbe49e2c4": "Receipt must be at most 10 MB.",
+  "text_994c724e3913": "Invalid PDF receipt.",
+  "text_abb655f83760": "Receipt",
+  "text_b559ef518fa4": "LokZeitleiste: receipt for work report",
+  "text_b96f0de6ca92": "Receipt delivery failed",
+  "text_c8732dc1ae57": "PDF must be unencrypted with 1–100 pages."
+}

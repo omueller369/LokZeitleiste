@@ -1,0 +1,23 @@
+{
+  "text_17fd9a9d1055": "Could not change read status",
+  "text_218197693424": "From",
+  "text_3a0ab9df12bd": "Microsoft sign-in failed. Start again.",
+  "text_43fab6f1ffae": "(FLAGS BODY.PEEK[HEADER.FIELDS (FROM TO SUBJECT DATE)])",
+  "text_5933f12cbf78": "Invalid entry",
+  "text_68971283841a": "Subject",
+  "text_74aa2a5012a4": "Invalid message identifier",
+  "text_84ff5eab31e4": "Microsoft sign-in expired. Start again.",
+  "text_86b7e0ec6c9f": "Invalid header",
+  "text_893040444042": "Attachment not found",
+  "text_918edb31339c": "Invalid attachment",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Attachment",
+  "text_9ebb264e23eb": "Message search failed",
+  "text_a1b88d76df99": "Microsoft sign-in failed.",
+  "text_a8c327fb1b2a": "Train driver not found",
+  "text_affb643a20dc": "No mailbox is configured for this driver yet.",
+  "text_d07f53ff8475": "Re-enter the mailbox password after changing the account or server.",
+  "text_d27cb8248aa8": "Save Microsoft as the provider first.",
+  "text_ef3778671a95": "Could not read folder list",
+  "text_f3a0c5d5531a": "Invalid filename"
+}

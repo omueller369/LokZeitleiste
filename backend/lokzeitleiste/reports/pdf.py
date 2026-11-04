@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from datetime import datetime
 from html import escape
 from io import BytesIO
@@ -38,7 +39,7 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
     doc = SimpleDocTemplate(stream, pagesize=landscape(A4),
                             leftMargin=14 * mm, rightMargin=14 * mm,
                             topMargin=13 * mm, bottomMargin=13 * mm,
-                            title="LokZeitleiste - Monatsbericht" if monthly else "LokZeitleiste - Tabellarische Eingangsbestätigung")
+                            title=_text_source('server_reports_pdf.text_6953ff7703d4') if monthly else _text_source('server_reports_pdf.text_bb3b918a4a6a'))
     heading = ParagraphStyle("heading", fontName="ReceiptSans-Bold", fontSize=12, leading=15, textColor=INK)
     body = ParagraphStyle("body", fontName="ReceiptSans", fontSize=8.2, leading=11, textColor=INK)
     small = ParagraphStyle("small", parent=body, fontSize=7.4, leading=9.5)
@@ -47,9 +48,9 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
         return Paragraph(escape(str(value)), style)
     story = []
     metadata = Table([
-        [p("LokZeitleiste - Monatsbericht" if monthly else "LokZeitleiste - Eingangsbestätigung", heading), p(f"Monat: {month:02d}/{year}")],
-        [p(f"Tf: {first_name} {last_name}"), p(f"Personalnummer: {personnel_number}")],
-        [p(f"{'Erstellt' if monthly else 'Eingang'}: {received_at:%d.%m.%Y %H:%M} Uhr"), p(f"Feiertagskalender: DE-{federal_state}")],
+        [p(_text_source('server_reports_pdf.text_6953ff7703d4') if monthly else _text_source('server_reports_pdf.text_10e132e72625'), heading), p(f"{_text_source('server_reports_pdf.text_7c00e2248e91')}{month:02d}/{year}")],
+        [p(f"Tf: {first_name} {last_name}"), p(f"{_text_source('server_reports_pdf.text_068e16029c9b')}{personnel_number}")],
+        [p(f"{('Erstellt' if monthly else 'Eingang')}: {received_at:%d.%m.%Y %H:%M}{_text_source('server_reports_pdf.text_4e2866d1f2b9')}"), p(f"{_text_source('server_reports_pdf.text_9051770073ea')}{federal_state}")],
     ], colWidths=[135 * mm, 134 * mm])
     metadata.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), PALE), ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -59,7 +60,7 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
     story.extend([metadata, Spacer(1, 8 * mm)])
-    headers = ["Datum", "Art", "Beginn", "Ende", "Pause", "Arbeit", "Gastfahrt", "Sonntag", "Feiertag", "Nacht"]
+    headers = [_text_source('server_reports_pdf.text_9135882d323c'), _text_source('server_reports_pdf.text_75df3579c730'), _text_source('server_reports_pdf.text_0d95fd6a769f'), _text_source('server_reports_pdf.text_2ddcd606c872'), _text_source('server_reports_pdf.text_858e4ba7a29f'), _text_source('server_reports_pdf.text_3f0828ad8bfa'), _text_source('server_reports_pdf.text_7c4d852aa578'), _text_source('server_reports_pdf.text_a5984592501e'), _text_source('server_reports_pdf.text_ecda07db6e0b'), _text_source('server_reports_pdf.text_0af3584be783')]
     widths = [23, 53, 20, 20, 20, 23, 27, 26, 26, 26]
     widths = [x * mm for x in widths]
     table_data = [[p(h, ParagraphStyle("header-" + h, parent=center, fontName="ReceiptSans-Bold",
@@ -76,17 +77,17 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
                 p(_clock(row.holiday), center), p(_clock(row.night), center),
             ])
         subtotal = totals(day_items)
-        table_data.append([p("Tagessumme" + (f" ({holiday_names})" if holiday_names else ""), small),
+        table_data.append([p(_text_source('server_reports_pdf.text_656074ac61ab') + (f" ({holiday_names})" if holiday_names else ""), small),
                            "", "", "", p(_clock(subtotal["pause"]), center),
                            p(_clock(subtotal["work"]), center), p(_clock(subtotal["guest"]), center),
                            p(_clock(subtotal["sunday"]), center), p(_clock(subtotal["holiday"]), center),
                            p(_clock(subtotal["night"]), center)])
         span_rows.append(len(table_data) - 1)
     if not rows:
-        table_data.append([p("Keine Einträge empfangen."), "", "", "", "", "", "", "", "", ""])
+        table_data.append([p(_text_source('server_reports_pdf.text_3845608540cd')), "", "", "", "", "", "", "", "", ""])
         span_rows.append(1)
     summed = totals(rows)
-    table_data.append([p("Monatssumme" if monthly else "Summe der Übermittlung", small), "", "", "",
+    table_data.append([p(_text_source('server_reports_pdf.text_e7f8fdae50a1') if monthly else _text_source('server_reports_pdf.text_6a76ba13ab68'), small), "", "", "",
                        *[p(_clock(summed[k]), center) for k in
                          ("pause", "work", "guest", "sunday", "holiday", "night")]])
     total_row = len(table_data) - 1
@@ -103,9 +104,9 @@ def _render_receipt_pdf(*, first_name, last_name, personnel_number, federal_stat
     table = Table(table_data, colWidths=widths, repeatRows=1, hAlign="LEFT")
     table.setStyle(TableStyle(style))
     story.extend([table, Spacer(1, 5 * mm)])
-    notes = Table([[p("Bestätigung der empfangenen Daten - keine Entgelt- oder Tarifabrechnung.", small)],
-                   [p("Arbeitszeit = volle Dienstspanne einschließlich dokumentierter Pausen. Gastfahrt ist enthalten und separat ausgewiesen.", small)],
-                   [p("Mangels genauer Zeitlage liegt die Pause rechnerisch am Ende, Gastfahrt am Beginn des Zeitraums. Sonntag, Feiertag und Nacht (22:00-06:00 Uhr) sind damit vorläufig; Zeitwechsel werden nicht gesondert bewertet.", small)]],
+    notes = Table([[p(_text_source('server_reports_pdf.text_cc3c8b1a37a8'), small)],
+                   [p(_text_source('server_reports_pdf.text_573f12e57765'), small)],
+                   [p(_text_source('server_reports_pdf.text_a915d0043f31'), small)]],
                   colWidths=[269 * mm])
     notes.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), PALE),
                                ("BOX", (0, 0), (-1, -1), .4, colors.HexColor("#cbd9df")),

@@ -1,4 +1,5 @@
 """Lokübergabebuch: read-only vehicle overview, backed by the vehicle master data."""
+from .localization import source as _text_source
 from pathlib import Path
 from typing import Literal
 from fastapi import APIRouter, Depends, Query, HTTPException
@@ -40,7 +41,7 @@ def create_router(require_admin, require_account):
     @router.get('/api/v1/admin/loco-handover/vehicles/{vehicle_id}', dependencies=[Depends(require_admin)])
     def details(vehicle_id:int, db:Session=Depends(database_session)):
         row=db.get(RailwayVehicle,vehicle_id)
-        if not row or is_retired(db,vehicle_id):raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+        if not row or is_retired(db,vehicle_id):raise HTTPException(404,_text_source('server_loco_handover.text_d0713be2fe85'))
         label,color=VEHICLE_STATUSES[row.status]
         company=assigned_company(db,row.id)
         return dict(id=row.id,vehicle_number=row.vehicle_number,name=row.name,series=row.series,

@@ -13,7 +13,7 @@ STATIC=Path(__file__).resolve().parents[1]/'lokzeitleiste'/'static'
 
 def fixture():
     css=(STATIC/'tf-help.css').read_text()
-    scripts='\n'.join((STATIC/name).read_text() for name in ['tf-help-content.js','tf-help.js','work-report-feedback.js'])
+    scripts=(STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC/name).read_text() for name in ['tf-help-content.js','tf-help.js','work-report-feedback.js'])
     checks=r'''
 (async()=>{
  if(new URLSearchParams(location.search).get('mode')==='print'){window.TfHelp.open('arbeit');document.body.classList.add('tf-help-printing');document.documentElement.dataset.helpStatus='pass';return;}

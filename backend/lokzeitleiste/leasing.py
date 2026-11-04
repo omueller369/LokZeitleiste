@@ -1,4 +1,5 @@
 """Leasing company master data and vehicle assignments, without altering legacy columns."""
+from .localization import source as _text_source
 import json
 from pathlib import Path
 from fastapi import APIRouter,Depends,HTTPException
@@ -29,7 +30,7 @@ class CompanyInput(BaseModel):
     @field_validator('country')
     @classmethod
     def country_code(cls,value):
-        if value not in COUNTRIES:raise ValueError('Bitte ein gültiges Land auswählen.')
+        if value not in COUNTRIES:raise ValueError(_text_source('server_leasing.text_c4de76be5a0d'))
         return value
     @field_validator('email')
     @classmethod
@@ -43,7 +44,7 @@ def seed_and_migrate(db):
     if seeded is None and 'railpool' in companies:
         companies['railpool'].seed_key='railpool-demo'
     if seeded is None and 'railpool' not in companies:
-        row=LeasingCompany(**CompanyInput(company='Railpool',contact='Hans Zimmer',street='Teststr. 123A',postal_code='12345',city='Musterort',email='railpool@ctl-software.io-goerlitz.eu',phone='0123-1234567',mobile='+49-171-1234567',hotline='0800-1234567',notes='Testdatensatz').model_dump(),revision=1,seed_key='railpool-demo')
+        row=LeasingCompany(**CompanyInput(company=_text_source('server_leasing.text_d049e28fb7a5'),contact=_text_source('server_leasing.text_ab6eb9d6375a'),street=_text_source('server_leasing.text_f0f93c91cb37'),postal_code='12345',city=_text_source('server_leasing.text_6028dee8995b'),email='railpool@ctl-software.io-goerlitz.eu',phone='0123-1234567',mobile='+49-171-1234567',hotline='0800-1234567',notes=_text_source('server_leasing.text_65183e51307c')).model_dump(),revision=1,seed_key='railpool-demo')
         db.add(row);db.flush();companies['railpool']=row
     for vehicle in db.scalars(select(RailwayVehicle)):
         name=vehicle.lessor.strip()
@@ -69,7 +70,7 @@ def create_router(require_admin):
     def save(db,row):
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Diese Lok-Leasing-Firma ist bereits vorhanden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_leasing.text_f4cac6b2b802')) from exc
         return view(row)
     @router.post('/api/v1/admin/leasing',status_code=201,dependencies=[Depends(require_admin)])
     def create(data:CompanyInput,db:Session=Depends(database_session)):
@@ -77,8 +78,8 @@ def create_router(require_admin):
     @router.put('/api/v1/admin/leasing/{company_id}',dependencies=[Depends(require_admin)])
     def update(company_id:int,data:CompanyUpdate,db:Session=Depends(database_session)):
         row=db.scalar(select(LeasingCompany).where(LeasingCompany.id==company_id).with_for_update())
-        if not row:raise HTTPException(404,'Lok-Leasing-Firma nicht gefunden.')
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Datensatz wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_leasing.text_0253738f9762'))
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_leasing.text_d182519b80e3'))
         for key,value in data.model_dump(exclude={'expected_revision'}).items():setattr(row,key,value)
         row.revision+=1;return save(db,row)
     return router

@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta
 from itertools import groupby
@@ -13,7 +14,7 @@ from ..models import WorkEntry
 from .intervals import interval, entry_end_date
 
 
-WORK_KINDS = {"Bereitschaft", "Rufbereitschaft", "Ausfallschicht", "Zugfahrt", "Sonstige Erfassung"}
+WORK_KINDS = {_text_source('server_reports_daily.text_a88b0d6dfef3'), _text_source('server_reports_daily.text_bfe022ddd1f8'), _text_source('server_reports_daily.text_98a9c4972272'), _text_source('server_reports_daily.text_52c5d4a0445b'), _text_source('server_reports_daily.text_f31b8681bfca')}
 
 
 @dataclass(frozen=True)

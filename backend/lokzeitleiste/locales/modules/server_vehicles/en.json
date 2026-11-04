@@ -1,0 +1,11 @@
+{
+  "text_0253738f9762": "Leasing company not found.",
+  "text_75edfe7e2c7c": "Locomotive has changed. Please reload.",
+  "text_81e8f7b73460": "Vehicle number already exists.",
+  "text_a30e1969d617": "Operational",
+  "text_a7767461460f": "Operational with restrictions",
+  "text_d0713be2fe85": "Locomotive not found.",
+  "text_ec514a9cce8d": "Vehicle number must contain 12 digits in the format 00 00 0000 000-0.",
+  "text_ee0a4ee77389": "Not operational",
+  "text_f9403d288c3a": "A reason or restriction is required."
+}

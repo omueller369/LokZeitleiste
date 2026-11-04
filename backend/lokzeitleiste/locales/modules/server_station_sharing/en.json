@@ -1,0 +1,11 @@
+{
+  "text_1bc2ef474b0a": "Invalid station selection.",
+  "text_41f90b727e22": "Station entry not found.",
+  "text_4205d5c216a8": "No station plan available.",
+  "text_54f6ecf479d6": "Please select another active driver.",
+  "text_a88493f6b7ce": "Merging would exceed 100 numbers; review the station individually.",
+  "text_a96506fc6b18": "Delivery not found.",
+  "text_bd80f341b74b": "Station plans must total at most 20 MB; select fewer stations or share without plans.",
+  "text_c20c9cabae31": "Your station list has changed. Reload the share.",
+  "text_d7d19f6de978": "Select each destination station only once per import."
+}

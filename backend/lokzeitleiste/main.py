@@ -1,3 +1,4 @@
+from .localization import source as _text_source
 import os
 from pathlib import Path
 
@@ -26,16 +27,16 @@ from .change_log import bind_actor
 from .accounts.access import authorize_route, password_required, ready, permissions, redact_plan
 
 
-app = FastAPI(title=SOFTWARE_TITLE+" API", version=SOFTWARE_VERSION)
+app = FastAPI(title=SOFTWARE_TITLE+_text_source('server_main.text_91596d3c3961'), version=SOFTWARE_VERSION)
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
 PUBLIC_ORIGIN = os.getenv("PUBLIC_ORIGIN", "")
 
 
 def require_tf(request: Request, authorization: str | None = Header(default=None), db: Session = Depends(database_session)) -> User:
-    token = authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else ""
+    token = authorization.removeprefix(_text_source('server_main.text_35e5a9632e18')).strip() if authorization and authorization.startswith(_text_source('server_main.text_35e5a9632e18')) else ""
     user = user_from_token(db, token)
     if not user or user.role != "tf":
-        raise HTTPException(401, "Tf-Anmeldung erforderlich")
+        raise HTTPException(401, _text_source('server_main.text_e0f4afcfcb37'))
     if request.url.path != '/api/v1/tf/logout':
         ready(db,user)
     bind_actor(db,user,request)
@@ -44,11 +45,11 @@ def require_tf(request: Request, authorization: str | None = Header(default=None
 
 def require_admin(request: Request, authorization: str | None = Header(default=None), admin_session: str | None = Cookie(default=None),
                   db: Session = Depends(database_session)) -> User:
-    user = user_from_token(db, authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else admin_session)
+    user = user_from_token(db, authorization.removeprefix(_text_source('server_main.text_35e5a9632e18')).strip() if authorization and authorization.startswith(_text_source('server_main.text_35e5a9632e18')) else admin_session)
     if not user or user.role not in ("admin", "staff"):
-        raise HTTPException(401, "Admin-Anmeldung erforderlich")
+        raise HTTPException(401, _text_source('server_main.text_935382ae5851'))
     if request.method not in ("GET", "HEAD") and PUBLIC_ORIGIN and request.headers.get("origin") != PUBLIC_ORIGIN:
-        raise HTTPException(403, "Ungültiger Ursprung")
+        raise HTTPException(403, _text_source('server_main.text_f68b23feaba4'))
     authorize_route(db,user,request)
     bind_actor(db,user,request)
     return user
@@ -72,10 +73,10 @@ def admin_script():
 @app.post("/api/v1/admin/login")
 def admin_login(credentials: Credentials, request: Request, response: Response, db: Session = Depends(database_session)):
     if PUBLIC_ORIGIN and request.headers.get('origin') != PUBLIC_ORIGIN:
-        raise HTTPException(403, "Ungültiger Ursprung")
+        raise HTTPException(403, _text_source('server_main.text_f68b23feaba4'))
     user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role.in_(("admin", "staff"))))
     if not user or not account_active(db,user) or not verify_password(credentials.password, user.password_hash):
-        raise HTTPException(401, "Anmeldung fehlgeschlagen")
+        raise HTTPException(401, _text_source('server_main.text_1c983667bad8'))
     token = issue_token(db, user)
     response.set_cookie("admin_session", token, httponly=True, secure=COOKIE_SECURE,
                         samesite="strict", max_age=365 * 24 * 3600, path="/")
@@ -85,7 +86,7 @@ def admin_login(credentials: Credentials, request: Request, response: Response, 
 @app.post("/api/v1/admin/logout")
 def admin_logout(response: Response, authorization: str | None = Header(default=None), admin_session: str | None = Cookie(default=None),
                  _: User = Depends(require_admin), db: Session = Depends(database_session)):
-    raw=authorization.removeprefix("Bearer ").strip() if authorization and authorization.startswith("Bearer ") else admin_session
+    raw=authorization.removeprefix(_text_source('server_main.text_35e5a9632e18')).strip() if authorization and authorization.startswith(_text_source('server_main.text_35e5a9632e18')) else admin_session
     if raw:
         revoke_token(db, raw)
     response.delete_cookie("admin_session", path="/")
@@ -100,7 +101,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
     image=decode_photo(data.photo_base64)
     username = data.username.strip().lower()
     if not username or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789._-" for c in username):
-        raise HTTPException(422, "Ungültiger Benutzername")
+        raise HTTPException(422, _text_source('server_main.text_d5e500b6ef25'))
     try:
         user = User(username=username, password_hash=hash_password(data.password), role="tf")
         db.add(user)
@@ -124,7 +125,7 @@ def create_tf(data: TfCreate, _: User = Depends(require_admin), db: Session = De
         return {"id": user.id, "username": user.username}
     except IntegrityError:
         db.rollback()
-        raise HTTPException(409, "TF-Nummer, Personalnummer oder E-Mail-Adresse bereits vorhanden")
+        raise HTTPException(409, _text_source('server_main.text_7a7dce702816'))
 
 
 @app.get("/api/v1/admin/tf")
@@ -140,7 +141,7 @@ def list_tf(viewer: User = Depends(require_admin), db: Session = Depends(databas
              "target_hours_minutes": details_dict(db,user)["monthly_minutes"], "vacation_days": p.vacation_days,
              "birth_date": p.birth_date.isoformat(), "bahncard": p.bahncard,
              "bahncard_valid_until": validity.get(user.id) if p.bahncard else None,
-             "photo_placeholder": "Bild folgt", "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None, **details_dict(db,user)} for user, p in rows]
+             "photo_placeholder": _text_source('server_main.text_0efc38e4e918'), "email": p.email, "federal_state": p.federal_state, "has_photo":db.get(ProfilePhoto,user.id) is not None, **details_dict(db,user)} for user, p in rows]
 
 
 @app.put("/api/v1/admin/tf/{tf_id}")
@@ -148,7 +149,7 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
     from .accounts.photos import decode_photo,save_photo
     user=db.scalar(select(User).where(User.id==tf_id).with_for_update())
     profile=db.get(TfProfile,tf_id)
-    if not user or user.role!='tf' or not profile:raise HTTPException(404,'Tf nicht gefunden')
+    if not user or user.role!='tf' or not profile:raise HTTPException(404,_text_source('server_main.text_a8c327fb1b2a'))
     previous_username=user.username
     from .accounts.tf_profiles import validate_details, save_details
     validate_details(db,data,user)
@@ -180,7 +181,7 @@ def update_tf(tf_id:int,data:TfProfileUpdate,actor:User=Depends(require_admin),d
             db.commit()
         return {'id':tf_id,'has_photo':db.get(ProfilePhoto,tf_id) is not None}
     except IntegrityError as exc:
-        db.rollback();raise HTTPException(409,'TF-Nummer, Personalnummer oder E-Mail-Adresse bereits vergeben') from exc
+        db.rollback();raise HTTPException(409,_text_source('server_main.text_026622f06bcf')) from exc
 
 
 @app.patch("/api/v1/admin/tf/{tf_id}/delivery")
@@ -188,7 +189,7 @@ def update_tf_delivery(tf_id: int, data: TfDeliveryUpdate, _: User = Depends(req
                        db: Session = Depends(database_session)):
     profile = db.get(TfProfile, tf_id)
     if not profile or not db.get(User, tf_id) or db.get(User, tf_id).role != "tf":
-        raise HTTPException(404, "Tf nicht gefunden")
+        raise HTTPException(404, _text_source('server_main.text_a8c327fb1b2a'))
     from .employee_mail import save_email
     save_email(db,db.get(User,tf_id),str(data.email))
     profile.federal_state = data.federal_state
@@ -209,7 +210,7 @@ def report_status(tf_id: int, _: User = Depends(require_admin), db: Session = De
 def list_months(tf_id: int, _: User = Depends(require_admin), db: Session = Depends(database_session)):
     user = db.get(User, tf_id)
     if not user or user.role != "tf":
-        raise HTTPException(404, "Tf nicht gefunden")
+        raise HTTPException(404, _text_source('server_main.text_a8c327fb1b2a'))
     months = db.scalars(select(WorkMonth).where(WorkMonth.tf_user_id == tf_id)
                         .order_by(WorkMonth.year.desc(), WorkMonth.month.desc())).all()
     return [{"year": m.year, "month": m.month, "entry_count": len(m.entries)} for m in months]
@@ -225,10 +226,10 @@ def admin_entries(tf_id: int, year: int, month: int, _: User = Depends(require_a
 
 def month_summary(db: Session, tf_id: int, year: int, month: int):
     if not (2000 <= year <= 2100 and 1 <= month <= 12):
-        raise HTTPException(422, "Ungültiger Monat")
+        raise HTTPException(422, _text_source('server_main.text_c6ef72ca00bb'))
     profile = db.get(TfProfile, tf_id)
     if not profile or not profile.federal_state:
-        raise HTTPException(409, "Bundesland des Tf fehlt im Admin-Profil")
+        raise HTTPException(409, _text_source('server_main.text_779050874050'))
     from .reports.intervals import period_entries
     from datetime import date
     import calendar
@@ -244,7 +245,7 @@ def month_summary(db: Session, tf_id: int, year: int, month: int):
     result["balance_minutes"] = result["totals"]["credited"] - planning["target_minutes"] if planning["complete"] else None
     result["tf_user_id"] = tf_id
     today = datetime.now(ZoneInfo("Europe/Berlin"))
-    result["status"] = "vorläufig" if (year, month) >= (today.year, today.month) else "Monatsende"
+    result["status"] = _text_source('server_main.text_8b5003fc1cba') if (year, month) >= (today.year, today.month) else _text_source('server_main.text_1d0a40263542')
     return result
 
 
@@ -253,7 +254,7 @@ def admin_month_summary(tf_id: int, year: int, month: int, viewer: User = Depend
                         db: Session = Depends(database_session)):
     user = db.get(User, tf_id)
     if not user or user.role != "tf":
-        raise HTTPException(404, "Tf nicht gefunden")
+        raise HTTPException(404, _text_source('server_main.text_a8c327fb1b2a'))
     return redact_plan(db,viewer,month_summary(db, tf_id, year, month))
 
 
@@ -267,7 +268,7 @@ def my_month_summary(year: int, month: int, user: User = Depends(require_tf),
 def tf_login(credentials: Credentials, db: Session = Depends(database_session)):
     user = db.scalar(select(User).where(User.username == credentials.username.lower(), User.role == "tf"))
     if not user or not account_active(db,user) or not verify_password(credentials.password, user.password_hash):
-        raise HTTPException(401, "Anmeldung fehlgeschlagen")
+        raise HTTPException(401, _text_source('server_main.text_1c983667bad8'))
     from .models import TfNumberMigration
     migration=db.get(TfNumberMigration,user.id)
     return {"previous_username":migration.previous_username if migration else None,"access_token": issue_token(db, user), "token_type": "bearer", "username": user.username, "password_change_required":password_required(db,user)}
@@ -277,7 +278,7 @@ def tf_login(credentials: Credentials, db: Session = Depends(database_session)):
 def tf_logout(authorization: str | None = Header(default=None), _: User = Depends(require_tf),
               db: Session = Depends(database_session)):
     if authorization:
-        revoke_token(db, authorization.removeprefix("Bearer ").strip())
+        revoke_token(db, authorization.removeprefix(_text_source('server_main.text_35e5a9632e18')).strip())
     return {"ok": True}
 
 
@@ -296,15 +297,15 @@ def upload_entries(year: int, month: int, batch: EntryBatch, background_tasks: B
 
 def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None):
     if not (2000 <= year <= 2100 and 1 <= month <= 12):
-        raise HTTPException(422, "Ungültiger Monat")
+        raise HTTPException(422, _text_source('server_main.text_c6ef72ca00bb'))
     if any(e.date.year != year or e.date.month != month for e in batch.entries):
-        raise HTTPException(422, "Eintrag gehört nicht zum angeforderten Monat")
+        raise HTTPException(422, _text_source('server_main.text_6b9d94bd7d58'))
     db.scalar(select(User).where(User.id == user.id).with_for_update())
     profile = db.get(TfProfile, user.id)
     if not profile or not profile.email or not profile.federal_state:
-        raise HTTPException(409, "E-Mail-Adresse und Bundesland des Tf fehlen im Admin-Profil")
+        raise HTTPException(409, _text_source('server_main.text_20a309fb57d0'))
     if batch.entries and not smtp_configured():
-        raise HTTPException(503, "E-Mail-Versand ist auf dem Server noch nicht eingerichtet")
+        raise HTTPException(503, _text_source('server_main.text_907f24b01340'))
     period = db.scalar(select(WorkMonth).where(WorkMonth.tf_user_id == user.id,
                                               WorkMonth.year == year, WorkMonth.month == month).with_for_update())
     if not period:
@@ -319,7 +320,7 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
         batch=EntryBatch(entries=[EntryIn.model_validate(dict(item.model_dump(),end_date=(existing[str(item.client_id)].explicit_end_date
             if item.end_date is None and str(item.client_id) in existing else item.end_date))) for item in batch.entries])
     except ValidationError as exc:
-        raise HTTPException(422,'Ungültiger Zeitraum mit gespeichertem Enddatum: '+str(exc.errors()[0]['msg'])) from exc
+        raise HTTPException(422,_text_source('server_main.text_53337f4ba003')+str(exc.errors()[0]['msg'])) from exc
     # Ein alter App-Stand darf eine administrative Zeitkorrektur nicht zurücksetzen.
     protected = set(db.scalars(select(WorkTimeChange.entry_id).join(WorkEntry).where(
         WorkEntry.work_month_id == period.id).with_for_update()).all())
@@ -330,10 +331,10 @@ def persist_entries(year,month,batch,background_tasks,user,db,manual_actor=None)
             normalized=item.model_dump(mode='json')
             normalized['start']=item.start.strftime('%H:%M');normalized['end']=item.end.strftime('%H:%M')
             if normalized!=entry_dict(entry):
-                raise HTTPException(409,"Arbeitszeitdatensatz ist gesperrt. Das gesamte Paket wurde nicht übernommen.")
+                raise HTTPException(409,_text_source('server_main.text_c9fc7277d121'))
         if entry and entry.id in protected and (entry.start_time,entry.end_time,entry.explicit_end_date) != (
                 item.start.strftime('%H:%M'),item.end.strftime('%H:%M'),item.end_date):
-            raise HTTPException(409, "Arbeitszeit wurde administrativ korrigiert. Aktuelle Monatsdaten vom Server laden.")
+            raise HTTPException(409, _text_source('server_main.text_ff706d38e5bb'))
     for item in batch.entries:
         key = str(item.client_id)
         entry = existing.get(key)
@@ -547,6 +548,8 @@ def portal_ui_script():
 
 
 from .i18n import language, request_language, translate, user_language
+from .localization import resolve_placeholders
+from fastapi.responses import Response
 from .models import UserLocale
 from pydantic import BaseModel
 from typing import Literal
@@ -558,9 +561,16 @@ async def localized_requests(request: Request, call_next):
     token=request_language.set(language(request.query_params.get('lang') or request.headers.get('accept-language')))
     try:
         response=await call_next(request)
+        if response.headers.get('content-type', '').split(';')[0] == 'text/html':
+            body = b''.join([chunk async for chunk in response.body_iterator])
+            headers = dict(response.headers)
+            for key in ('content-length', 'etag', 'last-modified'):
+                headers.pop(key, None)
+            response = Response(resolve_placeholders(body.decode('utf-8'), request_language.get()), status_code=response.status_code, headers=headers)
+            response.headers.add_vary_header('Accept-Language')
         if request.url.path.startswith('/api/'):
             response.headers['Cache-Control']='private, no-store'
-            response.headers.add_vary_header('Cookie, Authorization')
+            response.headers.add_vary_header(_text_source('server_main.text_316ece8edcb7'))
         elif request.url.path.startswith('/admin'):
             response.headers['Cache-Control']='no-cache'
         return response
@@ -572,7 +582,7 @@ async def localized_error(request: Request, exc):
     return JSONResponse({'detail':translate(exc.detail)}, status_code=exc.status_code, headers=exc.headers)
 
 class LocaleInput(BaseModel):
-    language: Literal['de','en','pl','ru','es']
+    language: Literal['de','pl','en']
 
 @app.get('/api/v1/account/locale')
 def get_locale(user: User=Depends(require_account), db: Session=Depends(database_session)):
@@ -590,6 +600,24 @@ def set_locale(data: LocaleInput, user: User=Depends(require_account), db: Sessi
 def translations_script():
     return FileResponse(Path(__file__).parent/'static'/'i18n.js', media_type='text/javascript')
 
+@app.get('/locales/messages.js')
+def module_messages_script():
+    return FileResponse(Path(__file__).parent/'static'/'messages.js', media_type='text/javascript', headers={'Cache-Control':'no-cache'})
+
+@app.get('/locales/manifest.json')
+def module_messages_manifest():
+    return FileResponse(Path(__file__).parent/'locales'/'manifest.json', media_type='application/json')
+
+@app.get('/locales/{module}/{locale}.json')
+def module_messages(module: str, locale: str):
+    import re
+    if not re.fullmatch(r'[a-z][a-z0-9_]*', module) or locale not in ('de', 'pl', 'en'):
+        raise HTTPException(404, _text_source('server_handover_protocols.text_8a18a03defcc'))
+    path = Path(__file__).parent/'locales'/'modules'/module/(locale+'.json')
+    if not path.is_file():
+        raise HTTPException(404, _text_source('server_handover_protocols.text_8a18a03defcc'))
+    return FileResponse(path, media_type='application/json')
+
 @app.get('/locales/catalog.json')
 def translations_catalog():
     return FileResponse(Path(__file__).parent/'locales'/'catalog.json', media_type='application/json')
@@ -600,7 +628,7 @@ from fastapi.exceptions import RequestValidationError
 async def localized_validation_error(request: Request, exc):
     # Never echo passwords, mailbox credentials or complete uploaded files in error responses.
     fields=[{'field':'.'.join(str(part) for part in error['loc']), 'type':error['type']} for error in exc.errors()]
-    return JSONResponse({'detail':translate('Eingaben sind ungültig. Bitte Pflichtfelder und Werte prüfen.'),'fields':fields},status_code=422)
+    return JSONResponse({'detail':translate(_text_source('server_main.text_ee756c3e4909')),'fields':fields},status_code=422)
 
 
 @app.get('/api/v1/admin/tf-metadata')

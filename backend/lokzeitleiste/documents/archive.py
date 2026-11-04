@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import io
 import json
 import re
@@ -137,20 +138,20 @@ def work_report_pdf(db,user,report):
     view=report_view(db,report);credited=view['credited_minutes']
     stamp=lambda value,previous=None:report_time(value,data['start_at'],data['end_at'],previous)
     station=lambda row,key:(' '.join([row.get(key,''),row.get(key+'_name','')])).strip() or '-'
-    lines=[(t('Vorname')+' / '+t('Nachname'),f'{profile.first_name} {profile.last_name}'),
-        (t('Arbeitsbericht'),report.id),(t('Version'),report_version(data)),
-        (t('Dienstart'),t('Dienstschicht' if data.get('kind','Sonstige Erfassung')=='Sonstige Erfassung' else data['kind'])),
-        (t('Dienstbeginn'),stamp(data['start_at'])),(t('Dienstende'),stamp(data['end_at'],data['start_at'])),(t('Arbeitszeit'),clock(credited)),
-        (t('Dokumentierte Pausen gesamt'),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+' min'),
-        (t('Ausbleibe'),', '.join(data.get('ausbleibe',[])) or '-')]
+    lines=[(t(_text_source('server_documents_archive.text_d2d77b6ffa70'))+' / '+t(_text_source('server_documents_archive.text_b25358edd497')),f'{profile.first_name} {profile.last_name}'),
+        (t(_text_source('server_documents_archive.text_363b42b18514')),report.id),(t(_text_source('server_documents_archive.text_dd167905de0d')),report_version(data)),
+        (t(_text_source('server_documents_archive.text_f6ffe691f447')),t(_text_source('server_documents_archive.text_d6b95aa24371') if data.get('kind',_text_source('server_documents_archive.text_f31b8681bfca'))==_text_source('server_documents_archive.text_f31b8681bfca') else data['kind'])),
+        (t(_text_source('server_documents_archive.text_c36eeb4a54c9')),stamp(data['start_at'])),(t(_text_source('server_documents_archive.text_5a6948869044')),stamp(data['end_at'],data['start_at'])),(t(_text_source('server_documents_archive.text_b574d367e922')),clock(credited)),
+        (t(_text_source('server_documents_archive.text_10db5b590be0')),str(data['actual_pause']+train_pause_minutes(data.get('train_journeys',[])))+_text_source('server_documents_archive.text_2e75737a6b58')),
+        (t(_text_source('server_documents_archive.text_e9d947cd1cae')),', '.join(data.get('ausbleibe',[])) or '-')]
     if data.get('in_hotel'):
-        lines.append((t('Hotelübergang'),t('Ja')))
-        if data.get('hotel_location'):lines.append((t('Ort'),data['hotel_location']))
-        if data.get('hotel_name'):lines.append((t('Hotelname'),data['hotel_name']))
-    lines += [(t('Gesamtarbeitszeit (Dienstspanne)'),clock(view['duration_minutes'])),(t('Gastfahrten gesamt'),clock(view['guest_total_minutes'])),(t('Gastfahrt im Dienst'),clock(view['guest_minutes'])),(t('Gastfahrt außerhalb des Dienstes'),clock(view['external_guest_minutes']))]
-    if data.get('overrun_reason','').strip():lines.append((t('Begründung für mehr als zwölf Stunden'),data['overrun_reason']))
-    transport={'train':'Zug','car':'Auto','taxi':'Taxi','public_transport':'ÖPNV','other':'Anderes Transportmittel'}
-    guests=[[t(v) for v in ['Von','Nach','Beginn','Ende','Dauer','Verkehrsmittel','Sz']]]
+        lines.append((t(_text_source('server_documents_archive.text_6d6dcf391265')),t(_text_source('server_documents_archive.text_cde9e58a9a4e'))))
+        if data.get('hotel_location'):lines.append((t(_text_source('server_documents_archive.text_30fb259129e5')),data['hotel_location']))
+        if data.get('hotel_name'):lines.append((t(_text_source('server_documents_archive.text_70d220ac37de')),data['hotel_name']))
+    lines += [(t(_text_source('server_documents_archive.text_4a393fe4e7b6')),clock(view['duration_minutes'])),(t(_text_source('server_documents_archive.text_e22bd91281c0')),clock(view['guest_total_minutes'])),(t(_text_source('server_documents_archive.text_c50b3fd126df')),clock(view['guest_minutes'])),(t(_text_source('server_documents_archive.text_5918b6927ab8')),clock(view['external_guest_minutes']))]
+    if data.get('overrun_reason','').strip():lines.append((t(_text_source('server_documents_archive.text_53e46440b1f3')),data['overrun_reason']))
+    transport={'train':_text_source('server_documents_archive.text_f8737ae629e3'),'car':_text_source('server_documents_archive.text_0286249762f7'),'taxi':_text_source('server_documents_archive.text_7793c31446e3'),'public_transport':_text_source('server_documents_archive.text_4f44f1d1c30e'),'other':_text_source('server_documents_archive.text_59ff8de64be1')}
+    guests=[[t(v) for v in [_text_source('server_documents_archive.text_640e86cbc244'),_text_source('server_documents_archive.text_0ea77701f68c'),_text_source('server_documents_archive.text_0d95fd6a769f'),_text_source('server_documents_archive.text_2ddcd606c872'),_text_source('server_documents_archive.text_668cbe316167'),_text_source('server_documents_archive.text_e5881251f1ac'),'Sz']]]
     previous_guest=None
     for trip in data['trips']:
         guests.append([station(trip,'start_station'),station(trip,'end_station'),stamp(trip['start_at'],previous_guest),stamp(trip['end_at'],trip['start_at']),clock(minutes(datetime.fromisoformat(trip['start_at']),datetime.fromisoformat(trip['end_at']))),t(transport[trip['transport']])+(' / '+trip['transport_detail'] if trip.get('transport_detail') else ''),'✓' if trip.get('self_payer') else '-'])
@@ -158,24 +159,24 @@ def work_report_pdf(db,user,report):
     if len(guests)==1:guests.append(['-']*7)
     if not any(trip.get('self_payer') for trip in data['trips']):guests=[row[:-1] for row in guests]
     guest_weights=(.18,.18,.14,.14,.08,.22,.06) if len(guests[0])==7 else (.20,.20,.14,.14,.08,.24)
-    sections=[(t('Gastfahrten'),guests,0,guest_weights)]
+    sections=[(t(_text_source('server_documents_archive.text_e881923b9f75')),guests,0,guest_weights)]
     train_pages=[]
     for train in data.get('train_journeys',[]):
-        header=[[t(v) for v in ['Zugnr.','StartBf','Abfahrt','ZielBf','Ankunft']],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'],train['start_at'])]]
-        train_page=[(t('Zugfahrt')+' '+train['train_number'],header)]
-        events=[[t(v) for v in ['Grund','Verursacher','Ort/Bf','Von','Bis','Dauer']]]
+        header=[[t(v) for v in [_text_source('server_documents_archive.text_13574159d054'),_text_source('server_documents_archive.text_f34068f22589'),_text_source('server_documents_archive.text_43cda2210cac'),_text_source('server_documents_archive.text_e96c233d6638'),_text_source('server_documents_archive.text_f079711187a4')]],[train['train_number'],station(train,'start_station'),stamp(train['start_at']),station(train,'end_station'),stamp(train['end_at'],train['start_at'])]]
+        train_page=[(t(_text_source('server_documents_archive.text_52c5d4a0445b'))+' '+train['train_number'],header)]
+        events=[[t(v) for v in [_text_source('server_documents_archive.text_b45f40c737c3'),_text_source('server_documents_archive.text_76b0a5929c12'),_text_source('server_documents_archive.text_05411091f811'),_text_source('server_documents_archive.text_640e86cbc244'),_text_source('server_documents_archive.text_078a815372af'),_text_source('server_documents_archive.text_668cbe316167')]]]
         previous_event=None;detail_rows=[]
         for event in sorted(train.get('events',[]),key=lambda e:(e['start_at'],e['end_at'],str(e.get('id','')))):
             events.append([t(event.get('reason_label') or event['reason']),t(event.get('cause_label') or event['cause']),station(event,'station'),stamp(event['start_at'],previous_event),stamp(event['end_at'],event['start_at']),clock(minutes(datetime.fromisoformat(event['start_at']),datetime.fromisoformat(event['end_at'])))])
             details=[]
-            if event.get('reason_detail'):details.append(t('Grund')+': '+event['reason_detail'])
-            if event.get('cause_detail'):details.append(t('Verursacher')+': '+event['cause_detail'])
+            if event.get('reason_detail'):details.append(t(_text_source('server_documents_archive.text_b45f40c737c3'))+': '+event['reason_detail'])
+            if event.get('cause_detail'):details.append(t(_text_source('server_documents_archive.text_76b0a5929c12'))+': '+event['cause_detail'])
             if details:
                 events.append([' / '.join(details),'','','','','']);detail_rows.append(len(events)-1)
             previous_event=event['end_at']
         if len(events)==1:events.append(['-']*6)
-        train_page.append((t('Zugfahrt'),events,.12,None,detail_rows));train_pages.append(train_page)
-    return pdf_document(t('Arbeitsbericht vom')+' '+datetime.fromisoformat(data['start_at']).strftime('%d.%m.%Y'),lines,sections=sections,paired_head=True,train_pages=train_pages)
+        train_page.append((t(_text_source('server_documents_archive.text_52c5d4a0445b')),events,.12,None,detail_rows));train_pages.append(train_page)
+    return pdf_document(t(_text_source('server_documents_archive.text_498192e57606'))+' '+datetime.fromisoformat(data['start_at']).strftime('%d.%m.%Y'),lines,sections=sections,paired_head=True,train_pages=train_pages)
 
 
 def archive_report(db,user,report,queue_email=False,include_months=True):
@@ -198,12 +199,12 @@ def archive_month(db,user,year,month):
     lang=user_language(db,user.id);t=lambda s:translate(s,lang)
     summary=summarize_month(entries,year=year,month=month,federal_state=state)
     from ..accounts.tf_profiles import monthly_minutes
-    lines=[(t('TF-Nummer'),user.username),(t('Vorname')+' / '+t('Nachname'),f'{profile.first_name} {profile.last_name}'),(t('Monat'),f'{year}-{month:02d}'),(t('Sollstunden'),clock(monthly_minutes(db,user.id,year,month)))]
-    labels={'work_without_guest':'Arbeitszeit ohne Gastfahrten','guest':'Gastfahrten gesamt','topup':'Auffüllung','vacation':'Urlaub','sick':'Krank','credited':'Angerechnete Arbeitszeit','sunday':'Sonntag','holiday':'Feiertag','night':'Nacht'}
+    lines=[(t(_text_source('server_documents_archive.text_18a967e63eee')),user.username),(t(_text_source('server_documents_archive.text_d2d77b6ffa70'))+' / '+t(_text_source('server_documents_archive.text_b25358edd497')),f'{profile.first_name} {profile.last_name}'),(t(_text_source('server_documents_archive.text_2933070469a2')),f'{year}-{month:02d}'),(t(_text_source('server_documents_archive.text_167c97688e21')),clock(monthly_minutes(db,user.id,year,month)))]
+    labels={'work_without_guest':_text_source('server_documents_archive.text_a4e70e3dd743'),'guest':_text_source('server_documents_archive.text_e22bd91281c0'),'topup':_text_source('server_documents_archive.text_4cd0daded920'),'vacation':_text_source('server_documents_archive.text_35d3a889824d'),'sick':_text_source('server_documents_archive.text_be1600b499c6'),'credited':_text_source('server_documents_archive.text_4301d60c487f'),'sunday':_text_source('server_documents_archive.text_a5984592501e'),'holiday':_text_source('server_documents_archive.text_ecda07db6e0b'),'night':_text_source('server_documents_archive.text_0af3584be783')}
     lines += [(t(label),clock(summary['totals'][key])) for key,label in labels.items()]
-    rows=[[t('Datum'),t('Dienstart'),t('Angerechnete Arbeitszeit')]]+[[r['date'],t(r['type']),clock(r['credited'])] for r in summary['days']]
+    rows=[[t(_text_source('server_documents_archive.text_9135882d323c')),t(_text_source('server_documents_archive.text_f6ffe691f447')),t(_text_source('server_documents_archive.text_4301d60c487f'))]]+[[r['date'],t(r['type']),clock(r['credited'])] for r in summary['days']]
     folder=month_folder(year,month)
-    rendered(db,generated(db,user,folder+'/Monatszusammenfassung.pdf',pdf_document(t('Monatszusammenfassung'),lines,rows),f'month-summary:{year}-{month:02d}'))
+    rendered(db,generated(db,user,folder+'/Monatszusammenfassung.pdf',pdf_document(t(_text_source('server_documents_archive.text_ad19a57659f2')),lines,rows),f'month-summary:{year}-{month:02d}'))
     report=render_receipt_pdf(first_name=profile.first_name,last_name=profile.last_name,personnel_number=profile.personnel_number,
         federal_state=state,year=year,month=month,received_at=today(),rows=[r for r in day_rows(entries,state) if r.day.year==year and r.day.month==month],lang=lang,monthly=True)
     rendered(db,generated(db,user,folder+'/Monatsbericht.pdf',report,f'month-report:{year}-{month:02d}'))
@@ -215,7 +216,7 @@ def archive_dispatch(db,dispatch):
     match=re.fullmatch(r'Arbeitsbericht-(\d+)\.pdf',dispatch.filename) or re.fullmatch(r'\d{4}-\d{2}-\d{2}-\d+-(\d+)-Arbeitsbericht\.pdf',dispatch.filename)
     if match:
         report=db.get(DutyReport,int(match[1]))
-        latest=db.scalar(select(ReportDispatch.id).where(ReportDispatch.tf_user_id==user.id,or_(ReportDispatch.filename==f'Arbeitsbericht-{int(match[1])}.pdf',ReportDispatch.filename.like(f'%-{int(match[1])}-Arbeitsbericht.pdf'))).order_by(ReportDispatch.id.desc()).limit(1))
+        latest=db.scalar(select(ReportDispatch.id).where(ReportDispatch.tf_user_id==user.id,or_(ReportDispatch.filename==f"{_text_source('server_documents_archive.text_7c4790899cc1')}{int(match[1])}.pdf",ReportDispatch.filename.like(f'%-{int(match[1])}-Arbeitsbericht.pdf'))).order_by(ReportDispatch.id.desc()).limit(1))
         if report and report.tf_user_id==user.id and latest==dispatch.id and dispatch.filename==report_filename(report):
             generated(db,user,f'{report_folder(report)}/{dispatch.filename}',dispatch.pdf_data,f'work-report:{report.id}')
             entry=db.get(WorkEntry,report.entry_id)
@@ -263,4 +264,4 @@ def backfill_documents(db):
                 try:archive_month(db,user,year,month)
                 except ValueError:
                     import logging
-                    logging.getLogger(__name__).exception('Monatsarchiv enthält widersprüchliche Altdaten: Benutzer %s, %s-%s',user.id,year,month)
+                    logging.getLogger(__name__).exception(_text_source('server_documents_archive.text_e9eb80b5d77e'),user.id,year,month)

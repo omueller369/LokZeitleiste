@@ -1,0 +1,16 @@
+{
+  "text_0e0bcc5b5bfd": "Bitte PDF, JPEG oder PNG als Beleg wählen.",
+  "text_235289ff07e2": "Ungültiger oder verschlüsselter PDF-Beleg.",
+  "text_31e50e289d08": "Ungültiger Bildbeleg.",
+  "text_33abe22453a7": "Ungültiger Belegdateiname.",
+  "text_363b42b18514": "Arbeitsbericht",
+  "text_3f8f3edb2657": "Belegversand fehlgeschlagen, Beleg-ID %s",
+  "text_52947d0640c2": "Beleg",
+  "text_68971283841a": "Subject",
+  "text_924dbe49e2c4": "Beleg darf höchstens 10 MB groß sein.",
+  "text_994c724e3913": "Ungültiger PDF-Beleg.",
+  "text_abb655f83760": "Quittungsbeleg",
+  "text_b559ef518fa4": "LokZeitleiste: Quittungsbeleg zum Arbeitsbericht",
+  "text_b96f0de6ca92": "Belegversand fehlgeschlagen",
+  "text_c8732dc1ae57": "PDF muss unverschlüsselt sein und 1–100 Seiten enthalten."
+}

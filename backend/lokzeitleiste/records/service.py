@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from datetime import date, timedelta
 from fastapi import HTTPException
 from sqlalchemy import select
@@ -15,7 +16,7 @@ def is_locked(db,entry_id):
 def assert_unlocked(db,entry_id):
     item=db.scalar(select(WorkEntryLock).where(WorkEntryLock.entry_id==entry_id).with_for_update())
     if item and item.locked:
-        raise HTTPException(409,'Der Arbeitszeitdatensatz ist gesperrt und kann nicht geändert werden.')
+        raise HTTPException(409,_text_source('server_records_service.text_c7ec8e2a4e58'))
 
 
 def entry_view(db,entry,entry_dict):
@@ -27,10 +28,10 @@ def entry_view(db,entry,entry_dict):
 
 def user_overview(db,user,year,month,entry_dict,month_summary, *, lock=False):
     if not 2000 <= year <= 2100 or not 1 <= month <= 12:
-        raise HTTPException(422,'Ungültiger Monat')
+        raise HTTPException(422,_text_source('server_records_service.text_c6ef72ca00bb'))
     profile = db.get(TfProfile,user.id) if user.role == 'tf' else None
     if user.role == 'tf' and (not profile or not profile.federal_state):
-        raise HTTPException(409,'Bundesland des Tf fehlt')
+        raise HTTPException(409,_text_source('server_records_service.text_f9f51abea01e'))
     state = profile.federal_state if profile else None
     try:
         data = overview(db,user.id,year,month,state,lock=lock)

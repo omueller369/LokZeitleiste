@@ -1,4 +1,5 @@
 """Versioned app vocabulary. Stable keys preserve historical report semantics."""
+from .localization import source as _text_source
 import json
 from pathlib import Path
 from typing import Literal
@@ -25,7 +26,7 @@ def historical_values(db):
     for raw in db.scalars(select(TrainGpsRecording.payload_json)):
         for reason in json.loads(raw).get('reasons',{}).values():
             if reason.get('reason'):result.add(('reason',reason['reason']))
-    if ('cause','CTL Logistics DE') in result:result.add(('cause','CTL'))
+    if ('cause',_text_source('server_app_defaults.text_2087c99eb939')) in result:result.add(('cause','CTL'))
     return result
 
 
@@ -33,7 +34,7 @@ def ensure_defaults(db):
     if db.get(AppDefaultSeed,1):return
     from .work_reports.schemas import REASONS
     used=historical_values(db)
-    defaults=[('reason',value,True) for value in REASONS]+[('cause',value,True) for value in ('CTL','DB InfraGo','Dritte Stelle','sonstiges')]
+    defaults=[('reason',value,True) for value in REASONS]+[('cause',value,True) for value in ('CTL',_text_source('server_app_defaults.text_1abed57a73e2'),_text_source('server_app_defaults.text_7fe3366aac3e'),_text_source('server_app_defaults.text_69384a6be550'))]
     known={(kind,value) for kind,value,_ in defaults}
     defaults += [(kind,value,False) for kind,value in sorted(used-known)]
     db.add(AppDefaultSeed(id=1))
@@ -47,9 +48,9 @@ def ensure_defaults(db):
 
 def use_value(db,category,value,previous=None):
     # Match historical CTL DE to its current key without rewriting report snapshots.
-    canonical='CTL' if category=='cause' and value=='CTL Logistics DE' else value
+    canonical='CTL' if category=='cause' and value==_text_source('server_app_defaults.text_2087c99eb939') else value
     row=db.scalar(select(Value).where(Value.category==category,Value.value==canonical).with_for_update())
-    if not row or (not row.active and value!=previous):raise HTTPException(422,'Auswahlwert ist nicht mehr verfügbar. Bitte neu auswählen.')
+    if not row or (not row.active and value!=previous):raise HTTPException(422,_text_source('server_app_defaults.text_abc1be1d3849'))
     row.ever_used=True
     return row
 
@@ -79,7 +80,7 @@ class ValueInput(BaseModel):
     @classmethod
     def trim(cls,value):
         value=value.strip()
-        if not value:raise ValueError('Bezeichnung ist erforderlich.')
+        if not value:raise ValueError(_text_source('server_app_defaults.text_25b9ad8f3ac8'))
         return value
 class ValueUpdate(ValueInput):
     expected_revision:int=Field(ge=1)
@@ -105,7 +106,7 @@ def create_router(require_admin,require_account):
     def commit(db,row):
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Bezeichnung ist bereits vorhanden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_app_defaults.text_49d3623ea7be')) from exc
         return view(row)
     @router.post('/api/v1/admin/app-defaults/{category}',status_code=201,dependencies=[Depends(require_admin)])
     def create(category:Literal['reason','cause'],data:ValueInput,db:Session=Depends(database_session)):
@@ -115,16 +116,16 @@ def create_router(require_admin,require_account):
     @router.put('/api/v1/admin/app-defaults/value/{value_id}',dependencies=[Depends(require_admin)])
     def update(value_id:int,data:ValueUpdate,db:Session=Depends(database_session)):
         row=db.scalar(select(Value).where(Value.id==value_id).with_for_update())
-        if not row:raise HTTPException(404,'Auswahlwert nicht gefunden.')
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Auswahlwert wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_app_defaults.text_5c5fa14fef76'))
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_app_defaults.text_60fe685fe99d'))
         row.label=data.label;row.label_key=data.label.casefold();row.active=data.active;row.revision+=1
         return commit(db,row)
     @router.delete('/api/v1/admin/app-defaults/value/{value_id}',dependencies=[Depends(require_admin)])
     def remove(value_id:int,expected_revision:int=Query(ge=1),db:Session=Depends(database_session)):
         row=db.scalar(select(Value).where(Value.id==value_id).with_for_update())
-        if not row:raise HTTPException(404,'Auswahlwert nicht gefunden.')
-        if row.revision!=expected_revision:raise HTTPException(409,'Auswahlwert wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_app_defaults.text_5c5fa14fef76'))
+        if row.revision!=expected_revision:raise HTTPException(409,_text_source('server_app_defaults.text_60fe685fe99d'))
         if row.ever_used or (row.category,row.value) in historical_values(db):
-            raise HTTPException(409,'Bereits verwendete Werte können nur deaktiviert werden.')
+            raise HTTPException(409,_text_source('server_app_defaults.text_94ee479e3ac2'))
         db.delete(row);db.commit();return {'ok':True}
     return router

@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 from datetime import date
 from pydantic import EmailStr, BaseModel, Field, field_validator, model_validator
 from .access import MODULES
@@ -13,7 +14,7 @@ class AddressIn(BaseModel):
     @classmethod
     def not_blank(cls,value):
         if not value.strip():
-            raise ValueError('Pflichtfeld darf nicht leer sein')
+            raise ValueError(_text_source('server_accounts_schemas.text_a54f48a13bbb'))
         return value.strip()
 
 
@@ -33,15 +34,15 @@ class StaffIn(BaseModel):
     @classmethod
     def not_blank(cls,value):
         if not value.strip():
-            raise ValueError('Pflichtfeld darf nicht leer sein')
+            raise ValueError(_text_source('server_accounts_schemas.text_a54f48a13bbb'))
         return value.strip()
 
     @model_validator(mode='after')
     def validate_fields(self):
         if self.birth_date > date.today():
-            raise ValueError('Geburtsdatum darf nicht in der Zukunft liegen')
+            raise ValueError(_text_source('server_accounts_schemas.text_ea509516913d'))
         if set(self.permissions) - MODULES.keys() or any(type(v) is not int or not 0 <= v <= 3 for v in self.permissions.values()):
-            raise ValueError('Ungültige Modulberechtigung')
+            raise ValueError(_text_source('server_accounts_schemas.text_bd61bc256371'))
         self.permissions = {m:self.permissions.get(m,0) for m in MODULES}
         return self
 
@@ -59,7 +60,7 @@ class PasswordChange(BaseModel):
     @model_validator(mode='after')
     def confirm(self):
         if self.new_password != self.confirm_password:
-            raise ValueError('Passwörter stimmen nicht überein')
+            raise ValueError(_text_source('server_accounts_schemas.text_943de6dfe431'))
         return self
 
 

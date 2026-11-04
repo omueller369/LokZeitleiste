@@ -1,0 +1,23 @@
+{
+  "text_0357b8d84286": "Postfachschlüssel passt nicht. Zugangsdaten neu hinterlegen.",
+  "text_05150731716a": "Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.",
+  "text_0d94fb23ce2e": "Versendet, aber Kopie im Gesendet-Ordner konnte nicht gespeichert werden.",
+  "text_1148fd35f915": "Postfach-Verschlüsselungsschlüssel muss auf dem Server eingerichtet werden.",
+  "text_218197693424": "From",
+  "text_4334ed9da2f0": "Mindestens ein Empfänger wurde abgelehnt. Zustellung kann teilweise erfolgt sein; Empfänger vor erneutem Senden prüfen.",
+  "text_50e64315bb61": "Postfachverbindung fehlgeschlagen. Server und Zugangsdaten prüfen.",
+  "text_6381fdab9086": "Nachricht größer als 10 MiB; bitte im externen Mailprogramm öffnen.",
+  "text_68971283841a": "Subject",
+  "text_843ace047541": "Postfach-SMTP benötigt SSL oder STARTTLS.",
+  "text_918edb31339c": "Ungültiger Anhang",
+  "text_93207f76e5a7": "Postfachordner hat sich geändert. Bitte neu laden.",
+  "text_9398a18492a2": "Nachricht nicht gefunden",
+  "text_97f7bb674340": "Mailserver ist noch nicht eingerichtet: MAILBOX_IMAP_HOST",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Anhang",
+  "text_a1ec065c6346": "Mailserver ist noch nicht eingerichtet: MAILBOX_SMTP_HOST",
+  "text_b65390d9692e": "E-Mail-Versand fehlgeschlagen. Keine automatische Wiederholung; Postfach und Server prüfen.",
+  "text_c411554968a4": "Mailserver ist noch nicht eingerichtet: ",
+  "text_e50b22ccbc58": "Ungültiger Ordner",
+  "text_f00305a5a31e": "Postfachordner nicht gefunden"
+}

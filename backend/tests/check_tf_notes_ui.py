@@ -51,7 +51,7 @@ CHECKS=r"""
 """
 
 def fixture():
-    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+(STATIC/'tf-portal.css').read_text()+'</style></head><body><main><h1>Notizen</h1><div id="notesWorkspace"></div></main><script>'+MOCK+(STATIC/'tf-notes.js').read_text()+CHECKS+'</script></body></html>'
+    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+(STATIC/'tf-portal.css').read_text()+'</style></head><body><main><h1>Notizen</h1><div id="notesWorkspace"></div></main><script>'+(STATIC/'messages.js').read_text()+MOCK+(STATIC/'tf-notes.js').read_text()+CHECKS+'</script></body></html>'
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--output-dir',type=Path,required=True);args=parser.parse_args();args.output_dir.mkdir(parents=True,exist_ok=True)

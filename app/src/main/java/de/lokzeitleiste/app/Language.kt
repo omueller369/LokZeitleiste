@@ -21,8 +21,8 @@ import java.util.Locale
 object LanguageRuntime {
     @Volatile var code = "de"
     var accountVersion by mutableStateOf(0)
-    val codes = listOf("de", "en", "pl", "ru", "es")
-    val labels = listOf("🇩🇪 Deutsch", "🇬🇧 English", "🇵🇱 Polski", "🇷🇺 Русский", "🇪🇸 Español")
+    val codes = listOf("de", "pl", "en")
+    val labels = listOf("🇩🇪 Deutsch", "🇵🇱 Polski", "🇬🇧 English")
     private var catalog: JSONObject? = null
     private var pattern: Regex? = null
     private val canonical = mutableMapOf<String, String>()

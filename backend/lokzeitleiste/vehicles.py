@@ -1,4 +1,5 @@
 """Administrative railway vehicles; status codes/colors are reusable by future TF views."""
+from .localization import source as _text_source
 import re
 from decimal import Decimal
 from datetime import date
@@ -15,9 +16,9 @@ from .models import VehicleTechnicalData,RailwayVehicle,VehicleRetirement,Vehicl
 from .leasing import assigned_company,view as company_view
 
 VEHICLE_STATUSES={
-    'ready':('Einsatzbereit','#d9f2df'),
-    'unavailable':('Nicht einsatzbereit','#ffdada'),
-    'limited':('Eingeschränkt einsatzbereit','#fff0b3'),
+    'ready':(_text_source('server_vehicles.text_a30e1969d617'),'#d9f2df'),
+    'unavailable':(_text_source('server_vehicles.text_ee0a4ee77389'),'#ffdada'),
+    'limited':(_text_source('server_vehicles.text_a7767461460f'),'#fff0b3'),
 }
 
 TECHNICAL_FIELDS={'length_m','weight_kg','axle_count','brake_shoe'}
@@ -48,13 +49,13 @@ class VehicleInput(BaseModel):
     @classmethod
     def number(cls,value):
         number=re.sub(r'[\s-]','',value)
-        if not re.fullmatch(r'[0-9]{12}',number):raise ValueError('Fahrzeugnummer muss 12 Ziffern im Format 00 00 0000 000-0 enthalten.')
+        if not re.fullmatch(r'[0-9]{12}',number):raise ValueError(_text_source('server_vehicles.text_ec514a9cce8d'))
         return f'{number[:2]} {number[2:4]} {number[4:8]} {number[8:11]}-{number[11]}'
 
     @model_validator(mode='after')
     def operational_status(self):
         self.status_note=self.status_note.strip()
-        if self.status!='ready' and not self.status_note:raise ValueError('Grund oder Einschränkung ist erforderlich.')
+        if self.status!='ready' and not self.status_note:raise ValueError(_text_source('server_vehicles.text_f9403d288c3a'))
         if self.status=='ready':self.status_note=''
         return self
 
@@ -109,15 +110,15 @@ def create_router(require_admin):
     @router.get('/api/v1/admin/vehicles/{vehicle_id}',dependencies=[Depends(require_admin)])
     def details(vehicle_id:int,db:Session=Depends(database_session)):
         row=db.get(RailwayVehicle,vehicle_id)
-        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
+        if not row:raise HTTPException(404,_text_source('server_vehicles.text_d0713be2fe85'))
         return vehicle_view(row)
 
     def assign(db,row,company_id):
         company=db.get(LeasingCompany,company_id) if company_id else None
-        if company_id and not company:raise HTTPException(422,'Lok-Leasing-Firma nicht gefunden.')
+        if company_id and not company:raise HTTPException(422,_text_source('server_vehicles.text_0253738f9762'))
         try:db.flush()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Fahrzeugnummer ist bereits vorhanden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_vehicles.text_81e8f7b73460')) from exc
         link=db.get(VehicleLeasing,row.id)
         if company:
             if link:link.company_id=company.id
@@ -138,7 +139,7 @@ def create_router(require_admin):
     def commit(db,row):
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Fahrzeugnummer ist bereits vorhanden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_vehicles.text_81e8f7b73460')) from exc
         return vehicle_view(row)
 
     @router.post('/api/v1/admin/vehicles',status_code=201,dependencies=[Depends(require_admin)])
@@ -151,8 +152,8 @@ def create_router(require_admin):
     @router.put('/api/v1/admin/vehicles/{vehicle_id}',dependencies=[Depends(require_admin)])
     def update(vehicle_id:int,data:VehicleUpdate,db:Session=Depends(database_session)):
         row=db.scalar(select(RailwayVehicle).where(RailwayVehicle.id==vehicle_id).with_for_update())
-        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Triebfahrzeug wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_vehicles.text_d0713be2fe85'))
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_vehicles.text_75edfe7e2c7c'))
         for field,value in data.model_dump(exclude={'expected_revision','leasing_company_id'}|TECHNICAL_FIELDS).items():setattr(row,field,value)
         if 'leasing_company_id' in data.model_fields_set:assign(db,row,data.leasing_company_id)
         save_technical(db,row,data)
@@ -160,8 +161,8 @@ def create_router(require_admin):
     @router.put('/api/v1/admin/vehicles/{vehicle_id}/retirement',dependencies=[Depends(require_admin)])
     def retirement(vehicle_id:int,data:RetirementInput,db:Session=Depends(database_session)):
         row=db.scalar(select(RailwayVehicle).where(RailwayVehicle.id==vehicle_id).with_for_update())
-        if not row:raise HTTPException(404,'Triebfahrzeug nicht gefunden.')
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Triebfahrzeug wurde geändert. Bitte neu laden.')
+        if not row:raise HTTPException(404,_text_source('server_vehicles.text_d0713be2fe85'))
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_vehicles.text_75edfe7e2c7c'))
         retired=db.get(VehicleRetirement,vehicle_id)
         if data.retired and not retired:db.add(VehicleRetirement(vehicle_id=vehicle_id))
         elif not data.retired and retired:db.delete(retired)

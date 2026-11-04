@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import logging
 
 from sqlalchemy import select
@@ -20,7 +21,7 @@ def process_dispatch(dispatch_id: int):
             return
         try:
             if not dispatch.pdf_data:
-                raise RuntimeError("PDF-Daten fehlen")
+                raise RuntimeError(_text_source('server_reports_service.text_3624c6e52f86'))
             from ..documents.archive import archive_dispatch
             archive_dispatch(session,dispatch)
             session.flush()
@@ -30,7 +31,7 @@ def process_dispatch(dispatch_id: int):
             dispatch.status = "failed"
             dispatch.attempts += 1
             dispatch.last_error = str(exc)[:500]
-            log.exception("PDF-Versand fehlgeschlagen, Versand-ID %s", dispatch_id)
+            log.exception(_text_source('server_reports_service.text_79082c245882'), dispatch_id)
         else:
             dispatch.status = "sent"
             dispatch.attempts += 1

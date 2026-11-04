@@ -4,6 +4,7 @@ The fixture contains no account data and makes no server requests. Chrome is
 provided by GitHub's ubuntu runner; no npm/browser download is required.
 """
 import argparse
+from localized_fixtures import localize_html
 import html
 import json
 import re
@@ -16,7 +17,7 @@ STATIC = Path(__file__).resolve().parents[1] / 'lokzeitleiste' / 'static'
 
 
 def fixture():
-    page = (STATIC / 'tf-portal.html').read_text()
+    page = localize_html((STATIC / 'tf-portal.html').read_text())
     page = re.sub(r'<script\b[^>]*>.*?</script>', '', page, flags=re.S)
     page = re.sub(r'<link\b[^>]*>', '', page)
     css = '\n'.join((STATIC / name).read_text() for name in ['tf-portal.css', 'work-report.css', 'responsive.css'])
@@ -27,7 +28,7 @@ def fixture():
         state={kind:'Sonstige Erfassung',client_id:'layout',legacy_pause:30,ausbleibe:[]};
         el('dutyStart').value=day+'T08:00';el('dutyEnd').value=day+'T16:00';totals();
     }};})();''', source)
-    controllers = '\n'.join((STATIC / name).read_text() for name in ['train-journeys.js', 'gps.js'])
+    controllers = (STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC / name).read_text() for name in ['train-journeys.js', 'gps.js'])
     checks = r'''
 (async()=>{
  const assert=(condition,message)=>{if(!condition)throw Error(message);};

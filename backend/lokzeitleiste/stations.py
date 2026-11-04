@@ -1,4 +1,5 @@
 """Private, per-driver station contacts and station plans."""
+from .localization import source as _text_source
 import json
 from pathlib import Path
 from typing import Literal
@@ -27,7 +28,7 @@ class StationContact(BaseModel):
     def clean(cls,value):
         value=value.strip()
         if not value or any(ord(c)<32 or ord(c)==127 for c in value):
-            raise ValueError('Bezeichnung und Nummer erforderlich.')
+            raise ValueError(_text_source('server_stations.text_a2c5ee1e5057'))
         return value
 
 
@@ -70,10 +71,10 @@ class StationUpdate(StationNotes):
     @field_validator('code','name',mode='before')
     @classmethod
     def identity_clean(cls,value,info):
-        if value is None:raise ValueError('Name und DS100 dürfen nicht leer sein.')
+        if value is None:raise ValueError(_text_source('server_stations.text_3822edba2c56'))
         if isinstance(value,str):
             value=value.strip()
-            if any(ord(c)<32 or ord(c)==127 for c in value):raise ValueError('Ungültiger Name oder DS100.')
+            if any(ord(c)<32 or ord(c)==127 for c in value):raise ValueError(_text_source('server_stations.text_c2f01df1b542'))
             if info.field_name=='code':value=value.upper()
         return value
 
@@ -81,7 +82,7 @@ class StationUpdate(StationNotes):
 def contacts_json(contacts):
     value=json.dumps([row.model_dump() for row in contacts],ensure_ascii=False)
     if len(value.encode('utf8'))>60000:
-        raise HTTPException(422,'Zu viele Kontaktdaten für einen Bahnhof.')
+        raise HTTPException(422,_text_source('server_stations.text_1e37397451a4'))
     return value
 
 
@@ -93,12 +94,12 @@ def create_router(require_account):
         if lock:db.scalar(select(User).where(User.id==user.id).with_for_update())
         query=select(TfStation).where(TfStation.id==station_id,TfStation.owner_id==user.id)
         row=db.scalar(query.with_for_update() if lock else query)
-        if not row:raise HTTPException(404,'Bahnhofseintrag nicht gefunden.')
+        if not row:raise HTTPException(404,_text_source('server_stations.text_41f90b727e22'))
         return row
 
     def check_revision(row,revision):
         if row.revision!=revision:
-            raise HTTPException(409,'Bahnhofseintrag wurde geändert. Bitte neu laden.')
+            raise HTTPException(409,_text_source('server_stations.text_04bd3c41d7f4'))
 
     def view(db,row):
         plan=db.get(TfStationPlan,row.id)
@@ -130,15 +131,15 @@ def create_router(require_account):
     def create(data:StationCreate,user:User=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update())
         station=db.get(RailwayStation,data.code)
-        if not station:raise HTTPException(422,'Bitte einen Bahnhof aus den Suchvorschlägen auswählen.')
+        if not station:raise HTTPException(422,_text_source('server_stations.text_9829a55f8030'))
         existing=db.scalar(select(TfStation).where(TfStation.owner_id==user.id,TfStation.code==station.code).with_for_update())
-        if existing:raise HTTPException(409,'Bahnhof ist bereits in Ihrer Liste.')
+        if existing:raise HTTPException(409,_text_source('server_stations.text_4c006d60605f'))
         row=TfStation(owner_id=user.id,code=station.code,name=station.name,contacts_json=contacts_json(data.contacts),revision=1)
         db.add(row)
         db.flush();save_notes(db,row.id,data)
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Bahnhof ist bereits in Ihrer Liste.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_stations.text_4c006d60605f')) from exc
         return view(db,row)
 
     @router.get('/api/v1/tf/stations/{station_id}')
@@ -153,12 +154,12 @@ def create_router(require_account):
         if code!=row.code or name!=row.name:
             others=db.execute(select(TfStation.code,TfStation.name).where(TfStation.owner_id==user.id,TfStation.id!=row.id)).all()
             if any(other.code.strip().upper()==code or other.name.strip().casefold()==name.casefold() for other in others):
-                raise HTTPException(409,'Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.',headers={'X-Station-Conflict':'identity'})
+                raise HTTPException(409,_text_source('server_stations.text_c1df98b85acb'),headers={'X-Station-Conflict':'identity'})
         row.code=code;row.name=name
         row.contacts_json=contacts_json(data.contacts);save_notes(db,row.id,data);row.revision+=1
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Name oder DS100 ist bereits in Ihrer Bahnhofsliste vorhanden. Bitte einen anderen Namen oder DS100 wählen.',headers={'X-Station-Conflict':'identity'}) from exc
+            db.rollback();raise HTTPException(409,_text_source('server_stations.text_c1df98b85acb'),headers={'X-Station-Conflict':'identity'}) from exc
         return view(db,row)
 
     @router.delete('/api/v1/tf/stations/{station_id}')
@@ -173,9 +174,9 @@ def create_router(require_account):
                           user:User=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,station_id,True);check_revision(row,expected_revision)
         content=await file.read(MAX_FILE+1)
-        if not content or len(content)>MAX_FILE:raise HTTPException(413,'Dokument darf höchstens 10 MB groß sein.')
+        if not content or len(content)>MAX_FILE:raise HTTPException(413,_text_source('server_stations.text_17a7a5960b60'))
         try:filename,mime,_=validate_receipt(file.filename,content)
-        except ValueError as exc:raise HTTPException(422,'Bahnhofsplan muss eine gültige PDF-, JPEG- oder PNG-Datei sein.') from exc
+        except ValueError as exc:raise HTTPException(422,_text_source('server_stations.text_5b870b2fe485')) from exc
         plan=db.get(TfStationPlan,row.id)
         if not plan:plan=TfStationPlan(station_id=row.id);db.add(plan)
         plan.filename=filename;plan.mime_type=mime;plan.content=content;row.revision+=1;db.commit()
@@ -184,7 +185,7 @@ def create_router(require_account):
     @router.get('/api/v1/tf/stations/{station_id}/plan')
     def download_plan(station_id:int,user:User=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,station_id);plan=db.get(TfStationPlan,row.id)
-        if not plan:raise HTTPException(404,'Kein Bahnhofsplan vorhanden.')
+        if not plan:raise HTTPException(404,_text_source('server_stations.text_4205d5c216a8'))
         return Response(plan.content,media_type=plan.mime_type,headers={
             'Content-Disposition':"attachment; filename*=UTF-8''"+quote(plan.filename,safe=''),
             'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})

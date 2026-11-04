@@ -1,4 +1,5 @@
 """Explicit, account-owned brake-sheet mail composition and archived PDF snapshots."""
+from .localization import source as _text_source
 import json,os
 from uuid import UUID,uuid4
 from html import escape
@@ -29,7 +30,7 @@ class MailInput(BaseModel):
     @field_validator('subject')
     @classmethod
     def header(cls,v):
-        if '\r' in v or '\n' in v:raise ValueError('Ungültige Kopfzeile')
+        if '\r' in v or '\n' in v:raise ValueError(_text_source('server_brake_sheet_mail.text_86b7e0ec6c9f'))
         return v
     bcc:list[EmailStr]=Field(default_factory=lambda:[BCC],max_length=30)
 
@@ -49,9 +50,9 @@ def mailbox(db,user):
     return None,sender,bool(sender and smtp_configured())
 
 def message(row,data):
-    msg=EmailMessage();msg['From']=row.sender;msg['To']=', '.join(str(a) for a in data.to)
+    msg=EmailMessage();msg[_text_source('server_brake_sheet_mail.text_218197693424')]=row.sender;msg['To']=', '.join(str(a) for a in data.to)
     if data.cc:msg['Cc']=', '.join(str(a) for a in data.cc)
-    msg['Subject']=data.subject;msg['Date']=formatdate(localtime=True);msg['Message-ID']=f'<brake-sheet-{row.id}@{row.sender.split("@")[-1]}>'
+    msg[_text_source('server_brake_sheet_mail.text_68971283841a')]=data.subject;msg[_text_source('server_brake_sheet_mail.text_99c40ab40592')]=formatdate(localtime=True);msg['Message-ID']=f'<brake-sheet-{row.id}@{row.sender.split("@")[-1]}>'
     msg.set_content(data.body)
     body=escape(data.body).replace('\n','<br>');cid='brake-sheet-preview-'+row.id+'@'+row.sender.split('@')[-1]
     msg.add_alternative('<html><body><p>'+body+'</p><img src="cid:'+cid+'" alt="Bremszettel" style="max-width:100%;height:auto"></body></html>',subtype='html')
@@ -63,30 +64,30 @@ def create_router(require_account):
     router=APIRouter();driver=driver_dependency(require_account)
     def owned(db,user,id):
         row=db.scalar(select(BrakeSheetDispatch).where(BrakeSheetDispatch.id==str(id),BrakeSheetDispatch.owner_id==user.id).with_for_update())
-        if not row:raise HTTPException(404,'Bremszettel nicht gefunden.')
+        if not row:raise HTTPException(404,_text_source('server_brake_sheet_mail.text_c5d2307ed28b'))
         return row
     @router.post('/api/v1/tf/brake-sheets/{id}/mail')
     def prepare(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
         draft=db.scalar(select(BrakeSheetDraft).where(BrakeSheetDraft.id==str(id),BrakeSheetDraft.owner_id==user.id).with_for_update())
-        if not draft:raise HTTPException(404,'Bremszettel nicht gefunden.')
-        if draft.revision!=data.expected_revision:raise HTTPException(409,'Bremszettel wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        if not draft:raise HTTPException(404,_text_source('server_brake_sheet_mail.text_c5d2307ed28b'))
+        if draft.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_brake_sheet_mail.text_5a7be4591f8a'))
         sheet=Sheet.model_validate_json(draft.payload_json);result=calculate(db,sheet)
-        if result['preview_missing']:raise HTTPException(422,'Bitte Pflichtangaben ergänzen: '+', '.join(result['preview_missing']))
+        if result['preview_missing']:raise HTTPException(422,_text_source('server_brake_sheet_mail.text_22306b124a93')+', '.join(result['preview_missing']))
         try:
             png=render(sheet,result,draft.created_at,draft.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
             pdf=render_pdf(sheet,result,draft.created_at,draft.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
-        filename=f'Bremszettel-{number}-{day.isoformat()}.PDF'
+        filename=f"{_text_source('server_brake_sheet_mail.text_b1cc93fb59b2')}{number}-{day.isoformat()}.PDF"
         path=f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}'
         document=generated(db,user,path,pdf,'brake-sheet:'+draft.id);db.flush()
         account,sender,ready=mailbox(db,user)
-        subject=f'Bremszettel {number} – {day:%d.%m.%Y}'
-        mail=dict(to=[TO],cc=[CC],bcc=[BCC],subject=subject,body=f'Anbei der Bremszettel für Zug {number} vom {day:%d.%m.%Y}.')
+        subject=f"{_text_source('server_brake_sheet_mail.text_af4bffc07380')}{number} – {day:%d.%m.%Y}"
+        mail=dict(to=[TO],cc=[CC],bcc=[BCC],subject=subject,body=f"{_text_source('server_brake_sheet_mail.text_75c42298154a')}{number}{_text_source('server_brake_sheet_mail.text_83146ef071d3')}{day:%d.%m.%Y}.")
         row=BrakeSheetDispatch(id=str(uuid4()),owner_id=user.id,draft_id=draft.id,draft_revision=draft.revision,document_id=document.id,filename=filename,sender=sender,mail_json=json.dumps(mail),pdf_content=pdf,image_content=png,status='ready')
         db.add(row);db.commit()
         root='/api/v1/tf/brake-sheet-mail/'+row.id
-        return dict(id=row.id,sender=sender,mail_ready=ready,mail_notice='' if ready else 'Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.',filename=filename,document_path=document.relative_path,pdf_url=root+'/pdf',image_url=root+'/image',**mail)
+        return dict(id=row.id,sender=sender,mail_ready=ready,mail_notice='' if ready else _text_source('server_brake_sheet_mail.text_f85be3c70c98'),filename=filename,document_path=document.relative_path,pdf_url=root+'/pdf',image_url=root+'/image',**mail)
     @router.get('/api/v1/tf/brake-sheet-mail/{id}/image')
     def image(id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
         return Response(owned(db,user,id).image_content,media_type='image/png',headers={'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
@@ -98,13 +99,13 @@ def create_router(require_account):
     def send(id:UUID,data:MailInput,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
         if row.status=='sent':return dict(sent=True,warning=row.warning,already_sent=True)
-        if row.status!='ready':raise HTTPException(409,'Versand wurde bereits gestartet. Vor erneutem Senden den Postausgang prüfen.')
+        if row.status!='ready':raise HTTPException(409,_text_source('server_brake_sheet_mail.text_bd6f5600c02a'))
         account,sender,ready=mailbox(db,user)
-        if not ready or sender!=row.sender:raise HTTPException(409,'Administratorpostfach ist noch nicht versandbereit. Die PDF wurde gespeichert.')
+        if not ready or sender!=row.sender:raise HTTPException(409,_text_source('server_brake_sheet_mail.text_f85be3c70c98'))
         if BCC not in [str(a) for a in data.bcc]:data.bcc.append(BCC)
         if account:account._settings=db.get(MailboxSettings,account.tf_user_id);account._db=db
         msg=message(row,data)
-        if len(msg.as_bytes())>service.MAX_MESSAGE:raise HTTPException(413,'Nachricht inklusive Anhängen darf höchstens 10 MiB groß sein.')
+        if len(msg.as_bytes())>service.MAX_MESSAGE:raise HTTPException(413,_text_source('server_brake_sheet_mail.text_05150731716a'))
         row.mail_json=data.model_dump_json();row.status='sending';db.commit()
         try:
             if account:result=service.send_prepared(account,msg,data)
@@ -115,7 +116,7 @@ def create_router(require_account):
         except HTTPException:
             row.status='unknown';db.commit();raise
         except Exception as exc:
-            row.status='unknown';db.commit();raise HTTPException(502,'E-Mail-Versand fehlgeschlagen. Postausgang vor erneutem Senden prüfen.') from exc
+            row.status='unknown';db.commit();raise HTTPException(502,_text_source('server_brake_sheet_mail.text_33b9b0349ead')) from exc
         row.status='sent';row.sent_at=now_utc();row.warning=result.get('warning','');db.commit()
         return result
     return router

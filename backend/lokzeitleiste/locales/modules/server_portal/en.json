@@ -1,0 +1,16 @@
+{
+  "text_0b2cedf9699a": "Model has changed. Please reload.",
+  "text_1ef574f58e7c": "The period must run forward and span no more than five years.",
+  "text_1f729bdb88a7": "Schedule changed. Reload the preview.",
+  "text_20a5783654bf": "Name required; a cycle must not exceed 366 days.",
+  "text_286d62fe23cf": "Shift model: ",
+  "text_52e37a639da5": "Unplanned",
+  "text_544cd24912ce": "Shift model changed. Please reload.",
+  "text_5acaadc6e827": "Plan changed in the meantime",
+  "text_5c3186377b14": "Shift model not found",
+  "text_720039485f67": "Shift model or train driver not found",
+  "text_96e398425db2": "Years must be between 2000 and 2100.",
+  "text_bce51f8460ec": "Model name already exists",
+  "text_e79aa42d7d18": "Rest day",
+  "text_eb8f579b6931": "Workday"
+}

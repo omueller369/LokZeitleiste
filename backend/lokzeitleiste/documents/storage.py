@@ -1,3 +1,4 @@
+from ..localization import source as _text_source
 import hashlib
 import os
 import re
@@ -26,38 +27,38 @@ def prepare_tree(user):
     if user.role == 'tf':
         folders = ['Arbeitsberichte/'+today().strftime('%Y/%m/%d'),
                    'Monatsabrechnung/'+today().strftime('%Y/%m'),
-                   'Zugfahrten', 'Fahrpläne/Trassen', 'Fahrpläne/FPLO', 'Fahrpläne/Sonstiges']
+                   _text_source('server_documents_storage.text_2db812cfb16e'), _text_source('server_documents_storage.text_c1ad83fc845b'), _text_source('server_documents_storage.text_c367019569a3'), _text_source('server_documents_storage.text_3a748a264d34')]
     else:
-        folders = ['Protokolle', 'Sonstiges']
-    for folder in ['Dokumente']+['Dokumente/'+p for p in folders]:
+        folders = [_text_source('server_documents_storage.text_b4026e97bc84'), _text_source('server_documents_storage.text_9f3d5f8d94cf')]
+    for folder in [_text_source('server_documents_storage.text_36f250abd259')]+['Dokumente/'+p for p in folders]:
         current = root
         for part in PurePosixPath(folder).parts:
             current = current/part
             if current.is_symlink():
-                raise HTTPException(409, 'Ungültiger Dokumentpfad.')
+                raise HTTPException(409, _text_source('server_documents_storage.text_b308beaf81c8'))
             current.mkdir(mode=0o770, exist_ok=True)
     return root
 
 
 def safe_path(user, relative, directory=False):
     if not isinstance(relative,str) or '\\' in relative or '\x00' in relative:
-        raise HTTPException(422,'Ungültiger Dokumentpfad.')
+        raise HTTPException(422,_text_source('server_documents_storage.text_b308beaf81c8'))
     parts=PurePosixPath(relative).parts
-    if PurePosixPath(relative).as_posix()!=relative or not parts or parts[0]!='Dokumente' or any(p in ('.','..') for p in relative.split('/')) or relative.startswith('/'):
-        raise HTTPException(422,'Ungültiger Dokumentpfad.')
+    if PurePosixPath(relative).as_posix()!=relative or not parts or parts[0]!=_text_source('server_documents_storage.text_36f250abd259') or any(p in ('.','..') for p in relative.split('/')) or relative.startswith('/'):
+        raise HTTPException(422,_text_source('server_documents_storage.text_b308beaf81c8'))
     root=prepare_tree(user);path=root
     for part in parts:
         path=path/part
-        if path.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+        if path.is_symlink():raise HTTPException(409,_text_source('server_documents_storage.text_b308beaf81c8'))
     if not path.exists() or (directory and not path.is_dir()) or (not directory and not path.is_file()):
-        raise HTTPException(404,'Dokument oder Verzeichnis nicht gefunden.')
-    if not path.resolve().is_relative_to(root.resolve()):raise HTTPException(422,'Ungültiger Dokumentpfad.')
+        raise HTTPException(404,_text_source('server_documents_storage.text_bd780be27f72'))
+    if not path.resolve().is_relative_to(root.resolve()):raise HTTPException(422,_text_source('server_documents_storage.text_b308beaf81c8'))
     return path
 
 
 def clean_name(name):
     if not name or not name.strip() or name.startswith(('.upload-','.delete-')) or name in ('.','..') or '/' in name or '\\' in name or any(ord(c)<32 or ord(c)==127 for c in name) or len(name.encode('utf-8'))>200:
-        raise HTTPException(422,'Ungültiger Dateiname.')
+        raise HTTPException(422,_text_source('server_documents_storage.text_11f2410fea6e'))
     return name
 
 
@@ -85,10 +86,10 @@ def _commit_relocations(db):
     for old,new,digest,root in db.info.pop('document_relocations',[]):
         try:
             if new.is_file() and not new.is_symlink() and not old.is_symlink() and old.is_file() and hashlib.sha256(old.read_bytes()).hexdigest()==digest:
-                old.unlink();_remove_empty_parents(old,root/'Dokumente')
+                old.unlink();_remove_empty_parents(old,root/_text_source('server_documents_storage.text_36f250abd259'))
         except OSError:
             import logging
-            logging.getLogger(__name__).exception('Altes Archiv konnte nach Migration nicht entfernt werden: %s',old)
+            logging.getLogger(__name__).exception(_text_source('server_documents_storage.text_e0a9db971b26'),old)
 
 
 @event.listens_for(Session,'after_rollback')
@@ -96,7 +97,7 @@ def _rollback_relocations(db):
     hashes=db.info.pop('document_relocation_hashes',{})
     for old,new,digest,root in db.info.pop('document_relocations',[]):
         if not new.is_symlink() and new.is_file() and hashlib.sha256(new.read_bytes()).hexdigest()==hashes.get(new,digest):
-            new.unlink();_remove_empty_parents(new,root/'Dokumente')
+            new.unlink();_remove_empty_parents(new,root/_text_source('server_documents_storage.text_36f250abd259'))
 
 
 def relocate(db,user,row,relative):
@@ -111,14 +112,14 @@ def relocate(db,user,row,relative):
         if error.status_code!=404:raise
         return row
     parts=PurePosixPath(relative).parts
-    if not parts or parts[0]!='Dokumente' or any(p in ('.','..') for p in parts):raise ValueError('Invalid archive path')
+    if not parts or parts[0]!=_text_source('server_documents_storage.text_36f250abd259') or any(p in ('.','..') for p in parts):raise ValueError(_text_source('server_documents_storage.text_955e73698b54'))
     current=root
     for part in parts[:-1]:
         current=current/part
-        if current.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+        if current.is_symlink():raise HTTPException(409,_text_source('server_documents_storage.text_b308beaf81c8'))
         current.mkdir(mode=0o770,exist_ok=True)
     target=root/relative
-    if target.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+    if target.is_symlink():raise HTTPException(409,_text_source('server_documents_storage.text_b308beaf81c8'))
     if target.exists() or db.scalar(select(DocumentFile.id).where(DocumentFile.owner_id==user.id,DocumentFile.relative_path==relative)):
         from uuid import uuid4
         target=target.with_name(target.stem+'-system-'+uuid4().hex[:12]+target.suffix)
@@ -137,14 +138,14 @@ def generated(db,user,relative,content,source):
         # A missing original is recreated directly in the requested directory.
         if (root/existing.relative_path).is_file():relative=existing.relative_path
     parts=PurePosixPath(relative).parts
-    if not parts or parts[0]!='Dokumente' or any(p in ('.','..') for p in parts):raise ValueError('Invalid archive path')
+    if not parts or parts[0]!=_text_source('server_documents_storage.text_36f250abd259') or any(p in ('.','..') for p in parts):raise ValueError(_text_source('server_documents_storage.text_955e73698b54'))
     current=root
     for part in parts[:-1]:
         current=current/part
-        if current.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+        if current.is_symlink():raise HTTPException(409,_text_source('server_documents_storage.text_b308beaf81c8'))
         current.mkdir(mode=0o770,exist_ok=True)
     path=root/relative
-    if path.is_symlink():raise HTTPException(409,'Ungültiger Dokumentpfad.')
+    if path.is_symlink():raise HTTPException(409,_text_source('server_documents_storage.text_b308beaf81c8'))
     if path.exists() and (not existing or existing.relative_path!=relative):
         from uuid import uuid4
         path=path.with_name(path.stem+'-system-'+uuid4().hex[:12]+path.suffix)
@@ -165,7 +166,7 @@ def tree(db,user,query=''):
     records={r.relative_path:r for r in db.scalars(select(DocumentFile).where(DocumentFile.owner_id==user.id))}
     from ..i18n import translate
     folders=[];files=[];q=query.casefold().strip()
-    for base,dirs,names in os.walk(root/'Dokumente',followlinks=False):
+    for base,dirs,names in os.walk(root/_text_source('server_documents_storage.text_36f250abd259'),followlinks=False):
         dirs[:]=sorted(d for d in dirs if not (Path(base)/d).is_symlink())
         relative=Path(base).relative_to(root).as_posix();folders.append(relative)
         for name in sorted(names):

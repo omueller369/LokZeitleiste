@@ -1,0 +1,16 @@
+{
+  "text_410e588051de": "This draft was deleted. Start a new work report.",
+  "text_6191a3c29a1a": "The draft was created on another device at the same time. Please refresh.",
+  "text_62076c210cc8": "The receipt ID is already assigned to different data.",
+  "text_6fa02de23390": "Work reports that have already been synchronised cannot be deleted here.",
+  "text_8c2bc6f77ea1": "The draft was changed on another device. Please load the server version.",
+  "text_a14edc14d076": "The work report contains too much train journey data.",
+  "text_ad0998f02720": "Draft ID does not match.",
+  "text_ad6be7cf2d64": "The receipt no longer belongs to the current draft.",
+  "text_be5ff4f617dc": "Work report already synchronised.",
+  "text_befd7075983c": "Receipt not found.",
+  "text_c94593c0b650": "Not all draft receipts have been backed up. Please back up again.",
+  "text_f2392b45d69d": "This work report has already been finalized. Please refresh the monthly list.",
+  "text_f7ed8ff759bc": "This draft was deleted.",
+  "text_f9b3aa236a1c": "Draft not found."
+}

@@ -1,4 +1,5 @@
 """Private national freight brake sheets; no mail dispatch endpoints."""
+from .localization import source as _text_source
 import json,re
 from datetime import date
 from decimal import Decimal,ROUND_CEILING
@@ -22,13 +23,13 @@ class Train(BaseModel):
     @field_validator('number')
     @classmethod
     def number_format(cls,v):
-        if v and not re.fullmatch('[0-9]{5}',v):raise ValueError('Zugnummer benötigt genau fünf Ziffern.')
+        if v and not re.fullmatch('[0-9]{5}',v):raise ValueError(_text_source('server_national_brake_sheets.text_bc17d5acbd39'))
         return v
     @field_validator('station')
     @classmethod
     def station_format(cls,v):
         v=v.strip().upper()
-        if v and not re.fullmatch('[A-Z0-9][A-Z0-9 -]{0,15}',v):raise ValueError('Betriebsstelle nur als DS100-Kürzel eingeben.')
+        if v and not re.fullmatch('[A-Z0-9][A-Z0-9 -]{0,15}',v):raise ValueError(_text_source('server_national_brake_sheets.text_c3ec75fff44b'))
         return v
 class Vehicle(BaseModel):
     vehicle_id:int=Field(gt=0)
@@ -64,12 +65,12 @@ class Sheet(BaseModel):
     @field_validator('last_vehicle')
     @classmethod
     def last_number(cls,v):
-        if v and not re.fullmatch('[0-9]{12}',v):raise ValueError('Letztes Fahrzeug benötigt zwölf Ziffern.')
+        if v and not re.fullmatch('[0-9]{12}',v):raise ValueError(_text_source('server_national_brake_sheets.text_01c286f1e77f'))
         return v
     @model_validator(mode='after')
     def unique(self):
         self.brakes_multi=self.brakes_k
-        if len({v.vehicle_id for v in self.locos})!=len(self.locos):raise ValueError('Tfz wurde doppelt ausgewählt.')
+        if len({v.vehicle_id for v in self.locos})!=len(self.locos):raise ValueError(_text_source('server_national_brake_sheets.text_dac96ac2fa14'))
         if not self.extra:self.extra_text=''
         return self
 class Save(BaseModel):
@@ -88,19 +89,19 @@ def calculate(db,sheet):
     available=int(totals['brake']*100/totals['weight']) if totals['brake'] is not None and totals['weight'] is not None and totals['weight']>0 else None
     delta=available-sheet.required_percent if available is not None and sheet.required_percent is not None else None
     missing=[]
-    if not lines:missing.append('Triebfahrzeug')
+    if not lines:missing.append(_text_source('server_national_brake_sheets.text_9de2ca1927a7'))
     for i,line in enumerate(lines):
-        for k,label in [('weight_kg','Gewicht'),('brake_weight','Bremsgewicht'),('axle_count','Radsätze'),('length_m','Länge')]:
-            if line[k] is None:missing.append(f'Tfz {i+1}: {label} in Stammdaten ergänzen')
-    if sheet.departure_date is None:missing.append('Datum')
-    if not sheet.trains[0].number:missing.append('Erste Zugnummer')
+        for k,label in [('weight_kg',_text_source('server_national_brake_sheets.text_d9cf8b745e5c')),('brake_weight',_text_source('server_national_brake_sheets.text_7417d0f1038a')),('axle_count',_text_source('server_national_brake_sheets.text_66290a3e0fe0')),('length_m',_text_source('server_national_brake_sheets.text_071f8e682b67'))]:
+            if line[k] is None:missing.append(f"{_text_source('server_national_brake_sheets.text_4c3c7e125e1d')}{i + 1}: {label}{_text_source('server_national_brake_sheets.text_b0c6f1f5f1fc')}")
+    if sheet.departure_date is None:missing.append(_text_source('server_national_brake_sheets.text_9135882d323c'))
+    if not sheet.trains[0].number:missing.append(_text_source('server_national_brake_sheets.text_2412adb522c1'))
     for i,t in enumerate(sheet.trains):
-        if t.number and not t.station:missing.append(f'DS100 zur Zugnummer {i+1}')
-        if t.station and not t.number:missing.append(f'Zugnummer {i+1}')
-    for key,label in [('wagon_weight','Wagenzuggewicht'),('wagon_brake','Wagenzug-Bremsgewicht'),('wagon_axles','Wagenzug-Achszahl'),('required_percent','Mindestbremshundertstel'),('wagon_length','Wagenzuglänge'),('braked_axles','Gebremste Achsen')]:
+        if t.number and not t.station:missing.append(f"{_text_source('server_national_brake_sheets.text_1a3158ef9312')}{i + 1}")
+        if t.station and not t.number:missing.append(f"{_text_source('server_national_brake_sheets.text_5a363204dcec')}{i + 1}")
+    for key,label in [('wagon_weight',_text_source('server_national_brake_sheets.text_25b56c13f621')),('wagon_brake','Wagenzug-Bremsgewicht'),('wagon_axles','Wagenzug-Achszahl'),('required_percent',_text_source('server_national_brake_sheets.text_9d41b1c4a1cb')),('wagon_length',_text_source('server_national_brake_sheets.text_7c524eadb795')),('braked_axles',_text_source('server_national_brake_sheets.text_e7a58baaa22c'))]:
         if getattr(sheet,key) is None:missing.append(label)
     for i,speed in enumerate(sheet.speeds):
-        if speed.lower and speed.value is None:missing.append(f'Geschwindigkeit in Spalte {i+4}')
+        if speed.lower and speed.value is None:missing.append(f"{_text_source('server_national_brake_sheets.text_4cb2bbae159a')}{i + 4}")
     return dict(loco=loco,wagon=wagon,total=totals,available=available,missing=delta if delta is not None and delta<0 else '/' if delta is not None else None,required_axles=sheet.wagon_axles*9//10 if sheet.wagon_axles is not None else None,preview_missing=missing)
 
 def create_router(require_account):
@@ -111,7 +112,7 @@ def create_router(require_account):
     def style():return FileResponse(static/'national-brake-sheet.css',media_type='text/css',headers={'Cache-Control':'no-cache'})
     def owned(db,user,id):
         row=db.scalar(select(NationalBrakeSheetDraft).where(NationalBrakeSheetDraft.id==str(id),NationalBrakeSheetDraft.owner_id==user.id).with_for_update())
-        if not row:raise HTTPException(404,'Deutscher Bremszettel nicht gefunden.')
+        if not row:raise HTTPException(404,_text_source('server_national_brake_sheets.text_4142936667a5'))
         return row
     def view(row):return dict(id=row.id,revision=row.revision,sheet=json.loads(row.payload_json),calculation=json.loads(row.calculation_json),created_by_name=row.created_by_name,created_at=row.created_at.isoformat()+'Z')
     @router.get(base)
@@ -124,21 +125,21 @@ def create_router(require_account):
     @router.put(base+'/{id}')
     def save(id:UUID,data:Save,user=Depends(driver),db:Session=Depends(database_session)):
         db.scalar(select(User).where(User.id==user.id).with_for_update());row=db.get(NationalBrakeSheetDraft,str(id))
-        if row and row.owner_id!=user.id:raise HTTPException(404,'Bremszettel nicht gefunden.')
-        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,'Entwurf wurde auf einem anderen Gerät geändert. Bitte neu laden.')
+        if row and row.owner_id!=user.id:raise HTTPException(404,_text_source('server_national_brake_sheets.text_c5d2307ed28b'))
+        if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_national_brake_sheets.text_60a93a0010ef'))
         result=calculate(db,data.sheet)
         if not row:
             profile=db.get(TfProfile,user.id)
-            if not profile:raise HTTPException(404,'TF nicht gefunden.')
+            if not profile:raise HTTPException(404,_text_source('server_national_brake_sheets.text_2c8562d53cb0'))
             row=NationalBrakeSheetDraft(id=str(id),owner_id=user.id,revision=0,created_at=now_utc(),created_by_name=(profile.first_name+' '+profile.last_name).strip());db.add(row)
         row.payload_json=data.sheet.model_dump_json();row.calculation_json=json.dumps(jsonable_encoder(result));row.revision+=1;row.updated_at=now_utc();db.commit();return view(row)
     def ready(db,user,id,data):
         row=owned(db,user,id)
-        if row.revision!=data.expected_revision:raise HTTPException(409,'Entwurf wurde geändert. Bitte neu laden.')
+        if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_national_brake_sheets.text_1de187c6857f'))
         try:sheet=Sheet.model_validate_json(row.payload_json)
-        except ValidationError as exc:raise HTTPException(422,'Bitte den Entwurf laden und die Zugparameter als ganze Zahlen von 0 bis 5000 korrigieren.') from exc
+        except ValidationError as exc:raise HTTPException(422,_text_source('server_national_brake_sheets.text_1da3b1193398')) from exc
         result=calculate(db,sheet)
-        if result['preview_missing']:raise HTTPException(422,'Bitte ergänzen: '+', '.join(result['preview_missing']))
+        if result['preview_missing']:raise HTTPException(422,_text_source('server_national_brake_sheets.text_f8e40c705a29')+', '.join(result['preview_missing']))
         return row,sheet,result
     @router.post(base+'/{id}/preview')
     def preview(id:UUID,data:Revision,user=Depends(driver),db:Session=Depends(database_session)):

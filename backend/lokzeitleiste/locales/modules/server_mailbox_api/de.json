@@ -1,0 +1,23 @@
+{
+  "text_17fd9a9d1055": "Lesestatus konnte nicht geändert werden",
+  "text_218197693424": "From",
+  "text_3a0ab9df12bd": "Microsoft-Anmeldung fehlgeschlagen. Erneut starten.",
+  "text_43fab6f1ffae": "(FLAGS BODY.PEEK[HEADER.FIELDS (FROM TO SUBJECT DATE)])",
+  "text_5933f12cbf78": "Ungültige Eingabe",
+  "text_68971283841a": "Subject",
+  "text_74aa2a5012a4": "Ungültige Nachrichtenkennung",
+  "text_84ff5eab31e4": "Microsoft-Anmeldung abgelaufen. Erneut starten.",
+  "text_86b7e0ec6c9f": "Ungültige Kopfzeile",
+  "text_893040444042": "Anhang nicht gefunden",
+  "text_918edb31339c": "Ungültiger Anhang",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Anhang",
+  "text_9ebb264e23eb": "Nachrichtensuche fehlgeschlagen",
+  "text_a1b88d76df99": "Microsoft-Anmeldung fehlgeschlagen.",
+  "text_a8c327fb1b2a": "Tf nicht gefunden",
+  "text_affb643a20dc": "Für diesen Tf ist noch kein Postfach eingerichtet.",
+  "text_d07f53ff8475": "Bei geändertem Konto oder Server das Postfachpasswort erneut eingeben.",
+  "text_d27cb8248aa8": "Zuerst Microsoft als Anbieter speichern.",
+  "text_ef3778671a95": "Ordnerliste konnte nicht gelesen werden",
+  "text_f3a0c5d5531a": "Ungültiger Dateiname"
+}

@@ -1,0 +1,14 @@
+{
+  "text_11f2410fea6e": "Invalid file name.",
+  "text_2db812cfb16e": "Train journeys",
+  "text_36f250abd259": "Documents",
+  "text_3a748a264d34": "Timetables/Other",
+  "text_955e73698b54": "Invalid archive path",
+  "text_9f3d5f8d94cf": "Other",
+  "text_b308beaf81c8": "Invalid document path.",
+  "text_b4026e97bc84": "Records",
+  "text_bd780be27f72": "Document or folder not found.",
+  "text_c1ad83fc845b": "Timetables/Train paths",
+  "text_c367019569a3": "Timetables/FPLO",
+  "text_e0a9db971b26": "The old archive could not be removed after migration: %s"
+}

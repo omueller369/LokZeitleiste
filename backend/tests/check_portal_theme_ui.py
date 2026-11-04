@@ -1,5 +1,7 @@
 """Real Chrome contrast, layout, module surfaces, modal and print palette checks."""
-import argparse,html,json,re,shutil,subprocess,tempfile
+import argparse
+from localized_fixtures import localize_html
+import html,json,re,shutil,subprocess,tempfile
 from pathlib import Path
 from pypdf import PdfReader
 from pypdf.generic import ContentStream
@@ -37,14 +39,14 @@ CHECKS=r'''
 })()
 '''
 def fixture(name,source,section):
-    page=(STATIC/source).read_text()
+    page=localize_html((STATIC/source).read_text())
     page=re.sub(r'<script\b[^>]*>.*?</script>','',page,flags=re.S)
     page=re.sub(r'<link\b[^>]*>','',page)
     css='\n'.join((STATIC/f).read_text() for f in ['portal-theme.css','portal.css','tf-portal.css','tf-shell.css','work-report.css','documents.css','tf-help.css','brake-sheet.css','national-brake-sheet.css','tf-signature.css','backend-nav.css','responsive.css'])
     page=page.replace('</head>','<style>'+css+'</style></head>')
     if section:page=page.replace('id="'+section+'" hidden','id="'+section+'"')
     if section=='workReport':page=page.replace('id="reportDetails" hidden','id="reportDetails"')
-    scripts='\n'.join((STATIC/f).read_text() for f in ['tf-help-content.js','tf-help.js','portal-theme.js'])
+    scripts=(STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC/f).read_text() for f in ['tf-help-content.js','tf-help.js','portal-theme.js'])
     tests="document.addEventListener('DOMContentLoaded',()=>{try{"+CHECKS+"}catch(error){document.documentElement.dataset.themeStatus='fail';document.documentElement.dataset.themeMessage=error.stack;window.parent.postMessage({themeStatus:'fail',message:error.stack},'*');}},{once:true});"
     return page.replace('</body>','<section class="card"><label>Prüfeingabe<input id="themeProbe"></label><img id="originalImage" alt="Beispielbild"><dialog>Testdialog</dialog></section><script>'+scripts+tests+'</script></body>')
 def main():

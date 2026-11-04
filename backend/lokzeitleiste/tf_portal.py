@@ -1,4 +1,5 @@
 """TF landing pages and read-only access to the driver's own personnel plan."""
+from .localization import source as _text_source, resolve_placeholders
 from pathlib import Path as FilePath
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Path, Request
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse, Response
@@ -14,8 +15,8 @@ STATIC=FilePath(__file__).parent/'static'
 
 def driver_dependency(require_account):
     def require_driver(user:User=Depends(require_account),db:Session=Depends(database_session)):
-        if user.role!='tf':raise HTTPException(403,'TF Portal ist nur für Triebfahrzeugführer verfügbar.')
-        if password_required(db,user):raise HTTPException(403,'Bitte zuerst Ihr Initialpasswort ändern.')
+        if user.role!='tf':raise HTTPException(403,_text_source('server_tf_portal.text_6f108eb23fef'))
+        if password_required(db,user):raise HTTPException(403,_text_source('server_tf_portal.text_7f6db20b42a7'))
         return user
     return require_driver
 
@@ -56,7 +57,7 @@ def create_router(require_account):
         user=user_from_token(db,tf_session or admin_session)
         if not user or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
         if user.role!='tf':return RedirectResponse('/account?area=tf',status_code=303)
-        html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
+        html=resolve_placeholders((STATIC/'loco-handover.html').read_text()).replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
         return HTMLResponse(html,headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/return.js')
@@ -71,7 +72,7 @@ def create_router(require_account):
     @router.get('/api/v1/tf/portal')
     def identity(user:User=Depends(require_driver),db:Session=Depends(database_session)):
         profile=db.get(TfProfile,user.id)
-        if not profile:raise HTTPException(404,'Tf nicht gefunden')
+        if not profile:raise HTTPException(404,_text_source('server_tf_portal.text_a8c327fb1b2a'))
         return {'id':user.id,'username':user.username,'first_name':profile.first_name,'last_name':profile.last_name}
 
     @router.get('/tf/me')
@@ -109,7 +110,7 @@ def create_router(require_account):
         from datetime import datetime
         from zoneinfo import ZoneInfo
         profile=db.get(TfProfile,user.id)
-        if not profile:raise HTTPException(404,'Tf nicht gefunden')
+        if not profile:raise HTTPException(404,_text_source('server_tf_portal.text_a8c327fb1b2a'))
         stamp=db.get(AccountLoginStamp,user.id)
         last_login=stamp.last_login_at if stamp else db.scalar(select(func.max(SessionToken.expires_at)).where(SessionToken.user_id==user.id))
         if last_login and not stamp:last_login-=TOKEN_LIFETIME
@@ -121,7 +122,7 @@ def create_router(require_account):
         from .accounts.tf_profiles import details_dict
         from .planning.duties import driver_type
         profile=db.get(TfProfile,user.id)
-        if not profile:raise HTTPException(404,'Tf nicht gefunden')
+        if not profile:raise HTTPException(404,_text_source('server_tf_portal.text_a8c327fb1b2a'))
         valid=db.get(TfBahnCardValidity,user.id)
         values={column.name:getattr(profile,column.name) for column in TfProfile.__table__.columns if column.name!='user_id'}
         values.update(details_dict(db,user),driver_type=driver_type(db,user.id),active=user.active,role=user.role,bahncard_valid_until=valid.valid_until if valid else None)
@@ -131,18 +132,18 @@ def create_router(require_account):
     def personal_photo(user:User=Depends(require_driver),db:Session=Depends(database_session)):
         from .models import ProfilePhoto
         photo=db.get(ProfilePhoto,user.id)
-        if not photo:raise HTTPException(404,'Kein Foto vorhanden')
+        if not photo:raise HTTPException(404,_text_source('server_tf_portal.text_689fa5701f2b'))
         return Response(photo.image_data,media_type='image/jpeg')
 
     @router.get('/api/v1/tf/portal/plan/{year}/{month}')
     def plan(year:int=Path(ge=2000,le=2100),month:int=Path(ge=1,le=12),
              user:User=Depends(require_driver),db:Session=Depends(database_session)):
-        if not db.get(TfProfile,user.id):raise HTTPException(404,'Tf nicht gefunden')
+        if not db.get(TfProfile,user.id):raise HTTPException(404,_text_source('server_tf_portal.text_a8c327fb1b2a'))
         return get_month(db,user.id,year,month)
 
     @router.get('/api/v1/tf/portal/plan/{year}')
     def annual_plan(year:int=Path(ge=2000,le=2100),user:User=Depends(require_driver),db:Session=Depends(database_session)):
-        if not db.get(TfProfile,user.id):raise HTTPException(404,'Tf nicht gefunden')
+        if not db.get(TfProfile,user.id):raise HTTPException(404,_text_source('server_tf_portal.text_a8c327fb1b2a'))
         return get_year(db,user.id,year)
 
     return router

@@ -1,0 +1,17 @@
+{
+  "text_11f2410fea6e": "Invalid file name.",
+  "text_14ae4d309870": "Check the subject and message.",
+  "text_181d7c8b6aa2": "Select at least one recipient.",
+  "text_2456bb8ed72f": "Employee management",
+  "text_3587543eb803": "Office staff",
+  "text_35b72faaf4be": "Please check recipients, subject and message (maximum 1000 characters).",
+  "text_4b42c6690ebe": "Administration",
+  "text_6d0ff17167bf": "Message not found.",
+  "text_753d6cdca15d": "A selected recipient is no longer available. Refresh the recipient list.",
+  "text_9e313cd30ea1": "Attachment",
+  "text_a8c327fb1b2a": "Train driver not found",
+  "text_aab4a4512402": "Not authorised.",
+  "text_ad0dcaacfb85": "Subject and message must not be empty.",
+  "text_bfaa2d8ffe47": "Attachment not found.",
+  "text_fc4a9071ea60": "The attachment must not exceed 10 MB."
+}

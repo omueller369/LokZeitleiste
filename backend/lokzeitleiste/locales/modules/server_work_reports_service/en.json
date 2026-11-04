@@ -1,0 +1,13 @@
+{
+  "text_1388d0bde458": "This entry already exists.",
+  "text_1e394950eace": "Working time was changed administratively. Train journeys can no longer be edited.",
+  "text_24dc80734f0d": "Train journeys have changed. Please reload.",
+  "text_35d3a889824d": "Annual leave",
+  "text_a0884052446c": "Working time or an absence is already recorded for this day.",
+  "text_a14edc14d076": "The work report contains too much train journey data.",
+  "text_a64af31596fd": "Work report has been saved meanwhile. Please reload.",
+  "text_b2e103a3cabe": "Unknown DS100 code: ",
+  "text_be1600b499c6": "Sick leave",
+  "text_cb1a440244f4": "This work report was already synchronized with different data.",
+  "text_f31b8681bfca": "Other time entry"
+}

@@ -1,4 +1,5 @@
 """Persistent, revision-checked selection ordering; no changes to stable value IDs."""
+from .localization import source as _text_source
 import json,re
 from fastapi import APIRouter,Depends,HTTPException
 from fastapi.responses import FileResponse
@@ -31,14 +32,14 @@ def scope_rows(db,scope):
         query=select(LocoHandoverDefault).where(LocoHandoverDefault.kind==scope)
     elif re.fullmatch(r'damage:[1-9][0-9]*',scope):
         query=select(LocoHandoverDefault).where(LocoHandoverDefault.kind=='damage',LocoHandoverDefault.parent_id==int(scope.split(':')[1]))
-    else:raise HTTPException(422,'Ungültige Sortierliste.')
+    else:raise HTTPException(422,_text_source('server_default_order.text_ca567f5a5d6e'))
     return list(db.scalars(query.order_by(LocoHandoverDefault.label,LocoHandoverDefault.id)))
 class OrderInput(BaseModel):
     ids:list[int]=Field(min_length=3,max_length=10000)
     expected_revision:int=Field(ge=0)
     @model_validator(mode='after')
     def unique(self):
-        if len(self.ids)!=len(set(self.ids)):raise ValueError('Doppelte Einträge sind nicht zulässig.')
+        if len(self.ids)!=len(set(self.ids)):raise ValueError(_text_source('server_default_order.text_9bd952dea210'))
         return self
 
 def create_router(require_admin):
@@ -53,13 +54,13 @@ def create_router(require_admin):
     def save_order(scope:str,data:OrderInput,db:Session=Depends(database_session)):
         # Serialise concurrent reorders, also when no order record exists yet.
         rows=scope_rows(db,scope)
-        if not rows or set(data.ids)!={r.id for r in rows}:raise HTTPException(409,'Liste wurde geändert. Bitte neu laden.')
+        if not rows or set(data.ids)!={r.id for r in rows}:raise HTTPException(409,_text_source('server_default_order.text_0079f43ebc70'))
         record=db.scalar(select(AppDefaultOrder).where(AppDefaultOrder.scope==scope).with_for_update())
-        if data.expected_revision!=(record.revision if record else 0):raise HTTPException(409,'Sortierung wurde geändert. Bitte neu laden.')
+        if data.expected_revision!=(record.revision if record else 0):raise HTTPException(409,_text_source('server_default_order.text_8323ee312bb9'))
         if record:record.ids_json=json.dumps(data.ids);record.revision+=1
         else:record=AppDefaultOrder(scope=scope,ids_json=json.dumps(data.ids),revision=1);db.add(record)
         try:db.commit()
         except IntegrityError as exc:
-            db.rollback();raise HTTPException(409,'Sortierung wurde geändert. Bitte neu laden.') from exc
+            db.rollback();raise HTTPException(409,_text_source('server_default_order.text_8323ee312bb9')) from exc
         return dict(ids=data.ids,revision=record.revision)
     return router

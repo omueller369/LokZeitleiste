@@ -1,4 +1,5 @@
 """TF-to-TF inbox. No SMTP, usernames or TF numbers in message-facing responses."""
+from .localization import source as _text_source, resolve_placeholders
 import io
 from pathlib import Path,PurePosixPath
 from fastapi import APIRouter,Depends,File,Form,UploadFile,HTTPException,Query
@@ -23,16 +24,16 @@ class MessageIn(Recipients):
     @classmethod
     def nonempty(cls,value):
         value=value.strip()
-        if not value:raise ValueError('Betreff und Nachricht dürfen nicht leer sein.')
+        if not value:raise ValueError(_text_source('server_tf_messages.text_ad0dcaacfb85'))
         return value
 class ReadIn(BaseModel):read:bool
 
 def name(profile):
-    if not profile:raise HTTPException(404,'Tf nicht gefunden')
+    if not profile:raise HTTPException(404,_text_source('server_tf_messages.text_a8c327fb1b2a'))
     return (profile.first_name+' '+profile.last_name).strip()
 def identity(db,user):
     profile=db.get(TfProfile if user.role=='tf' else StaffProfile,user.id)
-    return name(profile) if profile else 'Administration'
+    return name(profile) if profile else _text_source('server_tf_messages.text_4b42c6690ebe')
 def recipients(db):
     rows=[]
     for u in db.scalars(select(User).where(User.role.in_(['tf','staff','admin']),User.active==True)):
@@ -41,13 +42,13 @@ def recipients(db):
 
 def targets(db,data):
     active={u.id for u,p in recipients(db)};selected={u.id for u,p in recipients(db) if u.role=='tf'} if data.all_tf else set(data.recipients)
-    if not selected:raise HTTPException(422,'Bitte mindestens einen Empfänger auswählen.')
-    if not selected<=active:raise HTTPException(422,'Ein ausgewählter Empfänger ist nicht mehr verfügbar. Bitte die Empfängerliste aktualisieren.')
+    if not selected:raise HTTPException(422,_text_source('server_tf_messages.text_181d7c8b6aa2'))
+    if not selected<=active:raise HTTPException(422,_text_source('server_tf_messages.text_753d6cdca15d'))
     return selected
 
 def owned(db,user,message_id):
     delivery=db.scalar(select(Delivery).where(Delivery.message_id==message_id,Delivery.recipient_id==user.id,Delivery.deleted_at.is_(None)).with_for_update())
-    if not delivery:raise HTTPException(404,'Nachricht nicht gefunden.')
+    if not delivery:raise HTTPException(404,_text_source('server_tf_messages.text_6d0ff17167bf'))
     return delivery,db.get(Message,message_id)
 
 def view(db,message,delivery,detail=False):
@@ -59,7 +60,7 @@ def view(db,message,delivery,detail=False):
 
 def sent_owned(db,user,message_id):
     message=db.scalar(select(Message).where(Message.id==message_id,Message.sender_id==user.id))
-    if not message:raise HTTPException(404,'Nachricht nicht gefunden.')
+    if not message:raise HTTPException(404,_text_source('server_tf_messages.text_6d0ff17167bf'))
     return message
 
 def sent_view(db,message,detail=False):
@@ -73,19 +74,19 @@ def sent_view(db,message,detail=False):
 def create_router(require_account):
     router=APIRouter()
     def driver(user=Depends(require_account),db:Session=Depends(database_session)):
-        if user.role not in ('tf','staff','admin'):raise HTTPException(403,'Keine Freigabe.')
+        if user.role not in ('tf','staff','admin'):raise HTTPException(403,_text_source('server_tf_messages.text_aab4a4512402'))
         ready(db,user)
         return user
     @router.get('/admin/messages')
     def backend_page():
-        content=(Path(__file__).parent/'static'/'tf-messages.html').read_text()
-        content=content.replace('TF-Portal','Verwaltung').replace('<header><h1>Verwaltung</h1></header>','<header><a href="/admin/start">Verwaltung</a></header>').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
+        content=resolve_placeholders((Path(__file__).parent/'static'/'tf-messages.html').read_text())
+        content=content.replace('TF-Portal',_text_source('server_tf_messages.text_2456bb8ed72f')).replace('<header><h1>Verwaltung</h1></header>','<header><a href="/admin/start">Verwaltung</a></header>').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
         from fastapi.responses import HTMLResponse
         return HTMLResponse(content,headers={'Cache-Control':'no-store'})
     @router.get('/tf/messages.js')
     def script():return FileResponse(Path(__file__).parent/'static'/'tf-messages.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
     @router.get('/api/v1/tf/messages/recipients')
-    def choices(user=Depends(driver),db:Session=Depends(database_session)):return [dict(id=u.id,name=p,group='TF' if u.role=='tf' else 'Sachbearbeiter') for u,p in recipients(db)]
+    def choices(user=Depends(driver),db:Session=Depends(database_session)):return [dict(id=u.id,name=p,group='TF' if u.role=='tf' else _text_source('server_tf_messages.text_3587543eb803')) for u,p in recipients(db)]
     @router.get('/api/v1/tf/messages/unread')
     def unread(user=Depends(driver),db:Session=Depends(database_session)):
         return dict(count=db.scalar(select(func.count()).select_from(Delivery).join(Message,Message.id==Delivery.message_id).where(Delivery.recipient_id==user.id,Message.sender_id!=user.id,Delivery.read_at.is_(None),Delivery.deleted_at.is_(None))))
@@ -107,20 +108,20 @@ def create_router(require_account):
     @router.get('/api/v1/tf/messages/sent/{message_id}/attachment')
     def sent_attachment(message_id:int,user=Depends(driver),db:Session=Depends(database_session)):
         message=sent_owned(db,user,message_id);file=db.get(Attachment,message.attachment_id) if message.attachment_id else None
-        if not file:raise HTTPException(404,'Dateianhang nicht gefunden.')
+        if not file:raise HTTPException(404,_text_source('server_tf_messages.text_bfaa2d8ffe47'))
         from urllib.parse import quote
         return Response(file.content,media_type=file.mime_type,headers={'Content-Disposition':"attachment; filename*=UTF-8''"+quote(file.filename),'X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"})
     @router.post('/api/v1/tf/messages',status_code=201)
     async def send(payload:str=Form(max_length=50000),file:UploadFile|None=File(default=None),user=Depends(driver),db:Session=Depends(database_session)):
         try:data=MessageIn.model_validate_json(payload)
-        except ValidationError as exc:raise HTTPException(422,'Bitte Empfänger, Betreff und Nachricht (maximal 1000 Zeichen) prüfen.') from exc
+        except ValidationError as exc:raise HTTPException(422,_text_source('server_tf_messages.text_35b72faaf4be')) from exc
         selected=targets(db,data);attachment=None
         if file:
             try:content=await file.read(MAX_FILE+1)
             finally:await file.close()
-            if not content or len(content)>MAX_FILE:raise HTTPException(413,'Dateianhang darf höchstens 10 MB groß sein.')
-            filename=PurePosixPath((file.filename or 'Anhang').replace('\\','/')).name
-            if not filename or len(filename)>200 or any(ord(c)<32 or ord(c)==127 for c in filename):raise HTTPException(422,'Ungültiger Dateiname.')
+            if not content or len(content)>MAX_FILE:raise HTTPException(413,_text_source('server_tf_messages.text_fc4a9071ea60'))
+            filename=PurePosixPath((file.filename or _text_source('server_tf_messages.text_9e313cd30ea1')).replace('\\','/')).name
+            if not filename or len(filename)>200 or any(ord(c)<32 or ord(c)==127 for c in filename):raise HTTPException(422,_text_source('server_tf_messages.text_11f2410fea6e'))
             mime='application/octet-stream'
             try:
                 with Image.open(io.BytesIO(content)) as image:
@@ -137,7 +138,7 @@ def create_router(require_account):
     async def reply(message_id:int,payload:str=Form(max_length=50000),file:UploadFile|None=File(default=None),user=Depends(driver),db:Session=Depends(database_session)):
         delivery,original=owned(db,user,message_id)
         try:data=MessageIn.model_validate_json(payload)
-        except ValidationError as exc:raise HTTPException(422,'Bitte Betreff und Nachricht prüfen.') from exc
+        except ValidationError as exc:raise HTTPException(422,_text_source('server_tf_messages.text_14ae4d309870')) from exc
         data.recipients=[original.sender_id];data.all_tf=False
         return await send(data.model_dump_json(),file,user,db)
     @router.get('/api/v1/tf/messages/{message_id}')
@@ -161,7 +162,7 @@ def create_router(require_account):
     @router.get('/api/v1/tf/messages/{message_id}/attachment')
     def attachment(message_id:int,user=Depends(driver),db:Session=Depends(database_session)):
         delivery,message=owned(db,user,message_id);file=db.get(Attachment,message.attachment_id) if message.attachment_id else None
-        if not file:raise HTTPException(404,'Dateianhang nicht gefunden.')
+        if not file:raise HTTPException(404,_text_source('server_tf_messages.text_bfaa2d8ffe47'))
         from urllib.parse import quote
         return Response(file.content,media_type=file.mime_type,headers={'Content-Disposition':"attachment; filename*=UTF-8''"+quote(file.filename),'X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"})
     return router

@@ -1,4 +1,5 @@
 """Read-only comparison of Tf working hours and Berlin planning targets."""
+from .localization import source as _text_source
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .db import database_session
@@ -14,9 +15,9 @@ def year_overview(db, tf_id, year, month_summary):
         for planned in summary['planning']['days']:
             recorded = actual.get(planned['date'], {})
             work = recorded.get('work_without_guest', 0) + recorded.get('guest', 0)
-            complete = planned['kind'] != 'Ungeplant' or planned['is_holiday']
+            complete = planned['kind'] != _text_source('server_tf_overview.text_52e37a639da5') or planned['is_holiday']
             days.append(dict(planned, work_minutes=work, credited_minutes=recorded.get('credited', 0),
-                             actual_kind=recorded.get('type', 'Keine Erfassung'),
+                             actual_kind=recorded.get('type', _text_source('server_tf_overview.text_a2b79db20e81')),
                              guest_minutes=recorded.get('guest', 0), topup_minutes=recorded.get('topup', 0),
                              vacation_minutes=recorded.get('vacation', 0), sick_minutes=recorded.get('sick', 0),
                              complete=complete, balance_minutes=work-planned['target_minutes'] if complete else None))
@@ -39,10 +40,10 @@ def create_router(require_admin, month_summary):
     @router.get('/api/v1/admin/tf/{tf_id}/hours/{year}')
     def get_hours(tf_id: int, year: int, viewer: User = Depends(require_admin), db: Session = Depends(database_session)):
         if not 2000 <= year <= 2100:
-            raise HTTPException(422, 'Ungültiges Jahr')
+            raise HTTPException(422, _text_source('server_tf_overview.text_82ca6a93b865'))
         user = db.get(User, tf_id)
         if not user or user.role != 'tf':
-            raise HTTPException(404, 'Tf nicht gefunden')
+            raise HTTPException(404, _text_source('server_tf_overview.text_a8c327fb1b2a'))
         return year_overview(db, tf_id, year, month_summary)
 
     return router

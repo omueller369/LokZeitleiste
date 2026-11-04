@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),window={};
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('./localized-vm.cjs'),window={};
 vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/plan-colors.js','utf8'),{window,Date});
 const p=window.PlanColors;
 for(const [date,kind,expected]of [['2026-10-05','Arbeitstag','#f5f5f5'],['2026-10-03','Arbeitstag','#eedc82'],['2026-10-04','Ruhetag','#66cdaa'],['2026-10-05','Ruhetag','#66cdaa'],['2026-10-04','Urlaub','#ff7256']]){const node={style:{},dataset:{}};p.apply(node,{date,kind});assert.equal(node.style.backgroundColor,expected);assert.equal(node.style.backgroundImage,'none');}

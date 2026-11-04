@@ -216,7 +216,7 @@ Die persönliche Liste ist nach DS100 sortiert und nach DS100/Ort durchsuchbar. 
 
 Pro Listeneintrag kann ein Bahnhofsplan als PDF, JPEG oder PNG bis 10 MB hochgeladen, heruntergeladen, ersetzt oder gelöscht werden. Dateien werden auf gültiges Format geprüft und mit privater Downloadantwort ausgeliefert. Die Ablage erfolgt in der Datenbank und wird von der bestehenden Datenbanksicherung erfasst; es gibt keinen öffentlichen Dateipfad. Kontaktdaten und Pläne gehören jeweils nur dem angemeldeten TF. Andere TF oder Verwaltungsbenutzer können diese persönlichen API-Endpunkte nicht lesen oder ändern.
 
-Beim regulären Update/bei der Neuinstallation legt init_db die zusätzlichen Tabellen tf_stations und tf_station_plans an. Bestehende Konten beginnen mit einer leeren Liste. Es werden keine vorhandenen Personen-, Arbeitszeit-, PDF- oder Überstundendaten geändert. Der vorhandene TF-Testdatenreset berücksichtigt die neuen abhängigen Datensätze. Die neue Oberfläche ist in Deutsch, Englisch, Polnisch, Russisch und Spanisch eingebunden.
+Beim regulären Update/bei der Neuinstallation legt init_db die zusätzlichen Tabellen tf_stations und tf_station_plans an. Bestehende Konten beginnen mit einer leeren Liste. Es werden keine vorhandenen Personen-, Arbeitszeit-, PDF- oder Überstundendaten geändert. Der vorhandene TF-Testdatenreset berücksichtigt die neuen abhängigen Datensätze. Die neue Oberfläche ist in Deutsch, Polnisch und Englisch eingebunden.
 
 ### Bahnhöfe direkt an andere TF senden
 

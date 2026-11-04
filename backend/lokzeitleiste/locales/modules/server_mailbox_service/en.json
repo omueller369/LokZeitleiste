@@ -1,0 +1,23 @@
+{
+  "text_0357b8d84286": "Mailbox key does not match. Enter credentials again.",
+  "text_05150731716a": "Message including attachments must not exceed 10 MiB.",
+  "text_0d94fb23ce2e": "Sent, but a copy could not be saved in the Sent folder.",
+  "text_1148fd35f915": "A mailbox encryption key must be configured on the server.",
+  "text_218197693424": "From",
+  "text_4334ed9da2f0": "At least one recipient was rejected. Partial delivery may have occurred; check recipients before resending.",
+  "text_50e64315bb61": "Mailbox connection failed. Check server and credentials.",
+  "text_6381fdab9086": "Message exceeds 10 MiB; open in an external mail client.",
+  "text_68971283841a": "Subject",
+  "text_843ace047541": "Mailbox SMTP requires SSL or STARTTLS.",
+  "text_918edb31339c": "Invalid attachment",
+  "text_93207f76e5a7": "Mailbox folder changed. Please reload.",
+  "text_9398a18492a2": "Message not found",
+  "text_97f7bb674340": "Mail server is not configured yet: MAILBOX_IMAP_HOST",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Attachment",
+  "text_a1ec065c6346": "Mail server is not configured yet: MAILBOX_SMTP_HOST",
+  "text_b65390d9692e": "Email delivery failed. No automatic retry; check mailbox and server.",
+  "text_c411554968a4": "Mail server is not configured yet: ",
+  "text_e50b22ccbc58": "Invalid folder",
+  "text_f00305a5a31e": "Mailbox folder not found"
+}

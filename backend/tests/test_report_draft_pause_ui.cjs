@@ -1,4 +1,4 @@
-const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
 class E{constructor(){this.value='';this.children=[];this.handlers={};this.dataset={};}replaceChildren(){this.children=[];}append(n){this.children.push(n);}addEventListener(k,fn){this.handlers[k]=fn;}setAttribute(){}reportValidity(){return true;}}
 const nodes={},el=id=>nodes[id]??=new E(),window={},storage=new Map();
 const source=fs.readFileSync('backend/lokzeitleiste/static/work-report.js','utf8').split('// Keep collapse buttons')[0].replace(/\}\)\(\);\s*$/,`window.testDraft={saveLocal,stations,rows:()=>pending,setup(){state={kind:'Sonstige Erfassung',client_id:'draft',pause_policy:2,legacy_pause:0};user={id:1};key='draft';pending=[];trips=[];trainEditor={validate:async()=>[],draft:()=>[]};freeze=storeDraft=renderMonth=()=>{};syncDrafts=async()=>{};message=(text)=>window.lastMessage=text;api=async(path)=>path.includes('frequent')?Array.from({length:6},(_,i)=>({code:'S'+i,name:'Bahnhof '+i})):[{code:'NEW',name:'Bahnhof Neu'}];}};})();`);

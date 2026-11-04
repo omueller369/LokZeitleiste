@@ -1,3 +1,4 @@
+from ..localization import source as _text_source, resolve_placeholders
 from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
@@ -17,14 +18,14 @@ from .schemas import PasswordChange, PasswordReset, StaffCreate, StaffIn
 def account_dependency(origin):
     def account(request: Request, tf_session: str | None = Cookie(default=None), admin_session: str | None = Cookie(default=None),
                 authorization: str | None = Header(default=None), db: Session = Depends(database_session)):
-        bearer = authorization and authorization.startswith('Bearer ')
+        bearer = authorization and authorization.startswith(_text_source('server_accounts_api.text_35e5a9632e18'))
         area=request.headers.get('X-CTL-Area')
-        token = authorization.removeprefix('Bearer ').strip() if bearer else (tf_session if area=='tf' else admin_session if area=='backend' else (tf_session or admin_session) if request.url.path.startswith('/api/v1/tf/') else admin_session or tf_session)
+        token = authorization.removeprefix(_text_source('server_accounts_api.text_35e5a9632e18')).strip() if bearer else (tf_session if area=='tf' else admin_session if area=='backend' else (tf_session or admin_session) if request.url.path.startswith('/api/v1/tf/') else admin_session or tf_session)
         user = user_from_token(db,token)
         if not user:
-            raise HTTPException(401,'Anmeldung erforderlich')
+            raise HTTPException(401,_text_source('server_accounts_api.text_6638bb26a46e'))
         if not bearer and request.method not in ('GET','HEAD') and origin() and request.headers.get('origin') != origin():
-            raise HTTPException(403,'Ungültiger Ursprung')
+            raise HTTPException(403,_text_source('server_accounts_api.text_f68b23feaba4'))
         bind_actor(db,user,request)
         return user
 
@@ -39,10 +40,10 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     @router.post('/api/v1/account/login')
     def login(data: Credentials, request: Request, response: Response, db: Session = Depends(database_session)):
         if origin() and request.headers.get('origin') != origin():
-            raise HTTPException(403,'Ungültiger Ursprung')
+            raise HTTPException(403,_text_source('server_accounts_api.text_f68b23feaba4'))
         user = db.scalar(select(User).where(User.username == data.username.strip().lower(),User.active == True))
         if not user or not account_active(db,user) or not verify_password(data.password,user.password_hash):
-            raise HTTPException(401,'Anmeldung fehlgeschlagen')
+            raise HTTPException(401,_text_source('server_accounts_api.text_1c983667bad8'))
         token = issue_token(db,user)
         response.set_cookie('tf_session' if user.role=='tf' else 'admin_session',token,httponly=True,secure=cookie_secure,samesite='strict',path='/',max_age=365*24*3600)
         return {'access_token':token,'username':user.username,'role':user.role,'password_change_required':password_required(db,user)}
@@ -56,7 +57,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         return identity(db,user)
 
     def backend_user(user,db):
-        if user.role not in ('staff','admin'):raise HTTPException(403,'Nur für die Verwaltung.')
+        if user.role not in ('staff','admin'):raise HTTPException(403,_text_source('server_accounts_api.text_5193698dc5b0'))
         from .access import ready
         ready(db,user)
 
@@ -84,7 +85,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     def own_photo(user:User=Depends(account),db:Session=Depends(database_session)):
         backend_user(user,db)
         photo=db.get(ProfilePhoto,user.id)
-        if not photo:raise HTTPException(404,'Kein Foto vorhanden')
+        if not photo:raise HTTPException(404,_text_source('server_accounts_api.text_689fa5701f2b'))
         from fastapi.responses import Response as BinaryResponse
         return BinaryResponse(photo.image_data,media_type='image/jpeg')
 
@@ -92,7 +93,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     def profile_page():
         from pathlib import Path
         from fastapi.responses import HTMLResponse
-        content=(Path(__file__).parent.parent/'static'/'tf-profile.html').read_text().replace('TF-Portal','App-Verwaltung').replace('/account?area=tf','/account?area=backend').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
+        content=resolve_placeholders((Path(__file__).parent.parent/'static'/'tf-profile.html').read_text()).replace('TF-Portal',_text_source('server_accounts_api.text_cc2388b0d186')).replace('/account?area=tf','/account?area=backend').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
         return HTMLResponse(content,headers={'Cache-Control':'no-store'})
 
     @router.post('/api/v1/account/password')
@@ -100,9 +101,9 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
                user: User = Depends(account),db: Session = Depends(database_session)):
         current = db.scalar(select(User).where(User.id == user.id).with_for_update().execution_options(populate_existing=True))
         if not verify_password(data.current_password,current.password_hash):
-            raise HTTPException(403,'Aktuelles Passwort ist falsch')
+            raise HTTPException(403,_text_source('server_accounts_api.text_715f90ea3b07'))
         if verify_password(data.new_password,current.password_hash):
-            raise HTTPException(422,'Neues Passwort muss sich vom bisherigen Passwort unterscheiden')
+            raise HTTPException(422,_text_source('server_accounts_api.text_6ec0469e0d45'))
         current.password_hash = hash_password(data.new_password)
         policy = db.get(AccountPolicy,user.id)
         if not policy:
@@ -111,14 +112,14 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
         db.execute(delete(SessionToken).where(SessionToken.user_id == user.id))
         db.add(AccountAudit(actor_id=user.id,target_id=user.id,action='password_changed'))
         db.commit()
-        if not authorization or not authorization.startswith('Bearer '):
+        if not authorization or not authorization.startswith(_text_source('server_accounts_api.text_35e5a9632e18')):
             response.delete_cookie('tf_session' if user.role=='tf' else 'admin_session',path='/')
         return {'changed':True,'login_required':True}
 
     @router.post('/api/v1/account/logout')
     def logout(response: Response, tf_session: str | None = Cookie(default=None), admin_session: str | None = Cookie(default=None),
                authorization: str | None = Header(default=None), user: User = Depends(account),db: Session = Depends(database_session)):
-        raw = authorization.removeprefix('Bearer ').strip() if authorization and authorization.startswith('Bearer ') else (tf_session if user.role=='tf' else admin_session)
+        raw = authorization.removeprefix(_text_source('server_accounts_api.text_35e5a9632e18')).strip() if authorization and authorization.startswith(_text_source('server_accounts_api.text_35e5a9632e18')) else (tf_session if user.role=='tf' else admin_session)
         if raw: revoke_token(db,raw)
         response.delete_cookie('tf_session' if user.role=='tf' else 'admin_session',path='/')
         return {'ok':True}
@@ -188,14 +189,14 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
             return {'id':user.id,'username':user.username,'password_change_required':True}
         except IntegrityError as exc:
             db.rollback()
-            raise HTTPException(409,'Benutzername bereits vergeben') from exc
+            raise HTTPException(409,_text_source('server_accounts_api.text_caa6e4fbaee2')) from exc
 
     @router.put('/api/v1/admin/staff/{user_id}')
     def update(user_id: int,data: StaffIn,actor: User = Depends(admin_dependency),db: Session = Depends(database_session)):
         user = db.scalar(select(User).where(User.id == user_id).with_for_update())
         profile = db.get(StaffProfile,user_id)
         if not user or user.role != 'staff' or not profile:
-            raise HTTPException(404,'Verwaltungsmitarbeiter nicht gefunden')
+            raise HTTPException(404,_text_source('server_accounts_api.text_288eba24f387'))
         if data.permissions != permissions(db,user):
             demand(db,actor,'staff',3)
         check_delegation(db,actor,data.permissions,user)
@@ -215,13 +216,13 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     def reset(user_id: int,data: PasswordReset,actor: User = Depends(admin_dependency),db: Session = Depends(database_session)):
         user = db.scalar(select(User).where(User.id == user_id).with_for_update())
         if not user:
-            raise HTTPException(404,'Konto nicht gefunden')
+            raise HTTPException(404,_text_source('server_accounts_api.text_b59ef1fdfb31'))
         if user.id == actor.id:
-            raise HTTPException(422,'Für Ihr eigenes Konto bitte Passwort ändern verwenden')
+            raise HTTPException(422,_text_source('server_accounts_api.text_edf0b29d64e6'))
         if user.role != 'tf':
             check_delegation(db,actor,{},user)
         if verify_password(data.initial_password,user.password_hash):
-            raise HTTPException(422,'Initialpasswort muss sich vom bisherigen Passwort unterscheiden')
+            raise HTTPException(422,_text_source('server_accounts_api.text_796d569dbe68'))
         user.password_hash = hash_password(data.initial_password)
         policy = db.get(AccountPolicy,user.id)
         if not policy:

@@ -1,0 +1,23 @@
+{
+  "text_0357b8d84286": "Klucz skrzynki nie pasuje. Wprowadź dane dostępu ponownie.",
+  "text_05150731716a": "Wiadomość z załącznikami do 10 MiB.",
+  "text_0d94fb23ce2e": "Wysłano, ale nie udało się zapisać kopii w folderze Wysłane.",
+  "text_1148fd35f915": "Na serwerze trzeba skonfigurować klucz szyfrowania skrzynki.",
+  "text_218197693424": "From",
+  "text_4334ed9da2f0": "Odrzucono odbiorcę. Część mogła dostać wiadomość; sprawdź przed ponowną wysyłką.",
+  "text_50e64315bb61": "Połączenie ze skrzynką nieudane. Sprawdź serwer i dane.",
+  "text_6381fdab9086": "Wiadomość ponad 10 MiB; otwórz w innym kliencie.",
+  "text_68971283841a": "Subject",
+  "text_843ace047541": "SMTP skrzynki wymaga SSL lub STARTTLS.",
+  "text_918edb31339c": "Nieprawidłowy załącznik",
+  "text_93207f76e5a7": "Folder skrzynki zmienił się. Wczytaj ponownie.",
+  "text_9398a18492a2": "Nie znaleziono wiadomości",
+  "text_97f7bb674340": "Serwer poczty nie jest jeszcze skonfigurowany: MAILBOX_IMAP_HOST",
+  "text_99c40ab40592": "Date",
+  "text_9e313cd30ea1": "Załącznik",
+  "text_a1ec065c6346": "Serwer poczty nie jest jeszcze skonfigurowany: MAILBOX_SMTP_HOST",
+  "text_b65390d9692e": "Wysyłka e-mail nieudana. Bez automatycznej próby; sprawdź skrzynkę i serwer.",
+  "text_c411554968a4": "Serwer poczty nie jest jeszcze skonfigurowany: ",
+  "text_e50b22ccbc58": "Nieprawidłowy folder",
+  "text_f00305a5a31e": "Nie znaleziono folderu skrzynki"
+}
