@@ -121,5 +121,22 @@
   "text_6088a3b942bf": "G+P: first five wagons in G with a 25% deduction, remaining wagons in P. Above 500 m unrounded wagon-train length, a further 5% is deducted from P only. Results are rounded up at the end. Fields 4b and 16b use only the first word of the destination station.",
   "text_fbe000b7288f": "Source: sheet / first wagon row / last wagon row / total row",
   "text_845f97a170a6": "Wagon-train length before rounding, m",
-  "text_8a822ef9b778": "Manual wagon values: automatic import calculation has been detached."
+  "text_8a822ef9b778": "Manual wagon values: automatic import calculation has been detached.",
+  "text_da7b4b947bee": "Add towed locomotive",
+  "text_6d406169e595": "Towed locomotives in the wagon train",
+  "text_98de658a599f": "Final journey destination",
+  "text_c28979148ea3": "Position in the entire wagon train (1 = front)",
+  "text_a2338b5fd37d": "Own brake weight, t",
+  "text_787cb40eca00": "Towed locomotive brake mode",
+  "text_4e1a5113bb0d": "Count the brake weight in G?",
+  "text_dd8dce06f5b0": "Count brake weight",
+  "text_4945884011af": "Count as zero",
+  "text_c153ddb9f279": "Towed locomotive destination",
+  "text_e1ab5ee69625": "Order of drop-off stations (1, 2, …)",
+  "text_f92f801d2555": "Towed locomotive length, m",
+  "text_a5e9792df119": "Towed locomotive weight, t",
+  "text_aa34155bd848": "Brake sheets for journey sections",
+  "text_c751dda21c5e": "Edit original brake sheet",
+  "text_a092f73716ce": "Automatic note for field 9",
+  "text_61dff2d93907": "Import the wagon list first. Towed locomotives are counted as additional wagons. Assign unique positions in the entire wagon train. The same drop-off station must use the same order number. Make changes in the original brake sheet; saving regenerates section versions."
 }

@@ -36,5 +36,15 @@
   "text_fc74c531b994": "The wagon list could not be read unambiguously. Check headers, wagon positions, vehicle numbers and numeric values.",
   "text_7c3ce0b4afb2": "G or P brake weights are missing for the selected brake mode. Missing values are not substituted.",
   "text_12846d32442d": "Wagon list import supports G, P and G+P. Enter wagon values manually for other brake modes.",
-  "text_906e2fc6290d": "Imported values exceed the permitted brake-sheet input limits (1–50 wagons)."
+  "text_906e2fc6290d": "Imported values exceed the permitted brake-sheet input limits (1–50 wagons).",
+  "text_125e0f35734b": "Import a wagon list before adding towed locomotives.",
+  "text_83270cdf3d72": "Check the unique locomotive positions within the entire wagon train.",
+  "text_71faf3e94a85": "Check the final destination, locomotive destinations and unique drop-off order.",
+  "text_be76a8d9bb14": "A locomotive cannot appear as working, in the wagon list or more than once as towed.",
+  "text_2c84682009d9": "Enter brake mode and brake weight. For G, explicitly choose count or zero.",
+  "text_cb9bac8ec7cc": "Valid length or weight is missing for the towed locomotive.",
+  "text_47d309426a1c": "This section version is generated automatically. Edit the original brake sheet.",
+  "text_62ef2abc71ed": "This section version has been superseded by a new plan. Open the current version.",
+  "text_08720ebebab9": "Field 9 including the automatic locomotive note exceeds 500 characters. Shorten additional remarks or station entries.",
+  "text_2f1639602f6f": "Towed locomotives {numbers} only as far as {station}."
 }

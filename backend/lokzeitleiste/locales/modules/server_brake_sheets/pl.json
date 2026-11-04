@@ -36,5 +36,15 @@
   "text_fc74c531b994": "Nie można jednoznacznie odczytać listy wagonów. Sprawdź nagłówki, pozycje, numery pojazdów i wartości liczbowe.",
   "text_7c3ce0b4afb2": "Brakuje mas hamujących G lub P dla wybranego położenia hamulca. Brakujące wartości nie są zastępowane.",
   "text_12846d32442d": "Import listy wagonów obsługuje G, P oraz G+P. Dla innych położeń wprowadź wartości ręcznie.",
-  "text_906e2fc6290d": "Importowane wartości przekraczają dozwolone granice formularza (1–50 wagonów)."
+  "text_906e2fc6290d": "Importowane wartości przekraczają dozwolone granice formularza (1–50 wagonów).",
+  "text_125e0f35734b": "Dla holowanych pojazdów najpierw zaimportuj listę wagonów.",
+  "text_83270cdf3d72": "Sprawdź unikalne pozycje pojazdów w całym składzie.",
+  "text_71faf3e94a85": "Sprawdź cel końcowy, stacje docelowe i jednoznaczną kolejność stacji odczepienia.",
+  "text_be76a8d9bb14": "Pojazd nie może jednocześnie pracować, występować na liście wagonów ani być wielokrotnie holowany.",
+  "text_2c84682009d9": "Podaj położenie hamulca i masę hamującą. Dla G wybierz uwzględnienie lub 0.",
+  "text_cb9bac8ec7cc": "Brak prawidłowej długości lub masy holowanego pojazdu.",
+  "text_47d309426a1c": "Ta wersja odcinkowa jest tworzona automatycznie. Zmień źródłową kartę.",
+  "text_62ef2abc71ed": "Ta wersja odcinka została zastąpiona nowym planem. Otwórz aktualną wersję.",
+  "text_08720ebebab9": "Pole 9 z automatyczną uwagą przekracza 500 znaków. Skróć dodatkowe uwagi lub nazwy stacji.",
+  "text_2f1639602f6f": "Holowane pojazdy {numbers} tylko do {station}."
 }

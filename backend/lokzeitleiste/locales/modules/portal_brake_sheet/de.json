@@ -121,5 +121,22 @@
   "text_6088a3b942bf": "G+P: erste fünf Wagen in G mit 25 % Abzug, weitere Wagen in P. Über 500 m ungerundeter Wagenzuglänge zusätzlich 5 % Abzug nur von P. Ergebnisse werden am Ende aufgerundet. Bei 4b und 16b wird nur das erste Wort des Zielbahnhofs übernommen.",
   "text_fbe000b7288f": "Quelle: Blatt / erste Wagenzeile / letzte Wagenzeile / Summenzeile",
   "text_845f97a170a6": "Wagenzuglänge vor Rundung, m",
-  "text_8a822ef9b778": "Manuelle Wagenwerte: Die automatische Importberechnung ist gelöst."
+  "text_8a822ef9b778": "Manuelle Wagenwerte: Die automatische Importberechnung ist gelöst.",
+  "text_da7b4b947bee": "Tfz in Schlepp hinzufügen",
+  "text_6d406169e595": "Mitgeschleppte Tfz im Wagenzug",
+  "text_98de658a599f": "Ziel der gesamten Fahrt",
+  "text_c28979148ea3": "Position im gesamten Wagenzug (1 = vorne)",
+  "text_a2338b5fd37d": "Eigenes Bremsgewicht, t",
+  "text_787cb40eca00": "Bremsstellung des geschleppten Tfz",
+  "text_4e1a5113bb0d": "Bremsgewicht in G anrechnen?",
+  "text_dd8dce06f5b0": "Bremsgewicht anrechnen",
+  "text_4945884011af": "Mit 0 rechnen",
+  "text_c153ddb9f279": "Zielbahnhof des geschleppten Tfz",
+  "text_e1ab5ee69625": "Reihenfolge der Aussetzbahnhöfe (1, 2, …)",
+  "text_f92f801d2555": "Länge des geschleppten Tfz, m",
+  "text_a5e9792df119": "Gewicht des geschleppten Tfz, t",
+  "text_aa34155bd848": "Bremszettel für die Fahrtabschnitte",
+  "text_c751dda21c5e": "Ausgangsbremszettel bearbeiten",
+  "text_a092f73716ce": "Automatischer Hinweis für Feld 9",
+  "text_61dff2d93907": "Importiere zuerst die Wagenliste. Geschleppte Tfz werden zusätzlich als Wagen gezählt. Vergib eindeutige Positionen im gesamten Wagenzug. Gleiche Aussetzbahnhöfe brauchen dieselbe Reihenfolgenummer. Änderungen werden im Ausgangsbremszettel vorgenommen; Speichern erstellt die Abschnittsversionen neu."
 }

@@ -85,7 +85,7 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
         box((left,141,right,181),country.category)
         box((left,190,right,235),country.vmax)
     # ETCS (1212..1304), the second section and verification fields are untouched.
-    box((16,303,574,591),sheet.remarks,17,'left',valign='top')
+    box((16,303,574,591),result.get('remarks',sheet.remarks),17,'left',valign='top')
     box((590,303,1295,591),sheet.special,17,'left',valign='top')
     for active,y in [(sheet.dangerous,619),(sheet.exceptional,649),(sheet.restrictions,697),(sheet.waste,768)]:
         if active:cross(27,y)
