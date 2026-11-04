@@ -351,5 +351,6 @@
   "text_ef7671c578be": "Hover over an icon to see its meaning. The other icons open overtime, hours, planning, worktime or monthly data. Only permitted actions are shown.",
   "text_864ea227f2e9": "To add a new driver, click “Create driver”. The empty form opens only then. This action is available only with the required permission.",
   "text_433682fef776": "Look for the burgundy and navy RS mark with a container wagon. The app icon uses the same mark. The header shows “Rail Software” below it. Your account and saved data are retained.",
-  "text_4fa081dbf77e": "Next to the driver type selector, enter a name, personnel number, driver number or email address in the search field. The list updates as you type. You can combine the search with the driver type filter. Clear the search text to see all drivers of the selected type again. Only data you are allowed to see is searchable."
+  "text_4fa081dbf77e": "Next to the driver type selector, enter a name, personnel number, driver number or email address in the search field. The list updates as you type. You can combine the search with the driver type filter. Clear the search text to see all drivers of the selected type again. Only data you are allowed to see is searchable.",
+  "text_8ad0ce9e20b9": "Every module page in the backend has a “Home” button at the top and bottom. Click it to return to the backend home page with the module overview. Save your changes before leaving if you want to keep them."
 }

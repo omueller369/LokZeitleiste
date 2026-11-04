@@ -26,6 +26,8 @@ CHECKS=r'''
  for(const n of [theme,language,...(help?[help]:[])]){const r=rect(n);assert(r.left>=0&&r.right<=innerWidth+1,'Control fits viewport');assert(r.height>=44,'Touch target');}
  theme.click();assert(document.documentElement.dataset.theme==='dark','Theme still works');theme.click();
  language.value='pl';language.dispatchEvent(new Event('change'));await tick();assert(window.I18n.language==='pl','Language still works');
+ const homes=[...document.querySelectorAll('.backend-home-button')];
+ if(document.body.dataset.area==='backend'){assert(homes.length===2,'Two backend home buttons');for(const link of homes){assert(link.getAttribute('href')==='/admin/start','Home targets backend dashboard');assert(link.textContent===CtlText.text('portal_tf_shell.text_e04d24c52b3d',{},'pl'),'Home buttons switch language');const r=rect(link);assert(r.height>=44&&r.left>=0&&r.right<=innerWidth,'Home button fits viewport');}assert(document.querySelector('header').nextElementSibling.classList.contains('backend-home-top'),'Home above content');assert(document.querySelector('footer').previousElementSibling.classList.contains('backend-home-bottom'),'Home below content');}else assert(homes.length===0,'TF portal has no backend home controls');
  const old=header.querySelector('.tf-shell-title').textContent;await window.I18n.set('de');assert(brand.querySelector('button'),'Logout retained');
  document.documentElement.dataset.headerStatus='pass';parent.postMessage({headerStatus:'pass'},'*');
 })().catch(error=>{document.documentElement.dataset.headerStatus='fail';parent.postMessage({headerStatus:'fail',message:error.stack},'*');});
