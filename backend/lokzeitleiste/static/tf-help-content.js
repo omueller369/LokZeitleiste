@@ -1,4 +1,4 @@
-/* Gemeinsamer Hilfekatalog für alle TF-Module. BS/RBS/AS/K: 08:00–16:00 vorbelegt und acht Stunden Gutschrift. */
+/* Gemeinsamer Hilfekatalog für alle TF-Module. Internationaler Bremszettel: editierbare Vorschläge bei DE/G in Spalte 1. */
 window.TfHelpRevision="2026-11-04";
 window.TfHelpPages=globalThis.CtlText.restore([
   {

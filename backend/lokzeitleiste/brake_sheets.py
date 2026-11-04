@@ -77,7 +77,6 @@ class Sheet(BaseModel):
     def rules(self):
         self.section_from=self.station_from;self.section_to=self.station_to
         if self.second_from or self.second_to or self.second_first_vehicle or self.second_last_vehicle:raise ValueError(_text_source('server_brake_sheets.text_63cfe4faae33'))
-        if self.class_de=='D4':self.class_pl='D'
         if len({x.vehicle_id for x in self.locos})!=len(self.locos):raise ValueError(_text_source('server_brake_sheets.text_0bcfde1957a7'))
         return self
 class Save(BaseModel):

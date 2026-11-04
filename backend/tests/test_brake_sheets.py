@@ -128,7 +128,7 @@ class BrakeSheetTest(unittest.TestCase):
     def test_draft_creation_metadata_ownership_and_conflict(self):
         id=str(uuid4());path=self.base+'/'+id
         first=self.driver.put(path,json=dict(expected_revision=0,sheet=self.sheet(),created_by_name='Falsch'));self.assertEqual(first.status_code,200,first.text)
-        r=first.json();self.assertNotEqual(r['created_by_name'],'Falsch');self.assertTrue(r['created_at'].endswith('Z'));self.assertEqual(r['sheet']['class_pl'],'D');self.assertEqual(r['sheet']['section_from'],'BHF · Berlin');self.assertEqual(r['sheet']['section_to'],'Warszawa');self.assertEqual(r['sheet']['train_numbers'][0],'00123')
+        r=first.json();self.assertNotEqual(r['created_by_name'],'Falsch');self.assertTrue(r['created_at'].endswith('Z'));self.assertEqual(r['sheet']['class_pl'],'C');self.assertEqual(r['sheet']['section_from'],'BHF · Berlin');self.assertEqual(r['sheet']['section_to'],'Warszawa');self.assertEqual(r['sheet']['train_numbers'][0],'00123')
         self.assertNotIn('verification',r['sheet']);self.assertEqual(self.driver.get(path).json()['revision'],1)
         self.assertEqual(self.driver.put(path,json=dict(expected_revision=0,sheet=self.sheet())).status_code,409)
         second=self.driver.put(path,json=dict(expected_revision=1,sheet=self.sheet(train_numbers=['00123','12345','00001'])));self.assertEqual(second.status_code,200,second.text)
@@ -136,6 +136,22 @@ class BrakeSheetTest(unittest.TestCase):
         with Session(self.engine) as db:db.get(BrakeSheetDraft,id).owner_id=999;db.commit()
         self.assertEqual(self.driver.get(path).status_code,404);self.assertEqual(self.driver.get(self.base).json(),[])
         self.assertEqual(self.driver.put(path,json=dict(expected_revision=2,sheet=self.sheet())).status_code,404)
+    def test_de_freight_suggestions_are_editable_and_persisted(self):
+        sheet=self.sheet(class_de='D4',class_pl='C',brake_mode='P',required_percent=59,
+                         countries=[dict(country='DE',category='G',vmax=90),dict(country='DE',category='P',vmax=80),{},{}])
+        path=self.base+'/'+str(uuid4())
+        saved=self.driver.put(path,json=dict(expected_revision=0,sheet=sheet))
+        self.assertEqual(saved.status_code,200,saved.text)
+        result=self.driver.get(path).json()['sheet']
+        self.assertEqual((result['class_de'],result['class_pl'],result['brake_mode'],result['required_percent']),('D4','C','P',59))
+        self.assertEqual(result['countries'][0]['vmax'],90)
+        self.assertEqual((result['countries'][1]['country'],result['countries'][1]['category'],result['countries'][1]['vmax']),('DE','P',80))
+        result['required_percent']=75
+        updated=self.driver.put(path,json=dict(expected_revision=saved.json()['revision'],sheet=result))
+        self.assertEqual(updated.status_code,200,updated.text)
+        self.assertEqual(updated.json()['sheet']['required_percent'],75)
+        self.assertEqual(updated.json()['sheet']['class_pl'],'C')
+
     def test_privacy_permissions_and_vehicle_revision(self):
         anon=TestClient(app,base_url='https://testserver');self.staff_clients.append(anon)
         self.assertEqual(anon.get(self.base).status_code,401);self.assertEqual(self.client.get(self.base).status_code,403)
