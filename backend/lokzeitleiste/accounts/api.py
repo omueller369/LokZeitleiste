@@ -1,4 +1,4 @@
-from ..localization import source as _text_source
+from ..localization import source as _text_source, resolve_placeholders
 from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
@@ -93,7 +93,7 @@ def create_router(admin_dependency, origin, cookie_secure, dependency=None):
     def profile_page():
         from pathlib import Path
         from fastapi.responses import HTMLResponse
-        content=(Path(__file__).parent.parent/'static'/'tf-profile.html').read_text().replace('TF-Portal',_text_source('server_accounts_api.text_cc2388b0d186')).replace('/account?area=tf','/account?area=backend').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
+        content=resolve_placeholders((Path(__file__).parent.parent/'static'/'tf-profile.html').read_text()).replace('TF-Portal',_text_source('server_accounts_api.text_cc2388b0d186')).replace('/account?area=tf','/account?area=backend').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
         return HTMLResponse(content,headers={'Cache-Control':'no-store'})
 
     @router.post('/api/v1/account/password')

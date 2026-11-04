@@ -8,3 +8,9 @@
 - `TfHelpRevision` auf den Bearbeitungstag setzen. Bei geänderten Hilfe-Dateien auch die Versionskennung des Hilfe-Laders in `auth-session.js` anpassen. Die bestehenden Dateien sind die gemeinsame Quelle für Modulhilfen, Hilfekatalog und Druckausgabe.
 - Hilfefenster behalten X oben links, Drucker rechts, Fokus-Rückgabe und eine Druckansicht ausschließlich des Hilfetextes. Keine persönlichen Formularwerte in die Druckansicht übernehmen.
 - Die Android-Assets und `PortalPolicy` bei neuen Hilfedateien oder Routen mit ergänzen. Relevante JavaScript-, Browser-/Druck- und Android-Prüfungen ausführen.
+
+## Modulsprachen fortlaufend pflegen
+
+- Neue und geänderte Bedien-, Hilfe- und Systemtexte über stabile Sprachschlüssel in `backend/lokzeitleiste/locales/modules/<modul>/{de,pl,en}.json` pflegen. In allen drei Sprachen vollständige Einträge bereitstellen; keine neuen deutschen Texte direkt in die Oberfläche schreiben.
+- Gespeicherte Fachwerte, DS100-Kürzel, technische Protokolle und persönliche Texte unverändert lassen. Übersetzung erst bei der Darstellung vornehmen. Serverseitige Anpassungen gemeinsam genutzter HTML-Seiten müssen die Platzhalter vor textabhängigen Anpassungen auflösen.
+- Nach Katalogänderungen `python tools/build-translations.py` ausführen und die erzeugten Browser-, Backend- und Android-Dateien mit übernehmen. `--check` sowie die relevanten Sprach- und Browserprüfungen müssen erfolgreich sein.

@@ -1,5 +1,5 @@
 """TF-to-TF inbox. No SMTP, usernames or TF numbers in message-facing responses."""
-from .localization import source as _text_source
+from .localization import source as _text_source, resolve_placeholders
 import io
 from pathlib import Path,PurePosixPath
 from fastapi import APIRouter,Depends,File,Form,UploadFile,HTTPException,Query
@@ -79,7 +79,7 @@ def create_router(require_account):
         return user
     @router.get('/admin/messages')
     def backend_page():
-        content=(Path(__file__).parent/'static'/'tf-messages.html').read_text()
+        content=resolve_placeholders((Path(__file__).parent/'static'/'tf-messages.html').read_text())
         content=content.replace('TF-Portal',_text_source('server_tf_messages.text_2456bb8ed72f')).replace('<header><h1>Verwaltung</h1></header>','<header><a href="/admin/start">Verwaltung</a></header>').replace('</body>','<script src="/admin/backend-nav.js"></script></body>')
         from fastapi.responses import HTMLResponse
         return HTMLResponse(content,headers={'Cache-Control':'no-store'})

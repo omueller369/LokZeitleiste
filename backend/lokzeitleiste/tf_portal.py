@@ -1,5 +1,5 @@
 """TF landing pages and read-only access to the driver's own personnel plan."""
-from .localization import source as _text_source
+from .localization import source as _text_source, resolve_placeholders
 from pathlib import Path as FilePath
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Path, Request
 from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse, Response
@@ -57,7 +57,7 @@ def create_router(require_account):
         user=user_from_token(db,tf_session or admin_session)
         if not user or password_required(db,user):return RedirectResponse('/account?area=tf',status_code=303)
         if user.role!='tf':return RedirectResponse('/account?area=tf',status_code=303)
-        html=(STATIC/'loco-handover.html').read_text().replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
+        html=resolve_placeholders((STATIC/'loco-handover.html').read_text()).replace('href="/admin/start">Startseite', 'href="/tf">TF Portal')
         return HTMLResponse(html,headers={'Cache-Control':'no-store'})
 
     @router.get('/tf/return.js')

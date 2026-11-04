@@ -68,3 +68,11 @@ class ModuleAssetTest(unittest.TestCase):
             self.assertEqual(page.status_code, 200)
             self.assertNotRegex(page.text, r'\{\{[a-z_]+\.text_')
             self.assertIn('/locales/messages.js', page.text)
+
+    def test_backend_shared_pages_keep_backend_identity(self):
+        for path in ('/admin/me', '/admin/messages'):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn('Verwaltung', response.text)
+            self.assertNotIn('>TF-Portal<', response.text)
+            self.assertIn('/admin/backend-nav.js', response.text)
