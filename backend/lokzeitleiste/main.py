@@ -598,7 +598,7 @@ def set_locale(data: LocaleInput, user: User=Depends(require_account), db: Sessi
 
 @app.get('/i18n.js')
 def translations_script():
-    return FileResponse(Path(__file__).parent/'static'/'i18n.js', media_type='text/javascript')
+    return FileResponse(Path(__file__).parent/'static'/'i18n.js', media_type='text/javascript', headers={'Cache-Control':'no-cache'})
 
 @app.get('/locales/messages.js')
 def module_messages_script():
