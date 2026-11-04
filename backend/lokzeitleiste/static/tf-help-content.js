@@ -1,4 +1,4 @@
-/* Gemeinsamer Hilfekatalog für alle TF-Module. Rechte Kopfleiste: Tag/Nacht, Hilfe ?, Sprache; Logo und Abmelden links. */
+/* Gemeinsamer Hilfekatalog für alle TF-Module. BS/RBS/AS/K: 08:00–16:00 vorbelegt und acht Stunden Gutschrift. */
 window.TfHelpRevision="2026-11-04";
 window.TfHelpPages=globalThis.CtlText.restore([
   {

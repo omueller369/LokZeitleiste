@@ -105,8 +105,9 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
     var sending by remember { mutableStateOf(false) }
     var sendMessage by remember { mutableStateOf("") }
     val selected = entries.filter { runCatching { YearMonth.from(LocalDate.parse(it.date)) == month }.getOrDefault(false) }.sortedBy { it.date + it.start }
-    val calculationEntries = entries.filter { it.kind in listOf("Bereitschaft", "Zugfahrt", "Sonstige Erfassung") }
-    val work = calculationEntries.sumOf { monthMinutes(it, month) }
+    val calculationEntries = entries.filter { it.kind in listOf("Bereitschaft", "Rufbereitschaft", "Ausfallschicht", "Zugfahrt", "Sonstige Erfassung") }
+    val sickCredit = selected.filter { it.kind == "Krank" }.map { it.date }.distinct().size * 480
+    val work = calculationEntries.sumOf { monthMinutes(it, month) } + sickCredit
     val guests = calculationEntries.sumOf { monthMinutes(it, month, guestOnly = true) }
     val holidays = selected.count { it.kind == "Urlaub" }
     val night = calculationEntries.sumOf {
@@ -152,7 +153,7 @@ private fun MonthScreen(username: String, onTrain: () -> Unit, onPassword: () ->
                     Box {
                         OutlinedButton(onClick = { expanded = true }) { LocalizedText(kind + " ▾") }
                         DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
-                            kinds.forEach { option -> DropdownMenuItem(text = { LocalizedText(option) }, onClick = { kind = option; expanded = false }) }
+                            kinds.forEach { option -> DropdownMenuItem(text = { LocalizedText(option) }, onClick = { kind = option; expanded = false; if (option in listOf("Krank", "Rufbereitschaft", "Bereitschaft", "Ausfallschicht")) { start = "08:00"; end = "16:00"; endDate = date } }) }
                         }
                     }
                     OutlinedTextField(date, { if (endDate == date) endDate = it; date = it }, label = { LocalizedText("Datum (JJJJ-MM-TT)") })

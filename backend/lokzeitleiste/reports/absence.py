@@ -1,4 +1,4 @@
-"""Absence credit follows the current personnel plan; rest days have no credit."""
+"""Sick days credit eight hours; vacation credit follows the personnel plan."""
 from ..localization import source as _text_source
 from sqlalchemy import select
 from sqlalchemy.orm import object_session
@@ -10,6 +10,8 @@ def is_rest_day(db,user_id,day):
 
 
 def absence_minutes(entry):
+    if entry.kind == _text_source("server_reports_absence.text_be1600b499c6"):
+        return 480
     db=object_session(entry)
     period=db.get(WorkMonth,entry.work_month_id) if db and entry.work_month_id else None
     return 0 if period and is_rest_day(db,period.tf_user_id,entry.entry_date) else 480

@@ -28,7 +28,7 @@ def report_view(db,report):
     payload.setdefault('kind',_text_source('server_work_reports_service.text_f31b8681bfca'))
     payload.setdefault('in_hotel',False);payload.setdefault('hotel_name','');payload.setdefault('hotel_location','');payload.setdefault('pause_policy',1)
     rest=is_rest_day(db,report.tf_user_id,start.date()) if payload['kind'] in (_text_source('server_work_reports_service.text_35d3a889824d'),_text_source('server_work_reports_service.text_be1600b499c6')) else False
-    credit=(0 if rest else 480) if payload['kind'] in (_text_source('server_work_reports_service.text_35d3a889824d'),_text_source('server_work_reports_service.text_be1600b499c6')) else minutes(start,end)
+    credit=480 if payload['kind']==_text_source('server_work_reports_service.text_be1600b499c6') else (0 if rest else 480) if payload['kind']==_text_source('server_work_reports_service.text_35d3a889824d') else minutes(start,end)
     revision=payload.pop('_train_revision',0)
     payload.pop('_pdf_version_offset',None)
     entry=db.get(WorkEntry,report.entry_id)
