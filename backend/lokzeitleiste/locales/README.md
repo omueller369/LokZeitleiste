@@ -7,7 +7,7 @@ zu den API-, Dokument- und Fachmodulen. Gemeinsame und native Android-Texte
 liegen in `shared_legacy`. Fachcodes, gespeicherte Enumwerte, DS100,
 Protokollsyntax und Texte der Benutzer werden nicht umgeschrieben.
 
-HTML verwendet `{{modul.text_…}}`. JavaScript und Python referenzieren dieselben
+HTML verwendet `{{modul.text_…}}`. Der Schlüssel muss `text_` gefolgt von genau zwölf kleinen Hex-Zeichen sein (zum Beispiel `text_012345abcdef`); frei benannte Schlüssel werden vom Compiler abgelehnt. JavaScript und Python referenzieren dieselben
 Schlüssel über `CtlText.source()` beziehungsweise `localization.source()`.
 `source()` liefert den kanonischen Fachwert; die Darstellung übersetzt erst
 an der Ausgabegrenze, damit Formwerte, Vergleiche und bestehende Daten stabil

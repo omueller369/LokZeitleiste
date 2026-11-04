@@ -5,6 +5,7 @@ Edit locales/modules/<module>/{de,en,pl}.json. Never edit generated bundles.
 """
 import argparse
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +23,9 @@ def compile_messages():
             continue
         messages = {lang: json.loads((folder / f'{lang}.json').read_text()) for lang in LANGUAGES}
         expected = set(messages['de'])
+        invalid = [key for key in expected if not re.fullmatch(r'text_[a-f0-9]{12}', key)]
+        if invalid:
+            raise ValueError(f'{folder.name}: unsupported message key format: {invalid}')
         for lang, entries in messages.items():
             if set(entries) != expected or any(not isinstance(v, str) or not v for v in entries.values()):
                 raise ValueError(f'{folder.name}/{lang}: incomplete catalogue')

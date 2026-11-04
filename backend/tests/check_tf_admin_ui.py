@@ -26,6 +26,7 @@ CHECKS=r'''
  assert(document.getElementById('newTfLink').getAttribute('href')==='/admin/tf/new','Explicit add link');
  assert(document.querySelector('script[data-backend-nav]'),'Navigation bootstrap survives missing legacy logout');
  const search=document.getElementById('tfSearch'),type=document.getElementById('tfTypeFilter');
+ assert(document.querySelector('label[for=tfSearch]').textContent.trim()==='Suche','German search label resolved');assert(!document.body.textContent.includes('{{backend_admin.'),'No unresolved admin placeholders');
  const find=()=>search.dispatchEvent(new Event('input'));search.value='ALEX 123';find();assert(document.querySelectorAll('#users tr').length===1,'Case-insensitive multi-term search');
  type.value='border';type.dispatchEvent(new Event('change'));assert(!document.getElementById('tfNoResults').hidden,'Search combines with type filter');
  search.value='';find();assert(document.querySelectorAll('#users tr').length===1,'Clearing search retains type filter');type.value='';type.dispatchEvent(new Event('change'));
@@ -45,8 +46,10 @@ def fixture():
     page=(STATIC/'admin.html').read_text()
     page=re.sub(r'<script\b[^>]*>.*?</script>','',page,flags=re.S)
     page=re.sub(r'<link\b[^>]*>','',page)
-    keys=json.loads((STATIC.parent/'locales/keys.json').read_text())['de']
-    page=re.sub(r'\{\{([^{}]+)\}\}',lambda m:html.escape(keys[m[1]]),page)
+    from sys import path
+    path.insert(0,str(STATIC.parent.parent))
+    from lokzeitleiste.localization import resolve_placeholders
+    page=resolve_placeholders(page)
     css=(STATIC/'responsive.css').read_text()
     code=(STATIC/'messages.js').read_text()+MOCK+'\n'+(STATIC/'admin.js').read_text()+CHECKS
     return page.replace('</head>','<style>'+css+'</style></head>').replace('</body>','<script>'+code+'</script></body>')

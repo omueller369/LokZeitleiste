@@ -14,7 +14,7 @@ window.TfHelpPages=globalThis.CtlText.restore([
         "paragraphs": [
           "{{portal_tf_help_content.text_af8f9518bcd4}}",
           "{{portal_tf_help_content.text_2a38441413a0}}",
-          "{{portal_tf_help_content.rail_brand_intro}}"
+          "{{portal_tf_help_content.text_433682fef776}}"
         ],
         "steps": []
       },
@@ -984,24 +984,24 @@ window.TfHelpPages=globalThis.CtlText.restore([
   },
   {
     "id": "tf-admin",
-    "group": "{{portal_tf_help_content.tf_admin_group}}",
-    "title": "{{portal_tf_help_content.tf_admin_title}}",
-    "short": "{{portal_tf_help_content.tf_admin_short}}",
+    "group": "{{portal_tf_help_content.text_2456bb8ed72f}}",
+    "title": "{{portal_tf_help_content.text_7b960b63e289}}",
+    "short": "{{portal_tf_help_content.text_15509a8a3a5b}}",
     "path": "/admin/tf",
     "aliases": [
       "/admin/tf/new"
     ],
     "sections": [
       {
-        "title": "{{portal_tf_help_content.tf_admin_list}}",
+        "title": "{{portal_tf_help_content.text_f9e71f64525c}}",
         "paragraphs": [
-          "{{portal_tf_help_content.tf_admin_intro}}"
+          "{{portal_tf_help_content.text_7667cc41be6b}}"
         ],
         "steps": [
-          "{{portal_tf_help_content.tf_admin_search}}",
-          "{{portal_tf_help_content.tf_admin_step1}}",
-          "{{portal_tf_help_content.tf_admin_step2}}",
-          "{{portal_tf_help_content.tf_admin_step3}}"
+          "{{portal_tf_help_content.text_4fa081dbf77e}}",
+          "{{portal_tf_help_content.text_e4b1d6383333}}",
+          "{{portal_tf_help_content.text_ef7671c578be}}",
+          "{{portal_tf_help_content.text_864ea227f2e9}}"
         ]
       }
     ]

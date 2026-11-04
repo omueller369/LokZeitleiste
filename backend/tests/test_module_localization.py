@@ -29,6 +29,8 @@ class ModuleMessagesTest(unittest.TestCase):
             for key in re.findall(r'(?:\{\{|CtlText.source\(["\'])([a-z][a-z0-9_]*\.text_[a-f0-9]{12})', file.read_text()):
                 for locale in ('de', 'pl', 'en'):
                     self.assertIn(key, messages()[locale], str(file))
+            for token in re.findall(r'\{\{[a-z][a-z0-9_]*\.[a-z0-9_]+\}\}', file.read_text()):
+                self.assertNotEqual(resolve_placeholders(token), token, f'{file}: {token}')
             if file.suffix == '.html':
                 self.assertLess(file.read_text().index('/locales/messages.js'), file.read_text().index('/auth-session.js'))
 
@@ -63,11 +65,17 @@ class ModuleAssetTest(unittest.TestCase):
         self.assertIn('CtlMessages', bundle.text)
         for path in ('/locales/missing/de.json', '/locales/portal_tf_help_content/ru.json'):
             self.assertEqual(self.client.get(path).status_code, 404)
-        for path in ('/tf', '/admin/start', '/account'):
+        for path in ('/tf', '/admin/start', '/admin/tf', '/account'):
             page = self.client.get(path, headers={'Accept-Language':'pl'})
             self.assertEqual(page.status_code, 200)
-            self.assertNotRegex(page.text, r'\{\{[a-z_]+\.text_')
+            self.assertNotRegex(page.text, r'\{\{[a-z_]+\.[a-z0-9_]+')
             self.assertIn('/locales/messages.js', page.text)
+
+    def test_tf_search_label_is_resolved_in_german(self):
+        page = self.client.get('/admin/tf', headers={'Accept-Language':'de'})
+        self.assertEqual(page.status_code, 200)
+        self.assertIn('for="tfSearch">Suche', page.text)
+        self.assertNotIn('{{backend_admin.', page.text)
 
     def test_backend_shared_pages_keep_backend_identity(self):
         for path in ('/admin/me', '/admin/messages'):
