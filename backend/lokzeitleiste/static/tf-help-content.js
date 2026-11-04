@@ -1,4 +1,4 @@
-/* Gemeinsamer Hilfekatalog für alle TF-Module. Sprachwahl bleibt nach Neuladen im Seitenkopf erreichbar. */
+/* Gemeinsamer Hilfekatalog für alle TF-Module. Rechte Kopfleiste: Tag/Nacht, Hilfe ?, Sprache; Logo und Abmelden links. */
 window.TfHelpRevision="2026-11-04";
 window.TfHelpPages=globalThis.CtlText.restore([
   {
