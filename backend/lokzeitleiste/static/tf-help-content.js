@@ -1,4 +1,4 @@
-/* Gemeinsamer Hilfekatalog für alle TF-Module. */
+/* Gemeinsamer Hilfekatalog für alle TF-Module. Sprachwahl bleibt nach Neuladen im Seitenkopf erreichbar. */
 window.TfHelpRevision="2026-11-04";
 window.TfHelpPages=globalThis.CtlText.restore([
   {
