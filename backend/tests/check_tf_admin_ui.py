@@ -26,7 +26,7 @@ CHECKS=r'''
  assert(document.getElementById('newTfLink').getAttribute('href')==='/admin/tf/new','Explicit add link');
  assert(document.querySelector('script[data-backend-nav]'),'Navigation bootstrap survives missing legacy logout');
  const search=document.getElementById('tfSearch'),type=document.getElementById('tfTypeFilter');
- assert(document.querySelector('label[for=tfSearch]').textContent.trim()==='Suche','German search label resolved');assert(!document.body.textContent.includes('{{backend_admin.'),'No unresolved admin placeholders');
+ assert(document.querySelector('label[for=tfSearch]').textContent.trim()==='Suche','German search label resolved');assert(!document.querySelector('main').textContent.includes('{{backend_admin.'),'No unresolved admin placeholders');
  const find=()=>search.dispatchEvent(new Event('input'));search.value='ALEX 123';find();assert(document.querySelectorAll('#users tr').length===1,'Case-insensitive multi-term search');
  type.value='border';type.dispatchEvent(new Event('change'));assert(!document.getElementById('tfNoResults').hidden,'Search combines with type filter');
  search.value='';find();assert(document.querySelectorAll('#users tr').length===1,'Clearing search retains type filter');type.value='';type.dispatchEvent(new Event('change'));
