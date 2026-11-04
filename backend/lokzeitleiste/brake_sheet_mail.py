@@ -14,7 +14,7 @@ from .db import database_session
 from .models import BrakeSheetDraft,BrakeSheetDispatch,MailboxAccount,MailboxSettings,MailboxProvision,EmployeeEmail,User,now_utc
 from .tf_portal import driver_dependency
 from .signatures import signature_for,signature_position_for
-from .brake_sheets import Sheet,PreviewRequest,calculate
+from .brake_sheets import Sheet,PreviewRequest,calculate,section_suffix,document_source
 from .brake_sheet_image import render,render_pdf
 from .documents.storage import generated
 from .mailbox import service
@@ -78,9 +78,9 @@ def create_router(require_account):
             pdf=render_pdf(sheet,result,draft.created_at,draft.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
-        filename=f"{_text_source('server_brake_sheet_mail.text_b1cc93fb59b2')}{number}-{day.isoformat()}.PDF"
+        filename=f"{_text_source('server_brake_sheet_mail.text_b1cc93fb59b2')}{number}-{day.isoformat()}{section_suffix(sheet,draft.revision)}.PDF"
         path=f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}'
-        document=generated(db,user,path,pdf,'brake-sheet:'+draft.id);db.flush()
+        document=generated(db,user,path,pdf,document_source(sheet,draft));db.flush()
         account,sender,ready=mailbox(db,user)
         subject=f"{_text_source('server_brake_sheet_mail.text_af4bffc07380')}{number} – {day:%d.%m.%Y}"
         mail=dict(to=[TO],cc=[CC],bcc=[BCC],subject=subject,body=f"{_text_source('server_brake_sheet_mail.text_75c42298154a')}{number}{_text_source('server_brake_sheet_mail.text_83146ef071d3')}{day:%d.%m.%Y}.")
@@ -100,6 +100,8 @@ def create_router(require_account):
         row=owned(db,user,id)
         if row.status=='sent':return dict(sent=True,warning=row.warning,already_sent=True)
         if row.status!='ready':raise HTTPException(409,_text_source('server_brake_sheet_mail.text_bd6f5600c02a'))
+        draft=db.get(BrakeSheetDraft,row.draft_id)
+        if not draft or draft.owner_id!=user.id or draft.revision!=row.draft_revision:raise HTTPException(409,_text_source('server_brake_sheet_mail.text_5a7be4591f8a'))
         account,sender,ready=mailbox(db,user)
         if not ready or sender!=row.sender:raise HTTPException(409,_text_source('server_brake_sheet_mail.text_f85be3c70c98'))
         if BCC not in [str(a) for a in data.bcc]:data.bcc.append(BCC)

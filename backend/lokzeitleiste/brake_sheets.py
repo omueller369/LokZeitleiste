@@ -5,7 +5,7 @@ from datetime import date
 from decimal import Decimal,ROUND_CEILING
 from pathlib import Path
 from typing import Literal
-from uuid import UUID
+from uuid import UUID,uuid5
 from fastapi import APIRouter,Depends,HTTPException,UploadFile,File,Form
 from .wagon_import import WagonImport, ImportError as WagonImportError, parse as parse_wagons, MAX_UPLOAD
 from fastapi.responses import FileResponse,Response
@@ -18,6 +18,8 @@ from .models import BrakeSheetDraft,RailwayVehicle,VehicleRetirement,TfProfile,U
 from .tf_portal import driver_dependency
 from .signatures import signature_for,signature_position_for
 from .vehicles import vehicle_view,is_retired
+
+from .towed_locomotives import TowedLoco,TowError,ERRORS as TOW_ERRORS,plan as tow_plan,compose as tow_compose,sections as tow_sections
 
 class Country(BaseModel):
     country:Literal['DE','PL']|None=None
@@ -62,6 +64,11 @@ class Sheet(BaseModel):
     locos:list[Loco]=Field(default_factory=list,max_length=5)
     wagon:WagonValues=Field(default_factory=WagonValues)
     wagon_import:WagonImport|None=None
+    towed:list[TowedLoco]=Field(default_factory=list,max_length=49)
+    final_station:str=Field(default="",max_length=270)
+    section_parent:UUID|None=None
+    section_index:int=Field(default=0,ge=0,le=49)
+    section_superseded:bool=False
     holding_loco:Decimal|None=Field(default=None,ge=0,le=9999,decimal_places=3,allow_inf_nan=False)
     holding_unit:Literal['t','kN']|None=None
     required_percent:int|None=Field(default=None,ge=50,le=150,strict=True)
@@ -78,6 +85,13 @@ class Sheet(BaseModel):
         return value
     @model_validator(mode='after')
     def rules(self):
+        if self.towed and not self.section_parent:
+            self.final_station=self.final_station or self.station_to
+            try:self.station_to=tow_plan(self)[0]
+            except TowError as error:raise ValueError(_text_source(TOW_ERRORS[str(error)])) from error
+        elif not self.towed and not self.section_parent and self.final_station:
+            self.station_to=self.final_station;self.final_station=''
+            if self.wagon_import:self.first_vehicle=self.wagon_import.rows[0].number;self.last_vehicle=self.wagon_import.rows[-1].number
         self.section_from=self.station_from;self.section_to=self.station_to
         if self.second_from or self.second_to or self.second_first_vehicle or self.second_last_vehicle:raise ValueError(_text_source('server_brake_sheets.text_63cfe4faae33'))
         if len({x.vehicle_id for x in self.locos})!=len(self.locos):raise ValueError(_text_source('server_brake_sheets.text_0bcfde1957a7'))
@@ -107,7 +121,14 @@ def calculate(db,data):
     a=dict(count=len(lines),length=total('length_m'),holding=data.holding_loco,brake=total('brake_weight'),weight=total('weight_kg',1000))
     if a['length'] is not None:a['length']=a['length'].to_integral_value(rounding=ROUND_CEILING)
     b=data.wagon.model_dump()
-    if data.wagon_import:
+    towed=[];remarks=data.remarks
+    if data.towed or data.section_parent:
+        try:
+            values,ordered,towed,remarks=tow_compose(db,data,public_vehicle);b.update(values)
+            data.first_vehicle=ordered[0]['number'];data.last_vehicle=ordered[-1]['number']
+        except TowError as error:raise HTTPException(422,_text_source(TOW_ERRORS[str(error)])) from error
+        except WagonImportError as error:raise HTTPException(422,_text_source(IMPORT_ERRORS[str(error)])) from error
+    elif data.wagon_import:
         try:b.update(data.wagon_import.values(data.brake_mode))
         except WagonImportError as error:raise HTTPException(422, _text_source(IMPORT_ERRORS[str(error)])) from error
     summed={key:(value+Decimal(b[key] or 0) if value is not None else None) for key,value in a.items()}
@@ -117,7 +138,9 @@ def calculate(db,data):
     difference=available-data.required_percent if available is not None and data.required_percent is not None else None
     result=dict(lines=lines,a=a,b=b,total=summed,available=available,required=data.required_percent,missing=difference if difference is not None and difference<0 else '/' if difference is not None else None,cast_iron='/')
 
+    result.update(towed=towed,remarks=remarks,station_to=data.station_to,final_station=data.final_station,first_vehicle=data.first_vehicle,last_vehicle=data.last_vehicle)
     result['preview_missing']=preview_missing(data,result)
+    if data.section_superseded:result['preview_missing'].append(_text_source(TOW_ERRORS['superseded']))
     return result
 
 def preview_missing(data,result):
@@ -139,6 +162,12 @@ def preview_missing(data,result):
     return missing
 
 IMPORT_ERRORS={'file': 'server_brake_sheets.text_57876c2d52fe', 'format': 'server_brake_sheets.text_fc74c531b994', 'missing_brake': 'server_brake_sheets.text_7c3ce0b4afb2', 'mode': 'server_brake_sheets.text_12846d32442d', 'range': 'server_brake_sheets.text_906e2fc6290d'}
+
+def section_suffix(sheet,revision=None):
+    return (f'-A{sheet.section_index+1:02d}'+(f'-R{revision}' if revision is not None else '')) if sheet.towed or sheet.section_parent else ''
+
+def document_source(sheet,row):
+    return 'brake-sheet:'+row.id+(':'+str(row.revision) if sheet.towed or sheet.section_parent else '')
 
 class PreviewRequest(BaseModel):
     expected_revision:int=Field(ge=1)
@@ -168,16 +197,49 @@ def create_router(require_account):
     def preview(data:Sheet,user=Depends(driver),db:Session=Depends(database_session)):return calculate(db,data)
     @router.get('/api/v1/tf/brake-sheets')
     def listing(user=Depends(driver),db:Session=Depends(database_session)):
-        return [dict(id=r.id,revision=r.revision,updated_at=r.updated_at,train_numbers=json.loads(r.payload_json)['train_numbers']) for r in db.scalars(select(BrakeSheetDraft).where(BrakeSheetDraft.owner_id==user.id).order_by(BrakeSheetDraft.updated_at.desc()))]
+        rows=[]
+        for r in db.scalars(select(BrakeSheetDraft).where(BrakeSheetDraft.owner_id==user.id).order_by(BrakeSheetDraft.updated_at.desc())):
+            payload=json.loads(r.payload_json)
+            if payload.get('section_superseded'):continue
+            rows.append(dict(id=r.id,revision=r.revision,updated_at=r.updated_at,train_numbers=payload['train_numbers'],station_from=payload.get('station_from',''),station_to=payload.get('station_to',''),section_parent=payload.get('section_parent'),section_index=payload.get('section_index',0)))
+        return rows
     def creation(row):return dict(created_at=row.created_at.isoformat()+'Z',created_by_name=row.created_by_name)
     def owned(db,user,id):
         row=db.scalar(select(BrakeSheetDraft).where(BrakeSheetDraft.id==str(id),BrakeSheetDraft.owner_id==user.id).with_for_update())
         if not row:raise HTTPException(404,_text_source('server_brake_sheets.text_c5d2307ed28b'))
         return row
+    def section_links(db,user,row):
+        payload=json.loads(row.payload_json);parent=payload.get('section_parent') or row.id;links=[]
+        for candidate in db.scalars(select(BrakeSheetDraft).where(BrakeSheetDraft.owner_id==user.id)):
+            value=json.loads(candidate.payload_json)
+            if not value.get('section_superseded') and (candidate.id==parent or value.get('section_parent')==parent):
+                links.append(dict(id=candidate.id,station_from=value.get('station_from',''),station_to=value.get('station_to',''),section_index=value.get('section_index',0)))
+        return sorted(links,key=lambda v:v['section_index'])
+    def sync_sections(db,user,row,sheet):
+        active=set()
+        if sheet.towed:
+            try:
+                _,ordered,_,_=tow_compose(db,sheet,public_vehicle)
+                stages=tow_sections(sheet,ordered)
+            except TowError as error:raise HTTPException(422,_text_source(TOW_ERRORS[str(error)])) from error
+            for stage in stages[1:]:
+                stage.section_parent=UUID(row.id)
+                child_id=str(uuid5(UUID(row.id),'section:'+str(stage.section_index)+':'+stage.station_from+':'+stage.station_to))
+                child=db.get(BrakeSheetDraft,child_id)
+                if child and child.owner_id!=user.id:raise HTTPException(409,_text_source(TOW_ERRORS['readonly']))
+                calculation=calculate(db,stage)
+                if not child:
+                    child=BrakeSheetDraft(id=child_id,owner_id=user.id,revision=0,created_at=row.created_at,created_by_name=row.created_by_name);db.add(child)
+                from fastapi.encoders import jsonable_encoder
+                child.payload_json=stage.model_dump_json();child.calculation_json=json.dumps(jsonable_encoder(calculation));child.revision+=1;child.updated_at=now_utc();active.add(child_id)
+        for child in db.scalars(select(BrakeSheetDraft).where(BrakeSheetDraft.owner_id==user.id)):
+            value=json.loads(child.payload_json)
+            if value.get('section_parent')==row.id and child.id not in active and not value.get('section_superseded'):
+                value['section_superseded']=True;child.payload_json=json.dumps(value);child.revision+=1;child.updated_at=now_utc()
     @router.get('/api/v1/tf/brake-sheets/{id}')
     def detail(id:UUID,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
-        return dict(id=row.id,revision=row.revision,sheet=json.loads(row.payload_json),calculation=json.loads(row.calculation_json),**creation(row))
+        return dict(id=row.id,revision=row.revision,sheet=json.loads(row.payload_json),calculation=json.loads(row.calculation_json),sections=section_links(db,user,row),**creation(row))
     @router.post('/api/v1/tf/brake-sheets/{id}/preview')
     def image_preview(id:UUID,data:PreviewRequest,user=Depends(driver),db:Session=Depends(database_session)):
         row=owned(db,user,id)
@@ -200,8 +262,8 @@ def create_router(require_account):
         try:content=render_pdf(sheet,result,row.created_at,row.created_by_name,signature=signature_for(db,user),signature_position=signature_position_for(db,user))
         except ValueError as exc:raise HTTPException(422,str(exc)) from exc
         number=sheet.train_numbers[0];day=sheet.departure_date
-        filename=f"{_text_source('server_brake_sheets.text_b1cc93fb59b2')}{number}-{day.isoformat()}.PDF"
-        document=generated(db,user,f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}',content,'brake-sheet:'+row.id)
+        filename=f"{_text_source('server_brake_sheets.text_b1cc93fb59b2')}{number}-{day.isoformat()}{section_suffix(sheet,row.revision)}.PDF"
+        document=generated(db,user,f'Dokumente/Zugfahrten/{day:%Y/%m/%d}/{number}/{filename}',content,document_source(sheet,row))
         db.commit()
         return dict(filename=document.display_name,document_path=document.relative_path,download_url='/api/v1/documents/download?path='+quote(document.relative_path,safe=''))
     @router.put('/api/v1/tf/brake-sheets/{id}')
@@ -211,11 +273,13 @@ def create_router(require_account):
         row=db.get(BrakeSheetDraft,str(id))
         if row and row.owner_id!=user.id:raise HTTPException(404,_text_source('server_brake_sheets.text_c5d2307ed28b'))
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_brake_sheets.text_5a7be4591f8a'))
+        if data.sheet.section_parent or row and json.loads(row.payload_json).get('section_parent'):raise HTTPException(409,_text_source(TOW_ERRORS['readonly']))
+        data.sheet.section_index=0;data.sheet.section_superseded=False
         result=calculate(db,data.sheet)
         if not row:
             profile=db.get(TfProfile,user.id)
             if not profile:raise HTTPException(404,_text_source('server_brake_sheets.text_90407b4e449b'))
             row=BrakeSheetDraft(id=str(id),owner_id=user.id,revision=0,created_at=now_utc(),created_by_name=(profile.first_name+' '+profile.last_name).strip());db.add(row)
-        row.payload_json=data.sheet.model_dump_json();row.calculation_json=json.dumps(jsonable_encoder(result));row.revision+=1;row.updated_at=now_utc();db.commit()
-        return dict(id=row.id,revision=row.revision,sheet=data.sheet.model_dump(),calculation=result,**creation(row))
+        row.payload_json=data.sheet.model_dump_json();row.calculation_json=json.dumps(jsonable_encoder(result));row.revision+=1;row.updated_at=now_utc();db.flush();sync_sections(db,user,row,data.sheet);db.commit()
+        return dict(id=row.id,revision=row.revision,sheet=data.sheet.model_dump(),calculation=result,sections=section_links(db,user,row),**creation(row))
     return router

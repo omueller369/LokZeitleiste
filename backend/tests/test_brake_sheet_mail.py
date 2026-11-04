@@ -92,3 +92,12 @@ class BrakeSheetMailTest(unittest.TestCase):
         with Session(self.engine) as db:self.assertEqual(list(db.scalars(select(BrakeSheetDispatch))),[])
         self.assertEqual(self.driver.post(path+'/archive',json={'expected_revision':2}).status_code,409)
         self.assertEqual(self.client.post(path+'/archive',json={'expected_revision':1}).status_code,403)
+
+    def test_stale_prepared_draft_is_not_sent(self):
+        prepared=self.prepare()
+        with Session(self.engine) as db:
+            from lokzeitleiste.models import BrakeSheetDraft
+            dispatch=db.get(BrakeSheetDispatch,prepared['id']);draft=db.get(BrakeSheetDraft,dispatch.draft_id);draft.revision+=1;db.commit()
+        with patch('lokzeitleiste.brake_sheet_mail.service.send_prepared') as smtp:
+            response=self.driver.post('/api/v1/tf/brake-sheet-mail/'+prepared['id']+'/send',json=self.payload(prepared))
+            self.assertEqual(response.status_code,409,response.text);self.assertFalse(smtp.called)

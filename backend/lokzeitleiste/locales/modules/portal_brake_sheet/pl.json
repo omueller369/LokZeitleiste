@@ -121,5 +121,22 @@
   "text_6088a3b942bf": "G+P: pierwszych pięć wagonów w G z odliczeniem 25 %, pozostałe w P. Powyżej 500 m niezaokrąglonej długości składu dodatkowo 5 % od P. Wyniki zaokrąglane są w górę na końcu. W polach 4b i 16b stosowane jest tylko pierwsze słowo nazwy stacji docelowej.",
   "text_fbe000b7288f": "Źródło: arkusz / pierwszy wiersz wagonu / ostatni wiersz wagonu / wiersz sumy",
   "text_845f97a170a6": "Długość składu przed zaokrągleniem, m",
-  "text_8a822ef9b778": "Ręczne wartości wagonów: automatyczne obliczanie importu zostało odłączone."
+  "text_8a822ef9b778": "Ręczne wartości wagonów: automatyczne obliczanie importu zostało odłączone.",
+  "text_da7b4b947bee": "Dodaj holowany pojazd trakcyjny",
+  "text_6d406169e595": "Holowane pojazdy trakcyjne w składzie wagonów",
+  "text_98de658a599f": "Cel całej podróży",
+  "text_c28979148ea3": "Pozycja w całym składzie wagonów (1 = przód)",
+  "text_a2338b5fd37d": "Własna masa hamująca, t",
+  "text_787cb40eca00": "Położenie hamulca holowanego pojazdu",
+  "text_4e1a5113bb0d": "Czy uwzględnić masę hamującą w G?",
+  "text_dd8dce06f5b0": "Uwzględnij masę hamującą",
+  "text_4945884011af": "Uwzględnij jako 0",
+  "text_c153ddb9f279": "Stacja docelowa holowanego pojazdu",
+  "text_e1ab5ee69625": "Kolejność stacji odczepienia (1, 2, …)",
+  "text_f92f801d2555": "Długość holowanego pojazdu, m",
+  "text_a5e9792df119": "Masa holowanego pojazdu, t",
+  "text_aa34155bd848": "Karty próby hamulca dla odcinków",
+  "text_c751dda21c5e": "Edytuj źródłową kartę próby hamulca",
+  "text_a092f73716ce": "Automatyczna uwaga do pola 9",
+  "text_61dff2d93907": "Najpierw zaimportuj listę wagonów. Holowane pojazdy są dodatkowo liczone jak wagony. Podaj unikalne pozycje w całym składzie. Ta sama stacja odczepienia musi mieć ten sam numer kolejności. Zmiany wprowadzaj w źródłowej karcie; zapis ponownie tworzy wersje odcinkowe."
 }

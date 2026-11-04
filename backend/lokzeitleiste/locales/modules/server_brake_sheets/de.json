@@ -36,5 +36,15 @@
   "text_fc74c531b994": "Die Wagenliste konnte nicht eindeutig gelesen werden. Prüfe Überschriften, Wagenpositionen, Fahrzeugnummern und Zahlenwerte.",
   "text_7c3ce0b4afb2": "Für die gewählte Bremsstellung fehlen Bremsgewichte in G oder P. Fehlende Werte werden nicht ersetzt.",
   "text_12846d32442d": "Der Wagenlisten-Import unterstützt G, P und G+P. Für andere Bremsstellungen die Wagenwerte manuell eingeben.",
-  "text_906e2fc6290d": "Die importierten Werte liegen außerhalb der zulässigen Eingabegrenzen des Bremszettels (1–50 Wagen)."
+  "text_906e2fc6290d": "Die importierten Werte liegen außerhalb der zulässigen Eingabegrenzen des Bremszettels (1–50 Wagen).",
+  "text_125e0f35734b": "Für geschleppte Tfz muss zuerst eine Wagenliste importiert werden.",
+  "text_83270cdf3d72": "Prüfe die eindeutigen Tfz-Positionen innerhalb des gesamten Wagenzuges.",
+  "text_71faf3e94a85": "Prüfe Gesamtziel, Zielbahnhöfe und die eindeutige Reihenfolge der Aussetzbahnhöfe.",
+  "text_be76a8d9bb14": "Ein Tfz darf nicht zugleich arbeitend, in der Wagenliste oder mehrfach in Schlepp vorkommen.",
+  "text_2c84682009d9": "Gib Bremsstellung und Bremsgewicht an. Wähle bei G ausdrücklich Anrechnen oder 0.",
+  "text_cb9bac8ec7cc": "Für das geschleppte Tfz fehlen gültige Länge oder Gewicht.",
+  "text_47d309426a1c": "Diese Abschnittsversion wird automatisch erstellt. Bitte ändere den Ausgangsbremszettel.",
+  "text_62ef2abc71ed": "Diese Abschnittsversion wurde durch eine neue Planung ersetzt. Öffne die aktuelle Version.",
+  "text_08720ebebab9": "Feld 9 mit automatischem Tfz-Hinweis überschreitet 500 Zeichen. Kürze Deine zusätzlichen Bemerkungen oder die Bahnhofseinträge.",
+  "text_2f1639602f6f": "Mitgeführte Tfz {numbers} nur bis {station}."
 }
