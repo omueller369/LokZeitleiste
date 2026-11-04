@@ -341,5 +341,14 @@
   "text_fec51d2d9e0e": "Enter a station for From and To and choose a suggestion.",
   "text_feef9fa4558d": "What plus, minus, ticks and grey buttons mean.",
   "text_fef1b9e339af": "Open Work plan.",
-  "text_ff4ad25d9ffd": "If duty crosses midnight, select the correct following day for its end."
+  "text_ff4ad25d9ffd": "If duty crosses midnight, select the correct following day for its end.",
+  "tf_admin_group": "Administration",
+  "tf_admin_title": "Manage drivers",
+  "tf_admin_short": "Find, view, edit or add drivers.",
+  "tf_admin_list": "Driver list and icons",
+  "tf_admin_intro": "When you open the page, you immediately see all drivers you are allowed to access. Use the filter to narrow the list by driver type.",
+  "tf_admin_step1": "Click the eye in a row to view the details. The pencil opens editing immediately. You do not need to select a filter first.",
+  "tf_admin_step2": "Hover over an icon to see its meaning. The other icons open overtime, hours, planning, worktime or monthly data. Only permitted actions are shown.",
+  "tf_admin_step3": "To add a new driver, click “Create driver”. The empty form opens only then. This action is available only with the required permission.",
+  "rail_brand_intro": "Look for the burgundy and navy RS mark with a container wagon. The app icon uses the same mark. The header shows “Rail Software” below it. Your account and saved data are retained."
 }

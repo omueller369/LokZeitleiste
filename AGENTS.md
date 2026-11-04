@@ -21,3 +21,8 @@
 - `backend/lokzeitleiste/version.py` ist die gemeinsame Quelle für die sichtbare Softwareversion. Backend, Fußzeile, Dokumente, Android-Version und Android-Update-Metadaten müssen denselben Versionsstand verwenden. Android liest die Versionsbezeichnung automatisch aus dieser Datei; beim Versionssprung auch den Standard-`versionCode` in `app/build.gradle.kts` um eins erhöhen.
 - Pro zusammengehöriger Änderung genau einen Versionssprung vornehmen; mehrere bearbeitete Dateien und Korrekturen während derselben noch nicht übernommenen Aufgabe gehören zum selben Stand. Eine reine Versionsanpassung nicht rekursiv erneut erhöhen.
 - Den aktuellen Versionstitel in `README.md` mit aktualisieren. Historische Versionsdokumente und Testbeispiele nicht pauschal umnummerieren. Test-APKs dürfen zusätzlich die eindeutige Kennung `-test.<Buildnummer>` tragen.
+
+## GitHub und Update-Anleitung
+
+- GitHub für autorisierte Projektänderungen ausdrücklich verwenden; die bereits erteilte Zustimmung nicht wiederholt erfragen. Änderungen nach erfolgreicher Prüfung in den Testbranch übernehmen.
+- Nach jedem Upload ins Repository beziehungsweise in den Branch im Abschluss einen passenden Linux-Updatebefehl und eine Android-Updateanleitung angeben. Vorhandene Installation berücksichtigen; Android-Daten durch Installation über die bestehende App erhalten.

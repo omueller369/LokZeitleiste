@@ -98,6 +98,8 @@ def create_router(require_account):
     def shell_css():return FileResponse(STATIC/'tf-shell.css',media_type='text/css',headers={'Cache-Control':'no-cache'})
     @router.get('/tf/profile.js')
     def profile_script():return FileResponse(STATIC/'tf-profile.js',media_type='text/javascript',headers={'Cache-Control':'no-cache'})
+    @router.get('/tf/rail-software-logo.png')
+    def rail_logo():return FileResponse(STATIC/'rail-software-logo.png',media_type='image/png',headers={'Cache-Control':'public, max-age=86400'})
     @router.get('/tf/ctl-logistics-logo.jpg')
     def logo():return FileResponse(STATIC/'ctl-logistics-logo.jpg',media_type='image/jpeg',headers={'Cache-Control':'public, max-age=86400'})
 

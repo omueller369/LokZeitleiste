@@ -73,6 +73,13 @@ jobs:
         with:
           name: header-controls-ui
           path: ${{ runner.temp }}/header-controls-ui/
+      - name: TF administration browser regression
+        run: python backend/tests/check_tf_admin_ui.py --output-dir "$RUNNER_TEMP/tf-admin-ui"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tf-admin-ui
+          path: ${{ runner.temp }}/tf-admin-ui/
       - name: Compose configuration
         working-directory: backend
         run: |
