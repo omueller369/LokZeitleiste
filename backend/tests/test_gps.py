@@ -26,10 +26,14 @@ class AnalysisTest(unittest.TestCase):
         self.assertEqual(len(analyse(points(125))['rows']),3)
 
     def test_departure_above_ten_closes_stop_even_inside_radius(self):
-        data=points(125)+[dict(points()[0],t=BASE+130000,speed=10/3.6),dict(points()[0],t=BASE+135000,speed=10.1/3.6)]
-        data+= [dict(points()[0],t=BASE+s*1000) for s in range(140,266,5)]
+        data=points(125)+[dict(points()[0],t=BASE+130000,speed=10/3.6)]
+        data.append(dict(points()[0],t=BASE+135000,speed=15,lon=13.004))
+        data.append(dict(points()[0],t=BASE+140000))
+        for i in range(4):
+            data.append(dict(points()[0],t=BASE+145000+i*1000,speed=4,lon=13+i*.00006))
+        data+= [dict(points()[0],t=BASE+s*1000,lon=13.00018) for s in range(150,276,5)]
         stops=[r for r in analyse(data)['rows'] if r['kind']=='Halt']
-        self.assertEqual([(r['start']-BASE,r['end']-BASE) for r in stops],[(0,130000),(140000,265000)])
+        self.assertEqual([(r['start']-BASE,r['end']-BASE) for r in stops],[(0,140000),(150000,275000)])
 
     def test_rail_stop_fixtures_match_browser(self):
         cases=json.loads((Path(__file__).parent/'fixtures/gps-rail-stops.json').read_text())
@@ -136,7 +140,7 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(changed.json()['stop_edits']['live-'+str(BASE+300000)]['station_input'],'CCC')
 
     def test_legacy_station_assignment_does_not_shift_to_new_shorter_stop(self):
-        data=points(240)+[dict(points()[0],t=BASE+245000,lat=52.002,speed=3)]
+        data=points(240)+[dict(points()[0],t=BASE+245000+i*1000,lat=52.002+i*.00004,speed=4) for i in range(4)]
         data += [dict(points()[0],t=BASE+s*1000,lat=52.004) for s in range(250,556,5)]
         path,response=self.save(points=data)
         self.assertEqual(response.status_code,200,response.text)

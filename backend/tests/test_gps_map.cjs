@@ -34,6 +34,11 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  context.document.visibilityState='hidden';r.drawMap();assert(!r.mapSvg.children.some(n=>n.tag==='image'));assert(r.mapSvg.children.some(n=>n.tag==='polyline'));
  // Old recordings need no migration: markers are derived from original fixes.
  r.record={ended:true,points:Array.from({length:63},(_,i)=>({...point(52,13,100000+i*5000),speed:0}))};r.draw();
+ r.mapFollow.onclick();
+ const standCenter=r.mapView.center.x;
+ const spike=r.record.points.at(-1);spike.lon=13.05;spike.speed=null;r.drawMap();
+ assert.equal(r.mapView.center.x,standCenter,'A large standstill jump must not move the map');
+ assert.equal(spike.lon,13.05,'Raw GPS fixes stay available');
  const markers=()=>r.mapSvg.children.filter(n=>n.attributes['data-gps-stop']);assert.equal(markers().length,1);
  const marker=markers()[0];assert.equal(marker.children[0].attributes.fill,'#1565c0');assert.equal(marker.children[1].attributes.fill,'#d00000');
  const input=r.liveInputs[0].station;let focused=0,scrolled=0;input.focus=()=>focused++;input.scrollIntoView=()=>scrolled++;input.setSelectionRange=(a,b)=>assert.equal(a,b);marker.events.click();assert.equal(focused,1);assert.equal(scrolled,1);
@@ -46,7 +51,7 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  for(const fixture of JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8'))){const actual=context.window.GpsRecorder.liveStops(fixture.points,true,fixture.edits).map(({start,end})=>({start,end}));assert.equal(JSON.stringify(actual),JSON.stringify(fixture.expected),fixture.name);}
  // A newly visible shorter stop must not inherit the old s0 location of a later stop.
  const oldTrack=JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8')).find(f=>f.name==='two different stops').points;
- const base=oldTrack[0].t;r.record={ended:true,points:oldTrack.concat(Array.from({length:13},(_,i)=>({...oldTrack.at(-2),t:base+(495+i*5)*1000,speed:0}))).filter(p=>p.t!==base+495000),stations:{s0:{code:'CCC',name:'Old stop'}},reasons:{s0:{reason:'V1'}},selection:['s0']};
+ const base=oldTrack[0].t;r.record={ended:true,points:oldTrack.filter(p=>p.t<base+495000).concat(Array.from({length:13},(_,i)=>({...oldTrack.find(p=>p.t===base+490000),t:base+(495+i*5)*1000,speed:0}))),stations:{s0:{code:'CCC',name:'Old stop'}},reasons:{s0:{reason:'V1'}},selection:['s0']};
  // Keep the second stop stationary for >5 minutes so it was the only legacy stop.
  r.draw();assert.equal(r.liveInputs.length,2);assert.equal(r.liveInputs[0].station.value,'');assert.equal(r.liveInputs[1].station.value,'CCC · Old stop');assert.equal(r.record.selection[0],'s1');
  // Version-2 edited intervals are re-evaluated and merged; all source edits remain available.
