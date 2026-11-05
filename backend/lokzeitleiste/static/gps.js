@@ -22,27 +22,44 @@ function stopEnd(row,value,previous){
 }
 const distance=(a,b)=>{const r=Math.PI/180,h=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(h)));};
 const speedAt=(p,last)=>p.speed??(last&&last.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000?distance(last,p)/((p.t-last.t)/1000):null);
+// Four consecutive accurate fixes must show sustained movement in one direction.
+function* confirmedMotion(points, inclusive){
+ const fast=speed=>inclusive?speed>=10:speed>10;
+ for(let i=0;i+3<points.length;i++){
+  const fixes=points.slice(i,i+4);
+  if(fixes.some(p=>p.accuracy>50||(p.speed!=null&&!fast(p.speed*3.6))))continue;
+  let path=0,valid=true;
+  for(let j=1;j<fixes.length;j++){
+   const elapsed=fixes[j].t-fixes[j-1].t,meters=distance(fixes[j-1],fixes[j]);
+   if(elapsed<=0||elapsed>30000||!fast(meters*3600/elapsed)){valid=false;break;}
+   path+=meters;
+  }
+  if(valid&&distance(fixes[0],fixes[3])>=0.75*path&&fast(distance(fixes[0],fixes[3])*3600/(fixes[3].t-fixes[0].t)))yield fixes[0].t;
+ }
+}
 // Current rail rule: start below 5 km/h, finish above 10 km/h; keep local drift together.
-function liveStops(points,ended=false,edits={},legacy=false,version2=false,version3=false){
+function liveStops(points,ended=false,edits={},legacy=false,version2=false,version3=false,version4=false,display=null){
  let run=[],last=null,rows=[];const previousRule=version2||version3;
+ const confirmed=legacy||previousRule||version4?null:new Set(confirmedMotion(points,false));
  const finish=closed=>{const duration=run.length>1?run.at(-1).t-run[0].t:0;if(legacy?duration>300000:previousRule?duration>=240000:duration>120000)rows.push({key:'live-'+run[0].t,kind:globalThis.CtlText.source("portal_gps.text_0fd998791d67"),start:run[0].t,end:closed?run.at(-1).t:null,observed_end:run.at(-1).t,lat:run[0].lat,lon:run[0].lon});run=[];};
  for(const p of points){
   if(last&&p.t-last.t>30000)finish(ended);
-  if(p.accuracy>50){finish(ended);last=p;continue;}
+  if(p.accuracy>50){finish(ended);last=p;display?.push(p);continue;}
   // Existing edited/imported stops retain their identity after an update.
   if(version2&&run.length&&edits?.['live-'+p.t])finish(true);
   const speed=speedAt(p,last);
   if(legacy){if(speed!=null&&speed*3.6<3)run.push(p);else finish(true);}
-  else if(run.length){const nearby=distance(run[0],p)<=100+1e-6;if(speed!=null&&speed*3.6>(previousRule?5:10)&&(!nearby||(p.speed!=null&&!previousRule)))finish(true);else if(nearby)run.push(p);}
-  else if(speed!=null&&speed*3.6<(previousRule?3:5))run.push(p);
+  else if(run.length){const nearby=distance(run[0],p)<=100+1e-6;if(confirmed?confirmed.has(p.t):speed!=null&&speed*3.6>(previousRule?5:10)&&(!nearby||(p.speed!=null&&!previousRule)))finish(true);else if(nearby)run.push(p);}
+  else if(!confirmed?.has(p.t)&&speed!=null&&speed*3.6<(previousRule?3:5))run.push(p);
+  if(display)display.push(run.length?{...p,lat:run[0].lat,lon:run[0].lon}:p);
   last=p;
  }
  finish(ended);return rows;
 }
 // Upgrade cached legacy assignments by start time, never by a newly shifted row number.
 function normaliseRecording(record){
- if(!record||record.detection_version===4)return;
- const edits=record.stop_edits||{},old=liveStops(record.points||[],true,edits,![2,3].includes(record.detection_version),record.detection_version===2,record.detection_version===3);
+ if(!record||record.detection_version===5)return;
+ const edits=record.stop_edits||{},old=liveStops(record.points||[],true,edits,![2,3,4].includes(record.detection_version),record.detection_version===2,record.detection_version===3,record.detection_version===4);
  for(const [i,row]of old.entries()){
   const station=record.stations?.['s'+i]||record.locations?.[String(row.start)],reason=record.reasons?.['s'+i]||{};
   if(!edits[row.key]&&(station||reason.reason))edits[row.key]={station,station_input:station?(station.code?station.code+' · ':'')+station.name:'',reason:reason.reason||'',detail:reason.detail||'',imported:false};
@@ -51,10 +68,10 @@ function normaliseRecording(record){
  const fresh=liveStops(record.points||[],true,edits),mapping={start:'start',end:'end'};
  for(const [i,row]of old.entries()){const j=fresh.findIndex(item=>item.start<=row.start&&(item.end||item.observed_end)>=row.start);if(j>=0)mapping['s'+i]='s'+j;}
  for(const field of ['stations','reasons']){const values={};for(const [key,value]of Object.entries(record[field]||{}))if(mapping[key]&&!(mapping[key] in values))values[mapping[key]]=value;record[field]=values;}
- record.selection=[...new Set((record.selection||[]).filter(key=>mapping[key]).map(key=>mapping[key]))];record.detection_version=4;
+ record.selection=[...new Set((record.selection||[]).filter(key=>mapping[key]).map(key=>mapping[key]))];record.detection_version=5;
 }
 function firstDeparture(points){
- let previous=null;for(const p of points){if(p.accuracy>50){previous=null;continue;}const speed=speedAt(p,previous);if(speed!=null&&speed*3.6>=10)return p.t;previous=p;}return null;
+ return confirmedMotion(points,true).next().value??null;
 }
 const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|Standort.*(nicht erlaubt|verweigert|abgelehnt|fehlt)|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
 
@@ -96,7 +113,7 @@ class Recorder{
  const number=this.o.trainNumber().trim();if(!/^[A-Za-z0-9]{1,12}$/.test(number))throw Error(t(globalThis.CtlText.source("portal_gps.text_b9009a6c1629")));
  const prior=this.record?JSON.parse(JSON.stringify(this.record)):null,now=Date.now();
  if(running){if(now<=running.start)throw Error(t(globalThis.CtlText.source("portal_gps.text_5241a073e0be")));running.end=now;}
- else {this.record||={train_number:number,points:[],ended:true,revision:0,detection_version:4};this.record.manual_stops||=[];if(this.record.manual_stops.length>=500)throw Error(t(globalThis.CtlText.source("portal_gps.text_c704954a2ce2")));this.record.manual_stops.push({key:'manual-'+now,start:now,end:null});}
+ else {this.record||={train_number:number,points:[],ended:true,revision:0,detection_version:5};this.record.manual_stops||=[];if(this.record.manual_stops.length>=500)throw Error(t(globalThis.CtlText.source("portal_gps.text_c704954a2ce2")));this.record.manual_stops.push({key:'manual-'+now,start:now,end:null});}
  this.record.dirty=true;try{await this.persist();}catch(error){this.record=prior;throw error;}
  this.updateManual();this.draw();this.o.changed?.();if(running)this.say(globalThis.CtlText.source("portal_gps.text_3e685afd44c8"));
  }
@@ -112,7 +129,7 @@ class Recorder{
  }
  async sample(){if(this.pending||active!==this)return;this.pending=true;try{await this.add(await this.fix());}catch(error){if(active===this){this.fail(globalThis.CtlText.source("portal_gps.text_754c85b57a48"));if(error.code===1){this.clear();this.freeze();}}}finally{this.pending=false;}}
  async nativeRead(){let running=false;for(;;){const previous=this.record?.points?.at(-1)?.t||0,result=await window.AndroidPortal.gps('snapshot',{key:this.key,after:previous});running=result.running;if(result.points.length){if(!this.record)this.record={train_number:this.o.trainNumber().trim(),points:[],ended:false,revision:0,dirty:true};for(const point of result.points)if(point.t>(this.record.points.at(-1)?.t||0))this.record.points.push(point);this.record.dirty=true;await this.persist();}if(result.points.length<1000)break;}if(active!==this&&this.record?.points?.length&&!this.record.ended)window.openActiveGpsReport?.(this.o.journeyId);if(running&&!active){window.openActiveGpsReport?.(this.o.journeyId);active=this;this.record.ended=false;this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);}if(this.applyDeparture())await this.persist();if(active===this&&!running){clearInterval(this.nativeTimer);active=null;this.say(globalThis.CtlText.source("portal_gps.text_989a5a596446"));}this.draw();this.freeze();}
- async nativeStart(){const prior=this.record,reset=!this.record||this.record.ended;if(reset)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:4,ended:false,revision:this.record?.revision||0,dirty:true};try{await window.AndroidPortal.gps('start',{key:this.key,reset});}catch(error){this.record=prior;throw error;}active=this;this.record.ended=false;this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};await this.persist();this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);await this.nativeRead();this.freeze();this.o.changed?.();}
+ async nativeStart(){const prior=this.record,reset=!this.record||this.record.ended;if(reset)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};try{await window.AndroidPortal.gps('start',{key:this.key,reset});}catch(error){this.record=prior;throw error;}active=this;this.record.ended=false;this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};await this.persist();this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);await this.nativeRead();this.freeze();this.o.changed?.();}
  async help(){try{const reader=window.TfHelp||await window.loadTfHelp?.();if(!reader)throw Error(globalThis.CtlText.source("portal_gps.text_423e45b97d3e"));reader.open('gps');}catch(error){this.fail(error.message);}}
  chooseEndpoint(kind){
  if(kind==='start'&&this.o.selectStart)return this.o.selectStart();
@@ -143,7 +160,7 @@ class Recorder{
  if(!await this.prepareEndpoints())return;
  this.mapState={mode:'follow',zoom:this.mapState?.zoom||15};
  if(window.AndroidPortal){await this.nativeStart();return;}
- if(!this.record||this.record.ended)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:4,ended:false,revision:this.record?.revision||0,dirty:true};
+ if(!this.record||this.record.ended)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};
  this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station=this.startChoice?.code||this.record.start_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};active=this;try{await this.persist();}catch(error){this.clear();throw error;}await this.wake();this.timer=setInterval(()=>this.sample(),5000);this.sample();this.freeze();this.o.changed?.();
  }
  clear(){clearInterval(this.timer);clearInterval(this.nativeTimer);if(active===this)active=null;this.wakeLock?.release().catch(()=>{});}
@@ -194,7 +211,7 @@ class Recorder{
  focusStop(key){this.setFocusedStop(key,true);const input=this.liveInputs?.find(item=>item.row.key===key)?.station;if(input){input.scrollIntoView?.({behavior:'smooth',block:'center'});input.focus({preventScroll:true});input.setSelectionRange?.(input.value.length,input.value.length);}else {const row=this.rows().find(row=>row.source_keys.includes(key));this.o.focusImported?.(row?.source_keys.find(source=>this.o.hasImported?.(source))||key);}}
  mapZoom(delta){if(!this.mapView)return;const zoom=Math.max(2,Math.min(19,this.mapView.zoom+delta)),mode=this.mapState?.mode==='follow'?'follow':'free';this.mapState={mode,zoom,center:this.mapView.center};this.drawMap();}
  drawMap(){
- this.map.replaceChildren();this.map.append(this.mapTools);const points=(this.record?.points||[]).filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
+ this.map.replaceChildren();this.map.append(this.mapTools);const display=[];liveStops(this.record?.points||[],!!this.record?.ended,{},false,false,false,false,display);const points=display.filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),make=tag=>document.createElementNS(ns,tag);this.mapSvg=svg;svg.setAttribute('viewBox','0 0 600 300');svg.setAttribute('role','group');svg.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_f5976363df27")));
  const project=projectPoint;
  const coords=points.map(project),minX=Math.min(...coords.map(p=>p.x)),maxX=Math.max(...coords.map(p=>p.x)),minY=Math.min(...coords.map(p=>p.y)),maxY=Math.max(...coords.map(p=>p.y));
@@ -206,7 +223,7 @@ class Recorder{
  const layer=(template,rail=false)=>{for(const {x,y}of tiles){const image=make('image');image.setAttribute('x',x*256-left);image.setAttribute('y',y*256-top);image.setAttribute('width',256);image.setAttribute('height',256);image.setAttribute('href',template.replace('{z}',zoom).replace('{x}',((x%2**zoom)+2**zoom)%2**zoom).replace('{y}',y));image.setAttribute('referrerpolicy','origin');if(rail)image.setAttribute('data-gps-rail','true');if(rail)image.addEventListener('error',()=>{if(this.railFailed)return;this.railFailed=true;this.drawMap();});svg.append(image);}};
  layer(window.GpsTileUrl||'https://tile.openstreetmap.org/{z}/{x}/{y}.png');if(this.railEnabled&&!this.railFailed)layer(window.GpsRailTileUrl||'https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',true);}
  let segment=[],last=null,interrupted=false;const flush=()=>{if(segment.length){const line=make('polyline');line.setAttribute('points',segment.join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#d00000');line.setAttribute('stroke-width',3);svg.append(line);segment=[];}};
- for(const p of this.record.points){if(p.accuracy>50){flush();interrupted=true;continue;}if(last&&(interrupted||p.t-last.t>30000)){flush();const a=project(last),b=project(p),bridge=make('line');bridge.setAttribute('x1',a.x*size-left);bridge.setAttribute('y1',a.y*size-top);bridge.setAttribute('x2',b.x*size-left);bridge.setAttribute('y2',b.y*size-top);bridge.setAttribute('stroke','#d00000');bridge.setAttribute('stroke-width',2);bridge.setAttribute('stroke-dasharray','6 4');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));bridge.append(title);svg.append(bridge);}interrupted=false;const c=project(p);segment.push((c.x*size-left).toFixed(1)+','+(c.y*size-top).toFixed(1));last=p;}flush();
+ for(const p of display){if(p.accuracy>50){flush();interrupted=true;continue;}if(last&&(interrupted||p.t-last.t>30000)){flush();const a=project(last),b=project(p),bridge=make('line');bridge.setAttribute('x1',a.x*size-left);bridge.setAttribute('y1',a.y*size-top);bridge.setAttribute('x2',b.x*size-left);bridge.setAttribute('y2',b.y*size-top);bridge.setAttribute('stroke','#d00000');bridge.setAttribute('stroke-width',2);bridge.setAttribute('stroke-dasharray','6 4');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));bridge.append(title);svg.append(bridge);}interrupted=false;const c=project(p);segment.push((c.x*size-left).toFixed(1)+','+(c.y*size-top).toFixed(1));last=p;}flush();
  for(const [i,color]of [[0,'#008000'],[coords.length-1,'#c40000']]){const c=make('circle');c.setAttribute('cx',coords[i].x*size-left);c.setAttribute('cy',coords[i].y*size-top);c.setAttribute('r',5);c.setAttribute('fill',color);svg.append(c);}for(const row of this.rows().filter(row=>!row.manual&&!this.removed(row))){
  const p=project(row),marker=make('g');marker.setAttribute('data-gps-stop',row.key);marker.setAttribute('transform','translate('+(p.x*size-left)+' '+(p.y*size-top)+globalThis.CtlText.source("portal_gps.text_c436a7be64bc")+(this.focusedStopKey===row.key?2:1)+')');marker.setAttribute('aria-pressed',String(this.focusedStopKey===row.key));marker.setAttribute('role','button');marker.setAttribute('tabindex','0');marker.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start));marker.setAttribute('style','cursor:pointer');
  const dot=make('circle');dot.setAttribute('r',8);dot.setAttribute('fill','#1565c0');dot.setAttribute('stroke','#fff');dot.setAttribute('stroke-width',2);const half=make('path');half.setAttribute('d','M 0 -7 A 7 7 0 0 1 0 7 Z');half.setAttribute('fill','#d00000');half.setAttribute('pointer-events','none');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start);marker.append(dot,half,title);

@@ -155,9 +155,9 @@ def create_router(require_account):
         return row
     def read_payload(row):
         payload=json.loads(row.payload_json)
-        if payload.get('detection_version')==4:return payload
+        if payload.get('detection_version')==5:return payload
         # Resolve old numbered assignments by their original start time.
-        old=[r for r in analyse(payload['points'],payload.get('stop_edits') or {},legacy=payload.get('detection_version') not in (2,3),version2=payload.get('detection_version')==2,version3=payload.get('detection_version')==3)['rows'] if r['kind']==_text_source('server_gps.text_0fd998791d67')]
+        old=[r for r in analyse(payload['points'],payload.get('stop_edits') or {},legacy=payload.get('detection_version') not in (2,3,4),version2=payload.get('detection_version')==2,version3=payload.get('detection_version')==3,version4=payload.get('detection_version')==4)['rows'] if r['kind']==_text_source('server_gps.text_0fd998791d67')]
         edits=payload.get('stop_edits') or {}
         for item in old:
             station=payload.get('stations',{}).get(item['key']) or payload.get('locations',{}).get(str(item['start']))
@@ -178,7 +178,7 @@ def create_router(require_account):
                 if key in key_map:values.setdefault(key_map[key],value)
             payload[field]=values
         payload['selection']=list(dict.fromkeys(key_map[k] for k in payload.get('selection',[]) if k in key_map))
-        payload['detection_version']=4
+        payload['detection_version']=5
         return payload
     def view(row):
         payload=read_payload(row);result=analyse(payload['points'],payload.get('stop_edits') or {})
@@ -202,7 +202,7 @@ def create_router(require_account):
         row=db.scalar(select(TrainGpsRecording).where(TrainGpsRecording.owner_id==user.id,TrainGpsRecording.journey_id==str(journey_id)).with_for_update())
         if (row.revision if row else 0)!=data.expected_revision:raise HTTPException(409,_text_source('server_gps.text_e9455228bddf'))
         payload=data.model_dump(exclude={'expected_revision'});previous=read_payload(row) if row else {}
-        payload['detection_version']=4
+        payload['detection_version']=5
         if payload['manual_stops'] is None:payload['manual_stops']=previous.get('manual_stops',[])
         gps_stops=[item for item in analyse(payload['points'])['rows'] if item['kind']==_text_source('server_gps.text_0fd998791d67')]
         stops={'live-'+str(item['start']):item for item in gps_stops}

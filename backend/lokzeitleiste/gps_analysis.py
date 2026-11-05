@@ -14,9 +14,30 @@ def bearing(a,b):
     p,q=map(math.radians,[a['lat'],b['lat']]);d=math.radians(b['lon']-a['lon'])
     return math.degrees(math.atan2(math.sin(d)*math.cos(q),math.cos(p)*math.sin(q)-math.sin(p)*math.cos(q)*math.cos(d)))%360
 
-def analyse(points,preserved_starts=(),legacy=False,version2=False,version3=False):
+def confirmed_departures(points):
+    """Return first timestamps of four-fix sequences that confirm motion."""
+    for index in range(len(points)-3):
+        fixes=points[index:index+4]
+        if any(p['accuracy']>MAX_ACCURACY or
+               (p.get('speed') is not None and p['speed']*3.6<=10) for p in fixes):
+            continue
+        path=0
+        for a,b in zip(fixes,fixes[1:]):
+            elapsed=b['t']-a['t']
+            meters=distance(a,b)
+            if not 0<elapsed<=MAX_GAP or meters*3600/elapsed<=10:
+                break
+            path+=meters
+        else:
+            displacement=distance(fixes[0],fixes[-1])
+            if displacement>=0.75*path and displacement*3600/(fixes[-1]['t']-fixes[0]['t'])>10:
+                yield fixes[0]['t']
+
+
+def analyse(points,preserved_starts=(),legacy=False,version2=False,version3=False,version4=False):
     rows=[];gaps=[];run=[];last=None
     previous_rule=version2 or version3
+    confirmed=None if legacy or previous_rule or version4 else set(confirmed_departures(points))
     def finish():
         duration=run[-1]['t']-run[0]['t'] if len(run)>1 else 0
         if (duration>300_000 if legacy else duration>=240_000 if previous_rule else duration>120_000):
@@ -38,9 +59,12 @@ def analyse(points,preserved_starts=(),legacy=False,version2=False,version3=Fals
         elif run:
             nearby=distance(run[0],point)<=100+1e-6
             # A speed inferred from position jumps does not end a stop inside its circle.
-            if speed is not None and speed*3.6>(5 if previous_rule else 10) and (not nearby or (reported_speed and not previous_rule)):finish()
+            departure=(point['t'] in confirmed if confirmed is not None else
+                       speed is not None and speed*3.6>(5 if previous_rule else 10)
+                       and (not nearby or (reported_speed and not previous_rule)))
+            if departure:finish()
             elif nearby:run.append(point)
-        elif speed is not None and speed*3.6<(3 if previous_rule else 5):run.append(point)
+        elif (confirmed is None or point['t'] not in confirmed) and speed is not None and speed*3.6<(3 if previous_rule else 5):run.append(point)
         last=point
     finish()
     good=[(i,p) for i,p in enumerate(points) if p['accuracy']<=MAX_ACCURACY]

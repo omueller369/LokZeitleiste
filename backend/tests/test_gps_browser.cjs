@@ -30,9 +30,16 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  r.o.selectedEndpoint=async kind=>chosen[kind];r.o.endpoint=(kind,choice)=>{chosen[kind]=choice;};r.o.journeyTime=(kind,time)=>times.push({kind,time});
  r.o.selectStart=async()=>{startQuestions++;return {code:'BBB',name:'Start'};};r.o.selectEnd=async()=>{endQuestions++;return {code:'CCC',name:'Ziel'};};
  await r.start();await new Promise(resolve=>setTimeout(resolve,5));assert.equal(r.record.start_station,'BBB');assert.equal(r.record.end_station,'CCC');assert.equal(startQuestions+endQuestions,0);
- const first=r.record.points.at(-1).t,add=(delta,speed,accuracy=5)=>r.add({timestamp:first+delta,coords:{latitude:52,longitude:13,accuracy,speed:speed/3.6}});
+ const first=r.record.points.at(-1).t,add=(delta,speed,accuracy=5,longitude=13)=>r.add({timestamp:first+delta,coords:{latitude:52,longitude,accuracy,speed:speed/3.6}});
  await add(5000,20,51);await add(10000,9.99);assert.equal(times.length,0);
- await add(15000,10);await add(20000,12);assert.deepEqual(times,[{kind:'start',time:first+15000}]);
+ await add(15000,72,5,13.004);await add(20000,12);assert.equal(times.length,0);
+ for(let i=0;i<3;i++)await add(25000+i*5000,10,5,13+i*.0003);
+ assert.equal(times.length,0);await add(40000,10,5,13.0009);
+ assert.deepEqual(times,[{kind:'start',time:first+25000}]);
+ const fixes=[0,1,0,1].map((n,i)=>({t:first+i*5000,lat:52,lon:13+n*.004,accuracy:5,speed:null}));
+ assert.equal(context.window.GpsRecorder.firstDeparture(fixes),null,'Back-and-forth jumps are not a departure');
+ const moving=fixes.map((p,i)=>({...p,lon:13+i*.0003}));assert.equal(context.window.GpsRecorder.firstDeparture(moving),first);
+ moving[2].accuracy=51;assert.equal(context.window.GpsRecorder.firstDeparture(moving),null);
  const beforeStop=Date.now();await r.stop(false);assert.equal(times[1].kind,'end');assert(times[1].time>=beforeStop);assert.equal(body.arrival_at,times[1].time);assert.equal(body.departure_applied,true);assert.equal(startQuestions+endQuestions,0);
  await r.erase();delete chosen.end;await r.start();await new Promise(resolve=>setTimeout(resolve,5));assert.equal(startQuestions,0);assert.equal(endQuestions,1);assert.equal(r.record.end_station,'CCC');
  delete chosen.end;r.o.selectEnd=async()=>{endQuestions++;return {code:'DDD',name:'Neues Ziel'};};await r.stop(false);assert.equal(endQuestions,2);assert.equal(body.end_station,'DDD');await r.erase();
