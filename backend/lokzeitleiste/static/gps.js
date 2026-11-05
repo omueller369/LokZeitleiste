@@ -209,6 +209,25 @@ class Recorder{
  for(const marker of this.mapSvg?.children||[]){const stopKey=marker.getAttribute('data-gps-stop');if(!stopKey)continue;const selected=stopKey===key,position=marker.getAttribute('transform').replace(/ scale\([^)]*\)$/,'');marker.setAttribute('transform',position+globalThis.CtlText.source("portal_gps.text_7d14c715b37c")+(selected?2:1)+')');marker.setAttribute('aria-pressed',String(selected));}
  }
  focusStop(key){this.setFocusedStop(key,true);const input=this.liveInputs?.find(item=>item.row.key===key)?.station;if(input){input.scrollIntoView?.({behavior:'smooth',block:'center'});input.focus({preventScroll:true});input.setSelectionRange?.(input.value.length,input.value.length);}else {const row=this.rows().find(row=>row.source_keys.includes(key));this.o.focusImported?.(row?.source_keys.find(source=>this.o.hasImported?.(source))||key);}}
+ drawPositionMarker(svg,make,x,y,point){
+ const marker=make('g');
+ marker.setAttribute('data-gps-position','true');
+ marker.setAttribute('transform','translate('+x+' '+y+')');
+ marker.setAttribute('pointer-events','none');
+ const append=(tag,attributes)=>{const element=make(tag);for(const [key,value] of Object.entries(attributes))element.setAttribute(key,value);marker.append(element);return element;};
+ const label=(value,y)=>{
+  append('text',{y,'text-anchor':'middle','font-size':20,'font-weight':700,fill:'#172338',stroke:'#fff','stroke-width':4,'stroke-linejoin':'round','paint-order':'stroke'}).textContent=value;
+ };
+ const speed=Number.isFinite(point.speed)&&point.speed>=0?Math.round(point.speed*3.6)+' km/h':'–';
+ label(speed,-23);
+ append('path',{d:'M -12 -9 L -5 -16 L 5 -12 L 12 -19 M 4 -19 H 17',fill:'none',stroke:'#172338','stroke-width':2.5,'stroke-linecap':'round'});
+ append('path',{d:'M -19 6 V -3 L -15 -10 H 13 L 19 -3 V 6 L 15 10 H -15 Z',fill:'#1565c0',stroke:'#fff','stroke-width':2});
+ append('path',{d:'M -14 -5 H -8 V 0 H -17 Z M 9 -5 H 13 L 17 0 H 9 Z',fill:'#fff'});
+ append('path',{d:'M 2 -7 L -4 1 H 0 L -2 7 L 5 -2 H 1 Z',fill:'#ffe26d'});
+ for(const cx of [-11,11])append('circle',{cx,cy:11,r:4,fill:'#172338',stroke:'#fff','stroke-width':1.5});
+ label(this.record.train_number||this.o.trainNumber().trim(),34);
+ svg.append(marker);
+ }
  mapZoom(delta){if(!this.mapView)return;const zoom=Math.max(2,Math.min(19,this.mapView.zoom+delta)),mode=this.mapState?.mode==='follow'?'follow':'free';this.mapState={mode,zoom,center:this.mapView.center};this.drawMap();}
  drawMap(){
  this.map.replaceChildren();this.map.append(this.mapTools);const display=[];liveStops(this.record?.points||[],!!this.record?.ended,{},false,false,false,false,display);const points=display.filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
@@ -224,11 +243,14 @@ class Recorder{
  layer(window.GpsTileUrl||'https://tile.openstreetmap.org/{z}/{x}/{y}.png');if(this.railEnabled&&!this.railFailed)layer(window.GpsRailTileUrl||'https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',true);}
  let segment=[],last=null,interrupted=false;const flush=()=>{if(segment.length){const line=make('polyline');line.setAttribute('points',segment.join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#d00000');line.setAttribute('stroke-width',3);svg.append(line);segment=[];}};
  for(const p of display){if(p.accuracy>50){flush();interrupted=true;continue;}if(last&&(interrupted||p.t-last.t>30000)){flush();const a=project(last),b=project(p),bridge=make('line');bridge.setAttribute('x1',a.x*size-left);bridge.setAttribute('y1',a.y*size-top);bridge.setAttribute('x2',b.x*size-left);bridge.setAttribute('y2',b.y*size-top);bridge.setAttribute('stroke','#d00000');bridge.setAttribute('stroke-width',2);bridge.setAttribute('stroke-dasharray','6 4');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));bridge.append(title);svg.append(bridge);}interrupted=false;const c=project(p);segment.push((c.x*size-left).toFixed(1)+','+(c.y*size-top).toFixed(1));last=p;}flush();
- for(const [i,color]of [[0,'#008000'],[coords.length-1,'#c40000']]){const c=make('circle');c.setAttribute('cx',coords[i].x*size-left);c.setAttribute('cy',coords[i].y*size-top);c.setAttribute('r',5);c.setAttribute('fill',color);svg.append(c);}for(const row of this.rows().filter(row=>!row.manual&&!this.removed(row))){
+ const endpoints=[[0,'#008000']];if(this.record.ended)endpoints.push([coords.length-1,'#c40000']);
+ for(const [i,color]of endpoints){const c=make('circle');c.setAttribute('cx',coords[i].x*size-left);c.setAttribute('cy',coords[i].y*size-top);c.setAttribute('r',5);c.setAttribute('fill',color);svg.append(c);}for(const row of this.rows().filter(row=>!row.manual&&!this.removed(row))){
  const p=project(row),marker=make('g');marker.setAttribute('data-gps-stop',row.key);marker.setAttribute('transform','translate('+(p.x*size-left)+' '+(p.y*size-top)+globalThis.CtlText.source("portal_gps.text_c436a7be64bc")+(this.focusedStopKey===row.key?2:1)+')');marker.setAttribute('aria-pressed',String(this.focusedStopKey===row.key));marker.setAttribute('role','button');marker.setAttribute('tabindex','0');marker.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start));marker.setAttribute('style','cursor:pointer');
  const dot=make('circle');dot.setAttribute('r',8);dot.setAttribute('fill','#1565c0');dot.setAttribute('stroke','#fff');dot.setAttribute('stroke-width',2);const half=make('path');half.setAttribute('d','M 0 -7 A 7 7 0 0 1 0 7 Z');half.setAttribute('fill','#d00000');half.setAttribute('pointer-events','none');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start);marker.append(dot,half,title);
  marker.addEventListener('click',()=>this.focusStop(row.key));marker.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();this.focusStop(row.key);}});svg.append(marker);
- }this.map.append(svg);
+ }
+ if(!this.record.ended){const position=coords.at(-1);this.drawPositionMarker(svg,make,position.x*size-left,position.y*size-top,points.at(-1));}
+ this.map.append(svg);
  const link=(label,url)=>{const a=node('a',label);a.href=url;a.target='_blank';a.rel='noopener';return a;};this.map.append(link(globalThis.CtlText.source("portal_gps.text_f834e3bb911e"),'https://www.openstreetmap.org/copyright'));if(this.railEnabled)this.map.append(link('OpenRailwayMap','https://www.openrailwaymap.org/'),link('CC-BY-SA 2.0','https://creativecommons.org/licenses/by-sa/2.0/'));
  this.map.append(node('small',t(this.mapState.mode==='follow'?globalThis.CtlText.source("portal_gps.text_b2b3a3f2bec3"):globalThis.CtlText.source("portal_gps.text_8e02679954f1"))));if(this.railFailed)this.map.append(node('small',t(globalThis.CtlText.source("portal_gps.text_f1b2882182df"))));
  }

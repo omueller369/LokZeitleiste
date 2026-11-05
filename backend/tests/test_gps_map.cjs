@@ -24,8 +24,17 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
 
 (async()=>{
  const r=context.window.GpsRecorder.mount({userId:5,journeyId:'map',container:new Element('div'),trainNumber:()=> '123',readonly:()=>false,stations(){}});await r.readyPromise;r.setExpanded(true);
- const point=(lat,lon,t)=>({lat,lon,t,accuracy:5,speed:10});r.record={points:[point(52,13,1),point(52.1,13.1,5001)],ended:false};r.drawMap();
+ const point=(lat,lon,t)=>({lat,lon,t,accuracy:5,speed:10});r.record={train_number:'123',points:[point(52,13,1),point(52.1,13.1,5001)],ended:false};r.drawMap();
  assert.equal(r.mapState.mode,'follow');assert(Math.abs(r.mapView.center.x-(193.1/360))<1e-12);assert(r.mapSvg.children.some(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org')));
+ const position=()=>r.mapSvg.children.find(n=>n.attributes['data-gps-position']);
+ const labels=()=>position().children.filter(n=>n.tag==='text');
+ assert.equal(position().attributes.transform,'translate(300 150)');
+ assert.deepEqual(labels().map(n=>n.textContent),['36 km/h','123']);
+ assert(labels()[0].attributes.y<0&&labels()[1].attributes.y>0);
+ r.record.points.at(-1).speed=0;r.drawMap();assert.equal(labels()[0].textContent,'0 km/h');
+ r.record.points.at(-1).speed=null;r.drawMap();assert.equal(labels()[0].textContent,'–');
+ r.record.ended=true;r.drawMap();assert.equal(position(),undefined);
+ r.record.ended=false;r.drawMap();
  r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,16);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,16);
  r.mapOverview.onclick();assert.equal(r.mapState.mode,'overview');assert.notEqual(r.mapView.center.x,(193.3/360));r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');
  const e=(pointerId,x,y)=>({pointerId,clientX:x,clientY:y,pointerType:'touch',target:r.mapSvg,preventDefault(){}});r.map.events.pointerdown(e(1,200,150));r.map.events.pointerdown(e(2,400,150));const zoom=r.mapView.zoom;r.map.events.pointermove(e(2,600,150));assert.equal(r.mapView.zoom,zoom+1);assert.equal(r.mapState.mode,'free');r.map.events.pointerup(e(1,200,150));r.map.events.pointerup(e(2,600,150));

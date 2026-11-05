@@ -234,7 +234,7 @@
   "text_b1620a32ee9a": "Start here: what the home page shows and where to find help.",
   "text_b2996a640ec5": "Delete a note",
   "text_b341d58533ba": "Choose Send. Only this sends the message.",
-  "text_b434f5e85711": "Blue-red points mark stops. Selecting a point or stop row enlarges it and zooms to it in the centre of the map. Follow position returns to the current position. Entire route shows the whole recording. Plus and minus on the map change the zoom.",
+  "text_b434f5e85711": "During GPS recording, an electric locomotive marks your last GPS position. The speed in km/h appears above it and the train number below it. A dash means speed is unavailable. Blue-red points mark stops. Selecting a point or stop row enlarges it and zooms to it in the centre of the map. Follow position returns to the current position. Entire route shows the whole recording. Plus and minus on the map change the zoom.",
   "text_b46e36dced78": "Enter train number, departure and destination stations, departure and arrival times.",
   "text_b49196c0b1b8": "Check red fields and the list of missing information.",
   "text_b496f772d89f": "View months, years and individual days in your personal plan.",
