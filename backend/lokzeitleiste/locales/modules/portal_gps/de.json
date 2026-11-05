@@ -82,7 +82,7 @@
   "text_df6a9e9a8721": "Kein letzter GPS-Fix. Letzte gültige Position wird verwendet.",
   "text_e11d7606e7e0": "GPS-Aufzeichnung läuft.",
   "text_e237c9e516bb": "Standorte und Gründe gespeichert.",
-  "text_e461aed646b6": "Standzeiten (GPS ab vier Minuten, manuell ab Start Stand)",
+  "text_e461aed646b6": "Standzeiten (GPS länger als zwei Minuten, manuell ab Start Stand)",
   "text_e73e1be46ebb": "Grund als Freitext",
   "text_e945e3bd7919": "Aktueller GPS-Position folgen",
   "text_ea75d1374ab3": "GPS synchronisieren",

@@ -14,10 +14,12 @@ def bearing(a,b):
     p,q=map(math.radians,[a['lat'],b['lat']]);d=math.radians(b['lon']-a['lon'])
     return math.degrees(math.atan2(math.sin(d)*math.cos(q),math.cos(p)*math.sin(q)-math.sin(p)*math.cos(q)*math.cos(d)))%360
 
-def analyse(points,preserved_starts=(),legacy=False,version2=False):
+def analyse(points,preserved_starts=(),legacy=False,version2=False,version3=False):
     rows=[];gaps=[];run=[];last=None
+    previous_rule=version2 or version3
     def finish():
-        if len(run)>1 and (run[-1]['t']-run[0]['t']>300_000 if legacy else run[-1]['t']-run[0]['t']>=240_000):
+        duration=run[-1]['t']-run[0]['t'] if len(run)>1 else 0
+        if (duration>300_000 if legacy else duration>=240_000 if previous_rule else duration>120_000):
             rows.append(dict(key='s'+str(len(rows)),kind=_text_source('server_gps_analysis.text_0fd998791d67'),start=run[0]['t'],end=run[-1]['t'],lat=run[0]['lat'],lon=run[0]['lon'],index=points.index(run[0])))
         run.clear()
     for index,point in enumerate(points):
@@ -26,6 +28,7 @@ def analyse(points,preserved_starts=(),legacy=False,version2=False):
         if point['accuracy']>MAX_ACCURACY:
             finish();gaps.append(dict(start=point['t'],end=point['t'],reason=_text_source('server_gps_analysis.text_984f679d9207')));last=point;continue
         if version2 and run and 'live-'+str(point['t']) in preserved_starts:finish()
+        reported_speed=point.get('speed') is not None
         speed=point.get('speed')
         if speed is None and last and last['accuracy']<=MAX_ACCURACY and 0<point['t']-last['t']<=MAX_GAP:
             speed=distance(last,point)/((point['t']-last['t'])/1000)
@@ -33,9 +36,11 @@ def analyse(points,preserved_starts=(),legacy=False,version2=False):
             if speed is not None and speed*3.6<3:run.append(point)
             else:finish()
         elif run:
-            if distance(run[0],point)<=100+1e-6:run.append(point)
-            elif speed is not None and speed*3.6>5:finish()
-        elif speed is not None and speed*3.6<3:run.append(point)
+            nearby=distance(run[0],point)<=100+1e-6
+            # A speed inferred from position jumps does not end a stop inside its circle.
+            if speed is not None and speed*3.6>(5 if previous_rule else 10) and (not nearby or (reported_speed and not previous_rule)):finish()
+            elif nearby:run.append(point)
+        elif speed is not None and speed*3.6<(3 if previous_rule else 5):run.append(point)
         last=point
     finish()
     good=[(i,p) for i,p in enumerate(points) if p['accuracy']<=MAX_ACCURACY]

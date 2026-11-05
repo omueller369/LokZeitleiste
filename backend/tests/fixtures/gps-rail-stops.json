@@ -1,6 +1,37 @@
 [
 {
-  "name": "below four minutes",
+  "name": "below two minutes",
+  "edits": {},
+  "expected": [],
+  "points": [
+    {"t":1792627200000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627205000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627210000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627215000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627220000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627225000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627230000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627235000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627240000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627245000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627250000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627255000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627260000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627265000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627270000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627275000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627280000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627285000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627290000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627295000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627300000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627305000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627310000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
+    {"t":1792627315000,"lat":52.0,"lon":13,"accuracy":5,"speed":0}
+  ]
+},
+{
+  "name": "exactly two minutes",
   "edits": {},
   "expected": [],
   "points": [
@@ -28,91 +59,7 @@
     {"t":1792627305000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627310000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627315000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627320000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627325000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627330000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627335000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627340000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627345000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627350000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627355000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627360000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627365000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627370000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627375000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627380000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627385000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627390000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627395000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627400000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627405000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627410000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627415000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627420000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627425000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627430000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627435000,"lat":52.0,"lon":13,"accuracy":5,"speed":0}
-  ]
-},
-{
-  "name": "exactly four minutes",
-  "edits": {},
-  "expected": [
-    {
-      "start": 1792627200000,
-      "end": 1792627440000
-    }
-  ],
-  "points": [
-    {"t":1792627200000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627205000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627210000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627215000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627220000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627225000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627230000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627235000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627240000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627245000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627250000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627255000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627260000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627265000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627270000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627275000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627280000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627285000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627290000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627295000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627300000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627305000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627310000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627315000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627320000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627325000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627330000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627335000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627340000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627345000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627350000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627355000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627360000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627365000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627370000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627375000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627380000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627385000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627390000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627395000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627400000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627405000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627410000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627415000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627420000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627425000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627430000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627435000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627440000,"lat":52.0,"lon":13,"accuracy":5,"speed":0}
+    {"t":1792627320000,"lat":52.0,"lon":13,"accuracy":5,"speed":0}
   ]
 },
 {
@@ -184,7 +131,7 @@
   ]
 },
 {
-  "name": "jitter stays within 100m; exactly five outside does not depart",
+  "name": "jitter below departure threshold stays within 100m",
   "edits": {},
   "expected": [
     {
@@ -194,65 +141,65 @@
   ],
   "points": [
     {"t":1792627200000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627205000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627205000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627210000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627215000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627220000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627225000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627225000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627230000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627235000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627235000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627240000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627245000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627250000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627255000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627255000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627260000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627265000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627265000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627270000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627275000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627280000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627285000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627285000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627290000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627295000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627295000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627300000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627305000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627310000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627315000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627315000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627320000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627325000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627325000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627330000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627335000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627340000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627345000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627345000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627350000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627355000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627355000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627360000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627365000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627370000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627375000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627375000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627380000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627385000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627385000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627390000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627395000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627400000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627405000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627405000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627410000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627415000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627415000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627420000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627425000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627430000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627435000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627435000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627440000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627445000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627445000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627450000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627455000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627460000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627465000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627465000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627470000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627475000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627475000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627480000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
     {"t":1792627485000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627490000,"lat":51.99919061055467,"lon":13,"accuracy":5,"speed":null},
-    {"t":1792627495000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":4},
+    {"t":1792627495000,"lat":52.00080938944533,"lon":13,"accuracy":5,"speed":2},
     {"t":1792627500000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627505000,"lat":52.001169118087695,"lon":13,"accuracy":5,"speed":1.3888888888888888},
     {"t":1792627510000,"lat":52.00125905024829,"lon":13,"accuracy":5,"speed":1.3916666666666666}
@@ -386,7 +333,7 @@
     {"t":1792627430000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627435000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627440000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627445000,"lat":52.001169118087695,"lon":13,"accuracy":5,"speed":2},
+    {"t":1792627445000,"lat":52.001169118087695,"lon":13,"accuracy":5,"speed":3},
     {"t":1792627450000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627455000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627460000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
@@ -436,7 +383,7 @@
     {"t":1792627680000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627685000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627690000,"lat":52.002697964817756,"lon":13,"accuracy":5,"speed":0},
-    {"t":1792627695000,"lat":52.00377715074486,"lon":13,"accuracy":5,"speed":2}
+    {"t":1792627695000,"lat":52.00377715074486,"lon":13,"accuracy":5,"speed":3}
   ]
 },
 {
@@ -504,7 +451,16 @@
 {
   "name": "signal gap splits stops",
   "edits": {},
-  "expected": [],
+  "expected": [
+    {
+      "start": 1792627200000,
+      "end": 1792627350000
+    },
+    {
+      "start": 1792627390000,
+      "end": 1792627540000
+    }
+  ],
   "points": [
     {"t":1792627200000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627205000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
@@ -573,7 +529,16 @@
 {
   "name": "inaccurate fix splits stops",
   "edits": {},
-  "expected": [],
+  "expected": [
+    {
+      "start": 1792627200000,
+      "end": 1792627345000
+    },
+    {
+      "start": 1792627355000,
+      "end": 1792627500000
+    }
+  ],
   "points": [
     {"t":1792627200000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627205000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
@@ -773,6 +738,44 @@
     {"t":1792627790000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627795000,"lat":52.0,"lon":13,"accuracy":5,"speed":0},
     {"t":1792627800000,"lat":52.0,"lon":13,"accuracy":5,"speed":0}
+  ]
+},
+{
+  "name": "strictly over two minutes below five kmh",
+  "edits": {},
+  "expected": [
+    {
+      "start": 1792627200000,
+      "end": 1792627325000
+    }
+  ],
+  "points": [
+    {"t":1792627200000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627205000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627210000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627215000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627220000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627225000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627230000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627235000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627240000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627245000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627250000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627255000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627260000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627265000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627270000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627275000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627280000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627285000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627290000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627295000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627300000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627305000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627310000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627315000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627320000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111},
+    {"t":1792627325000,"lat":52,"lon":13,"accuracy":5,"speed":1.386111111111111}
   ]
 }
 ]

@@ -25,12 +25,12 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const r=context.window.GpsRecorder.mount({userId:7,journeyId:'live-v26',container:new Element('div'),trainNumber:()=> '123',readonly:()=>false,selectStart:async()=>({code:'BBB',name:'Berlin Beispiel'}),selectEnd:async()=>({code:'CCC',name:'Ziel'}),stations(){},resolve:async()=>({code:'BBB',name:'Berlin Beispiel'}),importStops:async rows=>{imports.push(...rows);return true;}});
  await r.readyPromise;await r.start();await new Promise(resolve=>setTimeout(resolve,5));
  const base=r.record.points[0].t,point=(delta,speed=0,accuracy=5)=>({t:base+delta,lat:52,lon:13,accuracy,speed});
- r.record.points=Array.from({length:48},(_,i)=>point(i*5000));r.draw();assert.equal(r.liveInputs.length,0);
- r.record.points.push(point(240000));r.draw();assert.equal(r.liveInputs.length,1);assert.equal(r.liveInputs[0].end.value,'');
+ r.record.points=Array.from({length:25},(_,i)=>point(i*5000));r.draw();assert.equal(r.liveInputs.length,0);
+ r.record.points.push(point(125000));r.draw();assert.equal(r.liveInputs.length,1);assert.equal(r.liveInputs[0].end.value,'');
  const row=r.liveInputs[0];row.station.value='BBB';row.station.oninput();row.detail.value='Warten auf Personal';row.detail.oninput();assert.equal(row.reason.value,'sonstiges');
  row.end.value=context.window.GpsRecorder.berlinInput(base+240000).slice(11,16);row.end.oninput();await row.take.onclick();
  assert.equal(imports.length,1);assert.equal(imports[0].end,base+240000);assert.equal(imports[0].station.code,'BBB');assert.equal(imports[0].reason.detail,'Warten auf Personal');assert.equal(r.liveInputs.length,0);
- assert(r.record.stop_edits['live-'+base].imported);assert.equal(r.record.points.length,49);r.draw();assert.equal(r.liveInputs.length,0);
+ assert(r.record.stop_edits['live-'+base].imported);assert.equal(r.record.points.length,26);r.draw();assert.equal(r.liveInputs.length,0);
  r.record.points.push({...point(245000,10),lon:13.002});for(let i=250000;i<=555000;i+=5000)r.record.points.push(point(i));r.draw();assert.equal(r.liveInputs.length,1);assert.equal(r.liveInputs[0].end.value,'');
  r.record.points.push({...point(560000,10),lon:13.002});r.draw();assert.equal(r.liveInputs[0].end.value,context.window.GpsRecorder.berlinInput(base+555000).slice(11,16));
  delete r.o.selectStart;const manualStart=r.chooseStart();await new Promise(resolve=>setTimeout(resolve,5));assert.equal(r.startDialog.list.children.length,0);r.startDialog.manual.value='BBB';await r.startDialog.accept.onclick();assert.equal((await manualStart).name,'Berlin Beispiel');assert.equal(stationQueries,0);let warnings=0;context.window.ReportFeedback={error(){warnings++;}};context.navigator.onLine=false;r.fail('Failed to fetch');r.fail('Internetverbindung unterbrochen');assert.equal(warnings,0);context.navigator.onLine=true;
