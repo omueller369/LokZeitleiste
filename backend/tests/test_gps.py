@@ -17,13 +17,19 @@ def points(seconds=305,speed=0):
 
 class AnalysisTest(unittest.TestCase):
     def test_strict_thresholds_and_endpoints(self):
-        self.assertEqual([r['kind'] for r in analyse(points(235))['rows']],['Start','Ende'])
+        self.assertEqual([r['kind'] for r in analyse(points(120))['rows']],['Start','Ende'])
         result=analyse(points());self.assertEqual([r['kind'] for r in result['rows']],['Start','Halt','Ende'])
         self.assertEqual(result['rows'][1]['end']-result['rows'][1]['start'],305000)
-        self.assertEqual(len(analyse(points(speed=3/3.6))['rows']),2)
-        self.assertEqual(len(analyse(points(speed=2.99/3.6))['rows']),3)
+        self.assertEqual(len(analyse(points(speed=5/3.6))['rows']),2)
+        self.assertEqual(len(analyse(points(speed=4.99/3.6))['rows']),3)
 
-        self.assertEqual(len(analyse(points(240))['rows']),3)
+        self.assertEqual(len(analyse(points(125))['rows']),3)
+
+    def test_departure_above_ten_closes_stop_even_inside_radius(self):
+        data=points(125)+[dict(points()[0],t=BASE+130000,speed=10/3.6),dict(points()[0],t=BASE+135000,speed=10.1/3.6)]
+        data+= [dict(points()[0],t=BASE+s*1000) for s in range(140,266,5)]
+        stops=[r for r in analyse(data)['rows'] if r['kind']=='Halt']
+        self.assertEqual([(r['start']-BASE,r['end']-BASE) for r in stops],[(0,130000),(140000,265000)])
 
     def test_rail_stop_fixtures_match_browser(self):
         cases=json.loads((Path(__file__).parent/'fixtures/gps-rail-stops.json').read_text())
@@ -34,9 +40,10 @@ class AnalysisTest(unittest.TestCase):
 
     def test_gaps_and_accuracy_never_count_as_stops(self):
         data=points();data[31:]=[{**p,'t':p['t']+60000} for p in data[31:]]
-        result=analyse(data);self.assertEqual(len(result['rows']),2);self.assertEqual(len(result['gaps']),1)
+        result=analyse(data);self.assertEqual(len(result['rows']),4);self.assertEqual(len(result['gaps']),1)
+        self.assertTrue(all(r['end']-r['start']<=155000 for r in result['rows'] if r['kind']=='Halt'))
         data=points();data[30]['accuracy']=51
-        self.assertEqual(len(analyse(data)['rows']),2)
+        self.assertEqual(len(analyse(data)['rows']),4)
         self.assertEqual(analyse([{**p,'accuracy':100} for p in data])['rows'],[])
         self.assertEqual(len(analyse([{**p,'accuracy':50} for p in points()])['rows']),3)
 
@@ -110,7 +117,7 @@ class RecordingTest(unittest.TestCase):
             self.assertEqual(self.save(path,expected_revision=2,points=points(310),stop_edits=edits)[1].status_code,422)
         self.assertEqual(self.save(path,expected_revision=2,end_station='UNKNOWN')[1].status_code,422)
 
-    def test_four_minute_jitter_stop_and_existing_edits_roundtrip(self):
+    def test_local_jitter_stop_and_existing_edits_roundtrip(self):
         data=points(240)
         # Movement/jitter inside the stop area must not split the interval.
         for i in range(5,len(data),5):data[i]={**data[i],'lat':52.0005,'speed':2}
@@ -129,7 +136,7 @@ class RecordingTest(unittest.TestCase):
         self.assertEqual(changed.json()['stop_edits']['live-'+str(BASE+300000)]['station_input'],'CCC')
 
     def test_legacy_station_assignment_does_not_shift_to_new_shorter_stop(self):
-        data=points(240)+[dict(points()[0],t=BASE+245000,lat=52.002,speed=2)]
+        data=points(240)+[dict(points()[0],t=BASE+245000,lat=52.002,speed=3)]
         data += [dict(points()[0],t=BASE+s*1000,lat=52.004) for s in range(250,556,5)]
         path,response=self.save(points=data)
         self.assertEqual(response.status_code,200,response.text)

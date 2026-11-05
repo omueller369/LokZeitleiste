@@ -74,6 +74,9 @@ def fixture():
  const point={lat:52,lon:13,accuracy:5,speed:0};gps.record={train_number:'123',ended:true,detection_version:3,points:Array.from({length:63},(_,i)=>({...point,t:Date.now()-310000+i*5000}))};gps.draw();
  const before=gps.record.points.length;gps.collapseButton.click();assert(gps.content.hidden&&gps.record.points.length===before,'Collapse preserves recorded fixes');
  assert(getComputedStyle(gps.content).display==='none','GPS body hidden visually');
+ assert((await gps.o.selectedEndpoint('start')).code==='BBB'&&(await gps.o.selectedEndpoint('end')).code==='CCC','Existing journey stations reused');
+ gps.o.journeyTime('start',window.GpsRecorder.berlinTime(day+'T08:12'));gps.o.journeyTime('end',window.GpsRecorder.berlinTime(day+'T15:42'));
+ assert(item.fields.start_at.value===day+'T08:12'&&item.fields.end_at.value===day+'T15:42','GPS times populate the journey without seconds');
  window.parent.postMessage({layoutStatus:'pass',width:innerWidth},'*');
 })().catch(error=>window.parent.postMessage({layoutStatus:'fail',message:error.stack},'*'));
 '''
