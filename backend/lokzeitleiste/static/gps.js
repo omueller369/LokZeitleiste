@@ -73,6 +73,18 @@ function normaliseRecording(record){
 function firstDeparture(points){
  return confirmedMotion(points,true).next().value??null;
 }
+function lastMovement(points){
+ let last=null;
+ for(const time of confirmedMotion(points,true))last=time;
+ if(last===null)return null;
+ // A confirmed sequence includes three more fixes after its first point.
+ const end=points.findIndex(point=>point.t===last)+3;
+ for(let i=points.length-1;i>end;i--){
+  const point=points[i];
+  if(point.accuracy<=50&&point.speed!=null&&point.speed*3.6>=5)return point.t;
+ }
+ return points[end].t;
+}
 const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|Standort.*(nicht erlaubt|verweigert|abgelehnt|fehlt)|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
 
 class Recorder{
@@ -117,7 +129,7 @@ class Recorder{
  this.record.dirty=true;try{await this.persist();}catch(error){this.record=prior;throw error;}
  this.updateManual();this.draw();this.o.changed?.();if(running)this.say(globalThis.CtlText.source("portal_gps.text_3e685afd44c8"));
  }
- applyDeparture(){if(active!==this||this.record?.departure_applied)return;const time=firstDeparture(this.record.points||[]);if(time==null)return;this.o.journeyTime?.('start',time);this.record.departure_applied=true;this.record.dirty=true;return true;}
+ applyDeparture(){if(!this.record||this.record.ended||this.record.departure_applied||this.o.readonly()||!this.o.journeyTime)return;const time=firstDeparture(this.record.points||[]);if(time==null)return;this.o.journeyTime('start',time);this.record.departure_applied=true;this.record.dirty=true;return true;}
  async persist(){if(this.record)await local(this.key,this.record);}
  async wake(){try{if(navigator.wakeLock&&document.visibilityState==='visible'){await this.wakeLock?.release();this.wakeLock=await navigator.wakeLock.request('screen');}}catch(error){/* Recording remains possible without optional screen wake lock. */}}
  fix(){return new Promise((resolve,reject)=>navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,maximumAge:0,timeout:12000}));}
@@ -164,8 +176,30 @@ class Recorder{
  this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station=this.startChoice?.code||this.record.start_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};active=this;try{await this.persist();}catch(error){this.clear();throw error;}await this.wake();this.timer=setInterval(()=>this.sample(),5000);this.sample();this.freeze();this.o.changed?.();
  }
  clear(){clearInterval(this.timer);clearInterval(this.nativeTimer);if(active===this)active=null;this.wakeLock?.release().catch(()=>{});}
- async stop(finalFix=true){if(!this.record)return;if(window.AndroidPortal){await window.AndroidPortal.gps('stop',{key:this.key});await this.nativeRead();}if(active===this&&finalFix&&!window.AndroidPortal){clearInterval(this.timer);try{await this.add(await this.fix());}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_df6a9e9a8721"));}}
- const stoppedAt=Date.now();this.applyDeparture();this.clear();this.record.ended=true;this.record.dirty=true;this.record.arrival_at=stoppedAt;this.o.journeyTime?.('end',stoppedAt);this.o.changed?.();await this.persist();this.draw();if(this.record.points.length){await this.chooseEnd();try{if(navigator.onLine)await this.sync();}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_05b6b4dee7bc"));}this.say(globalThis.CtlText.source("portal_gps.text_f90390ecedc2"));}else this.say(globalThis.CtlText.source("portal_gps.text_74a3cf033540"));
+ async stop(finalFix=true){if(!this.record||this.record.ended)return;if(window.AndroidPortal){await window.AndroidPortal.gps('stop',{key:this.key});await this.nativeRead();}if(active===this&&finalFix&&!window.AndroidPortal){clearInterval(this.timer);try{await this.add(await this.fix());}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_df6a9e9a8721"));}}
+ if(this.record.ended)return;
+ this.applyDeparture();
+ this.clear();
+ this.record.ended=true;this.record.dirty=true;
+ await this.persist();this.draw();
+ if(!this.record.points.length){this.say(globalThis.CtlText.source("portal_gps.text_74a3cf033540"));return;}
+ let noArrival=false;
+ if(finalFix&&!this.o.readonly()){
+  const destination=await this.chooseEnd();
+  const arrival=lastMovement(this.record.points);
+  if(destination&&arrival!==null&&this.o.journeyTime){
+   const message=t(globalThis.CtlText.source("portal_gps.text_0ff345ca4d07"))
+    .replace('{station}',()=>destination.name||destination.code)
+    .replace('{time}',()=>stamp(arrival,this.record.points[0].t));
+   if(confirm(message)){
+    this.o.journeyTime('end',arrival);
+    this.record.arrival_at=arrival;this.record.dirty=true;
+    await this.persist();
+   }
+  }else if(destination&&arrival===null)noArrival=true;
+ }
+ try{await this.checkpointTask;if(navigator.onLine)await this.sync();}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_05b6b4dee7bc"));return;}
+ this.say(globalThis.CtlText.source(noArrival?"portal_gps.text_86d975e208e9":"portal_gps.text_f90390ecedc2"));
  }
  async sync(){if(!this.record||(!this.record.points?.length&&!this.record.manual_stops?.length))return;const reply=await api(this.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({train_number:this.record.train_number,start_station:this.record.start_station||null,points:this.record.points,departure_applied:!!this.record.departure_applied,arrival_at:this.record.arrival_at||null,end_station:this.record.end_station||null,stop_edits:this.record.stop_edits||{},manual_stops:this.record.manual_stops||[],ended:this.record.ended,expected_revision:this.record.revision||0})});if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_03169f7c2fb3")));this.serverRecord=reply;this.record={...reply,dirty:false,reason_drafts:this.record?.reason_drafts||{},station_drafts:this.record?.station_drafts||{},selection:this.record?.selection??reply.selection??[]};this.analysis=reply.analysis;await this.persist();this.draw();this.say(globalThis.CtlText.source("portal_gps.text_d9d95ec8044f"));}
  async reload(){if((this.record?.dirty||Object.keys(this.record?.reason_drafts||{}).length||Object.keys(this.record?.station_drafts||{}).length)&&!confirm(t(globalThis.CtlText.source("portal_gps.text_49ea0b5fe962"))))return;const reply=await api(this.path);this.serverRecord=reply;if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_d425fe5589f1")));this.record={...reply,dirty:false,reason_drafts:{}};this.analysis=reply.analysis;await this.persist();this.draw();}

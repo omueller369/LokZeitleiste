@@ -238,7 +238,7 @@
   "text_b46e36dced78": "Wpisz numer pociągu, stacje początkową i końcową oraz godziny odjazdu i przyjazdu.",
   "text_b49196c0b1b8": "Sprawdź czerwone pola i listę brakujących danych.",
   "text_b496f772d89f": "Przeglądaj miesiące, lata i poszczególne dni własnego planu.",
-  "text_b4a43c957136": "Na stacji docelowej wybierz Zakończ rejestrację GPS. Ten moment zostanie wpisany jako czas przyjazdu. Jeśli brakuje stacji docelowej, możesz ją teraz uzupełnić. Następnie sprawdź odjazd, przyjazd i stacje w przejeździe.",
+  "text_b4a43c957136": "Na stacji docelowej wybierz Zakończ rejestrację GPS. Potwierdź dotarcie do stacji docelowej oraz wpisanie czasu ostatniego wykrytego ruchu jako czasu przyjazdu. Jeśli anulujesz lub nie pojawi się proponowany czas, czas przyjazdu w przejeździe się nie zmieni. Następnie sprawdź odjazd, przyjazd i stacje.",
   "text_b4ae69a5954e": "Dodaj DS100 lub nazwę stacji oraz powód. Własny powód wpisz w polu tekstowym.",
   "text_b5f8dd9c5b1b": "Zamykanie i drukowanie",
   "text_b6e5befb520a": "Zapis GPS i mapa",

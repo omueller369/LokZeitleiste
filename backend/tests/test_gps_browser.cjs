@@ -40,9 +40,21 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  assert.equal(context.window.GpsRecorder.firstDeparture(fixes),null,'Back-and-forth jumps are not a departure');
  const moving=fixes.map((p,i)=>({...p,lon:13+i*.0003}));assert.equal(context.window.GpsRecorder.firstDeparture(moving),first);
  moving[2].accuracy=51;assert.equal(context.window.GpsRecorder.firstDeparture(moving),null);
- const beforeStop=Date.now();await r.stop(false);assert.equal(times[1].kind,'end');assert(times[1].time>=beforeStop);assert.equal(body.arrival_at,times[1].time);assert.equal(body.departure_applied,true);assert.equal(startQuestions+endQuestions,0);
+ await add(45000,6,5,13.001);await add(50000,0,5,13.001);await add(55000,30,51,13.005);
+ const questions=[];let acceptArrival=true;
+ context.confirm=message=>{questions.push(message);return acceptArrival;};
+ await r.stop();assert.deepEqual(times[1],{kind:'end',time:first+45000});
+ assert.equal(body.arrival_at,first+45000);assert.equal(body.departure_applied,true);
+ assert.equal(startQuestions+endQuestions,0);assert.equal(questions.length,1);
+ assert(questions[0].includes('Ziel')&&questions[0].includes(context.window.GpsRecorder.berlinInput(first+45000).slice(11,16)));
+ await r.erase();await r.start();await new Promise(resolve=>setTimeout(resolve,5));
+ const second=r.record.points.at(-1).t;
+ for(let i=0;i<4;i++)await r.add({timestamp:second+5000+i*5000,coords:{latitude:52,longitude:13+i*.0003,accuracy:5,speed:10/3.6}});
+ acceptArrival=false;await r.stop();assert.equal(questions.length,3); // Delete confirmation plus the second arrival.
+ assert.deepEqual(times.slice(2),[{kind:'start',time:second+5000}]);assert.equal(body.arrival_at,null);
+ acceptArrival=true;
  await r.erase();delete chosen.end;await r.start();await new Promise(resolve=>setTimeout(resolve,5));assert.equal(startQuestions,0);assert.equal(endQuestions,1);assert.equal(r.record.end_station,'CCC');
- delete chosen.end;r.o.selectEnd=async()=>{endQuestions++;return {code:'DDD',name:'Neues Ziel'};};await r.stop(false);assert.equal(endQuestions,2);assert.equal(body.end_station,'DDD');await r.erase();
+ delete chosen.end;r.o.selectEnd=async()=>{endQuestions++;return {code:'DDD',name:'Neues Ziel'};};const previousQuestions=questions.length;await r.stop();assert.equal(endQuestions,2);assert.equal(body.end_station,'DDD');assert.equal(body.arrival_at,null);assert.equal(questions.length,previousQuestions);await r.erase();
  delete chosen.start;r.o.selectStart=async()=>{startQuestions++;return null;};await r.start();assert.equal(startQuestions,1);assert.equal(endQuestions,2);assert.equal(r.record,null);assert(!context.window.GpsRecorder.isActive());
  const historical=context.window.GpsRecorder.mount({userId:5,journeyId:'history',container:new Element('div'),trainNumber:()=> '123',dutyDay:()=> '2000-01-01',readonly:()=>false,selectEnd:async()=>({code:'CCC',name:'Ziel'}),selectStart:async()=>({code:'BBB',name:'Berlin Beispiel'}),stations(){}});
  await historical.readyPromise;assert.equal(historical.box.hidden,true);await historical.start();assert.equal(context.window.GpsRecorder.isActive(),false);

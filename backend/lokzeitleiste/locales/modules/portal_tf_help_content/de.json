@@ -238,7 +238,7 @@
   "text_b46e36dced78": "Trage Zugnummer, Startbahnhof, Zielbahnhof sowie Abfahrt und Ankunft ein.",
   "text_b49196c0b1b8": "Prüfe rot markierte Felder und die Liste fehlender Angaben.",
   "text_b496f772d89f": "Monat, Jahr und einzelne Tage im persönlichen Plan ansehen.",
-  "text_b4a43c957136": "Wähle am Ziel GPS-Aufzeichnung beenden. Dieser Zeitpunkt wird als Ankunft eingetragen. Fehlt der Zielbahnhof, kannst Du ihn jetzt ergänzen. Prüfe anschließend Abfahrt, Ankunft und Bahnhöfe in der Zugfahrt.",
+  "text_b4a43c957136": "Wähle am Ziel GPS-Aufzeichnung beenden. Bestätige, dass Du den Zielbahnhof erreicht hast und die Uhrzeit der letzten erkannten Bewegung als Ankunft übernehmen möchtest. Wenn Du abbrichst oder keine Uhrzeit vorgeschlagen wird, bleibt die Ankunft in der Zugfahrt unverändert. Prüfe anschließend Abfahrt, Ankunft und Bahnhöfe.",
   "text_b4ae69a5954e": "Ergänze DS100 oder Bahnhofsname sowie den Grund. Einen eigenen Grund schreibst Du ins Textfeld.",
   "text_b5f8dd9c5b1b": "Schließen und Drucken",
   "text_b6e5befb520a": "GPS-Aufzeichnung und Karte",

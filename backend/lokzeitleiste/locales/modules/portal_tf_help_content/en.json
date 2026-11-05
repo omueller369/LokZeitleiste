@@ -238,7 +238,7 @@
   "text_b46e36dced78": "Enter train number, departure and destination stations, departure and arrival times.",
   "text_b49196c0b1b8": "Check red fields and the list of missing information.",
   "text_b496f772d89f": "View months, years and individual days in your personal plan.",
-  "text_b4a43c957136": "At the destination, choose Stop GPS recording. This time is entered as the arrival. If the destination station is missing, you can add it now. Then check the departure, arrival and stations in the journey.",
+  "text_b4a43c957136": "At the destination, choose Stop GPS recording. Confirm that you have reached the destination and want to use the time of the last detected movement as your arrival time. If you cancel or no time is suggested, the journey arrival stays as it was. Then check the departure, arrival and stations.",
   "text_b4ae69a5954e": "Add DS100 or the station name and a reason. Enter a custom reason in the text field.",
   "text_b5f8dd9c5b1b": "Close and print",
   "text_b6e5befb520a": "GPS recording and map",
