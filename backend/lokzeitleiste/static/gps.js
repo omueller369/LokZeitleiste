@@ -11,6 +11,8 @@ function download(name,content,type){if(window.AndroidPortal){window.AndroidPort
 function berlinInput(ms){const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ms)).map(p=>[p.type,p.value]));return p.year+'-'+p.month+'-'+p.day+'T'+p.hour+':'+p.minute+':'+p.second;}
 function berlinTime(value){if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(value))return null;const wall=Date.parse(value+(value.length===16?':00':'')+'Z');let result=wall;for(let i=0;i<3;i++)result+=wall-Date.parse(berlinInput(result)+'Z');return berlinInput(result).slice(0,value.length)===value?result:null;}
 const clock=ms=>berlinInput(ms).slice(11,16);
+const placeLabel=place=>place?[place.code,place.name].filter(Boolean).join(' · '):'';
+const durationLabel=ms=>[Math.floor(ms/3600000),Math.floor(ms/60000)%60].map(n=>String(n).padStart(2,'0')).join(':');
 const projectPoint=p=>{const lat=Math.max(-85,Math.min(85,p.lat))*Math.PI/180;return{x:(p.lon+180)/360,y:(1-Math.log(Math.tan(lat)+1/Math.cos(lat))/Math.PI)/2};};
 function stopEnd(row,value,previous){
  if(!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value))return null;
@@ -38,19 +40,21 @@ function* confirmedMotion(points, inclusive){
  }
 }
 // Current rail rule: start below 5 km/h, finish above 10 km/h; keep local drift together.
-function liveStops(points,ended=false,edits={},legacy=false,version2=false,version3=false,version4=false,display=null){
- let run=[],last=null,rows=[];const previousRule=version2||version3;
+function liveStops(points,ended=false,edits={},legacy=false,version2=false,version3=false,version4=false,display=null,totals=null){
+ let run=[],last=null,rows=[],previousState=null;const previousRule=version2||version3;
  const confirmed=legacy||previousRule||version4?null:new Set(confirmedMotion(points,false));
  const finish=closed=>{const duration=run.length>1?run.at(-1).t-run[0].t:0;if(legacy?duration>300000:previousRule?duration>=240000:duration>120000)rows.push({key:'live-'+run[0].t,kind:globalThis.CtlText.source("portal_gps.text_0fd998791d67"),start:run[0].t,end:closed?run.at(-1).t:null,observed_end:run.at(-1).t,lat:run[0].lat,lon:run[0].lon});run=[];};
  for(const p of points){
+  if(totals&&previousState&&p.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000)totals[previousState]+=p.t-last.t;
   if(last&&p.t-last.t>30000)finish(ended);
-  if(p.accuracy>50){finish(ended);last=p;display?.push(p);continue;}
+  if(p.accuracy>50){finish(ended);last=p;previousState=null;display?.push(p);continue;}
   // Existing edited/imported stops retain their identity after an update.
   if(version2&&run.length&&edits?.['live-'+p.t])finish(true);
   const speed=speedAt(p,last);
   if(legacy){if(speed!=null&&speed*3.6<3)run.push(p);else finish(true);}
   else if(run.length){const nearby=distance(run[0],p)<=100+1e-6;if(confirmed?confirmed.has(p.t):speed!=null&&speed*3.6>(previousRule?5:10)&&(!nearby||(p.speed!=null&&!previousRule)))finish(true);else if(nearby)run.push(p);}
   else if(!confirmed?.has(p.t)&&speed!=null&&speed*3.6<(previousRule?3:5))run.push(p);
+  if(totals)previousState=run.length?'stopped':speed!=null||confirmed?.has(p.t)?'moving':null;
   if(display)display.push(run.length?{...p,lat:run[0].lat,lon:run[0].lon}:p);
   last=p;
  }
@@ -141,25 +145,32 @@ class Recorder{
  }
  async sample(){if(this.pending||active!==this)return;this.pending=true;try{await this.add(await this.fix());}catch(error){if(active===this){this.fail(globalThis.CtlText.source("portal_gps.text_754c85b57a48"));if(error.code===1){this.clear();this.freeze();}}}finally{this.pending=false;}}
  async nativeRead(){let running=false;for(;;){const previous=this.record?.points?.at(-1)?.t||0,result=await window.AndroidPortal.gps('snapshot',{key:this.key,after:previous});running=result.running;if(result.points.length){if(!this.record)this.record={train_number:this.o.trainNumber().trim(),points:[],ended:false,revision:0,dirty:true};for(const point of result.points)if(point.t>(this.record.points.at(-1)?.t||0))this.record.points.push(point);this.record.dirty=true;await this.persist();}if(result.points.length<1000)break;}if(active!==this&&this.record?.points?.length&&!this.record.ended)window.openActiveGpsReport?.(this.o.journeyId);if(running&&!active){window.openActiveGpsReport?.(this.o.journeyId);active=this;this.record.ended=false;this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);}if(this.applyDeparture())await this.persist();if(active===this&&!running){clearInterval(this.nativeTimer);active=null;this.say(globalThis.CtlText.source("portal_gps.text_989a5a596446"));}this.draw();this.freeze();}
- async nativeStart(){const prior=this.record,reset=!this.record||this.record.ended;if(reset)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};try{await window.AndroidPortal.gps('start',{key:this.key,reset});}catch(error){this.record=prior;throw error;}active=this;this.record.ended=false;this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};await this.persist();this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);await this.nativeRead();this.freeze();this.o.changed?.();}
+ async nativeStart(){const prior=this.record,reset=!this.record||this.record.ended;if(reset)this.record={train_number:this.o.trainNumber().trim(),departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};try{await window.AndroidPortal.gps('start',{key:this.key,reset});}catch(error){this.record=prior;throw error;}active=this;this.record.ended=false;this.setEndpoint('start',this.startChoice);this.setEndpoint('end',this.endChoice);this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};await this.persist();this.nativeTimer=setInterval(()=>this.nativeRead().catch(error=>this.fail(error.message)),5000);await this.nativeRead();this.freeze();this.o.changed?.();}
  async help(){try{const reader=window.TfHelp||await window.loadTfHelp?.();if(!reader)throw Error(globalThis.CtlText.source("portal_gps.text_423e45b97d3e"));reader.open('gps');}catch(error){this.fail(error.message);}}
  chooseEndpoint(kind){
  if(kind==='start'&&this.o.selectStart)return this.o.selectStart();
  if(kind==='end'&&this.o.selectEnd)return this.o.selectEnd();
  const dialog=node('dialog'),title=node('h2',t(kind==='start'?globalThis.CtlText.source("portal_gps.text_9227f0b954f4"):globalThis.CtlText.source("portal_gps.text_26b65b9318e6"))),manual=node('input'),list=node('datalist'),message=node('p'),accept=node('button',t(globalThis.CtlText.source("portal_gps.text_aa30480ab57a"))),cancel=node('button',t(globalThis.CtlText.source("portal_gps.text_f7ff1178af20")));
- dialog.className='gps-dialog';manual.maxLength=270;manual.placeholder=t(globalThis.CtlText.source("portal_gps.text_d27be01cc4fa"));manual.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_d27be01cc4fa")));list.id='gps-'+kind+'-'+this.o.journeyId;manual.setAttribute('list',list.id);this.o.stations(manual,list);accept.type=cancel.type='button';message.setAttribute('role','status');dialog.append(title,manual,list,message,accept,cancel);document.body.append(dialog);
+ dialog.className='gps-dialog';manual.maxLength=270;manual.placeholder=t(globalThis.CtlText.source("portal_gps.text_3ac37da56214"));manual.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_3ac37da56214")));list.id='gps-'+kind+'-'+this.o.journeyId;manual.setAttribute('list',list.id);this.o.stations(manual,list);accept.type=cancel.type='button';message.setAttribute('role','status');dialog.append(title,manual,list,message,accept,cancel);document.body.append(dialog);
  const state={dialog,manual,list,accept,cancel};if(kind==='start')this.startDialog=state;else this.endDialog=state;
  return new Promise(resolve=>{let done=false;const finish=choice=>{if(done)return;done=true;dialog.close();dialog.remove();resolve(choice);};cancel.onclick=()=>finish(null);dialog.addEventListener('cancel',event=>{event.preventDefault();finish(null);});accept.onclick=async()=>{accept.disabled=true;try{if(!manual.value.trim())throw Error(t(globalThis.CtlText.source("portal_gps.text_f177c377fb1f")));const choice=await this.o.resolve(manual);finish(choice);}catch(error){message.textContent=t(globalThis.CtlText.source("portal_gps.text_b675bc7ca31b"));}finally{accept.disabled=false;}};dialog.showModal();});
  }
  async selectedEndpoint(kind){
  const current=await (this.o.selectedEndpoint?.(kind)??this.o.endpointStation?.(kind));
- if(current?.code)return current;
- if(this.record&&!this.record.ended&&this.record[kind+'_station'])return {code:this.record[kind+'_station'],name:this.record[kind+'_station_name']||this.record.stations?.[kind]?.name||''};
+ if(current?.code||current?.name)return current;
+ if(this.record&&!this.record.ended){
+  const code=this.record[kind+'_station']||'',name=this.record[kind+'_station_name']||this.record.stations?.[kind]?.name||'';
+  if(code||name)return {code,name};
+ }
  return null;
  }
  async prepareEndpoints(){for(const kind of ['start','end']){const choice=await this.selectedEndpoint(kind)||await this.chooseEndpoint(kind);if(!choice)return false;this[kind+'Choice']=choice;this.o.endpoint?.(kind,choice);}return true;}
  chooseStart(){return this.chooseEndpoint('start');}
- async chooseEnd(){const choice=await this.selectedEndpoint('end')||await this.chooseEndpoint('end');if(choice){this.record.end_station=choice.code;this.record.dirty=true;this.o.endpoint?.('end',choice);await this.persist();}return choice;}
+ setEndpoint(kind,place){
+  this.record[kind+'_station']=place.code||null;
+  this.record[kind+'_station_name']=place.name||'';
+ }
+ async chooseEnd(){const choice=await this.selectedEndpoint('end')||await this.chooseEndpoint('end');if(choice){this.setEndpoint('end',choice);this.record.dirty=true;this.o.endpoint?.('end',choice);await this.persist();}return choice;}
  async importStops(){
  if(this.o.readonly()||this.past()||active===this||!this.record?.ended)return;
  if(!this.o.importStops)throw Error(t(globalThis.CtlText.source("portal_gps.text_81cfd9b89bb2")));
@@ -172,8 +183,8 @@ class Recorder{
  if(!await this.prepareEndpoints())return;
  this.mapState={mode:'follow',zoom:this.mapState?.zoom||15};
  if(window.AndroidPortal){await this.nativeStart();return;}
- if(!this.record||this.record.ended)this.record={train_number:this.o.trainNumber().trim(),start_station:this.startChoice?.code||this.record?.start_station||null,end_station:this.endChoice?.code||null,departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};
- this.record.end_station=this.endChoice?.code||this.record.end_station;this.record.start_station=this.startChoice?.code||this.record.start_station;this.record.start_station_name=this.startChoice?.name||this.record.start_station_name;this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};active=this;try{await this.persist();}catch(error){this.clear();throw error;}await this.wake();this.timer=setInterval(()=>this.sample(),5000);this.sample();this.freeze();this.o.changed?.();
+ if(!this.record||this.record.ended)this.record={train_number:this.o.trainNumber().trim(),departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};
+ this.setEndpoint('start',this.startChoice);this.setEndpoint('end',this.endChoice);this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};active=this;try{await this.persist();}catch(error){this.clear();throw error;}await this.wake();this.timer=setInterval(()=>this.sample(),5000);this.sample();this.freeze();this.o.changed?.();
  }
  clear(){clearInterval(this.timer);clearInterval(this.nativeTimer);if(active===this)active=null;this.wakeLock?.release().catch(()=>{});}
  async stop(finalFix=true){if(!this.record||this.record.ended)return;if(window.AndroidPortal){await window.AndroidPortal.gps('stop',{key:this.key});await this.nativeRead();}if(active===this&&finalFix&&!window.AndroidPortal){clearInterval(this.timer);try{await this.add(await this.fix());}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_df6a9e9a8721"));}}
@@ -201,7 +212,7 @@ class Recorder{
  try{await this.checkpointTask;if(navigator.onLine)await this.sync();}catch(error){this.say(globalThis.CtlText.source("portal_gps.text_05b6b4dee7bc"));return;}
  this.say(globalThis.CtlText.source(noArrival?"portal_gps.text_86d975e208e9":"portal_gps.text_f90390ecedc2"));
  }
- async sync(){if(!this.record||(!this.record.points?.length&&!this.record.manual_stops?.length))return;const reply=await api(this.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({train_number:this.record.train_number,start_station:this.record.start_station||null,points:this.record.points,departure_applied:!!this.record.departure_applied,arrival_at:this.record.arrival_at||null,end_station:this.record.end_station||null,stop_edits:this.record.stop_edits||{},manual_stops:this.record.manual_stops||[],ended:this.record.ended,expected_revision:this.record.revision||0})});if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_03169f7c2fb3")));this.serverRecord=reply;this.record={...reply,dirty:false,reason_drafts:this.record?.reason_drafts||{},station_drafts:this.record?.station_drafts||{},selection:this.record?.selection??reply.selection??[]};this.analysis=reply.analysis;await this.persist();this.draw();this.say(globalThis.CtlText.source("portal_gps.text_d9d95ec8044f"));}
+ async sync(){if(!this.record||(!this.record.points?.length&&!this.record.manual_stops?.length))return;const reply=await api(this.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({train_number:this.record.train_number,start_station:this.record.start_station||null,start_station_name:this.record.start_station_name||'',end_station_name:this.record.end_station_name||'',points:this.record.points,departure_applied:!!this.record.departure_applied,arrival_at:this.record.arrival_at||null,end_station:this.record.end_station||null,stop_edits:this.record.stop_edits||{},manual_stops:this.record.manual_stops||[],ended:this.record.ended,expected_revision:this.record.revision||0})});if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_03169f7c2fb3")));this.serverRecord=reply;this.record={...reply,dirty:false,reason_drafts:this.record?.reason_drafts||{},station_drafts:this.record?.station_drafts||{},selection:this.record?.selection??reply.selection??[]};this.analysis=reply.analysis;await this.persist();this.draw();this.say(globalThis.CtlText.source("portal_gps.text_d9d95ec8044f"));}
  async reload(){if((this.record?.dirty||Object.keys(this.record?.reason_drafts||{}).length||Object.keys(this.record?.station_drafts||{}).length)&&!confirm(t(globalThis.CtlText.source("portal_gps.text_49ea0b5fe962"))))return;const reply=await api(this.path);this.serverRecord=reply;if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_d425fe5589f1")));this.record={...reply,dirty:false,reason_drafts:{}};this.analysis=reply.analysis;await this.persist();this.draw();}
  async resolve(){if(this.record?.dirty)await this.sync();if(!this.record?.points.length)return;let reply;
  for(let i=0;i<=this.record.points.length;i++){reply=await api(this.path+'/stations',{method:'POST'});if(!reply)throw Error(t(globalThis.CtlText.source("portal_gps.text_d425fe5589f1")));this.analysis=reply.analysis;this.record={...reply,dirty:false,reason_drafts:this.record?.reason_drafts||{},station_drafts:this.record?.station_drafts||{},selection:this.record?.selection??reply.selection??[]};await this.persist();this.draw();const pending=reply.analysis.rows.filter(row=>row.lookup_pending).length;if(!pending)break;this.say(t(globalThis.CtlText.source("portal_gps.text_36442944a80a"))+' '+pending);await pause(2200);}
@@ -210,12 +221,12 @@ class Recorder{
  const stations={...this.record.stations},reasons={...this.record.reasons},selection=this.record.selection||[],remainingReasons={...this.record.reason_drafts},remainingStations={...this.record.station_drafts};
  for(const {row,input,reason,detail} of this.stationInputs){
  if(selectedOnly&&!selection.includes(row.key))continue;
- if(input.value.trim()){const station=await this.o.resolve(input);stations[row.key]=station.code;}else delete stations[row.key];
+ if(input.value.trim())stations[row.key]=await this.o.resolve(input);else delete stations[row.key];
  if(reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")&&!detail.value.trim())throw Error(t(globalThis.CtlText.source("portal_gps.text_58f91be54d8a")));
  reasons[row.key]={reason:reason.value,detail:detail.value.trim()};delete remainingReasons[row.key];delete remainingStations[row.key];
  }
- // Stored API station objects become DS100 codes; unselected assignments stay intact.
- for(const key of Object.keys(stations))if(typeof stations[key]==='object')stations[key]=stations[key].code;
+ // Keep both station codes and free-text assignments when saving the selection.
+ for(const key of Object.keys(stations))if(typeof stations[key]==='object')stations[key]=stations[key].code||{name:stations[key].name};
  const reply=await api(this.path+'/stations',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({expected_revision:this.record.revision,stations,reasons,selection})});
  this.record={...reply,dirty:false,reason_drafts:remainingReasons,station_drafts:remainingStations,selection};this.analysis=reply.analysis;await this.persist();this.draw();this.say(globalThis.CtlText.source("portal_gps.text_e237c9e516bb"));
  }
@@ -226,6 +237,7 @@ class Recorder{
  this.mapTools=node('div');this.mapTools.className='gps-map-tools';this.mapTools.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_fae9dd10ec93")));
  const control=(label,caption,action)=>{const b=node('button',label);b.type='button';b.title=t(caption);b.setAttribute('aria-label',t(caption));b.onclick=action;this.mapTools.append(b);return b;};
  this.mapZoomIn=control('+',globalThis.CtlText.source("portal_gps.text_809820ce88d5"),()=>this.mapZoom(1));this.mapZoomOut=control('−',globalThis.CtlText.source("portal_gps.text_914f3003d3a8"),()=>this.mapZoom(-1));
+ this.mapZoomLevel=node('span');this.mapZoomLevel.className='gps-map-zoom';this.mapTools.append(this.mapZoomLevel);
  this.mapFollow=control(t(globalThis.CtlText.source("portal_gps.text_33ee562dc3d3")),globalThis.CtlText.source("portal_gps.text_e945e3bd7919"),()=>{this.mapState={mode:'follow',zoom:this.mapState?.zoom||15};this.drawMap();});
  this.mapOverview=control(t(globalThis.CtlText.source("portal_gps.text_b2dc8ee2fa59")),globalThis.CtlText.source("portal_gps.text_bc631a1b8308"),()=>{this.mapState={mode:'overview',zoom:this.mapState?.zoom||15};this.drawMap();});
  this.railEnabled=true;this.mapRail=control(t(globalThis.CtlText.source("portal_gps.text_da54ccd0ee5a")),globalThis.CtlText.source("portal_gps.text_272f99c19dbe"),()=>{this.railEnabled=!this.railEnabled;this.railFailed=false;this.drawMap();});
@@ -243,33 +255,39 @@ class Recorder{
  for(const marker of this.mapSvg?.children||[]){const stopKey=marker.getAttribute('data-gps-stop');if(!stopKey)continue;const selected=stopKey===key,position=marker.getAttribute('transform').replace(/ scale\([^)]*\)$/,'');marker.setAttribute('transform',position+globalThis.CtlText.source("portal_gps.text_7d14c715b37c")+(selected?2:1)+')');marker.setAttribute('aria-pressed',String(selected));}
  }
  focusStop(key){this.setFocusedStop(key,true);const input=this.liveInputs?.find(item=>item.row.key===key)?.station;if(input){input.scrollIntoView?.({behavior:'smooth',block:'center'});input.focus({preventScroll:true});input.setSelectionRange?.(input.value.length,input.value.length);}else {const row=this.rows().find(row=>row.source_keys.includes(key));this.o.focusImported?.(row?.source_keys.find(source=>this.o.hasImported?.(source))||key);}}
- drawPositionMarker(svg,make,x,y,point){
+ drawPositionMarker(svg,make,x,y,point,totals){
  const marker=make('g');
  marker.setAttribute('data-gps-position','true');
  marker.setAttribute('transform','translate('+x+' '+y+')');
  marker.setAttribute('pointer-events','none');
  const append=(tag,attributes)=>{const element=make(tag);for(const [key,value] of Object.entries(attributes))element.setAttribute(key,value);marker.append(element);return element;};
- const label=(value,y)=>{
-  append('text',{y,'text-anchor':'middle','font-size':20,'font-weight':700,fill:'#172338',stroke:'#fff','stroke-width':4,'stroke-linejoin':'round','paint-order':'stroke'}).textContent=value;
+ const label=(value,x,y,size=12,fill='#172338',anchor='middle')=>{
+  append('text',{x,y,'text-anchor':anchor,'font-size':size,'font-weight':700,fill,stroke:'#fff','stroke-width':size>=20?4:2.5,'stroke-linejoin':'round','paint-order':'stroke'}).textContent=value;
  };
  const speed=Number.isFinite(point.speed)&&point.speed>=0?Math.round(point.speed*3.6)+' km/h':'–';
- label(speed,-23);
+ label(speed,23,4,11,'#172338','start');
+ label(durationLabel(totals.moving),-7,-25,12,'#146c34','end');
+ label('/',0,-25);
+ label(durationLabel(totals.stopped),7,-25,12,'#b42318','start');
  append('path',{d:'M -12 -9 L -5 -16 L 5 -12 L 12 -19 M 4 -19 H 17',fill:'none',stroke:'#172338','stroke-width':2.5,'stroke-linecap':'round'});
  append('path',{d:'M -19 6 V -3 L -15 -10 H 13 L 19 -3 V 6 L 15 10 H -15 Z',fill:'#1565c0',stroke:'#fff','stroke-width':2});
  append('path',{d:'M -14 -5 H -8 V 0 H -17 Z M 9 -5 H 13 L 17 0 H 9 Z',fill:'#fff'});
  append('path',{d:'M 2 -7 L -4 1 H 0 L -2 7 L 5 -2 H 1 Z',fill:'#ffe26d'});
  for(const cx of [-11,11])append('circle',{cx,cy:11,r:4,fill:'#172338',stroke:'#fff','stroke-width':1.5});
- label(this.record.train_number||this.o.trainNumber().trim(),34);
+ label(this.record.train_number||this.o.trainNumber().trim(),0,34,20);
  svg.append(marker);
  }
  mapZoom(delta){if(!this.mapView)return;const zoom=Math.max(2,Math.min(19,this.mapView.zoom+delta)),mode=this.mapState?.mode==='follow'?'follow':'free';this.mapState={mode,zoom,center:this.mapView.center};this.drawMap();}
  drawMap(){
- this.map.replaceChildren();this.map.append(this.mapTools);const display=[];liveStops(this.record?.points||[],!!this.record?.ended,{},false,false,false,false,display);const points=display.filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
+ this.map.replaceChildren();this.map.append(this.mapTools);const display=[],totals={moving:0,stopped:0};liveStops(this.record?.points||[],!!this.record?.ended,{},false,false,false,false,display,totals);const points=display.filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomLevel.hidden=true;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),make=tag=>document.createElementNS(ns,tag);this.mapSvg=svg;svg.setAttribute('viewBox','0 0 600 300');svg.setAttribute('role','group');svg.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_f5976363df27")));
  const project=projectPoint;
  const coords=points.map(project),minX=Math.min(...coords.map(p=>p.x)),maxX=Math.max(...coords.map(p=>p.x)),minY=Math.min(...coords.map(p=>p.y)),maxY=Math.max(...coords.map(p=>p.y));
  if(!this.mapState)this.mapState={mode:this.record.ended?'overview':'follow',zoom:15};let zoom=this.mapState.zoom,center=this.mapState.center||coords.at(-1);
  if(this.mapState.mode==='overview'){zoom=15;while(zoom>2&&((maxX-minX)*256*2**zoom>540||(maxY-minY)*256*2**zoom>240))zoom--;center={x:(minX+maxX)/2,y:(minY+maxY)/2};}else if(this.mapState.mode==='follow')center=coords.at(-1);
+ this.mapZoomLevel.hidden=false;
+ this.mapZoomLevel.textContent=t(globalThis.CtlText.source("portal_gps.text_7afb2d86cd0c"))+' '+zoom;
+ this.mapZoomLevel.setAttribute('data-i18n-ignore','');
  this.mapView={zoom,center,size:256*2**zoom};this.mapFollow.setAttribute('aria-pressed',String(this.mapState.mode==='follow'));this.mapOverview.setAttribute('aria-pressed',String(this.mapState.mode==='overview'));this.mapRail.setAttribute('aria-pressed',String(this.railEnabled&&!this.railFailed));this.mapZoomIn.disabled=zoom>=19;this.mapZoomOut.disabled=zoom<=2;
  const size=256*2**zoom,left=center.x*size-300,top=center.y*size-150,visible=!this.content.hidden&&document.visibilityState!=='hidden'&&!this.box.closest?.('[hidden]');
  if(visible&&navigator.onLine){const tiles=[];for(let x=Math.floor(left/256);x<=Math.floor((left+600)/256);x++)for(let y=Math.floor(top/256);y<=Math.floor((top+300)/256);y++){if(y<0||y>=2**zoom)continue;tiles.push({x,y});}
@@ -283,7 +301,7 @@ class Recorder{
  const dot=make('circle');dot.setAttribute('r',8);dot.setAttribute('fill','#1565c0');dot.setAttribute('stroke','#fff');dot.setAttribute('stroke-width',2);const half=make('path');half.setAttribute('d','M 0 -7 A 7 7 0 0 1 0 7 Z');half.setAttribute('fill','#d00000');half.setAttribute('pointer-events','none');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start);marker.append(dot,half,title);
  marker.addEventListener('click',()=>this.focusStop(row.key));marker.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();this.focusStop(row.key);}});svg.append(marker);
  }
- if(!this.record.ended){const position=coords.at(-1);this.drawPositionMarker(svg,make,position.x*size-left,position.y*size-top,points.at(-1));}
+ if(!this.record.ended){const position=coords.at(-1);this.drawPositionMarker(svg,make,position.x*size-left,position.y*size-top,points.at(-1),totals);}
  this.map.append(svg);
  const link=(label,url)=>{const a=node('a',label);a.href=url;a.target='_blank';a.rel='noopener';return a;};this.map.append(link(globalThis.CtlText.source("portal_gps.text_f834e3bb911e"),'https://www.openstreetmap.org/copyright'));if(this.railEnabled)this.map.append(link('OpenRailwayMap','https://www.openrailwaymap.org/'),link('CC-BY-SA 2.0','https://creativecommons.org/licenses/by-sa/2.0/'));
  this.map.append(node('small',t(this.mapState.mode==='follow'?globalThis.CtlText.source("portal_gps.text_b2b3a3f2bec3"):globalThis.CtlText.source("portal_gps.text_8e02679954f1"))));if(this.railFailed)this.map.append(node('small',t(globalThis.CtlText.source("portal_gps.text_f1b2882182df"))));
@@ -294,8 +312,8 @@ class Recorder{
  if(this.checkpointTask)return this.checkpointTask;
  this.checkpointTask=(async()=>{if(active===this&&window.AndroidPortal)await this.nativeRead();await this.persist();if(!this.record||(!this.record.points?.length&&!this.record.manual_stops?.length)||navigator.onLine===false)return false;
  const record=this.record,snapshot=JSON.parse(JSON.stringify(record));
- try{const reply=await api(this.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({train_number:snapshot.train_number,start_station:snapshot.start_station||null,end_station:snapshot.end_station||null,points:snapshot.points,departure_applied:!!snapshot.departure_applied,arrival_at:snapshot.arrival_at||null,ended:snapshot.ended,stop_edits:snapshot.stop_edits||{},manual_stops:snapshot.manual_stops||[],expected_revision:snapshot.revision||0})});
- if(!reply) return false;this.serverRecord=reply;if(this.record===record){record.revision=reply.revision;record.dirty=['start_station','end_station','ended','departure_applied','arrival_at'].some(key=>record[key]!==snapshot[key])||JSON.stringify(record.points)!==JSON.stringify(snapshot.points)||JSON.stringify(record.stop_edits||{})!==JSON.stringify(snapshot.stop_edits||{})||JSON.stringify(record.manual_stops||[])!==JSON.stringify(snapshot.manual_stops||[]);await this.persist();}return true;
+ try{const reply=await api(this.path,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({train_number:snapshot.train_number,start_station:snapshot.start_station||null,start_station_name:snapshot.start_station_name||'',end_station_name:snapshot.end_station_name||'',end_station:snapshot.end_station||null,points:snapshot.points,departure_applied:!!snapshot.departure_applied,arrival_at:snapshot.arrival_at||null,ended:snapshot.ended,stop_edits:snapshot.stop_edits||{},manual_stops:snapshot.manual_stops||[],expected_revision:snapshot.revision||0})});
+ if(!reply) return false;this.serverRecord=reply;if(this.record===record){record.revision=reply.revision;record.dirty=['start_station','end_station','start_station_name','end_station_name','ended','departure_applied','arrival_at'].some(key=>record[key]!==snapshot[key])||JSON.stringify(record.points)!==JSON.stringify(snapshot.points)||JSON.stringify(record.stop_edits||{})!==JSON.stringify(snapshot.stop_edits||{})||JSON.stringify(record.manual_stops||[])!==JSON.stringify(snapshot.manual_stops||[]);await this.persist();}return true;
  }catch(error){if(error.status===409)throw error;return false;}})();try{return await this.checkpointTask;}finally{this.checkpointTask=null;}
  }
  async discard(){if(window.AndroidPortal)await window.AndroidPortal.gps('stop',{key:this.key});this.clear();this.clearManual();await local(this.key,null);this.record=null;this.analysis=null;this.draw();}
@@ -305,15 +323,15 @@ class Recorder{
  if(!stops.length){this.results.append(node('p',t(globalThis.CtlText.source("portal_gps.text_280e8fae6dfe"))));return;}
  const table=node('table');table.className='excel';const head=node('tr');for(const value of [globalThis.CtlText.source("portal_gps.text_792751a9dcdb"),globalThis.CtlText.source("portal_gps.text_640e86cbc244"),globalThis.CtlText.source("portal_gps.text_078a815372af"),globalThis.CtlText.source("portal_gps.text_b45f40c737c3"),globalThis.CtlText.source("portal_gps.text_936378b371b9"),globalThis.CtlText.source("portal_gps.text_6c2d352161df")])head.append(node('th',t(value)));table.append(head);
  for(const row of stops){const old=this.analysis?.rows?.find(item=>item.kind===globalThis.CtlText.source("portal_gps.text_0fd998791d67")&&item.start===row.start),legacy=this.record.locations?.[String(row.start)]||old?.station,draft=row.source_keys.map(key=>this.record.stop_edits?.[key]).find(Boolean)||(legacy?{station:legacy,station_input:(legacy.code?legacy.code+' · ':'')+legacy.name,reason:old?.reason?.reason||'',detail:old?.reason?.detail||''}:{}),tr=node('tr'),station=node('input'),list=node('datalist'),reason=node('select'),detail=node('input'),end=node('input'),take=node('button',t(globalThis.CtlText.source("portal_gps.text_8956021eae0e"))),remove=node('button',t(globalThis.CtlText.source("portal_gps.text_6c2d352161df")));
- station.maxLength=270;station.value=draft.station_input??(draft.station?draft.station.code+' · '+draft.station.name:'');station.placeholder=t(globalThis.CtlText.source("portal_gps.text_d27be01cc4fa"));station.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_792751a9dcdb")));list.id='gps-live-'+this.o.journeyId+'-'+row.key;station.setAttribute('list',list.id);this.o.stations(station,list);
+ station.maxLength=270;station.value=draft.station_input??(draft.station?placeLabel(draft.station):'');station.placeholder=t(globalThis.CtlText.source("portal_gps.text_3ac37da56214"));station.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_792751a9dcdb")));list.id='gps-live-'+this.o.journeyId+'-'+row.key;station.setAttribute('list',list.id);this.o.stations(station,list);
  const empty=node('option',t(globalThis.CtlText.source("portal_gps.text_4112179c8995")));empty.value='';reason.append(empty);for(const value of window.TrainJourneyReasons||[]){const option=node('option',t(window.TrainJourneyReasonLabel?.(value)||value));option.value=value;reason.append(option);}reason.value=draft.reason||'';reason.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_820c55eb8960")));detail.maxLength=256;detail.value=draft.detail||'';detail.placeholder=t(globalThis.CtlText.source("portal_gps.text_d2373f70bb27"));detail.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_e73e1be46ebb")));
  let endTouched=false,editedEnd=null;const previousEnd=()=>draft.manual_end&&draft.end?draft.end:row.end;const endTime=()=>endTouched?editedEnd:!end.value?null:!endTouched&&previousEnd()&&end.value===clock(previousEnd())?previousEnd():stopEnd(row,end.value,previousEnd());
  end.type='time';end.step='60';end.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_ea90c8a580d4")));end.value=previousEnd()?clock(previousEnd()):'';take.type='button';take.title=t(globalThis.CtlText.source("portal_gps.text_6781a6571713"));take.disabled=this.o.readonly();
- const remember=()=>{this.record.stop_edits||={};this.record.stop_edits[row.key]={...this.record.stop_edits[row.key],station_input:station.value,station:draft.station&&station.value===draft.station.code+' · '+draft.station.name?draft.station:null,reason:reason.value,detail:detail.value,end:endTime(),manual_end:endTouched||!!draft.manual_end,imported:false};this.record.dirty=true;this.persist().catch(error=>this.fail(error.message));};
+ const remember=()=>{this.record.stop_edits||={};this.record.stop_edits[row.key]={...this.record.stop_edits[row.key],station_input:station.value,station:draft.station&&station.value===placeLabel(draft.station)?draft.station:null,reason:reason.value,detail:detail.value,end:endTime(),manual_end:endTouched||!!draft.manual_end,imported:false};this.record.dirty=true;this.persist().catch(error=>this.fail(error.message));};
  tr.tabIndex=0;tr.onclick=event=>{if(!event.target?.closest?.('button,details,summary'))this.setFocusedStop(row.key,true);};tr.addEventListener('focusin',()=>this.setFocusedStop(row.key));tr.addEventListener('focusout',event=>{if(!tr.contains(event.relatedTarget))this.setFocusedStop(null);});
  station.oninput=remember;reason.onchange=remember;detail.oninput=()=>{if(detail.value.trim())reason.value=globalThis.CtlText.source("portal_gps.text_69384a6be550");remember();};end.oninput=()=>{editedEnd=stopEnd(row,end.value,editedEnd||previousEnd());endTouched=true;remember();};
- take.onclick=async()=>{if(this.o.readonly())return;take.disabled=true;try{const until=endTime();if(!until||until<=row.start)throw Error(t(globalThis.CtlText.source("portal_gps.text_3469ecb39054")));if(!reason.value)throw Error(t(globalThis.CtlText.source("portal_gps.text_f2df21cce73d")));if(reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")&&!detail.value.trim())throw Error(t(globalThis.CtlText.source("portal_gps.text_58f91be54d8a")));const choice=draft.station&&station.value===draft.station.code+' · '+draft.station.name?draft.station:await this.o.resolve(station);const imported=await this.o.importStops([{...row,end:until,station:choice,reason:{reason:reason.value,detail:reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")?detail.value.trim():'',label:window.TrainJourneyReasonLabel?.(reason.value)||reason.value}}]);if(imported===false)return;
- this.record.stop_edits||={};this.record.stop_edits[row.key]={station_input:choice.code+' · '+choice.name,station:choice,reason:reason.value,detail:detail.value,end:until,manual_end:endTouched||!!draft.manual_end,imported:true};this.record.dirty=true;await this.persist();this.draw();}catch(error){this.fail(error.message);}finally{take.disabled=this.o.readonly();}};
+ take.onclick=async()=>{if(this.o.readonly())return;take.disabled=true;try{const until=endTime();if(!until||until<=row.start)throw Error(t(globalThis.CtlText.source("portal_gps.text_3469ecb39054")));if(!reason.value)throw Error(t(globalThis.CtlText.source("portal_gps.text_f2df21cce73d")));if(reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")&&!detail.value.trim())throw Error(t(globalThis.CtlText.source("portal_gps.text_58f91be54d8a")));const choice=draft.station&&station.value===placeLabel(draft.station)?draft.station:await this.o.resolve(station);const imported=await this.o.importStops([{...row,end:until,station:choice,reason:{reason:reason.value,detail:reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")?detail.value.trim():'',label:window.TrainJourneyReasonLabel?.(reason.value)||reason.value}}]);if(imported===false)return;
+ this.record.stop_edits||={};this.record.stop_edits[row.key]={station_input:placeLabel(choice),station:choice,reason:reason.value,detail:detail.value,end:until,manual_end:endTouched||!!draft.manual_end,imported:true};this.record.dirty=true;await this.persist();this.draw();}catch(error){this.fail(error.message);}finally{take.disabled=this.o.readonly();}};
  remove.type='button';remove.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_ee3fb0eb114c"))+' · '+stamp(row.start));remove.onclick=()=>this.run(()=>this.deleteStop(row));
  const history=node('details'),historyRows=row.source_keys.map(key=>({key,edit:this.record.stop_edits?.[key]})).filter(item=>item.edit);if(historyRows.length>1){history.append(node('summary',t(globalThis.CtlText.source("portal_gps.text_557314f9ed76"))));for(const {key,edit}of historyRows)history.append(node('p',stamp(Number(key.slice(5)))+' · '+(edit.station_input||edit.station?.name||'')+' · '+(edit.reason||'')+(edit.detail?' · '+edit.detail:'')));}history.hidden=historyRows.length<2;
  for(const elements of [[station,list,history],[node('span',stamp(row.start))],[end],[reason,detail],[take],[remove]]){const td=node('td');td.append(...elements);tr.append(td);}table.append(tr);this.liveInputs.push({row,tr,station,reason,detail,end,take,remove});

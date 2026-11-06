@@ -29,13 +29,25 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const position=()=>r.mapSvg.children.find(n=>n.attributes['data-gps-position']);
  const labels=()=>position().children.filter(n=>n.tag==='text');
  assert.equal(position().attributes.transform,'translate(300 150)');
- assert.deepEqual(labels().map(n=>n.textContent),['36 km/h','123']);
- assert(labels()[0].attributes.y<0&&labels()[1].attributes.y>0);
+ assert.deepEqual(labels().map(n=>n.textContent),['36 km/h','00:00','/','00:00','123']);
+ const [speed,driving,,standing,train]=labels().map(label=>label.attributes);
+ assert(speed.x>19&&speed.y>0&&speed['font-size']<train['font-size']);
+ assert(driving.y<0&&standing.y<0&&train.y>0);
+ assert.equal(driving.fill,'#146c34');assert.equal(standing.fill,'#b42318');
+ assert.match(r.mapZoomLevel.textContent,/ 15$/);
+ const shortTrack=r.record.points;
+ r.record.points=Array.from({length:37},(_,i)=>({
+  ...point(52,13+Math.min(i,13)*.0007,i*5000+1+(i>=25?120000:0)),
+  speed:i<13?10:0
+ }));
+ r.drawMap();
+ assert.deepEqual(labels().slice(1,4).map(n=>n.textContent),['00:01','/','00:01']);
+ r.record.points=shortTrack;
  r.record.points.at(-1).speed=0;r.drawMap();assert.equal(labels()[0].textContent,'0 km/h');
  r.record.points.at(-1).speed=null;r.drawMap();assert.equal(labels()[0].textContent,'–');
  r.record.ended=true;r.drawMap();assert.equal(position(),undefined);
  r.record.ended=false;r.drawMap();
- r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,16);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,16);
+ r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,16);assert.match(r.mapZoomLevel.textContent,/ 16$/);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,16);
  r.mapOverview.onclick();assert.equal(r.mapState.mode,'overview');assert.notEqual(r.mapView.center.x,(193.3/360));r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');
  const e=(pointerId,x,y)=>({pointerId,clientX:x,clientY:y,pointerType:'touch',target:r.mapSvg,preventDefault(){}});r.map.events.pointerdown(e(1,200,150));r.map.events.pointerdown(e(2,400,150));const zoom=r.mapView.zoom;r.map.events.pointermove(e(2,600,150));assert.equal(r.mapView.zoom,zoom+1);assert.equal(r.mapState.mode,'free');r.map.events.pointerup(e(1,200,150));r.map.events.pointerup(e(2,600,150));
  r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');r.mapState.zoom=19;r.drawMap();r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,19);assert.equal(r.mapZoomIn.disabled,true);

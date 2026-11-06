@@ -21,6 +21,19 @@ class TrainJourneysTest(unittest.TestCase):
     def update(self,report,trains,revision=0):
         return self.driver.put(f'/api/v1/tf/work-reports/{report}/train-journeys',json={'expected_revision':revision,'train_journeys':trains})
 
+    def test_train_places_accept_free_text_alongside_ds100(self):
+        data=self.data()
+        train=data['train_journeys'][0]
+        train.update(start_station='',start_station_name=' km 42,7 ')
+        train['events'][0].update(station='',station_name='km 44,3')
+        saved=self.create(data)
+        train=saved['train_journeys'][0]
+        self.assertEqual((train['start_station'],train['start_station_name']),('', 'km 42,7'))
+        self.assertEqual(train['end_station'],'LL')
+        self.assertEqual(train['events'][0]['station_name'],'km 44,3')
+        train.update(end_station='',end_station_name=' ')
+        self.assertEqual(self.update(saved['id'],[train]).status_code,422)
+
     def test_ctl_type_pause_without_station_roundtrips(self):
         data=self.data();event=data['train_journeys'][0]['events'][0]
         event.update(cause='CTL',station='',station_name='')

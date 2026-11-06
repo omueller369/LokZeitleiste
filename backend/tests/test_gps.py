@@ -69,6 +69,20 @@ class RecordingTest(unittest.TestCase):
         path=path or self.path();data=dict(train_number='ABC123',points=points(),ended=True,expected_revision=0);data.update(changes)
         result=self.driver.put(path,json=data);return path,result
 
+    def test_free_text_endpoints_and_stop_roundtrip(self):
+        key='live-'+str(BASE)
+        path,response=self.save(start_station_name=' km 42,7 ',end_station='BBB',
+            stop_edits={key:{'station_input':'km 44,3','station':{'code':'','name':'km 44,3'}}})
+        self.assertEqual(response.status_code,200,response.text)
+        recording=self.driver.get(path).json()
+        self.assertEqual(recording['stations']['start'],{'code':'','name':'km 42,7'})
+        self.assertEqual(recording['stations']['end']['code'],'BBB')
+        self.assertEqual(recording['stop_edits'][key]['station']['name'],'km 44,3')
+        choices=self.driver.put(path+'/stations',json={'expected_revision':1,'stations':{
+            'start':{'name':'km 42,7'},'s0':{'name':'km 44,3'},'end':'BBB'}})
+        self.assertEqual(choices.status_code,200,choices.text)
+        self.assertEqual(choices.json()['analysis']['rows'][1]['station'],{'code':'','name':'km 44,3'})
+
     def test_private_roundtrip_revision_and_delete(self):
         path,response=self.save();self.assertEqual(response.status_code,200,response.text)
         self.assertEqual(response.json()['revision'],1);self.assertEqual(len(response.json()['analysis']['rows']),3)

@@ -87,9 +87,9 @@ class TrainEventIn(BaseModel):
 class TrainJourneyIn(BaseModel):
     id:UUID
     train_number:str=Field(min_length=1,max_length=12)
-    start_station:str=Field(min_length=1,max_length=10)
+    start_station:str=Field(max_length=10)
     start_station_name:str=Field(default='',max_length=255)
-    end_station:str=Field(min_length=1,max_length=10)
+    end_station:str=Field(max_length=10)
     end_station_name:str=Field(default='',max_length=255)
     start_at:datetime
     end_at:datetime
@@ -109,6 +109,10 @@ class TrainJourneyIn(BaseModel):
 
     @model_validator(mode='after')
     def valid_journey(self):
+        self.start_station_name=self.start_station_name.strip()
+        self.end_station_name=self.end_station_name.strip()
+        if not (self.start_station or self.start_station_name) or not (self.end_station or self.end_station_name):
+            raise ValueError(_text_source('server_work_reports_schemas.text_8c8b67c386de'))
         if self.end_at<=self.start_at:raise ValueError(_text_source('server_work_reports_schemas.text_ecd10b0d9952'))
         if len({e.id for e in self.events})!=len(self.events):raise ValueError(_text_source('server_work_reports_schemas.text_e8489536b599'))
         self.events.sort(key=lambda e:(e.start_at,e.end_at,str(e.id)))

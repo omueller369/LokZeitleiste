@@ -30,7 +30,19 @@ function structuredTrips(){return trips.map(t=>({...t}));}
 function localReport(){return pending.find(r=>r.client_id===state.client_id);}
 function canLeave(){return !hasDraft()&&(!queue.length||!!localReport());}
 function stationLabel(code,name){return name?code+' · '+name:code;}
-async function resolveStation(input){const value=input.value.trim(),parts=value.split(' · '),q=parts[0];const rows=await api('/api/v1/tf/work-reports/stations?q='+encodeURIComponent(q));const exact=rows.find(r=>r.code===q.toUpperCase())||rows.find(r=>r.name.toLocaleLowerCase()===value.toLocaleLowerCase());if(!exact)throw Error(globalThis.CtlText.source("portal_work_report.text_9829a55f8030"));input.value=stationLabel(exact.code,exact.name);return exact;}
+async function resolveStation(input,allowText=false){
+ const value=input.value.trim(),parts=value.split(' · '),query=parts[0];
+ const canLookup=query&&navigator.onLine!==false&&[...query].length<=255;
+ const rows=!allowText||canLookup?await api('/api/v1/tf/work-reports/stations?q='+encodeURIComponent(query)):[];
+ const lower=value.toLocaleLowerCase();
+ const exact=rows.find(row=>row.code===query.toUpperCase()&&
+  (!allowText||parts.length===1||stationLabel(row.code,row.name).toLocaleLowerCase()===lower))
+  ||rows.find(row=>row.name.toLocaleLowerCase()===lower);
+ const place=exact||(allowText&&value&&[...value].length<=255?{code:'',name:value}:null);
+ if(!place)throw Error(globalThis.CtlText.source("portal_work_report.text_9829a55f8030"));
+ input.value=place.code?stationLabel(place.code,place.name):place.name;
+ return place;
+}
 function absence(kind=state.kind){return kind===globalThis.CtlText.source("portal_work_report.text_35d3a889824d")||kind===globalThis.CtlText.source("portal_work_report.text_be1600b499c6");}
 function defaultDutyKind(kind){return [globalThis.CtlText.source("portal_work_report.text_f31b8681bfca"),globalThis.CtlText.source("portal_work_report.text_be1600b499c6"),globalThis.CtlText.source("portal_work_report.text_bfe022ddd1f8"),globalThis.CtlText.source("portal_work_report.text_a88b0d6dfef3"),globalThis.CtlText.source("portal_work_report.text_98a9c4972272")].includes(kind);}
 function prefillDutyHours(kind){if(!defaultDutyKind(kind))return false;const date=el('dutyStart').value.slice(0,10)||el('dutyEnd').value.slice(0,10)||today();el('dutyStart').value=date+'T08:00';el('dutyEnd').value=date+'T16:00';el('dutyStart').dataset.previous=el('dutyStart').value;return true;}
@@ -148,6 +160,7 @@ function stations(input,list){
  input.addEventListener('input',()=>{
   clearTimeout(timer);const n=++version,q=input.value.trim().split(' · ')[0];list.replaceChildren();
   if(!q){popular();return;}
+  if([...q].length>255)return;
   timer=setTimeout(async()=>{try{const rows=await api('/api/v1/tf/work-reports/stations?q='+encodeURIComponent(q));if(n===version){const term=q.toLocaleLowerCase();suggestions([...popularRows.filter(r=>(r.code+' '+r.name).toLocaleLowerCase().includes(term)),...rows]);}}catch(error){message(error.message);}},180);
  });
  popular();

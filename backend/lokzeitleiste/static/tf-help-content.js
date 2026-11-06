@@ -1,5 +1,5 @@
 /* Gemeinsamer Hilfekatalog für alle TF-Module. Internationaler Bremszettel: editierbare Vorschläge bei DE/G in Spalte 1. */
-window.TfHelpRevision="2026-11-05";
+window.TfHelpRevision="2026-11-06";
 window.TfHelpPages=globalThis.CtlText.restore([
   {
     "id": "start",

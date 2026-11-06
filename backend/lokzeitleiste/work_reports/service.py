@@ -105,6 +105,7 @@ def save_report(db,user,data,commit=True):
 def resolve_train_stations(db,journeys):
     for train in journeys:
         for code,attribute in ((train.start_station,'start_station_name'),(train.end_station,'end_station_name')):
+            if not code:continue
             station=db.get(RailwayStation,code)
             if not station:raise HTTPException(422,_text_source('server_work_reports_service.text_b2e103a3cabe')+code)
             setattr(train,attribute,station.name)

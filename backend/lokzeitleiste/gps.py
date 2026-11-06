@@ -48,6 +48,8 @@ class Recording(BaseModel):
     points:list[Point]=Field(default_factory=list,max_length=20000)
     start_station:str|None=Field(default=None,max_length=10)
     end_station:str|None=Field(default=None,max_length=10)
+    start_station_name:str=Field(default='',max_length=255)
+    end_station_name:str=Field(default='',max_length=255)
     manual_stops:list[ManualStop]|None=Field(default=None,max_length=500)
     stop_edits:dict[str,StopEdit]|None=Field(default=None,max_length=1024)
     departure_applied:bool=False
@@ -74,9 +76,12 @@ class StopReason(BaseModel):
         if self.reason==_text_source('server_gps.text_69384a6be550') and not self.detail:raise ValueError(_text_source('server_gps.text_58f91be54d8a'))
         return self
 
+class FreePlace(BaseModel):
+    name:str=Field(min_length=1,max_length=255)
+
 class Choices(BaseModel):
     expected_revision:int=Field(ge=1)
-    stations:dict[str,str]=Field(default_factory=dict,max_length=1024)
+    stations:dict[str,str|FreePlace]=Field(default_factory=dict,max_length=1024)
     reasons:dict[str,StopReason]|None=Field(default=None,max_length=1024)
     selection:list[str]|None=Field(default=None,max_length=1024)
 
@@ -238,20 +243,22 @@ def create_router(require_account):
             if station:edits[key]=dict(station=station,station_input=(station.get('code','')+' · ' if station.get('code') else '')+station.get('name',''),reason=reason.get('reason',''),detail=reason.get('detail',''),end=None,manual_end=False,imported=False)
         payload['stop_edits']=edits
         if 'locations' in previous:payload['locations']=previous['locations']
-        if data.end_station:
-            station=db.get(RailwayStation,data.end_station.strip().upper())
-            if not station:raise HTTPException(422,_text_source('server_gps.text_5b9f556e58d7'))
-            payload['end_station']=station.code
-
         payload['stations']=previous.get('stations',{}) if previous.get('points')==payload['points'] else {}
         payload['reasons']=previous.get('reasons',{}) if previous.get('points')==payload['points'] else {}
         payload['selection']=previous.get('selection',[]) if previous.get('points')==payload['points'] else []
-        if data.start_station:
-            station=db.get(RailwayStation,data.start_station.strip().upper())
-            if not station:raise HTTPException(422,_text_source('server_gps.text_f96e8bf660b7'))
-            payload['start_station']=station.code;payload['stations']['start']=dict(code=station.code,name=station.name)
-        if data.end_station:
-            end=db.get(RailwayStation,payload['end_station']);payload['stations']['end']=dict(code=end.code,name=end.name)
+        for kind,error in (('start',_text_source('server_gps.text_f96e8bf660b7')),('end',_text_source('server_gps.text_5b9f556e58d7'))):
+            code_field,name_field=kind+'_station',kind+'_station_name'
+            code=(payload[code_field] or '').strip().upper()
+            name=payload[name_field].strip()
+            if not code and name_field not in data.model_fields_set and not previous.get(code_field):
+                name=previous.get(name_field) or ''
+            if code:
+                station=db.get(RailwayStation,code)
+                if not station:raise HTTPException(422,error)
+                code,name=station.code,station.name
+            payload[code_field],payload[name_field]=code or None,name
+            if name:payload['stations'][kind]=dict(code=code,name=name)
+            elif name_field in data.model_fields_set:payload['stations'].pop(kind,None)
         if not row:row=TrainGpsRecording(owner_id=user.id,journey_id=str(journey_id),revision=0);db.add(row)
         row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     @router.delete('/api/v1/tf/gps/{journey_id}')
@@ -277,10 +284,18 @@ def create_router(require_account):
         row=owned(db,user,journey_id,True)
         if row.revision!=data.expected_revision:raise HTTPException(409,_text_source('server_gps.text_e9455228bddf'))
         payload=read_payload(row);keys={item['key'] for item in analyse(payload['points'],payload.get('stop_edits') or {})['rows']};selected={}
-        for key,code in data.stations.items():
-            station=db.get(RailwayStation,code.strip().upper())
-            if key not in keys or not station:raise HTTPException(422,_text_source('server_gps.text_c5c16d0e1424'))
-            selected[key]=dict(code=station.code,name=station.name)
+        for key,place in data.stations.items():
+            if key in keys:
+                if isinstance(place,FreePlace):
+                    if place.name.strip():
+                        selected[key]=dict(code='',name=place.name.strip())
+                        continue
+                else:
+                    station=db.get(RailwayStation,place.strip().upper())
+                    if station:
+                        selected[key]=dict(code=station.code,name=station.name)
+                        continue
+            raise HTTPException(422,_text_source('server_gps.text_c5c16d0e1424'))
         if data.reasons is not None:
             if any(key not in keys for key in data.reasons):raise HTTPException(422,_text_source('server_gps.text_27e6f9d32657'))
             labels={}
@@ -291,6 +306,9 @@ def create_router(require_account):
             if any(key not in keys for key in data.selection):raise HTTPException(422,_text_source('server_gps.text_31cbf51014e1'))
             payload['selection']=list(dict.fromkeys(data.selection))
         payload['stations']=selected
-        if selected.get('start'):payload['start_station']=selected['start']['code']
+        for kind in ('start','end'):
+            if kind in selected:
+                payload[kind+'_station']=selected[kind]['code'] or None
+                payload[kind+'_station_name']=selected[kind]['name']
         row.payload_json=json.dumps(payload,ensure_ascii=False);row.revision+=1;db.commit();return view(row)
     return router
