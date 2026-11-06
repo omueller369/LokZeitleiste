@@ -1,4 +1,4 @@
-# LokZeitleiste v0.26.15
+# LokZeitleiste v0.26.16
 
 LokZeitleiste ist jetzt in eine Android-App für Tf und ein Python-Backend für Admins und Monatsdaten geteilt.
 

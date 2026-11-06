@@ -52,7 +52,7 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const e=(pointerId,x,y)=>({pointerId,clientX:x,clientY:y,pointerType:'touch',target:r.mapSvg,preventDefault(){}});r.map.events.pointerdown(e(1,200,150));r.map.events.pointerdown(e(2,400,150));const zoom=r.mapView.zoom;r.map.events.pointermove(e(2,600,150));assert.equal(r.mapView.zoom,zoom+1);assert.equal(r.mapState.mode,'free');r.map.events.pointerup(e(1,200,150));r.map.events.pointerup(e(2,600,150));
  r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');r.mapState.zoom=19;r.drawMap();r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,19);assert.equal(r.mapZoomIn.disabled,true);
  const layer=r.mapSvg.children.find(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org'));layer.events.error();assert.equal(r.railFailed,true);assert(!r.mapSvg.children.some(n=>String(n.attributes.href).includes('tiles.openrailwaymap.org')));assert(r.mapSvg.children.some(n=>String(n.attributes.href).includes('tile.openstreetmap.org')));
- context.document.visibilityState='hidden';r.drawMap();assert(!r.mapSvg.children.some(n=>n.tag==='image'));assert(r.mapSvg.children.some(n=>n.tag==='polyline'));
+ context.document.visibilityState='hidden';r.drawMap();assert(!r.mapSvg.children.some(n=>n.tag==='image'));assert(r.mapSvg.children.some(n=>'data-gps-trail' in n.attributes));
  // Old recordings need no migration: markers are derived from original fixes.
  r.record={ended:true,points:Array.from({length:63},(_,i)=>({...point(52,13,100000+i*5000),speed:0}))};r.draw();
  r.mapFollow.onclick();
@@ -67,6 +67,16 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  assert.equal(r.mapState.mode,'free');assert(r.mapView.zoom>=16);assert(markers()[0].attributes.transform.includes('translate(300 150)'));assert(markers()[0].attributes.transform.endsWith('scale(2)'));r.liveInputs[0].tr.events.focusout({relatedTarget:null});
  assert(markers()[0].attributes.transform.endsWith('scale(1)'));r.liveInputs[0].tr.events.focusin();assert(markers()[0].attributes.transform.endsWith('scale(2)'));
  const key=r.liveInputs[0].row.key;r.record.stop_edits={[key]:{imported:true}};let imported=null;r.o.focusImported=value=>imported=value;r.draw();assert.equal(r.liveInputs.length,0);markers()[0].events.click();assert.equal(imported,key);
+ // Route colors follow speed, and the signal gap stays dashed and neutral.
+ r.record={ended:true,points:[
+  point(52,13,1),{...point(52,13.001,5001),speed:60/3.6},
+  {...point(52,13.002,10001),speed:120/3.6},
+  {...point(52,13.003,15001),speed:180/3.6},
+  {...point(52,13.004,50001),speed:180/3.6}
+ ]};r.drawMap();
+ const trails=r.mapSvg.children.filter(n=>'data-gps-trail' in n.attributes);
+ assert.deepEqual(trails.map(n=>n.attributes.stroke),['rgb(0,119,70)','rgb(207,107,0)','rgb(190,22,40)']);
+ assert.equal(r.mapSvg.children.find(n=>n.attributes['stroke-dasharray']).attributes.stroke,'#626b78');
  // Signal gaps do not invent stops, and short stationary runs have no marker.
  r.record={ended:true,points:[{...point(52,13,1),speed:0},{...point(52,13,400001),speed:0}]};r.draw();assert.equal(markers().length,0);
  for(const fixture of JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8'))){const actual=context.window.GpsRecorder.liveStops(fixture.points,true,fixture.edits).map(({start,end})=>({start,end}));assert.equal(JSON.stringify(actual),JSON.stringify(fixture.expected),fixture.name);}

@@ -113,3 +113,10 @@
 #workReport .gps-box .gps-block-content[hidden]{display:none!important}
 @media(max-width:800px){#workReport .duty-overview{grid-template-columns:minmax(0,1fr);gap:16px}#workReport .duty-overview-right{width:100%}}
 @media(max-width:380px){#workReport #dutyMetrics{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}#workReport .duty-kinds{gap:2px}}
+
+.gps-trail-legend{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:8px 0;font-size:.8rem}
+.gps-trail-scale{position:relative;width:160px;height:1.6em}
+.gps-trail-scale::before{content:"";position:absolute;inset:0 0 auto;height:4px;border-radius:3px;background:var(--gps-trail-gradient)}
+.gps-trail-scale span{position:absolute;top:5px;transform:translateX(-50%)}
+.gps-trail-scale span:first-child{transform:none}
+.gps-trail-scale span:last-child{transform:translateX(-100%)}

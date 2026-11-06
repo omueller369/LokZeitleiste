@@ -24,6 +24,20 @@ function stopEnd(row,value,previous){
 }
 const distance=(a,b)=>{const r=Math.PI/180,h=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(h)));};
 const speedAt=(p,last)=>p.speed??(last&&last.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000?distance(last,p)/((p.t-last.t)/1000):null);
+// A fixed scale keeps colors comparable between recordings and while zooming.
+const trailScale=[[0,[25,85,195]],[60,[0,119,70]],[120,[207,107,0]],[160,[190,22,40]]];
+const trailColor=rgb=>'rgb('+rgb.join(',')+')';
+const unknownTrail='#626b78';
+function speedColor(speed){
+ if(!Number.isFinite(speed))return unknownTrail;
+ const kmh=Math.min(160,Math.max(0,Math.round(speed*3.6/5)*5));
+ const end=trailScale.findIndex(([limit])=>limit>=kmh);
+ if(end===0)return trailColor(trailScale[0][1]);
+ const [startSpeed,startColor]=trailScale[end-1],[endSpeed,endColor]=trailScale[end];
+ const fraction=(kmh-startSpeed)/(endSpeed-startSpeed);
+ return trailColor(startColor.map((channel,index)=>Math.round(channel+(endColor[index]-channel)*fraction)));
+}
+
 // Four consecutive accurate fixes must show sustained movement in one direction.
 function* confirmedMotion(points, inclusive){
  const fast=speed=>inclusive?speed>=10:speed>10;
@@ -55,7 +69,7 @@ function liveStops(points,ended=false,edits={},legacy=false,version2=false,versi
   else if(run.length){const nearby=distance(run[0],p)<=100+1e-6;if(confirmed?confirmed.has(p.t):speed!=null&&speed*3.6>(previousRule?5:10)&&(!nearby||(p.speed!=null&&!previousRule)))finish(true);else if(nearby)run.push(p);}
   else if(!confirmed?.has(p.t)&&speed!=null&&speed*3.6<(previousRule?3:5))run.push(p);
   if(totals)previousState=run.length?'stopped':speed!=null||confirmed?.has(p.t)?'moving':null;
-  if(display)display.push(run.length?{...p,lat:run[0].lat,lon:run[0].lon}:p);
+  if(display)display.push({...p,lat:run.length?run[0].lat:p.lat,lon:run.length?run[0].lon:p.lon,mapSpeed:run.length?0:speed});
   last=p;
  }
  finish(ended);return rows;
@@ -277,6 +291,48 @@ class Recorder{
  label(this.record.train_number||this.o.trainNumber().trim(),0,34,20);
  svg.append(marker);
  }
+ drawTrail(svg,make,display,position){
+ const paths=new Map(),bridges=[];
+ let last=null,interrupted=false;
+ for(const point of display){
+  if(point.accuracy>50){interrupted=true;continue;}
+  const next=position(point);
+  if(last){
+   if(interrupted||point.t-last.t>30000)bridges.push([last,next]);
+   else if(last.x!==next.x||last.y!==next.y){
+    const color=speedColor(point.mapSpeed);
+    const segment='M'+last.x.toFixed(1)+' '+last.y.toFixed(1)+'L'+next.x.toFixed(1)+' '+next.y.toFixed(1);
+    if(!paths.has(color))paths.set(color,[]);
+    paths.get(color).push(segment);
+   }
+  }
+  interrupted=false;
+  last={...next,t:point.t};
+ }
+ for(const [color,segments] of paths){
+  const line=make('path');line.setAttribute('data-gps-trail','');line.setAttribute('d',segments.join(''));
+  line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width',3);
+  line.setAttribute('stroke-linecap','round');svg.append(line);
+ }
+ for(const [a,b] of bridges){
+  const bridge=make('line');
+  for(const [key,value] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:unknownTrail,'stroke-width':2,'stroke-dasharray':'6 4'}))bridge.setAttribute(key,value);
+  const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));
+  bridge.append(title);svg.append(bridge);
+ }
+ }
+ trailLegend(){
+ const legend=node('div');legend.className='gps-trail-legend';legend.setAttribute('data-i18n-ignore','');
+ legend.append(node('span',t(globalThis.CtlText.source("portal_gps.text_8af2c376113e"))));
+ const scale=node('div');scale.className='gps-trail-scale';scale.setAttribute('style','--gps-trail-gradient:linear-gradient(90deg,'+
+  trailScale.map(([speed,color])=>trailColor(color)+' '+speed/160*100+'%').join(',')+')');
+ for(const [speed] of trailScale){
+  const tick=node('span',speed===160?'160+':String(speed));
+  tick.setAttribute('style','left:'+speed/160*100+'%');scale.append(tick);
+ }
+ legend.append(scale);
+ return legend;
+ }
  mapZoom(delta){if(!this.mapView)return;const zoom=Math.max(2,Math.min(19,this.mapView.zoom+delta)),mode=this.mapState?.mode==='follow'?'follow':'free';this.mapState={mode,zoom,center:this.mapView.center};this.drawMap();}
  drawMap(){
  this.map.replaceChildren();this.map.append(this.mapTools);const display=[],totals={moving:0,stopped:0};liveStops(this.record?.points||[],!!this.record?.ended,{},false,false,false,false,display,totals);const points=display.filter(p=>p.accuracy<=50);if(!points.length){this.mapSvg=null;this.mapView=null;this.mapZoomLevel.hidden=true;this.mapZoomIn.disabled=this.mapZoomOut.disabled=true;return;}
@@ -293,8 +349,7 @@ class Recorder{
  if(visible&&navigator.onLine){const tiles=[];for(let x=Math.floor(left/256);x<=Math.floor((left+600)/256);x++)for(let y=Math.floor(top/256);y<=Math.floor((top+300)/256);y++){if(y<0||y>=2**zoom)continue;tiles.push({x,y});}
  const layer=(template,rail=false)=>{for(const {x,y}of tiles){const image=make('image');image.setAttribute('x',x*256-left);image.setAttribute('y',y*256-top);image.setAttribute('width',256);image.setAttribute('height',256);image.setAttribute('href',template.replace('{z}',zoom).replace('{x}',((x%2**zoom)+2**zoom)%2**zoom).replace('{y}',y));image.setAttribute('referrerpolicy','origin');if(rail)image.setAttribute('data-gps-rail','true');if(rail)image.addEventListener('error',()=>{if(this.railFailed)return;this.railFailed=true;this.drawMap();});svg.append(image);}};
  layer(window.GpsTileUrl||'https://tile.openstreetmap.org/{z}/{x}/{y}.png');if(this.railEnabled&&!this.railFailed)layer(window.GpsRailTileUrl||'https://tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png',true);}
- let segment=[],last=null,interrupted=false;const flush=()=>{if(segment.length){const line=make('polyline');line.setAttribute('points',segment.join(' '));line.setAttribute('fill','none');line.setAttribute('stroke','#d00000');line.setAttribute('stroke-width',3);svg.append(line);segment=[];}};
- for(const p of display){if(p.accuracy>50){flush();interrupted=true;continue;}if(last&&(interrupted||p.t-last.t>30000)){flush();const a=project(last),b=project(p),bridge=make('line');bridge.setAttribute('x1',a.x*size-left);bridge.setAttribute('y1',a.y*size-top);bridge.setAttribute('x2',b.x*size-left);bridge.setAttribute('y2',b.y*size-top);bridge.setAttribute('stroke','#d00000');bridge.setAttribute('stroke-width',2);bridge.setAttribute('stroke-dasharray','6 4');const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));bridge.append(title);svg.append(bridge);}interrupted=false;const c=project(p);segment.push((c.x*size-left).toFixed(1)+','+(c.y*size-top).toFixed(1));last=p;}flush();
+ this.drawTrail(svg,make,display,p=>{const c=project(p);return {x:c.x*size-left,y:c.y*size-top};});
  const endpoints=[[0,'#008000']];if(this.record.ended)endpoints.push([coords.length-1,'#c40000']);
  for(const [i,color]of endpoints){const c=make('circle');c.setAttribute('cx',coords[i].x*size-left);c.setAttribute('cy',coords[i].y*size-top);c.setAttribute('r',5);c.setAttribute('fill',color);svg.append(c);}for(const row of this.rows().filter(row=>!row.manual&&!this.removed(row))){
  const p=project(row),marker=make('g');marker.setAttribute('data-gps-stop',row.key);marker.setAttribute('transform','translate('+(p.x*size-left)+' '+(p.y*size-top)+globalThis.CtlText.source("portal_gps.text_c436a7be64bc")+(this.focusedStopKey===row.key?2:1)+')');marker.setAttribute('aria-pressed',String(this.focusedStopKey===row.key));marker.setAttribute('role','button');marker.setAttribute('tabindex','0');marker.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_1a86455fdc47"))+' · '+stamp(row.start));marker.setAttribute('style','cursor:pointer');
@@ -302,7 +357,7 @@ class Recorder{
  marker.addEventListener('click',()=>this.focusStop(row.key));marker.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();this.focusStop(row.key);}});svg.append(marker);
  }
  if(!this.record.ended){const position=coords.at(-1);this.drawPositionMarker(svg,make,position.x*size-left,position.y*size-top,points.at(-1),totals);}
- this.map.append(svg);
+ this.map.append(svg,this.trailLegend());
  const link=(label,url)=>{const a=node('a',label);a.href=url;a.target='_blank';a.rel='noopener';return a;};this.map.append(link(globalThis.CtlText.source("portal_gps.text_f834e3bb911e"),'https://www.openstreetmap.org/copyright'));if(this.railEnabled)this.map.append(link('OpenRailwayMap','https://www.openrailwaymap.org/'),link('CC-BY-SA 2.0','https://creativecommons.org/licenses/by-sa/2.0/'));
  this.map.append(node('small',t(this.mapState.mode==='follow'?globalThis.CtlText.source("portal_gps.text_b2b3a3f2bec3"):globalThis.CtlText.source("portal_gps.text_8e02679954f1"))));if(this.railFailed)this.map.append(node('small',t(globalThis.CtlText.source("portal_gps.text_f1b2882182df"))));
  }
