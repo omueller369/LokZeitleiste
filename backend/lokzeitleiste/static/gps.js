@@ -25,12 +25,14 @@ function stopEnd(row,value,previous){
 const distance=(a,b)=>{const r=Math.PI/180,h=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(h)));};
 const speedAt=(p,last)=>p.speed??(last&&last.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000?distance(last,p)/((p.t-last.t)/1000):null);
 // A fixed scale keeps colors comparable between recordings and while zooming.
-const trailScale=[[0,[25,85,195]],[60,[0,119,70]],[120,[207,107,0]],[160,[190,22,40]]];
+const trailScale=[[0,[25,85,195]],[40,[0,119,70]],[90,[207,107,0]],[140,[190,22,40]]];
+const defaultMapZoom=10;
+const trailMaxSpeed=trailScale.at(-1)[0];
 const trailColor=rgb=>'rgb('+rgb.join(',')+')';
 const unknownTrail='#626b78';
 function speedColor(speed){
  if(!Number.isFinite(speed))return unknownTrail;
- const kmh=Math.min(160,Math.max(0,Math.round(speed*3.6/5)*5));
+ const kmh=Math.min(trailMaxSpeed,Math.max(0,Math.floor(speed*3.6/5)*5));
  const end=trailScale.findIndex(([limit])=>limit>=kmh);
  if(end===0)return trailColor(trailScale[0][1]);
  const [startSpeed,startColor]=trailScale[end-1],[endSpeed,endColor]=trailScale[end];
@@ -195,7 +197,7 @@ class Recorder{
  async start(){if(this.past())return;if(this.o.readonly()||active||manualActive)return;if(!window.AndroidPortal&&(!window.isSecureContext||!navigator.geolocation))throw Error(t(globalThis.CtlText.source("portal_gps.text_38fdca6391ba")));if(!/^[A-Za-z0-9]{1,12}$/.test(this.o.trainNumber().trim()))throw Error(t(globalThis.CtlText.source("portal_gps.text_b9009a6c1629")));
  if(this.record?.ended&&this.record.points.length&&!confirm(t(globalThis.CtlText.source("portal_gps.text_ba5568b6ce4d"))))return;
  if(!await this.prepareEndpoints())return;
- this.mapState={mode:'follow',zoom:this.mapState?.zoom||15};
+ this.mapState={mode:'follow',zoom:this.mapState?.zoom||defaultMapZoom};
  if(window.AndroidPortal){await this.nativeStart();return;}
  if(!this.record||this.record.ended)this.record={train_number:this.o.trainNumber().trim(),departure_applied:false,points:[],manual_stops:this.record?.manual_stops||[],stop_edits:Object.fromEntries(Object.entries(this.record?.stop_edits||{}).filter(([key])=>key.startsWith('manual-'))),detection_version:5,ended:false,revision:this.record?.revision||0,dirty:true};
  this.setEndpoint('start',this.startChoice);this.setEndpoint('end',this.endChoice);this.analysis=null;this.record.analysis=null;this.record.reasons={};this.record.reason_drafts={};active=this;try{await this.persist();}catch(error){this.clear();throw error;}await this.wake();this.timer=setInterval(()=>this.sample(),5000);this.sample();this.freeze();this.o.changed?.();
@@ -252,8 +254,8 @@ class Recorder{
  const control=(label,caption,action)=>{const b=node('button',label);b.type='button';b.title=t(caption);b.setAttribute('aria-label',t(caption));b.onclick=action;this.mapTools.append(b);return b;};
  this.mapZoomIn=control('+',globalThis.CtlText.source("portal_gps.text_809820ce88d5"),()=>this.mapZoom(1));this.mapZoomOut=control('−',globalThis.CtlText.source("portal_gps.text_914f3003d3a8"),()=>this.mapZoom(-1));
  this.mapZoomLevel=node('span');this.mapZoomLevel.className='gps-map-zoom';this.mapTools.append(this.mapZoomLevel);
- this.mapFollow=control(t(globalThis.CtlText.source("portal_gps.text_33ee562dc3d3")),globalThis.CtlText.source("portal_gps.text_e945e3bd7919"),()=>{this.mapState={mode:'follow',zoom:this.mapState?.zoom||15};this.drawMap();});
- this.mapOverview=control(t(globalThis.CtlText.source("portal_gps.text_b2dc8ee2fa59")),globalThis.CtlText.source("portal_gps.text_bc631a1b8308"),()=>{this.mapState={mode:'overview',zoom:this.mapState?.zoom||15};this.drawMap();});
+ this.mapFollow=control(t(globalThis.CtlText.source("portal_gps.text_33ee562dc3d3")),globalThis.CtlText.source("portal_gps.text_e945e3bd7919"),()=>{this.mapState={mode:'follow',zoom:this.mapState?.zoom||defaultMapZoom};this.drawMap();});
+ this.mapOverview=control(t(globalThis.CtlText.source("portal_gps.text_b2dc8ee2fa59")),globalThis.CtlText.source("portal_gps.text_bc631a1b8308"),()=>{this.mapState={mode:'overview',zoom:this.mapState?.zoom||defaultMapZoom};this.drawMap();});
  this.railEnabled=true;this.mapRail=control(t(globalThis.CtlText.source("portal_gps.text_da54ccd0ee5a")),globalThis.CtlText.source("portal_gps.text_272f99c19dbe"),()=>{this.railEnabled=!this.railEnabled;this.railFailed=false;this.drawMap();});
  this.mapPointers=new Map();const xy=e=>{const r=this.mapSvg?.getBoundingClientRect?.();return r?{x:(e.clientX-r.left)/r.width*600,y:(e.clientY-r.top)/r.height*300}:null;};
  const begin=()=>{if(!this.mapView)return;const ps=[...this.mapPointers.values()],v=this.mapView;this.mapGesture={points:ps.map(p=>({...p})),zoom:v.zoom,center:{...v.center},size:v.size};};
@@ -265,7 +267,7 @@ class Recorder{
  for(const type of ['pointerup','pointercancel','lostpointercapture'])this.map.addEventListener(type,e=>{this.mapPointers.delete(e.pointerId);begin();});
  }
  setFocusedStop(key,center=false){const row=this.rows().find(row=>row.source_keys.includes(key));key=row?.key||key;const same=this.focusedStopKey===key;if(same&&!center&&!this.content.hidden)return;this.focusedStopKey=key;
- if(row&&!row.manual&&!this.removed(row)){const wasHidden=this.content.hidden;if(wasHidden){this.content.hidden=false;this.updateCollapse();}const target=projectPoint(row);if(!wasHidden&&same&&this.mapState?.mode==='free'&&this.mapView?.zoom>=16&&this.mapView.center.x===target.x&&this.mapView.center.y===target.y)return;this.mapState={mode:'free',zoom:Math.min(19,Math.max(16,this.mapView?.zoom||this.mapState?.zoom||15)),center:projectPoint(row)};this.drawMap();return;}
+ if(row&&!row.manual&&!this.removed(row)){const wasHidden=this.content.hidden;if(wasHidden){this.content.hidden=false;this.updateCollapse();}const target=projectPoint(row);if(!wasHidden&&same&&this.mapState?.mode==='free'&&this.mapView?.zoom>=16&&this.mapView.center.x===target.x&&this.mapView.center.y===target.y)return;this.mapState={mode:'free',zoom:Math.min(19,Math.max(16,this.mapView?.zoom||this.mapState?.zoom||defaultMapZoom)),center:projectPoint(row)};this.drawMap();return;}
  for(const marker of this.mapSvg?.children||[]){const stopKey=marker.getAttribute('data-gps-stop');if(!stopKey)continue;const selected=stopKey===key,position=marker.getAttribute('transform').replace(/ scale\([^)]*\)$/,'');marker.setAttribute('transform',position+globalThis.CtlText.source("portal_gps.text_7d14c715b37c")+(selected?2:1)+')');marker.setAttribute('aria-pressed',String(selected));}
  }
  focusStop(key){this.setFocusedStop(key,true);const input=this.liveInputs?.find(item=>item.row.key===key)?.station;if(input){input.scrollIntoView?.({behavior:'smooth',block:'center'});input.focus({preventScroll:true});input.setSelectionRange?.(input.value.length,input.value.length);}else {const row=this.rows().find(row=>row.source_keys.includes(key));this.o.focusImported?.(row?.source_keys.find(source=>this.o.hasImported?.(source))||key);}}
@@ -276,7 +278,7 @@ class Recorder{
  marker.setAttribute('pointer-events','none');
  const append=(tag,attributes)=>{const element=make(tag);for(const [key,value] of Object.entries(attributes))element.setAttribute(key,value);marker.append(element);return element;};
  const label=(value,x,y,size=12,fill='#172338',anchor='middle')=>{
-  append('text',{x,y,'text-anchor':anchor,'font-size':size,'font-weight':700,fill,stroke:'#fff','stroke-width':size>=20?4:2.5,'stroke-linejoin':'round','paint-order':'stroke'}).textContent=value;
+  append('text',{x,y,'text-anchor':anchor,'font-size':size,'font-weight':700,fill,stroke:'#fff','stroke-width':2.5,'stroke-linejoin':'round','paint-order':'stroke'}).textContent=value;
  };
  const speed=Number.isFinite(point.speed)&&point.speed>=0?Math.round(point.speed*3.6)+' km/h':'–';
  label(speed,23,4,11,'#172338','start');
@@ -288,7 +290,7 @@ class Recorder{
  append('path',{d:'M -14 -5 H -8 V 0 H -17 Z M 9 -5 H 13 L 17 0 H 9 Z',fill:'#fff'});
  append('path',{d:'M 2 -7 L -4 1 H 0 L -2 7 L 5 -2 H 1 Z',fill:'#ffe26d'});
  for(const cx of [-11,11])append('circle',{cx,cy:11,r:4,fill:'#172338',stroke:'#fff','stroke-width':1.5});
- label(this.record.train_number||this.o.trainNumber().trim(),0,34,20);
+ label(this.record.train_number||this.o.trainNumber().trim(),0,26,10);
  svg.append(marker);
  }
  drawTrail(svg,make,display,position){
@@ -325,10 +327,10 @@ class Recorder{
  const legend=node('div');legend.className='gps-trail-legend';legend.setAttribute('data-i18n-ignore','');
  legend.append(node('span',t(globalThis.CtlText.source("portal_gps.text_8af2c376113e"))));
  const scale=node('div');scale.className='gps-trail-scale';scale.setAttribute('style','--gps-trail-gradient:linear-gradient(90deg,'+
-  trailScale.map(([speed,color])=>trailColor(color)+' '+speed/160*100+'%').join(',')+')');
+  trailScale.map(([speed,color])=>trailColor(color)+' '+speed/trailMaxSpeed*100+'%').join(',')+')');
  for(const [speed] of trailScale){
-  const tick=node('span',speed===160?'160+':String(speed));
-  tick.setAttribute('style','left:'+speed/160*100+'%');scale.append(tick);
+  const tick=node('span',speed===trailMaxSpeed?speed+'+':String(speed));
+  tick.setAttribute('style','left:'+speed/trailMaxSpeed*100+'%');scale.append(tick);
  }
  legend.append(scale);
  return legend;
@@ -339,7 +341,7 @@ class Recorder{
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),make=tag=>document.createElementNS(ns,tag);this.mapSvg=svg;svg.setAttribute('viewBox','0 0 600 300');svg.setAttribute('role','group');svg.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_f5976363df27")));
  const project=projectPoint;
  const coords=points.map(project),minX=Math.min(...coords.map(p=>p.x)),maxX=Math.max(...coords.map(p=>p.x)),minY=Math.min(...coords.map(p=>p.y)),maxY=Math.max(...coords.map(p=>p.y));
- if(!this.mapState)this.mapState={mode:this.record.ended?'overview':'follow',zoom:15};let zoom=this.mapState.zoom,center=this.mapState.center||coords.at(-1);
+ if(!this.mapState)this.mapState={mode:this.record.ended?'overview':'follow',zoom:defaultMapZoom};let zoom=this.mapState.zoom,center=this.mapState.center||coords.at(-1);
  if(this.mapState.mode==='overview'){zoom=15;while(zoom>2&&((maxX-minX)*256*2**zoom>540||(maxY-minY)*256*2**zoom>240))zoom--;center={x:(minX+maxX)/2,y:(minY+maxY)/2};}else if(this.mapState.mode==='follow')center=coords.at(-1);
  this.mapZoomLevel.hidden=false;
  this.mapZoomLevel.textContent=t(globalThis.CtlText.source("portal_gps.text_7afb2d86cd0c"))+' '+zoom;

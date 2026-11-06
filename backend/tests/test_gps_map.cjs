@@ -31,10 +31,10 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  assert.equal(position().attributes.transform,'translate(300 150)');
  assert.deepEqual(labels().map(n=>n.textContent),['36 km/h','00:00','/','00:00','123']);
  const [speed,driving,,standing,train]=labels().map(label=>label.attributes);
- assert(speed.x>19&&speed.y>0&&speed['font-size']<train['font-size']);
+ assert(speed.x>19&&speed.y>0&&speed['font-size']===11&&train['font-size']===10);
  assert(driving.y<0&&standing.y<0&&train.y>0);
  assert.equal(driving.fill,'#146c34');assert.equal(standing.fill,'#b42318');
- assert.match(r.mapZoomLevel.textContent,/ 15$/);
+ assert.match(r.mapZoomLevel.textContent,/ 10$/);
  const shortTrack=r.record.points;
  r.record.points=Array.from({length:37},(_,i)=>({
   ...point(52,13+Math.min(i,13)*.0007,i*5000+1+(i>=25?120000:0)),
@@ -47,7 +47,7 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  r.record.points.at(-1).speed=null;r.drawMap();assert.equal(labels()[0].textContent,'–');
  r.record.ended=true;r.drawMap();assert.equal(position(),undefined);
  r.record.ended=false;r.drawMap();
- r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,16);assert.match(r.mapZoomLevel.textContent,/ 16$/);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,16);
+ r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,11);assert.match(r.mapZoomLevel.textContent,/ 11$/);assert.equal(r.mapState.mode,'follow');r.record.points.push(point(52.2,13.3,10001));r.drawMap();assert(Math.abs(r.mapView.center.x-(193.3/360))<1e-12);assert.equal(r.mapView.zoom,11);
  r.mapOverview.onclick();assert.equal(r.mapState.mode,'overview');assert.notEqual(r.mapView.center.x,(193.3/360));r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');
  const e=(pointerId,x,y)=>({pointerId,clientX:x,clientY:y,pointerType:'touch',target:r.mapSvg,preventDefault(){}});r.map.events.pointerdown(e(1,200,150));r.map.events.pointerdown(e(2,400,150));const zoom=r.mapView.zoom;r.map.events.pointermove(e(2,600,150));assert.equal(r.mapView.zoom,zoom+1);assert.equal(r.mapState.mode,'free');r.map.events.pointerup(e(1,200,150));r.map.events.pointerup(e(2,600,150));
  r.mapFollow.onclick();assert.equal(r.mapState.mode,'follow');r.mapState.zoom=19;r.drawMap();r.mapZoomIn.onclick();assert.equal(r.mapView.zoom,19);assert.equal(r.mapZoomIn.disabled,true);
@@ -69,13 +69,14 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  const key=r.liveInputs[0].row.key;r.record.stop_edits={[key]:{imported:true}};let imported=null;r.o.focusImported=value=>imported=value;r.draw();assert.equal(r.liveInputs.length,0);markers()[0].events.click();assert.equal(imported,key);
  // Route colors follow speed, and the signal gap stays dashed and neutral.
  r.record={ended:true,points:[
-  point(52,13,1),{...point(52,13.001,5001),speed:60/3.6},
-  {...point(52,13.002,10001),speed:120/3.6},
-  {...point(52,13.003,15001),speed:180/3.6},
-  {...point(52,13.004,50001),speed:180/3.6}
+  point(52,13,1),{...point(52,13.001,5001),speed:40/3.6},
+  {...point(52,13.002,10001),speed:90/3.6},
+  {...point(52,13.003,15001),speed:139/3.6},
+  {...point(52,13.0035,20001),speed:140/3.6},
+  {...point(52,13.004,55001),speed:180/3.6}
  ]};r.drawMap();
  const trails=r.mapSvg.children.filter(n=>'data-gps-trail' in n.attributes);
- assert.deepEqual(trails.map(n=>n.attributes.stroke),['rgb(0,119,70)','rgb(207,107,0)','rgb(190,22,40)']);
+ assert.deepEqual(trails.map(n=>n.attributes.stroke),['rgb(0,119,70)','rgb(207,107,0)','rgb(192,31,36)','rgb(190,22,40)']);
  assert.equal(r.mapSvg.children.find(n=>n.attributes['stroke-dasharray']).attributes.stroke,'#626b78');
  // Signal gaps do not invent stops, and short stationary runs have no marker.
  r.record={ended:true,points:[{...point(52,13,1),speed:0},{...point(52,13,400001),speed:0}]};r.draw();assert.equal(markers().length,0);
