@@ -25,7 +25,7 @@ function stopEnd(row,value,previous){
 const distance=(a,b)=>{const r=Math.PI/180,h=Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lon-a.lon)*r/2)**2;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(h)));};
 const speedAt=(p,last)=>p.speed??(last&&last.accuracy<=50&&p.t>last.t&&p.t-last.t<=30000?distance(last,p)/((p.t-last.t)/1000):null);
 // A fixed scale keeps colors comparable between recordings and while zooming.
-const trailScale=[[0,[25,85,195]],[40,[0,119,70]],[90,[207,107,0]],[140,[190,22,40]]];
+const trailScale=[[0,[25,85,195]],[40,[0,119,70]],[90,[207,107,0]],[100,[190,22,40]]];
 const defaultMapZoom=10;
 const trailMaxSpeed=trailScale.at(-1)[0];
 const trailColor=rgb=>'rgb('+rgb.join(',')+')';
@@ -313,12 +313,12 @@ class Recorder{
  }
  for(const [color,segments] of paths){
   const line=make('path');line.setAttribute('data-gps-trail','');line.setAttribute('d',segments.join(''));
-  line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width',3);
+  line.setAttribute('fill','none');line.setAttribute('stroke',color);line.setAttribute('stroke-width',6);
   line.setAttribute('stroke-linecap','round');svg.append(line);
  }
  for(const [a,b] of bridges){
   const bridge=make('line');
-  for(const [key,value] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:unknownTrail,'stroke-width':2,'stroke-dasharray':'6 4'}))bridge.setAttribute(key,value);
+  for(const [key,value] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:unknownTrail,'stroke-width':4,'stroke-dasharray':'6 4'}))bridge.setAttribute(key,value);
   const title=make('title');title.textContent=t(globalThis.CtlText.source("portal_gps.text_8067c798e3d6"));
   bridge.append(title);svg.append(bridge);
  }

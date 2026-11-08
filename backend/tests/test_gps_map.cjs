@@ -71,13 +71,16 @@ vm.runInNewContext(fs.readFileSync('backend/lokzeitleiste/static/gps.js','utf8')
  r.record={ended:true,points:[
   point(52,13,1),{...point(52,13.001,5001),speed:40/3.6},
   {...point(52,13.002,10001),speed:90/3.6},
-  {...point(52,13.003,15001),speed:139/3.6},
-  {...point(52,13.0035,20001),speed:140/3.6},
+  {...point(52,13.003,15001),speed:99/3.6},
+  {...point(52,13.0035,20001),speed:100/3.6},
   {...point(52,13.004,55001),speed:180/3.6}
  ]};r.drawMap();
  const trails=r.mapSvg.children.filter(n=>'data-gps-trail' in n.attributes);
- assert.deepEqual(trails.map(n=>n.attributes.stroke),['rgb(0,119,70)','rgb(207,107,0)','rgb(192,31,36)','rgb(190,22,40)']);
- assert.equal(r.mapSvg.children.find(n=>n.attributes['stroke-dasharray']).attributes.stroke,'#626b78');
+ assert.deepEqual(trails.map(n=>n.attributes.stroke),['rgb(0,119,70)','rgb(207,107,0)','rgb(199,65,20)','rgb(190,22,40)']);
+ assert(trails.every(n=>n.attributes['stroke-width']===6));
+ const gap=r.mapSvg.children.find(n=>n.attributes['stroke-dasharray']);
+ assert.equal(gap.attributes.stroke,'#626b78');assert.equal(gap.attributes['stroke-width'],4);
+ const scale=r.trailLegend().children[1];assert.equal(scale.children.at(-1).textContent,'100+');
  // Signal gaps do not invent stops, and short stationary runs have no marker.
  r.record={ended:true,points:[{...point(52,13,1),speed:0},{...point(52,13,400001),speed:0}]};r.draw();assert.equal(markers().length,0);
  for(const fixture of JSON.parse(fs.readFileSync('backend/tests/fixtures/gps-rail-stops.json','utf8'))){const actual=context.window.GpsRecorder.liveStops(fixture.points,true,fixture.edits).map(({start,end})=>({start,end}));assert.equal(JSON.stringify(actual),JSON.stringify(fixture.expected),fixture.name);}
