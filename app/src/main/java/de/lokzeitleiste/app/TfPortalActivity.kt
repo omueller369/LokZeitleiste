@@ -102,6 +102,7 @@ class TfPortalActivity : ComponentActivity() {
     private fun logout(force:Boolean=false) {
         if(GpsRecordingService.currentKey!=null) { if(!force){toast("Bitte zuerst die GPS-Aufzeichnung beenden.");return};stopService(Intent(this,GpsRecordingService::class.java));GpsRecordingService.currentKey=null }
         if(leaving)return;leaving=true
+        if(force)toast(AuthenticationRequired().message.orEmpty())
         val token=TokenVault.token(this)
         lifecycleScope.launch {
             if(token!=null) runCatching { withTimeout(5000) { ApiClient.logout(token) } }
@@ -130,7 +131,7 @@ class TfPortalActivity : ComponentActivity() {
         }
         val secure=if(policy.origin.startsWith("https:")) "; Secure" else ""
         CookieManager.getInstance().setAcceptCookie(true)
-        CookieManager.getInstance().setCookie(policy.origin,"admin_session=$token; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000$secure") {
+        CookieManager.getInstance().setCookie(policy.origin,"tf_session=$token; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000$secure") {
             CookieManager.getInstance().flush()
             web.loadUrl(policy.origin+if(session.getJSONObject("account").optBoolean("password_change_required")) "/account" else if(GpsRecordingService.currentKey!=null) "/tf/arbeitsbericht" else "/tf")
         }

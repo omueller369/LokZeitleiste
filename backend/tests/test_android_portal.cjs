@@ -3,7 +3,9 @@ const source=fs.readFileSync('backend/lokzeitleiste/static/android-portal.js','u
 async function boot(id){let online=true,status=200,calls=[];const native={postMessage(raw){const r=JSON.parse(raw);calls.push(r);const value=r.method==='session'?{account:{id,role:'tf'},profile:{id},username:'787100'}:r.method==='export.start'?{export_id:'export'}:{};queueMicrotask(()=>native.onmessage({data:JSON.stringify({id:r.id,ok:true,value})}));}};
  const window={addEventListener(){},NativePortal:native,fetch:async()=>{if(!online)throw TypeError('Network failed');return new Response(JSON.stringify({owner:id}),{status});}};
  class Reader{readAsDataURL(blob){blob.arrayBuffer().then(bytes=>{this.result='data:application/octet-stream;base64,'+Buffer.from(bytes).toString('base64');this.onload();});}}
- const context={window,NativePortal:native,URL,location:{href:'https://testserver/tf',origin:'https://testserver'},Response,FileReader:Reader,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},console};vm.runInNewContext(source,context);
+ const tabs=new Map([['ctl.area','backend'],['ctl.session.tf','old-token']]);
+ const context={window,NativePortal:native,sessionStorage:{setItem:(k,v)=>tabs.set(k,v),removeItem:k=>tabs.delete(k)},URL,location:{href:'https://testserver/tf',origin:'https://testserver'},Response,FileReader:Reader,localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},console};vm.runInNewContext(source,context);
+ assert.equal(tabs.get('ctl.area'),'tf');assert.equal(tabs.has('ctl.session.tf'),false);
  return {window,calls,offline(){online=false;},status(s){status=s;}};}
 (async()=>{
  let app=await boot(1);const path='/api/v1/tf/portal/plan/2026/10';assert.equal((await (await app.window.fetch(path)).json()).owner,1);await new Promise(r=>setTimeout(r,0));app.offline();assert.equal((await (await app.window.fetch(path)).json()).owner,1);assert.equal((await (await app.window.fetch('/api/v1/account/me')).json()).id,1);await assert.rejects(app.window.fetch('/api/v1/tf/work-reports',{method:'POST'}));

@@ -1,6 +1,9 @@
 /* Android-only adapters. Shared portal rules and APIs remain the source of truth. */
 (()=>{
 if(!window.NativePortal)return;
+// Native login owns the TF cookie, including the initial password-change page.
+sessionStorage.setItem('ctl.area','tf');
+sessionStorage.removeItem('ctl.session.tf');
 let serial=0;const waiting=new Map();
 NativePortal.onmessage=event=>{let reply;try{reply=JSON.parse(event.data);}catch(_){return;}const job=waiting.get(reply.id);if(!job)return;waiting.delete(reply.id);reply.ok?job.resolve(reply.value):job.reject(Error(reply.error||globalThis.CtlText.source("backend_android_portal.text_c7a2a716bb01")));};
 function request(method,values={}){return new Promise((resolve,reject)=>{const id=String(++serial);waiting.set(id,{resolve,reject});try{NativePortal.postMessage(JSON.stringify({id,method,...values}));}catch(error){waiting.delete(id);reject(error);}});}

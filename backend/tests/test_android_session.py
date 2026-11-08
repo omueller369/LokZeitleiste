@@ -1,4 +1,6 @@
 import unittest
+import re
+from pathlib import Path
 from unittest.mock import patch
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -15,8 +17,13 @@ class AndroidSessionTest(unittest.TestCase):
         self.assertEqual(result.status_code,200,result.text)
         token=result.json()['access_token']
         web=TestClient(app,base_url='https://testserver');self.staff_clients.append(web)
-        web.cookies.set('admin_session',token)
+        source=(Path(__file__).resolve().parents[2]/'app/src/main/java/de/lokzeitleiste/app/TfPortalActivity.kt').read_text()
+        cookie=re.search(r'setCookie\(policy.origin,"([a-z_]+)=\$token;',source).group(1)
+        web.cookies.clear()
+        web.cookies.set(cookie,token)
+        web.headers['X-CTL-Area']='tf'
         self.assertEqual(web.get('/tf').status_code,200)
+        self.assertEqual(web.get('/api/v1/account/me').status_code,200)
         self.assertEqual(web.get('/api/v1/tf/portal').json()['id'],self.tf)
         self.assertEqual(web.get('/api/v1/tf/portal/plan/2026/10').status_code,200)
         self.assertEqual(web.get('/api/v1/documents/tree').status_code,200)
@@ -29,7 +36,11 @@ class AndroidSessionTest(unittest.TestCase):
     def test_cookie_mutations_still_require_configured_origin(self):
         web=TestClient(app,base_url='https://testserver');self.staff_clients.append(web)
         token=web.post('/api/v1/tf/login',json={'username':'787100','password':'tf-secret-12345'}).json()['access_token']
-        web.cookies.set('admin_session',token)
+        source=(Path(__file__).resolve().parents[2]/'app/src/main/java/de/lokzeitleiste/app/TfPortalActivity.kt').read_text()
+        cookie=re.search(r'setCookie\(policy.origin,"([a-z_]+)=\$token;',source).group(1)
+        web.cookies.clear()
+        web.cookies.set(cookie,token)
+        web.headers['X-CTL-Area']='tf'
         with patch('lokzeitleiste.main.PUBLIC_ORIGIN','https://testserver'):
             self.assertEqual(web.put('/api/v1/account/locale',json={'language':'en'}).status_code,403)
             self.assertEqual(web.put('/api/v1/account/locale',json={'language':'en'},headers={'Origin':'https://testserver'}).status_code,200)
