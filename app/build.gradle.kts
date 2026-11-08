@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -20,7 +22,7 @@ android {
         applicationId = "de.lokzeitleiste.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("50").get().toInt()
+        versionCode = providers.gradleProperty("lokzeitleisteVersionCode").orElse("51").get().toInt()
         versionName = providers.gradleProperty("lokzeitleisteVersionName").orElse(softwareVersion).get()
         buildConfigField("String", "API_BASE_URL", "\"${apiBaseUrl}\"")
     }
@@ -50,13 +52,35 @@ dependencies {
 
 // Package the actual shared portal sources on every build; no second UI implementation.
 val portalAssets = layout.buildDirectory.dir("generated/portalAssets")
+val portalMessageFile = rootProject.file("backend/lokzeitleiste/locales/keys.json")
+val portalSourceMessages = (JsonSlurper().parse(portalMessageFile) as Map<*, *>)["de"] as Map<*, *>
+val portalMessageToken = Regex("""\{\{([a-z][a-z0-9_]*\.text_[a-f0-9]{12})\}\}""")
 val prepareTfPortal by tasks.registering(Sync::class) {
+    inputs.file(portalMessageFile)
+    filteringCharset = "UTF-8"
     from(rootProject.file("backend/lokzeitleiste/static")) {
         include("messages.js", "national-brake-sheet.*", "brake-sheet.*", "tf-shell.*", "portal-theme.*", "plan-colors.js", "auth-session.js", "tf-help*", "tf-notes.*", "tf-messages.*", "tf-profile.*", "tf-signature.*", "ctl-logistics-logo.jpg", "rail-software-*.png", "handover-protocols.js", "loco-handover.*", "tf-portal.*", "work-report.*", "work-report-feedback.js", "train-journeys.js", "gps.js", "stations.js",
             "station-sharing.js", "tf-return.js", "documents.*", "account.*", "my-worktime.*",
             "entry-form.js", "portal.css", "responsive.css", "i18n.js", "android-portal.js")
     }
+    // Match the server's template rendering before WebView sees the page. Static
+    // labels inside data-i18n-ignore must be resolved too; user values are untouched.
+    filesMatching("*.html") {
+        filter { line: String ->
+            portalMessageToken.replace(line) { match ->
+                portalSourceMessages[match.groupValues[1]] as? String
+                    ?: error("Unknown Android portal translation: ${match.groupValues[1]}")
+            }
+        }
+    }
     into(portalAssets.map { it.dir("tf-portal") })
+    doLast {
+        destinationDir.walkTopDown().filter { it.extension == "html" }.forEach { page ->
+            check(!Regex("""\{\{[a-z][a-z0-9_]*\.[a-z0-9_]+\}\}""").containsMatchIn(page.readText(Charsets.UTF_8))) {
+                "Unresolved Android portal translation in ${page.name}"
+            }
+        }
+    }
 }
 android.sourceSets["main"].assets.srcDir(portalAssets)
 tasks.named("preBuild").configure { dependsOn(prepareTfPortal) }

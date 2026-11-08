@@ -174,7 +174,7 @@
   "text_863cdea8c47e": "Create a train journey and add individual events.",
   "text_8734e980fce8": "Record a journey, check stops and select map points.",
   "text_886e4475e1d0": "Record a stop",
-  "text_88961a1f6aa8": "The language selector is at the far right of the header. To its left are ? for help and the day/night switch. It offers Deutsch, Polski and English. It changes controls, messages and help. Your own texts and stored information stay unchanged.",
+  "text_88961a1f6aa8": "The language selector is at the far right of the header. To its left are ? for help and the day/night switch. It offers Deutsch, Polski and English. It changes controls, messages and help. Your own texts and stored information stay unchanged. If the Android app shows technical translation placeholders, install the current APK over your existing app and restart it. Do not uninstall the app, so your local data is preserved.",
   "text_898071157710": "Choose Upload and wait for the result. The file limit is 10 MB.",
   "text_89a1a7ba24ad": "Choose one or more recipients. Check the names carefully.",
   "text_89d7731f9259": "What happens when help opens?",

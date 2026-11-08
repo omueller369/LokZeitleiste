@@ -69,6 +69,8 @@ jobs:
             -PlokzeitleisteApiBaseUrl=https://ctl-software.io-goerlitz.eu \
             -PlokzeitleisteVersionCode=$((100000 + GITHUB_RUN_NUMBER)) \
             -PlokzeitleisteVersionName="$SOFTWARE_VERSION-test.$GITHUB_RUN_NUMBER"
+      - name: Verify translations inside the built APK
+        run: python backend/tests/check_android_translations.py --apk app/build/outputs/apk/debug/app-debug.apk
       - uses: actions/upload-artifact@v4
         with:
           name: LokZeitleiste-TF-Portal-debug

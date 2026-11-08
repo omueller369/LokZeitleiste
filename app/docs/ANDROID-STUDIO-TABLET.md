@@ -423,3 +423,15 @@ Wichtig: Eine neue Quellcode-Datei allein ist noch keine installierbare Version.
 - App-Signierung: https://developer.android.com/studio/publish/app-signing
 - Android-Installationsbestätigung: https://developer.android.com/reference/android/content/pm/PackageInstaller.SessionParams
 - Weitere projektspezifische Funktionen/Offline-Grenzen: [TF-PORTAL.md](TF-PORTAL.md)
+
+## Sprachplatzhalter in der Android-App (0.26.25)
+
+Der Android-Build löst die statischen HTML-Sprachplatzhalter mit denselben deutschen Quelltexten wie das Backend auf. Dies gilt auch für feste Beschriftungen unter `data-i18n-ignore`, die die spätere Browserübersetzung bewusst auslässt. Die gemeinsame DE/PL/EN-Laufzeit und persönliche Formularwerte bleiben erhalten. Der Sprachkatalog ist eine explizite Eingabe des Asset-Builds; Katalogänderungen erstellen die Portaldateien neu. Unbekannte HTML-Schlüssel brechen den Build ab.
+
+Der Android-Workflow prüft zusätzlich die HTML-Dateien in der tatsächlich erzeugten APK, bevor diese als Artefakt oder Update veröffentlicht wird:
+
+```bash
+python backend/tests/check_android_translations.py --apk app/build/outputs/apk/debug/app-debug.apk
+```
+
+Bei sichtbaren Platzhaltern die aktuelle APK mit demselben Signierschlüssel über die bestehende App installieren und neu starten. Die App nicht deinstallieren, damit lokale Daten erhalten bleiben. Ein reines Serverupdate ersetzt keine in älteren APKs eingebetteten Portaldateien.
