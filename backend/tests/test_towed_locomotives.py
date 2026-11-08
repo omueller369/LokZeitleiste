@@ -30,7 +30,7 @@ class TowedLocomotiveTest(unittest.TestCase):
         for key,expected in [('count',[8,7,6]),('length',[520,490,480]),('weight',[650,560,480]),('brake',[389,290,230])]:self.assertEqual([x['calculation']['b'][key] for x in results],expected)
         self.assertEqual([x['sheet']['first_vehicle'] for x in results],['918061850020','330000000000','330000000000'])
         self.assertEqual([x['sheet']['last_vehicle'] for x in results],['918061850038','918061850038','330000000005'])
-        self.assertIn('918061850020',results[0]['calculation']['remarks']);self.assertIn('Stop X',results[0]['calculation']['remarks']);self.assertNotIn('918061850020',results[1]['calculation']['remarks']);self.assertEqual(results[2]['calculation']['remarks'],'User remark')
+        self.assertIn('918061850020',results[0]['calculation']['special']);self.assertIn('Stop X',results[0]['calculation']['special']);self.assertNotIn('918061850020',results[1]['calculation']['special']);self.assertEqual(results[2]['calculation']['special'],'')
         for result in results:self.assertEqual(Decimal(str(result['calculation']['a']['brake'])),Decimal(75))
         self.assertEqual(results[1]['sheet']['towed'][0]['position'],7)
         child=results[1];self.assertEqual(self.driver.put(self.base+'/'+child['id'],json=dict(expected_revision=child['revision'],sheet=child['sheet'])).status_code,409)
@@ -57,7 +57,55 @@ class TowedLocomotiveTest(unittest.TestCase):
             with patch.object(ImageDraw.ImageDraw,'text',capture):response=self.driver.post(self.base+'/'+link['id']+'/archive',json={'expected_revision':result['revision']})
             self.assertEqual(response.status_code,200,response.text);filenames.append(response.json()['filename'])
             content=self.driver.get(response.json()['download_url']);archived.append((response.json()['download_url'],content.content));self.assertEqual(len(PdfReader(BytesIO(content.content)).pages),1)
-        self.assertEqual(len(set(filenames)),3);self.assertTrue(all('-A0' in name for name in filenames));self.assertTrue(any('nur bis' in value for value in texts))
+        self.assertEqual(len(set(filenames)),3);self.assertTrue(all('-A0' in name for name in filenames));self.assertTrue(any('im Schlepp' in value for value in texts))
         again=self.save(saved['sheet'],saved['id'],saved['revision'])
         newer=self.driver.post(self.base+'/'+again['id']+'/archive',json={'expected_revision':again['revision']});self.assertEqual(newer.status_code,200,newer.text);self.assertNotIn(newer.json()['filename'],filenames)
         for url,content in archived:self.assertEqual(self.driver.get(url).content,content)
+
+    def test_two_column_form_after_single_dropoff(self):
+        payload=self.payload(two=False)
+        payload['special']='Manual field 9'
+        result=self.save(payload)['calculation']
+        self.assertEqual(result['remarks'],'User remark')
+        self.assertIn('Manual field 9',result['special'])
+        self.assertIn('Tfz 918061850020 läuft von Origin bis Stop X im Schlepp an Position(en): 1 mit.',result['special'])
+        second=result['second']
+        self.assertEqual((second['station_from'],second['station_to']),('Stop X','Final'))
+        after=second['calculation']
+        self.assertEqual(after['first_vehicle'],'330000000000')
+        self.assertEqual(after['last_vehicle'],'330000000005')
+        self.assertEqual(after['b']['count'],6)
+        self.assertEqual(after['b']['weight'],480)
+        self.assertEqual(after['b']['length'],480)
+        self.assertEqual(after['b']['brake'],230)
+        self.assertEqual(after['total']['brake'],305)
+        self.assertEqual(after['available'],54)
+        self.assertEqual(after['missing'],-5)
+        self.assertNotIn('second',after)
+
+    def test_render_keeps_final_destination_and_fills_following_columns(self):
+        from datetime import datetime
+        from lokzeitleiste.brake_sheets import Sheet
+        from lokzeitleiste.brake_sheet_image import render
+        saved=self.save(self.payload(two=False))
+        texts=[];original=ImageDraw.ImageDraw.text
+        def capture(draw,xy,value,*args,**kwargs):
+            texts.append((xy[0]/(draw._image.width/1335),xy[1]/(draw._image.height/1888),str(value)))
+            return original(draw,xy,value,*args,**kwargs)
+        with patch.object(ImageDraw.ImageDraw,'text',capture):
+            render(Sheet(**saved['sheet']),saved['calculation'],datetime(2026,11,8),'Tester')
+        self.assertTrue(any(323<=x<619 and 210<=y<236 and v=='Final' for x,y,v in texts))
+        self.assertTrue(any(607<=x<833 and 627<=y<654 and v=='Stop X' for x,y,v in texts))
+        self.assertTrue(any(843<=x<1069 and 627<=y<654 and v=='Stop X' for x,y,v in texts))
+        self.assertTrue(any(1079<=x<1299 and 627<=y<654 and v=='Final' for x,y,v in texts))
+        self.assertTrue(any(1006<=x<1139 and 860<=y<896 and v=='6' for x,y,v in texts))
+        self.assertTrue(any(1148<=x<1299 and 1090<=y<1131 and v=='54' for x,y,v in texts))
+        self.assertTrue(any(590<=x<1295 and 303<=y<591 and 'im Schlepp' in v for x,y,v in texts))
+
+    def test_towed_to_final_has_notice_without_empty_following_section(self):
+        payload=self.payload(two=False)
+        payload['towed'][0]['destination']='Final'
+        result=self.save(payload)['calculation']
+        self.assertNotIn('second',result)
+        self.assertIn('bis Final im Schlepp',result['special'])
+        self.assertEqual(result['remarks'],'User remark')

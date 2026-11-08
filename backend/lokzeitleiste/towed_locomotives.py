@@ -1,5 +1,4 @@
 """Ordered non-working locomotives and explicit drop-off sections for brake sheets."""
-from collections import defaultdict
 from decimal import Decimal, ROUND_CEILING
 import re, unicodedata
 from pydantic import BaseModel, Field
@@ -91,12 +90,11 @@ def compose(db,data,public_vehicle):
     ceil=lambda v:int(v.to_integral_value(rounding=ROUND_CEILING))
     b=dict(count=count,length=ceil(raw_length),weight=ceil(raw_weight),brake=ceil(total))
     if not(10<=b['length']<=720 and 100<=b['weight']<=5000 and 100<=b['brake']<=5000):raise TowError('dimensions')
-    groups=defaultdict(list);names={}
-    for item in tows:
-        key=station_key(item['destination'])
-        if key!=station_key(data.final_station or data.station_to):groups[key].append(item['number']);names[key]=item['destination']
-    notes=[text(ERRORS['notice'],request_language.get(),numbers=', '.join(groups[key]),station=names[key]) for key in sorted(groups)]
-    remarks='\n'.join([part for part in [data.remarks.strip(),*notes] if part])
+    notes=[text(ERRORS['notice'],request_language.get(),numbers=item['number'],
+                origin=data.station_from.split(' · ')[-1].strip(),
+                station=item['destination'].split(' · ')[-1].strip(),positions=str(item['position']))
+           for item in tows]
+    remarks='\n'.join([part for part in [data.special.strip(),*notes] if part])
     if len(remarks)>500:raise TowError('notice_limit')
     return b,ordered,tows,remarks
 

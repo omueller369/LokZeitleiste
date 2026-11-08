@@ -46,7 +46,7 @@
   "text_47d309426a1c": "This section version is generated automatically. Edit the original brake sheet.",
   "text_62ef2abc71ed": "This section version has been superseded by a new plan. Open the current version.",
   "text_08720ebebab9": "Field 9 including the automatic locomotive note exceeds 500 characters. Shorten additional remarks or station entries.",
-  "text_2f1639602f6f": "Towed locomotives {numbers} only as far as {station}.",
+  "text_2f1639602f6f": "Locomotive {numbers} is hauled from {origin} to {station} at position(s): {positions}.",
   "text_0ac0b51d459a": "The wagon list matches {detected}, while the form selects {requested}. Check the actual brake mode: applying values changes field 15 to {detected}.",
   "text_a2d61c07db1c": "Excel total differs for {column}: {reported} {unit}. Individual wagons sum to {computed} {unit}. After your confirmation, individual wagon values will be used.",
   "text_0b22cbff963e": "The Excel summary row contains {reported} {unit} for {column}, but no corresponding individual wagon values. This summary cell is not used as an individual value."

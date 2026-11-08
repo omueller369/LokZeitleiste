@@ -1,6 +1,6 @@
 # Internationaler Bremszettel DE/PL – abgestimmte Eingabefelder
 
-Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. Bildvorschau auf Originalvorlage vorhanden. Ausgefüllte PDF-Ausgabe und explizites E-Mail-Overlay sind vorhanden; zweiter Abschnitt und ETCS bleiben leer. Die Eingabemaske und die bestätigten Berechnungen des ersten Abschnitts sind als Entwurf umgesetzt.
+Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler Bremszettel Güterzüge Grenzverkehr-DE-PL“. Die Vorlage enthält keine AcroForm-Felder. Bildvorschau auf Originalvorlage vorhanden. Ausgefüllte PDF-Ausgabe und explizites E-Mail-Overlay sind vorhanden; ETCS bleibt leer; bei Absetzbahnhöfen wird der Folgeabschnitt ausgefüllt. Die Eingabemaske und die bestätigten Berechnungen des ersten Abschnitts sind als Entwurf umgesetzt.
 
 ## Kopf und Zugdaten
 
@@ -15,8 +15,8 @@ Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler B
 10–13. Checkboxen Gefahrgut, außergewöhnliche Sendung, zusätzliche Einschränkungsdokumente, Abfalltransporte. Nur Gefahrgut voreingestellt.
 14. DE-Auswahl D3 – 22,5 t / D4 – 22,5 t; PL-Auswahl C – 20,5 t / D – 22,5 t. DE D4 setzt PL auf D.
 15. Radiobuttons G / P / G+P / LL+P / R, Default G.
-16a/b. Übernahme aus 4a/b. 16c/d bleiben nach letzter Vorgabe leer.
-17/18. Fahrzeugnummer des ersten/letzten Fahrzeugs: erstes Paar Pflicht; zweites Paar bleibt nach letzter Vorgabe leer. Manuelle Eingabe in fünf Blöcken 2–2–4–3–1 Ziffern wie Tfz-Verwaltung, keine Defaultwerte. Benutzernummerierung der Teilfelder weicht teilweise von PDF ab; Zuordnung visuell vor Export prüfen.
+16a/b. Aktueller Fahrtabschnitt bis zum nächsten Absetzbahnhof. 4b behält das endgültige Fahrtziel. 16c/d zeigen den folgenden Abschnitt nach dem Absetzen, sofern vorhanden.
+17/18. Fahrzeugnummer des ersten/letzten Fahrzeugs: erstes Paar Pflicht; zweites Paar zeigt bei einem Folgeabschnitt die neu ermittelten Randfahrzeuge. Manuelle Eingabe in fünf Blöcken 2–2–4–3–1 Ziffern wie Tfz-Verwaltung, keine Defaultwerte. Benutzernummerierung der Teilfelder weicht teilweise von PDF ab; Zuordnung visuell vor Export prüfen.
 
 ## Triebfahrzeuge, bis zu fünf Zeilen
 
@@ -50,7 +50,7 @@ Quelle: vom Benutzer bereitgestellte einseitige PDF-Vorlage „Internationaler B
 
 - Alleinige Pflicht zur ersten Tfz-Zeile sowie Duplikate/weitere Zugnummernbezeichnungen.
 - Gewichts-, Festhaltekraft- und Dezimalvorgaben der Summenzeilen.
-- Der gesamte zweite Abschnitt c/d/c+d, einschließlich 24–27 c+d, bleibt nach Vorgabe leer.
+- Bei einem Folgeabschnitt werden 19–23 c/d/c+d und 24–27 c+d mit denselben Berechnungsregeln nach dem Entfernen der abgesetzten Tfz befüllt. Ohne Folgeabschnitt bleiben diese Felder leer.
 - ETCS bleibt zunächst leer.
 - Felder 38/39/40 sind bestätigt und umgesetzt: Erstelldatum, Uhrzeit und TF-Name beim ersten Speichern serverseitig setzen und unverändert erhalten. 41–44 bleiben leer.
 - Speichern/Versionieren, PDF-Zuordnung und Ausgabe im Originalformular.
@@ -65,7 +65,7 @@ Eigenes Formular `/tf/bremszettel`, TF-authentifizierte APIs `/api/v1/tf/brake-s
 
 ## Bildvorschau
 
-„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine sauber vektorbasiert nachgezeichnete Vorlage positionsgenau. Die Geometrie entspricht dem hochgeladenen Original. ETCS, der zweite Abschnitt und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; PDF-Speicherung und E-Mail-Versand siehe unten.
+„Vorschau“ wird nach vollständigen Pflichtangaben verfügbar. Vor der Darstellung werden aktuelle Änderungen als eigener Entwurf gesichert. Die PNG-Vorschau befüllt eine sauber vektorbasiert nachgezeichnete Vorlage positionsgenau. Die Geometrie entspricht dem hochgeladenen Original. ETCS und 41–44 werden nicht beschrieben. Authentifizierter POST `/api/v1/tf/brake-sheets/{id}/preview` prüft Eigentümer, Entwurfsrevision, Tfz-Revision und Vollständigkeit; Ausgabe mit no-store. Zu lange Texte werden mit einer verständlichen Fehlermeldung abgewiesen, nicht abgeschnitten. Die Ansicht ist ein Bild-Overlay; PDF-Speicherung und E-Mail-Versand siehe unten.
 
 ## Qualität der Vorlage
 
@@ -85,7 +85,7 @@ Der Blindempfänger wird serverseitig ergänzt, auch bei älteren Browserstände
 
 
 ## Kompakte Maske und getrennte Ablage (26.10.2026)
-Die Grunddaten stehen am Desktop in vier Spalten, darunter zwei schmalere Bahnhofsfelder. Tfz-Auswahl folgt unmittelbar; abgeleitete, unveränderliche Tfz-Werte werden in der Maske ausgeblendet, im PDF weiter ausgegeben. Spalten 3/4 sind anfangs eingeklappt und über +/− gemeinsam umschaltbar. Gespeicherte optionale Länder-/Kategoriewerte oder abweichende Vmax öffnen die Spalten automatisch; Einklappen löscht keine Werte. Hinweiszeilen zum leeren ETCS/zweiten Abschnitt sind ausgeblendet, die PDF-Felder bleiben unverändert leer.
+Die Grunddaten stehen am Desktop in vier Spalten, darunter zwei schmalere Bahnhofsfelder. Tfz-Auswahl folgt unmittelbar; abgeleitete, unveränderliche Tfz-Werte werden in der Maske ausgeblendet, im PDF weiter ausgegeben. Spalten 3/4 sind anfangs eingeklappt und über +/− gemeinsam umschaltbar. Gespeicherte optionale Länder-/Kategoriewerte oder abweichende Vmax öffnen die Spalten automatisch; Einklappen löscht keine Werte. Hinweiszeilen zum leeren ETCS/zweiten Abschnitt sind ausgeblendet, ETCS bleibt leer; der zweite Abschnitt wird bei einem Folgeabschnitt befüllt.
 
 Vorschau: **Speichern** ruft den geschützten Endpunkt `/api/v1/tf/brake-sheets/{id}/archive` auf und legt nur die PDF ab (keine Mail-Dispatch-Zeile, kein Postfach erforderlich, kein SMTP). **Speichern & senden** nutzt weiterhin den expliziten Maildialog; erst dessen Senden-Schaltfläche sendet. Beide Ablagen verwenden denselben Dokumentquellschlüssel. Hauptaktionen auch unterhalb der Erstellung. Bei schmalen Bildschirmen werden die Felder in zwei bzw. eine Spalte umgebrochen.
 
@@ -101,3 +101,9 @@ DS100-Präfix ausschließlich bei der Ausgabe; Suchfunktion und gespeicherte
 Auswahl bleiben erhalten. Manuell eingegebene Namen (z. B. in Polen) bleiben
 unverändert. Bereits archivierte PDF-Dateien werden dadurch nicht überschrieben;
 eine neu erzeugte Vorschau oder PDF verwendet die neue Darstellung.
+
+## Schlepp-Tfz und Folgeabschnitt (0.26.24)
+
+Feld 4b enthält immer das endgültige Ziel, auch wenn 16b einen früheren Absetzbahnhof enthält. Bei mehreren Absetzbahnhöfen zeigt die rechte Spaltengruppe jeweils den unmittelbar folgenden Abschnitt; weitere Abschnitte bleiben über die bestehenden Abschnittsversionen erreichbar.
+
+Feld 9 enthält zusätzlich zu den manuell eingegebenen Besonderheiten je Tfz den Hinweis „Tfz (Nummer) läuft von (Bahnhof) bis (Bahnhof) im Schlepp an Position(en): (Position im Wagenzug) mit.“ Dies gilt auch bei Mitnahme bis zum endgültigen Ziel. Feld 8 bleibt unverändert. Der Hinweis wird bei jeder Berechnung neu aufgebaut; er wird nicht in den manuellen Text zurückgeschrieben.

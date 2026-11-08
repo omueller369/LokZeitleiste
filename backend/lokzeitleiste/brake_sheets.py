@@ -106,7 +106,7 @@ def public_vehicle(row):
     keys=('id','revision','vehicle_number','series','name','length_m','weight_kg','axle_count','brake_shoe','brake_g','brake_g_25','brake_p','brake_r','spring_brake','spring_unit','status','status_label')
     return {k:data[k] for k in keys}
 
-def calculate(db,data):
+def calculate(db,data,include_following=True):
     lines=[]
     for item in data.locos:
         row=db.get(RailwayVehicle,item.vehicle_id)
@@ -140,6 +140,14 @@ def calculate(db,data):
     result=dict(lines=lines,a=a,b=b,total=summed,available=available,required=data.required_percent,missing=difference if difference is not None and difference<0 else '/' if difference is not None else None,cast_iron='/')
 
     result.update(towed=towed,remarks=remarks,station_to=data.station_to,final_station=data.final_station,first_vehicle=data.first_vehicle,last_vehicle=data.last_vehicle)
+    result['special']=remarks if data.towed or data.section_parent else data.special
+    result['remarks']=data.remarks
+    if include_following and data.towed:
+        stages=tow_sections(data,ordered)
+        if len(stages)>1:
+            following=stages[1]
+            result['second']=dict(station_from=following.station_from,station_to=following.station_to,
+                                  calculation=calculate(db,following,include_following=False))
     if data.wagon_import and not data.towed and not data.section_parent:
         result['wagon_brake_breakdown']=data.wagon_import.brake_components(data.brake_mode)
     result['preview_missing']=preview_missing(data,result)

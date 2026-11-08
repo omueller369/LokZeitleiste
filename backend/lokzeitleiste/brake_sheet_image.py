@@ -77,16 +77,16 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
     box((210,157,380,183),' / '.join(n for n in sheet.train_numbers if n),16)
     box((387,157,619,182),date)
     box((12,210,316,236),station_name(sheet.station_from),15)
-    box((323,210,619,236),station_name(sheet.station_to),15)
+    box((323,210,619,236),station_name(sheet.final_station or sheet.station_to),15)
     columns=[(806,966),(973,1051),(1059,1129),(1138,1206)]
     for country,(left,right) in zip(sheet.countries,columns):
         if not country.country:continue
         box((left,102,right,133),country.country)
         box((left,141,right,181),country.category)
         box((left,190,right,235),country.vmax)
-    # ETCS (1212..1304), the second section and verification fields are untouched.
+    # ETCS (1212..1304) and verification fields are untouched.
     box((16,303,574,591),result.get('remarks',sheet.remarks),17,'left',valign='top')
-    box((590,303,1295,591),sheet.special,17,'left',valign='top')
+    box((590,303,1295,591),result.get('special',sheet.special),17,'left',valign='top')
     for active,y in [(sheet.dangerous,619),(sheet.exceptional,649),(sheet.restrictions,697),(sheet.waste,768)]:
         if active:cross(27,y)
     box((381,627,598,654),station_name(sheet.station_from),14)
@@ -97,6 +97,18 @@ def render(sheet,result,created_at,created_by,transparent=False,signature=None,s
     xs=[(382,527),(534,691),(698,835)];ys=[(860,896),(905,939),(947,992),(1002,1037),(1047,1081)]
     for key,(top,bottom) in zip(['count','length','holding','brake','weight'],ys):
         for values,(left,right) in zip([result['a'],result['b'],result['total']],xs):box((left,top,right,bottom),values[key],20)
+    second=result.get('second')
+    if second:
+        following=second['calculation']
+        box((843,627,1069,654),station_name(second['station_from']),14)
+        box((1079,627,1299,654),station_name(second['station_to']),14)
+        box((843,701,1069,732),vehicle(following['first_vehicle']),15)
+        box((1079,701,1299,732),vehicle(following['last_vehicle']),15)
+        for key,(top,bottom) in zip(['count','length','holding','brake','weight'],ys):
+            for values,(left,right) in zip([following['a'],following['b'],following['total']],[(843,997),(1006,1139),(1148,1299)]):
+                box((left,top,right,bottom),values[key],20)
+        for value,(top,bottom) in zip([following['available'],sheet.required_percent,following['missing'],'/'],[(1090,1131),(1140,1181),(1190,1235),(1245,1322)]):
+            box((1148,top,1299,bottom),value,23)
     if sheet.holding_unit:cross(169 if sheet.holding_unit=='t' else 212,980)
     de=f'DE: {sheet.class_de} – 22,5 t';pl=f'PL: {sheet.class_pl} – '+('20,5 t' if sheet.class_pl=='C' else '22,5 t')
     box((15,1149,190,1233),de+'\n'+pl,14)
