@@ -24,7 +24,7 @@ def fixture():
     page = page.replace('</head>', '<style>' + css + '</style></head>')
     source = (STATIC / 'work-report.js').read_text().split('// Keep collapse buttons')[0]
     source = re.sub(r'\}\)\(\);\s*$', '''window.LayoutReport={fill(editor,day){
-        trainEditor=editor;user={id:1};key='layout-test';trips=[];
+        setupReportToggles();trainEditor=editor;user={id:1};key='layout-test';trips=[];
         state={kind:'Sonstige Erfassung',client_id:'layout',legacy_pause:30,ausbleibe:[]};
         el('dutyStart').value=day+'T08:00';el('dutyEnd').value=day+'T16:00';totals();
     }};})();''', source)
