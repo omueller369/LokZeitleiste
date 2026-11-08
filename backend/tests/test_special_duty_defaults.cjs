@@ -7,7 +7,7 @@ const api=window.dutyTest;
 for(const kind of ['Sonstige Erfassung','Krank','Rufbereitschaft','Bereitschaft','Ausfallschicht']){
  api.setup();el('dutyStart').value='2026-10-24T21:00';el('dutyEnd').value='2026-10-25T05:00';api.changeDutyKind(kind);
  assert.equal(api.state().kind,kind);assert.equal(el('dutyStart').value,'2026-10-24T08:00');assert.equal(el('dutyEnd').value,'2026-10-24T16:00');
- assert.equal(api.keepDefaultDutyDate('2026-10-24T08:00','2026-10-25T08:00'),true);assert.equal(el('dutyEnd').value,'2026-10-25T16:00');el('dutyStart').value='2026-10-25T08:00';api.realTotals();assert.equal(el('requiredPause').textContent,kind==='Sonstige Erfassung'?'0:30':'0:00');assert.equal(el('netDuration').textContent,'8:00');
+ assert.equal(api.keepDefaultDutyDate('2026-10-24T08:00','2026-10-25T08:00'),true);assert.equal(el('dutyEnd').value,'2026-10-25T16:00');el('dutyStart').value='2026-10-25T08:00';api.realTotals();assert.equal(el('dutyDuration').textContent,'8:00');assert.equal(el('documentedPauseTotal').textContent,'0:00');
 }
 api.setup();el('dutyStart').value='2026-10-24T21:00';el('dutyEnd').value='2026-10-25T05:00';api.changeDutyKind('Urlaub');assert.equal(el('dutyEnd').value,'2026-10-25T05:00');
 api.setup({saved_id:17});api.changeDutyKind('Bereitschaft');assert.equal(api.state().kind,'Sonstige Erfassung');assert.equal(el('dutyStart').value,'2026-10-24T21:00');

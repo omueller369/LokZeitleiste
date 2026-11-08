@@ -90,29 +90,40 @@
 
 .gps-box .gps-stand-toggle{background:#167b32;color:#fff;border:2px solid #126429;min-height:44px;font-weight:700}.gps-box .gps-stand-toggle[aria-pressed="true"]{background:#ba1424;border-color:#95101c}.gps-box .gps-stand-toggle:disabled{opacity:.55}.gps-box .gps-stand-duration{color:#b00020;font-weight:800;font-size:1.15rem;align-self:center}
 
-/* Compact duty overview: left two-thirds for categories and metrics, right third for times/allowances. */
-#workReport .duty-overview{display:grid;grid-template-columns:minmax(0,2fr) minmax(15rem,1fr);gap:24px;align-items:start;margin:12px 0 18px}
-#workReport .duty-overview-left,#workReport .duty-overview-right{min-width:0;display:flex;flex-direction:column;gap:16px}
-#workReport .duty-summary-group{border:1px solid #b9c8d1;border-radius:9px;padding:12px;min-width:0;margin:0}
-#workReport .duty-kinds{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
-#workReport .duty-kinds label{margin:0;padding:6px 2px;min-height:60px;gap:8px;cursor:pointer}
-#workReport .duty-kinds input{width:20px;height:20px}
-#workReport #dutyMetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
-#workReport .duty-metric{text-align:center;min-width:0;display:flex;flex-direction:column;gap:10px;font-variant-numeric:tabular-nums}
-#workReport .duty-metric>span{font-size:.9rem;white-space:nowrap}
-#workReport .duty-metric>strong{font-size:1.45rem;line-height:1.2;white-space:nowrap}
-#workReport .duty-metric>#dutyDuration.over-limit{font-size:1.45rem}
-#workReport .duty-overview-right>label{margin:0;min-width:0}
-#workReport .duty-overview-right input[type="datetime-local"]{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
-#workReport #absenceAllowance .absence-allowance{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-#workReport #absenceAllowance label{margin:0;gap:8px;min-height:50px}
-#workReport #absenceAllowance input{width:20px;height:20px}
+/* Portrait tablet: dates and sums on the left, two vertical selection columns on the right. */
+#workReport .duty-overview{display:grid;grid-template-columns:minmax(15rem,1fr) minmax(11rem,.65fr);gap:14px;align-items:start;margin:10px 0 14px}
+#workReport .duty-overview-left{min-width:0;display:flex;flex-direction:column;gap:12px}
+#workReport .duty-overview-right{min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+#workReport .duty-summary-group{border:1px solid #b9c8d1;border-radius:9px;padding:10px;min-width:0;margin:0}
+#workReport .duty-kinds{display:flex;flex-direction:column;gap:4px}
+#workReport .duty-kinds label,#workReport #absenceAllowance label{display:flex;flex-direction:row;align-items:center;justify-content:space-between;min-height:36px;margin:0;gap:6px;padding:2px;cursor:pointer}
+#workReport .duty-kinds input,#workReport #absenceAllowance input{width:20px;height:20px;margin:0}
+#workReport #dutyMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#workReport .duty-metric{text-align:center;min-width:0;display:flex;flex-direction:column;gap:6px;font-variant-numeric:tabular-nums}
+#workReport .duty-metric>span{font-size:.85rem;white-space:nowrap}
+#workReport .duty-metric>strong,#workReport .duty-metric>#dutyDuration.over-limit{font-size:1.25rem;line-height:1.2;white-space:nowrap}
+#workReport .duty-overview-left>label{margin:0;min-width:0;font-size:.9rem}
+#workReport .duty-overview-left input[type="datetime-local"]{width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:8px;font-size:.95rem}
+#workReport #absenceAllowance .absence-allowance{display:flex;flex-direction:column;gap:4px}
+#workReport #absenceAllowance legend{font-size:.8rem}
 #workReport #kindHint:empty{display:none}
+#workReport .report-icon-button{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:40px;min-width:40px;height:40px;padding:8px;margin:0;border:1px solid #b9c8d1;border-radius:8px;background:#edf3f7;color:#173d52;cursor:pointer}
+#workReport .report-icon-button svg{display:block;pointer-events:none}
+#workReport .report-icon-button[aria-expanded=true]{background:#d8eaf6;outline:2px solid #17445b}
+#workReport #toggleDutyNote{position:absolute;inset-inline-end:3.25rem;top:0}
+#workReport #dutyFields>legend{position:relative;padding-inline-end:6.5rem}
+#workReport .report-icon-button:focus-visible{outline:3px solid #17445b;outline-offset:2px}
+#workReport #monthPlanStrip[hidden],#workReport #overrunBox[hidden]{display:none!important}
 #workReport .gps-box>h3{position:relative;display:flex;align-items:center;min-height:44px;margin:0;padding-inline-end:3.5rem}
 #workReport .gps-box .gps-block-content{margin-top:12px}
 #workReport .gps-box .gps-block-content[hidden]{display:none!important}
-@media(max-width:800px){#workReport .duty-overview{grid-template-columns:minmax(0,1fr);gap:16px}#workReport .duty-overview-right{width:100%}}
-@media(max-width:380px){#workReport #dutyMetrics{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}#workReport .duty-kinds{gap:2px}}
+@media(max-width:540px){
+ #workReport .duty-overview{grid-template-columns:minmax(0,1fr);gap:12px}
+ #workReport .duty-overview-right{grid-template-columns:1fr 1fr}
+ #workReport .duty-kinds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ #workReport .duty-overview-right #absenceAllowance{height:100%;box-sizing:border-box}
+}
+
 
 .gps-trail-legend{display:flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:8px 0;font-size:.8rem}
 .gps-trail-scale{position:relative;width:160px;height:1.6em}

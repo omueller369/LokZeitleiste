@@ -171,8 +171,7 @@ class ReportIn(BaseModel):
         if self.kind in (_text_source('server_work_reports_schemas.text_35d3a889824d'),_text_source('server_work_reports_schemas.text_be1600b499c6')):
             if self.start_at.date()!=self.end_at.date():raise ValueError(_text_source('server_work_reports_schemas.text_0f4caa8b3d88'))
             if self.trips or self.train_journeys or self.actual_pause:raise ValueError(_text_source('server_work_reports_schemas.text_9343742f0ae9'))
-        self.overrun_reason=self.overrun_reason.strip() if self.kind==_text_source('server_work_reports_schemas.text_f31b8681bfca') else ''
-        if self.kind==_text_source('server_work_reports_schemas.text_f31b8681bfca') and duration>720 and not self.overrun_reason:raise ValueError(_text_source('server_work_reports_schemas.text_fbf65bce40e9'))
+        self.overrun_reason=self.overrun_reason.strip()
         if self.actual_pause>=duration:raise ValueError(_text_source('server_work_reports_schemas.text_76b44ca0ac05'))
         ordered=sorted(self.trips,key=lambda t:t.start_at)
         for index,trip in enumerate(ordered):

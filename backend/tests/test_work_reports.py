@@ -77,10 +77,17 @@ class WorkReportsTest(unittest.TestCase):
     def test_pause_boundaries_and_reason(self):
         for duration,expected in [(360,0),(361,30),(539,30),(540,45),(541,45),(599,45),(600,45),(601,46),(660,105),(720,165),(721,166),(780,225)]:self.assertEqual(minimum_pause(duration),expected)
         data=self.payload(end='2026-10-12T22:00')
-        self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=data).status_code,422)
-        data['overrun_reason']='Verspätete Ablösung';report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],225)
+        report=self.create(data);self.assertEqual(report['duration_minutes'],780);self.assertEqual(report['minimum_pause_minutes'],225)
         for name in ('start_at','end_at'):
             invalid=dict(data);invalid[name]=invalid[name]+':10';self.assertEqual(self.driver.post('/api/v1/tf/work-reports',json=invalid).status_code,422)
+    def test_optional_duty_note_is_kept_for_special_duties(self):
+        data=self.payload()
+        data.update(kind='Bereitschaft',trips=[],actual_pause=0,overrun_reason=' Hinweis zum Dienst ')
+        report=self.create(data)
+        self.assertEqual(report['overrun_reason'],'Hinweis zum Dienst')
+        reread=self.driver.get(f"/api/v1/tf/work-reports/{report['id']}").json()
+        self.assertEqual(reread['overrun_reason'],'Hinweis zum Dienst')
+
     def test_new_pause_policy_enforces_only_the_mandatory_part(self):
         from pydantic import ValidationError
         start=datetime(2026,10,12,9)

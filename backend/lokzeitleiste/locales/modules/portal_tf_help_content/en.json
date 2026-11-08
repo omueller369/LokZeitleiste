@@ -56,7 +56,7 @@
   "text_2c341c928746": "Choose the right station from the directory.",
   "text_2c82ee521b90": "On phones, some groups appear below each other. Swipe wide tables left or right. The sequence of steps stays the same.",
   "text_2c884aa7d96f": "Send by email",
-  "text_2cb36fd5df02": "Σ WT shows the whole duty span. Min. ☕ shows the required break. WT incl. ☕ shows credited work time including recorded breaks. Breaks so far shows recorded breaks. h:mm means hours and minutes: 8:30 is eight hours thirty minutes; 0:45 is 45 minutes.",
+  "text_2cb36fd5df02": "Duty start and end are on the left. Below them, Σ- AZ shows the full duty span and Σ Break the total documented breaks. Select the duty type and allowances on the right. Use the calendar icon to show or hide the work and rest day plan. Use the note icon to open an optional duty note. It can remain empty even for duties exceeding twelve hours. Existing explanations appear there. h:mm means hours and minutes: 8:30 is eight hours and thirty minutes.",
   "text_2ea31f72ee49": "Use ? on the right of the header to open help for the current area. Instructions and help contains all topics.",
   "text_2f571b7ba8ad": "Locomotive handover log",
   "text_30ef493302ac": "First choose the right folder.",

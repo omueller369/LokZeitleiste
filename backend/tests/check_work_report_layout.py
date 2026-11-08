@@ -42,19 +42,26 @@ def fixture():
  // Bounding-rectangle reads below force synchronous layout; no animation-frame race in headless mode.
  const kinds=[...document.querySelectorAll('#dutyKinds label span')].map(el=>el.textContent);
  assert(kinds.join(',')==='DS,BS,RBS,AS,U,K','Dienstart abbreviations');
- const ids=['dutyDuration','requiredPause','netDuration','documentedPauseTotal'];
- assert(ids.map(id=>document.getElementById(id).textContent).join(',')==='8:00,0:30,8:00,0:30','Metrics contain h:mm only');
+ const ids=['dutyDuration','documentedPauseTotal'];
+ assert(ids.map(id=>document.getElementById(id).textContent).join(',')==='8:00,0:30','Metrics contain h:mm only');
  const overview=rect('.duty-overview'),k=rect('#dutyKinds'),metrics=rect('#dutyMetrics'),begin=rect('.duty-begin'),end=rect('.duty-end'),allowance=rect('#absenceAllowance');
  assert(end.top>=begin.bottom-1,'Dienstende below Dienstbeginn');
- assert(allowance.top>=end.bottom-1,'Ausbleibe below Dienstende');
- if(innerWidth>800){
-  assert(begin.left>k.right,'Duty times on the right');
-  assert(Math.abs(k.left-metrics.left)<2,'Metrics aligned left below kinds');
-  assert(metrics.top>=k.bottom,'Metrics below kinds');
-  assert(allowance.width/overview.width>.30&&allowance.width/overview.width<.35,'Ausbleibe occupies one third');
+
+ assert(metrics.top>=end.bottom,'Metrics below duty times');
+ if(innerWidth>540){
+  assert(k.left>=begin.right,'Kinds to the right of times');
+  assert(allowance.left>=k.right,'Allowances to the right of kinds');
+  const choices=[...document.querySelectorAll('#dutyKinds label')];
+  assert(choices[1].getBoundingClientRect().top>=choices[0].getBoundingClientRect().bottom,'Vertical duty types');
  }else{
-  assert(begin.top>=metrics.bottom,'Mobile duty times stack below left groups');
+  assert(k.top>=metrics.bottom,'Phone selections below times and sums');
  }
+ const calendar=document.getElementById('toggleMonthPlan'),plan=document.getElementById('monthPlanStrip');
+ assert(plan.hidden,'Plan initially hidden');calendar.click();assert(!plan.hidden,'Calendar opens plan');calendar.click();assert(plan.hidden,'Calendar closes plan');
+ const note=document.getElementById('toggleDutyNote'),box=document.getElementById('overrunBox'),input=document.getElementById('overrunReason');
+ assert(box.hidden&&!input.required,'Duty note optional and initially hidden');note.click();assert(!box.hidden,'Note opens');
+ input.value='Hinweis für diesen Dienst';note.click();assert(box.hidden&&input.value.includes('Hinweis'),'Hiding preserves duty note');
+ assert(!document.getElementById('requiredPause')&&!document.getElementById('netDuration'),'Removed metrics absent');
  for(const selector of ['#dutyKinds','#dutyMetrics','#absenceAllowance']){
   const el=document.querySelector(selector),box=el.getBoundingClientRect(),style=getComputedStyle(el);
   assert(style.borderTopWidth==='1px'&&parseFloat(style.borderTopLeftRadius)>0,'Thin rounded group frame');
@@ -96,7 +103,7 @@ def main():
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         (root / 'fixture.html').write_text(fixture())
-        for width in [1280, 768, 375, 320]:
+        for width in [1280, 800, 768, 600, 375, 320]:
             host = root / f'host-{width}.html'
             host.write_text(f'''<!doctype html><html data-layout-status="pending"><head><meta charset="utf-8"><style>body{{margin:0;background:#eef3f5}}iframe{{border:0;width:{width}px;height:1800px;display:block}}</style><script>
 addEventListener('message',event=>{{if(event.source!==document.querySelector('iframe')?.contentWindow)return;document.documentElement.dataset.layoutStatus=event.data.layoutStatus;document.documentElement.dataset.layoutMessage=event.data.message||'';}});
