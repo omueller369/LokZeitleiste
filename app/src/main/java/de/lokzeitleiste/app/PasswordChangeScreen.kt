@@ -24,11 +24,11 @@ fun PasswordChangeScreen(username: String, token: String, mandatory: Boolean = f
         LocalizedText("Passwort ändern", style = MaterialTheme.typography.headlineMedium)
         LocalizedText("Konto: $username")
         if (mandatory) LocalizedText("Vor der Nutzung müssen Sie Ihr Initialpasswort ändern.")
-        OutlinedTextField(current, { current = it }, enabled = !busy, label = { LocalizedText("Aktuelles Passwort") },
+        OutlinedTextField(current, { current = it }, enabled = !busy, label = { LocalizedText("Aktuelles Passwort") }, isError = current.isBlank(),
             visualTransformation = PasswordVisualTransformation())
-        OutlinedTextField(new, { new = it }, enabled = !busy, label = { LocalizedText("Neues Passwort (mindestens 6 Zeichen)") },
+        OutlinedTextField(new, { new = it }, enabled = !busy, label = { LocalizedText("Neues Passwort (mindestens 6 Zeichen)") }, isError = new.length < 6 || new == current,
             visualTransformation = PasswordVisualTransformation())
-        OutlinedTextField(confirm, { confirm = it }, enabled = !busy, label = { LocalizedText("Passwort wiederholen") },
+        OutlinedTextField(confirm, { confirm = it }, enabled = !busy, label = { LocalizedText("Passwort wiederholen") }, isError = confirm.isBlank() || confirm != new,
             visualTransformation = PasswordVisualTransformation())
         if (error.isNotBlank()) LocalizedText(error, color = MaterialTheme.colorScheme.error)
         Button(enabled = !busy, onClick = {

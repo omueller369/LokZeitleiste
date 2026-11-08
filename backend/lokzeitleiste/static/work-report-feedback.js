@@ -21,7 +21,7 @@ function next(){if(current||!queue.length)return;current=queue.shift();returnFoc
 function finish(){clearTimeout(dismissTimer);current=null;const focus=returnFocus;returnFocus=null;if(focus?.isConnected!==false&&!focus?.disabled)focus?.focus?.();next();}
 okay.onclick=()=>dialog.close();dialog.addEventListener('close',finish);dialog.addEventListener('cancel',event=>{event.preventDefault();dialog.close();});
 helpButton.onclick=openHelp;
-window.ReportFeedback={help:openHelp,error(value,options={}){const message=String(value||'').trim();if(!message||current?.message===message||queue.some(row=>row.message===message))return;queue.push({message,...options});next();},hint};
+window.ReportFeedback={help:openHelp,error(value,options={}){const message=String(value||'').trim();window.CtlValidation?.report(message,options.field?[options.field]:undefined);if(!message||current?.message===message||queue.some(row=>row.message===message))return;queue.push({message,...options});next();},hint};
 // A form can emit several invalid events at once. Show its first invalid field only.
 let invalidPending=false;
 (document.getElementById('workReport')||(document.getElementById('messageCompose')?document:null))?.addEventListener('invalid',event=>{event.preventDefault();if(invalidPending)return;invalidPending=true;setTimeout(()=>invalidPending=false,0);const field=event.target,label=field.labels?.[0]?.textContent?.trim()||field.getAttribute('aria-label')||'';window.ReportFeedback.error(label?label+': '+field.validationMessage:field.validationMessage,{field,hint:globalThis.CtlText.source("portal_work_report_feedback.text_d19d77ca4519")});},true);

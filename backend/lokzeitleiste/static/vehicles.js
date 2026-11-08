@@ -1,6 +1,7 @@
 (()=>{
 const el=id=>document.getElementById(id),t=value=>window.I18n?.t(value)||value,node=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n;};
 const fields={length_m:'vehicleLength',weight_kg:'vehicleWeight',axle_count:'vehicleAxles',brake_shoe:'vehicleBrakeShoe',status:'vehicleStatus',status_note:'vehicleStatusNote',series:'vehicleSeries',leasing_company_id:'vehicleLeasing',name:'vehicleName',brake_r:'vehicleBrakeR',brake_p:'vehicleBrakeP',brake_g:'vehicleBrakeG',spring_brake:'vehicleSpring',spring_unit:'vehicleSpringUnit',next_revision:'vehicleRevisionDate',mileage:'vehicleMileage',notes:'vehicleNotes'};
+for(const [field,id] of Object.entries(fields))el(id).dataset.validationField=field;
 const numeric=new Set(['brake_r','brake_p','brake_g','spring_brake','mileage']),statuses={ready:[globalThis.CtlText.source("backend_vehicles.text_a30e1969d617"),'#d9f2df'],unavailable:[globalThis.CtlText.source("backend_vehicles.text_ee0a4ee77389"),'#ffdada'],limited:[globalThis.CtlText.source("backend_vehicles.text_a7767461460f"),'#fff0b3']};
 let companies=[],level=0,current=null,editing=false,dirty=false,busy=false,listTicket=0,timer;
 function message(text){el('vehicleMessage').textContent=t(text);}

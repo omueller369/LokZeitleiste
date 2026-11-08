@@ -29,6 +29,9 @@ function pauseFor(report){return Number(report.actual_pause)+trainPause(report);
 function structuredTrips(){return trips.map(t=>({...t}));}
 function localReport(){return pending.find(r=>r.client_id===state.client_id);}
 function canLeave(){return !hasDraft()&&(!queue.length||!!localReport());}
+for(const [id,field] of Object.entries({dutyStart:'start_at',dutyEnd:'end_at',hotelName:'hotel_name',hotelLocation:'hotel_location',overrunReason:'overrun_reason',guestFrom:'start_station',guestTo:'end_station',guestStart:'start_at',guestEnd:'end_at',guestTransport:'transport',guestTransportDetail:'transport_detail'})){
+ const input=el(id);if(input)input.dataset.validationField=field;
+}
 function stationLabel(code,name){return name?code+' · '+name:code;}
 async function resolveStation(input,allowText=false){
  const value=input.value.trim(),parts=value.split(' · '),query=parts[0];
@@ -39,7 +42,7 @@ async function resolveStation(input,allowText=false){
   (!allowText||parts.length===1||stationLabel(row.code,row.name).toLocaleLowerCase()===lower))
   ||rows.find(row=>row.name.toLocaleLowerCase()===lower);
  const place=exact||(allowText&&value&&[...value].length<=255?{code:'',name:value}:null);
- if(!place)throw Error(globalThis.CtlText.source("portal_work_report.text_9829a55f8030"));
+ if(!place){window.CtlValidation?.mark(input);throw Error(globalThis.CtlText.source("portal_work_report.text_9829a55f8030"));}
  input.value=place.code?stationLabel(place.code,place.name):place.name;
  return place;
 }

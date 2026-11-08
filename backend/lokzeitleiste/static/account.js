@@ -10,7 +10,7 @@ el('loginForm').onsubmit=event=>{event.preventDefault();submit(event.target,asyn
  await api('/api/v1/account/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(event.target)))});
  event.target.reset();await show(true);message('Angemeldet.');});};
 el('passwordForm').onsubmit=event=>{event.preventDefault();submit(event.target,async()=>{
- const data=Object.fromEntries(new FormData(event.target));if(data.new_password!==data.confirm_password)throw Error(globalThis.CtlText.source("backend_account.text_89780fc834cd"));
+ const data=Object.fromEntries(new FormData(event.target));if(data.new_password!==data.confirm_password){for(const name of ['new_password','confirm_password'])window.CtlValidation?.mark(event.target.elements[name]);throw Error(globalThis.CtlText.source("backend_account.text_89780fc834cd"));}
  await api('/api/v1/account/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
  el('ownWorktime').hidden=true;el('tfPortal').hidden=true;event.target.reset();el('passwordForm').hidden=true;el('loginForm').hidden=false;el('logout').hidden=true;el('back').hidden=user.role==='tf';
  message(globalThis.CtlText.source("backend_account.text_6d78631ebe51"));});};

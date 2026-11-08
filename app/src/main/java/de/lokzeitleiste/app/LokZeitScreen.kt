@@ -279,10 +279,10 @@ private fun EditStopDialog(entry: StopEntry, onDismiss: () -> Unit, onSave: (Sto
     val seconds = if (start != null && end != null && end >= start) duration(start, end) else 0L
     AlertDialog(onDismissRequest = onDismiss, title = { LocalizedText("Standzeit korrigieren") }, text = {
         Column(Modifier.heightIn(max = 510.dp).verticalScroll(rememberScrollState())) {
-            OutlinedTextField(name, { name = it }, label = { LocalizedText("Betriebsstelle") })
+            OutlinedTextField(name, { name = it }, isError = name.isBlank(), label = { LocalizedText("Betriebsstelle") })
             OutlinedTextField(code, { code = it.uppercase().trim() }, label = { LocalizedText("DS100-Kürzel (optional)") })
-            OutlinedTextField(arrival, { arrival = it }, label = { LocalizedText("Ankunft: TT.MM.JJJJ HH:mm:ss") })
-            OutlinedTextField(departure, { departure = it }, label = { LocalizedText("Abfahrt: TT.MM.JJJJ HH:mm:ss") })
+            OutlinedTextField(arrival, { arrival = it }, isError = start == null, label = { LocalizedText("Ankunft: TT.MM.JJJJ HH:mm:ss") })
+            OutlinedTextField(departure, { departure = it }, isError = end == null || start != null && end < start, label = { LocalizedText("Abfahrt: TT.MM.JJJJ HH:mm:ss") })
             LocalizedText("Dauer: ${seconds.clock()}")
             StopReasonDropdown(reason, seconds, onSelect = { reason = it })
             OutlinedTextField(note, { note = it }, label = { LocalizedText("Notiz (optional)") })
@@ -302,6 +302,7 @@ private fun StopReasonDropdown(value: String, seconds: Long, onSelect: (String) 
     ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
         OutlinedTextField(
             value = value,
+            isError = !validReason(value, seconds),
             onValueChange = {},
             readOnly = true,
             label = { LocalizedText("Grund der Standzeit") },

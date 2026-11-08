@@ -99,7 +99,7 @@
   "text_4e03801404c0": "Add missing information and events not yet recorded.",
   "text_4e27671f205d": "Read the heading first to see which area you are in.",
   "text_4f3ea5cc1a2f": "Use Save draft if needed.",
-  "text_4ff0f620311a": "Note the area, exact message and approximate time. Give this information to your administration. Do not share your password.",
+  "text_4ff0f620311a": "Note the area, exact message and approximate time. Give this information to your administration. Do not share your password. Missing required values and invalid inputs have a red border. When an error refers to a field, check and correct the fields marked in red.",
   "text_50a69389a7b6": "Check the grouped information and the missing fields shown.",
   "text_520ed8aeaa01": "When does this help?",
   "text_52c42f577a8a": "Check time values and notices. Resolve missing breaks or incomplete information before final submission.",

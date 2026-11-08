@@ -52,3 +52,13 @@
  html[data-theme=dark] dialog::backdrop{background:#02070ddd}
 }
 @media print{html[data-theme]{color-scheme:light!important}.portal-theme-toggle{display:none!important}}
+
+/* Required, malformed and server-rejected fields share the same visible border. */
+@media screen{
+ html body :is(input:not([type=hidden]),select,textarea):is(:invalid,[aria-invalid=true],[data-invalid=true],[data-ctl-invalid=true]){
+  border:2px solid #c40000!important;outline:1px solid #c40000!important;outline-offset:0;box-shadow:0 0 0 1px #c4000033!important
+ }
+ html[data-theme=dark] body :is(input:not([type=hidden]),select,textarea):is(:invalid,[aria-invalid=true],[data-invalid=true],[data-ctl-invalid=true]){
+  border-color:#ff8585!important;outline-color:#ff8585!important
+ }
+}

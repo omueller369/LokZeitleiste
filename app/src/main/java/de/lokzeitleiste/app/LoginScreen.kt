@@ -20,6 +20,7 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
+    var credentialsRejected by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf<ApiClient.LoginResult?>(null) }
     val scope = rememberCoroutineScope()
@@ -34,10 +35,10 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
         LocalizedText("LokZeitleiste", style = MaterialTheme.typography.headlineLarge)
         LocalizedText("Tf-Anmeldung mit dem vom Admin angelegten Konto")
         Spacer(Modifier.height(24.dp))
-        OutlinedTextField(username, { username = it.filter(Char::isDigit).take(6) }, label = { LocalizedText("TF-Nummer") },
-            singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-        OutlinedTextField(password, { password = it }, label = { LocalizedText("Passwort") },
-            visualTransformation = PasswordVisualTransformation())
+        OutlinedTextField(username, { credentialsRejected = false; username = it.filter(Char::isDigit).take(6) }, label = { LocalizedText("TF-Nummer") },
+            isError = credentialsRejected || !username.matches(Regex("[1-9][0-9]{5}")), singleLine = true, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+        OutlinedTextField(password, { credentialsRejected = false; password = it }, label = { LocalizedText("Passwort") },
+            isError = credentialsRejected || password.isBlank(), visualTransformation = PasswordVisualTransformation())
         if (message.isNotBlank()) LocalizedText(message, color = MaterialTheme.colorScheme.error)
         Button(enabled = !busy && username.matches(Regex("[1-9][0-9]{5}")), onClick = {
             busy = true; message = ""
@@ -48,6 +49,7 @@ fun LoginScreen(onSuccess: (String, String) -> Unit) {
                     password = ""
                     if (result.passwordChangeRequired) pending = result else onSuccess(result.username, result.token)
                 } catch (error: Exception) {
+                    credentialsRejected = error is de.lokzeitleiste.app.network.AuthenticationRequired
                     message = error.message ?: "Anmeldung fehlgeschlagen."
                 } finally { busy = false }
             }

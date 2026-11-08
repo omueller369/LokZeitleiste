@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('./localized-vm.cjs'),assert=require('node:assert/strict');
-class E{constructor(){this.value='';this.style={};this.maxLength=120;}addEventListener(){}focus(){}select(){}setAttribute(){}scrollIntoView(){}}
+class E{constructor(){this.dataset={};this.value='';this.style={};this.maxLength=120;}addEventListener(){}focus(){}select(){}setAttribute(){}scrollIntoView(){}}
 const nodes={},el=id=>nodes[id]??=new E(),window={addEventListener(){}};
 let source=fs.readFileSync('backend/lokzeitleiste/static/vehicles.js','utf8');source=source.slice(0,source.indexOf('(async()=>{try{const me='))+'window.test={render,setLevel(v){level=v;}};})();';
 vm.runInNewContext(source,{document:{getElementById:el},window,confirm:()=>true,console,Set});window.test.setLevel(3);
