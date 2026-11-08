@@ -140,6 +140,8 @@ def calculate(db,data):
     result=dict(lines=lines,a=a,b=b,total=summed,available=available,required=data.required_percent,missing=difference if difference is not None and difference<0 else '/' if difference is not None else None,cast_iron='/')
 
     result.update(towed=towed,remarks=remarks,station_to=data.station_to,final_station=data.final_station,first_vehicle=data.first_vehicle,last_vehicle=data.last_vehicle)
+    if data.wagon_import and not data.towed and not data.section_parent:
+        result['wagon_brake_breakdown']=data.wagon_import.brake_components(data.brake_mode)
     result['preview_missing']=preview_missing(data,result)
     if data.section_superseded:result['preview_missing'].append(_text_source(TOW_ERRORS['superseded']))
     return result
@@ -199,7 +201,21 @@ def create_router(require_account):
                 notices.append(_localized_text(notice,request_language.get(),**difference))
         except WagonImportError as error:
             raise HTTPException(422,_text_source(IMPORT_ERRORS[str(error)])) from error
-        return dict(**imported,wagon=values,brake_mode=selected_mode,requested_brake_mode=mode,notices=notices,column_totals=source.column_totals())
+        choices=[]
+        if source.detected_mode()=='G+P':
+            for policy,choice_mode in [('all_g','G'),('mixed','G+P'),('unchanged','G+P')]:
+                choice_source=source.model_copy(update={'brake_policy':policy})
+                try:choice_values=choice_source.values(choice_mode)
+                except WagonImportError as error:
+                    choices.append(dict(policy=policy,error=_text_source(IMPORT_ERRORS[str(error)])))
+                    continue
+                choices.append(dict(policy=policy,brake_mode=choice_mode,wagon_import=choice_source,
+                    wagon=choice_values,breakdown=choice_source.brake_components(choice_mode),
+                    column_totals=choice_source.column_totals(choice_mode),
+                    rows=[dict(number=row.number,position=choice_source.row_brake(row,index,choice_mode)[0],
+                               brake=choice_source.row_brake(row,index,choice_mode)[1]) for index,row in enumerate(source.rows)]))
+        return dict(**imported,wagon=values,brake_mode=selected_mode,requested_brake_mode=mode,notices=notices,
+                    column_totals=source.column_totals(),choices=choices)
     @router.get('/api/v1/tf/brake-sheets/vehicles')
     def vehicles(user=Depends(driver),db:Session=Depends(database_session)):
         return [public_vehicle(r) for r in db.scalars(select(RailwayVehicle).where(~RailwayVehicle.id.in_(select(VehicleRetirement.vehicle_id))).order_by(RailwayVehicle.vehicle_number))]

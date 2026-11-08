@@ -6,7 +6,7 @@ sys.path.insert(0,str(STATIC.parent.parent))
 from lokzeitleiste.localization import resolve_placeholders
 MOCK=r'''
 window.confirm=()=>true;window.ReportFeedback={error:message=>{document.documentElement.dataset.error=message;}};
-const imported={station_from:'Origin',station_to:'FIRST',first_vehicle:'330000000000',last_vehicle:'330000000007',brake_mode:'P',requested_brake_mode:'G',column_totals:[{column:'D',unit:'m',total:'120.08'},{column:'E',unit:'t',total:'196'},{column:'F',unit:'t',total:'640.08'},{column:'H',unit:'t',total:'560'},{column:'I',unit:'t',total:null}],notices:['Excel-Summe P: 350 t; Einzelwagen: 560 t. Feld 15 wird nach Bestätigung P.'],wagon:{count:8,length:121,weight:641,brake:560},wagon_import:{sheet:'Dynamic',first_row:10,last_row:17,total_row:18,length_total:'120.08',weight_total:'640.08',g_total:null,p_total:'560',rows:Array.from({length:8},(_,i)=>({number:String(330000000000+i),length:'15.01',weight:'80.01',g:null,p:'70'}))}};
+let imported={station_from:'Origin',station_to:'FIRST',first_vehicle:'330000000000',last_vehicle:'330000000007',brake_mode:'P',requested_brake_mode:'G',column_totals:[{column:'D',unit:'m',total:'120.08'},{column:'E',unit:'t',total:'196'},{column:'F',unit:'t',total:'640.08'},{column:'H',unit:'t',total:'560'},{column:'I',unit:'t',total:null}],notices:['Excel-Summe P: 350 t; Einzelwagen: 560 t. Feld 15 wird nach Bestätigung P.'],wagon:{count:8,length:121,weight:641,brake:560},wagon_import:{sheet:'Dynamic',first_row:10,last_row:17,total_row:18,length_total:'120.08',weight_total:'640.08',g_total:null,p_total:'560',rows:Array.from({length:8},(_,i)=>({number:String(330000000000+i),length:'15.01',weight:'80.01',g:null,p:'70'}))}};
 const locomotives=[{id:1,revision:1,vehicle_number:'91 80 6185 002-0',series:'185',length_m:30,weight_kg:90000,brake_g:80,brake_p:100,brake_r:120},{id:2,revision:1,vehicle_number:'91 80 6185 003-8',series:'185',length_m:10,weight_kg:80000,brake_g:40,brake_p:60,brake_r:80}];let rootMeta=null;
 function calculation(data){const active=data.towed||[],first=active.find(row=>row.position===1),last=active.find(row=>row.position===8+active.length),destination=!data.section_parent&&active.length?active[0].destination:data.station_to;return {lines:[],a:{count:0,length:null,weight:null,holding:null,brake:null},b:data.wagon_import?{...imported.wagon,count:8+active.length}:data.wagon,total:{count:0,length:null,weight:null,holding:null,brake:null},available:null,missing:null,preview_missing:['Tfz'],station_to:destination,final_station:data.final_station||'',first_vehicle:first?'918061850020':imported.first_vehicle,last_vehicle:last?'918061850038':imported.last_vehicle,remarks:active.length?'Mitgeführte Tfz nur bis Stop X.':'',towed:[]};}
 window.fetch=async(path,options={})=>({ok:true,json:async()=>{if(path.endsWith('/account/me'))return {id:1,role:'tf'};if(path.endsWith('/vehicles'))return locomotives;if(path.endsWith('/import-wagons')){if(!(options.body instanceof FormData))throw Error('Multipart upload required');return imported;}if(path.endsWith('/calculate'))return calculation(JSON.parse(options.body));if(options.method==='PUT'){const data=JSON.parse(options.body).sheet,id=path.split('/').at(-1),result=calculation(data);data.station_to=result.station_to;rootMeta={id,revision:1,sheet:data,calculation:result,created_at:'2026-11-04T10:00:00Z',created_by_name:'Test',sections:[{id,section_index:0,station_from:'Origin',station_to:'Stop X'},{id:'00000000-0000-0000-0000-000000000001',section_index:1,station_from:'Stop X',station_to:'Stop Y'},{id:'00000000-0000-0000-0000-000000000002',section_index:2,station_from:'Stop Y',station_to:'FIRST'}]};return rootMeta;}if(rootMeta&&path.endsWith(rootMeta.id))return rootMeta;if(rootMeta&&path.endsWith('00000000-0000-0000-0000-000000000001')){const data=JSON.parse(JSON.stringify(rootMeta.sheet));data.section_parent=rootMeta.id;data.section_index=1;data.station_from='Stop X';data.station_to='Stop Y';data.towed=data.towed.slice(1);data.towed[0].position=9;return {...rootMeta,id:'00000000-0000-0000-0000-000000000001',sheet:data,calculation:calculation(data)};}return [];} });
@@ -35,6 +35,28 @@ CHECKS=r'''
  for(const box of [...document.querySelectorAll('.brake-towed')])box.querySelector('button').click();assert(!document.getElementById('station_to').readOnly,'Normal editing restored after removing all tows');assert(document.getElementById('wagon_count').value==='8','Base wagon count restored immediately');assert(document.getElementById('wagon_brake').value==='','Stale combined brake sum cleared before recalculation');
  const weight=document.getElementById('wagon_weight');weight.value='700';weight.dispatchEvent(new Event('input',{bubbles:true}));
  assert(JSON.parse(localStorage.getItem('lokzeitleiste.brake-sheet.1')).sheet.wagon_import===null,'Manual override detaches automatic source');
+ const originalBrake=document.getElementById('wagon_brake').value;
+ imported={...imported,brake_mode:'G+P',wagon_import:{...imported.wagon_import,rows:imported.wagon_import.rows.map((row,i)=>({...row,g:i<5?'59':null,p:i<5?null:'70'}))}};
+ imported.choices=[['all_g','G',505,505,505],['mixed','G+P',432,295,221.25],['unchanged','G+P',505,295,295]].map(([policy,brake_mode,brake,g,g_counted])=>({
+  policy,brake_mode,wagon:{...imported.wagon,brake},wagon_import:{...imported.wagon_import,brake_policy:policy},
+  column_totals:imported.column_totals,breakdown:{g,g_counted,p:policy==='all_g'?0:210,total:policy==='mixed'?431.25:505},
+  rows:imported.wagon_import.rows.map((row,i)=>({number:row.number,position:policy==='all_g'||i<5?'G':'P',brake:i<5?59:70}))
+ }));
+ await pick();
+ assert(!document.getElementById('brakeImportChoiceBox').hidden,'G+P import offers explicit choices');
+ assert(document.getElementById('brakeImportApply').disabled,'Choosing a policy is mandatory');
+ assert(document.getElementById('wagon_brake').value===originalBrake,'Preview leaves form intact');
+ const selection=document.getElementById('brakeImportChoice');
+ for(const policy of ['all_g','mixed','unchanged','mixed']){
+  selection.value=policy;selection.dispatchEvent(new Event('change',{bubbles:true}));
+  assert(!document.getElementById('brakeImportApply').disabled,'Chosen policy enables apply');
+  assert(document.querySelectorAll('#brakeImportValues table').length===2,'Totals and per-wagon preview');
+  if(policy==='mixed')assert(document.getElementById('brakeImportValues').textContent.includes('221.25'),'G minus 25 percent shown');
+ }
+ document.getElementById('brakeImportApply').click();
+ const selectedState=JSON.parse(localStorage.getItem('lokzeitleiste.brake-sheet.1')).sheet;
+ assert(selectedState.wagon_import.brake_policy==='mixed','Chosen policy stored with source rows');
+ assert(selectedState.brake_mode==='G+P','Chosen brake mode applied');
  document.documentElement.dataset.wagonStatus='pass';
 })().catch(error=>{document.documentElement.dataset.wagonStatus='fail';document.documentElement.dataset.wagonMessage=error.stack;});
 '''

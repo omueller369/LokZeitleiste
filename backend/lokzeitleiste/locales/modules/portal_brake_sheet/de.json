@@ -139,5 +139,17 @@
   "text_c751dda21c5e": "Ausgangsbremszettel bearbeiten",
   "text_a092f73716ce": "Automatischer Hinweis für Feld 9",
   "text_61dff2d93907": "Importiere zuerst die Wagenliste. Geschleppte Tfz werden zusätzlich als Wagen gezählt. Vergib eindeutige Positionen im gesamten Wagenzug. Gleiche Aussetzbahnhöfe brauchen dieselbe Reihenfolgenummer. Änderungen werden im Ausgangsbremszettel vorgenommen; Speichern erstellt die Abschnittsversionen neu.",
-  "text_8849bbb7f2b4": "Neu berechnete Spaltensumme"
+  "text_8849bbb7f2b4": "Neu berechnete Spaltensumme",
+  "text_05a8b3df94c2": "Werte unverändert übernehmen – ohne Abzug",
+  "text_1bfa94302ed8": "P-Summe [t]",
+  "text_4367ed02a8c5": "G+P – G-Summe minus 25 %, danach plus P",
+  "text_59c1287f0b41": "Übernahme der G+P-Wagenliste",
+  "text_6e7c13b082a4": "Bitte eine Übernahmeform wählen",
+  "text_7450b3f6c81a": "Gesamtbremsgewicht vor Aufrundung [t]",
+  "text_983d7a2c51e4": "Wagennummer",
+  "text_984f0abcf321": "Alle Wagen in G (fehlendes G aus P kopieren)",
+  "text_b74d1958a2e0": "Angerechnete G-Summe [t]",
+  "text_c5b28e90d147": "G-Summe vor Abzug [t]",
+  "text_d6e32f0a589b": "Wagenwerte nach gewählter Übernahme",
+  "text_d82ab314590c": "Wähle die Berechnung vor der Übernahme. Bei „Alle Wagen in G“ wird ein fehlender G-Wert unverändert aus P kopiert. Bei „G+P“ wird nur die G-Summe um 25 % reduziert. „Unverändert“ übernimmt die vorhandenen Einzelwerte ohne weiteren Abzug. Prüfe die Werte und die Bremsstellung vor der Übernahme."
 }

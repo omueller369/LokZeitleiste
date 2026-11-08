@@ -39,10 +39,60 @@ function addTowed(data={}){if(towLines.length>=49)return;if(!el('final_station')
 el('addTowed').onclick=()=>{if(!busy&&!sectionParent){addTowed();changed();}};
 
 el('brakeImport').onclick=()=>{if(!busy&&owner&&!sectionParent)el('brakeImportFile').click();};
-el('brakeImportFile').onchange=async()=>{const file=el('brakeImportFile').files?.[0];if(!file||busy||!owner||sectionParent)return;busy=true;ticket++;clearTimeout(timeout);el('brakeFields').disabled=true;el('brakeImport').disabled=true;try{const body=new FormData();body.append('file',file);body.append('mode',mode());pendingImport=await api('/import-wagons',{method:'POST',body});el('brakeImportNotices').textContent=(pendingImport.notices||[]).map(t).join('\n\n');el('brakeImportNotices').hidden=!(pendingImport.notices||[]).length;const values=el('brakeImportValues');values.replaceChildren();const table=node('table');values.append(table);const row=(caption,value)=>{const tr=node('tr'),th=node('th',caption),td=node('td');td.textContent=String(value??'—');td.setAttribute('data-i18n-ignore','');tr.append(th,td);table.append(tr);};for(const column of pendingImport.column_totals||[])row(t(globalThis.CtlText.source("portal_brake_sheet.text_8849bbb7f2b4"))+' '+column.column+' ['+column.unit+']',fmt(column.total===null?null:Number(column.total)));row('15',pendingImport.brake_mode);row('4b / 16b',pendingImport.station_to);row('16a',pendingImport.station_from);row('17a',pendingImport.first_vehicle);row('17b',pendingImport.last_vehicle);for(const [caption,key]of [['19b','count'],['20b','length'],['22b','brake'],['23b','weight']])row(caption,pendingImport.wagon[key]);row(globalThis.CtlText.source("portal_brake_sheet.text_fbe000b7288f"),[pendingImport.wagon_import.sheet,pendingImport.wagon_import.first_row,pendingImport.wagon_import.last_row,pendingImport.wagon_import.total_row??'—'].join(' / '));row(globalThis.CtlText.source("portal_brake_sheet.text_845f97a170a6"),fmt(pendingImport.wagon_import.rows.reduce((sum,row)=>sum+Number(row.length),0)));el('brakeImportDialog').showModal();}catch(error){pendingImport=null;status(error.message,true);}finally{busy=false;el('brakeFields').disabled=!!sectionParent;el('brakeImport').disabled=!!sectionParent;el('brakeImportFile').value='';}};
+function chosenImport(){
+ if(!pendingImport)return null;
+ const choices=pendingImport.choices||[];
+ if(!choices.length)return pendingImport;
+ const choice=choices.find(choice=>choice.policy===el('brakeImportChoice').value);
+ return choice&&!choice.error?{...pendingImport,...choice}:null;
+}
+function renderImportPreview(){
+ const data=chosenImport(),values=el('brakeImportValues');values.replaceChildren();
+ el('brakeImportApply').disabled=!data;
+ if(!data)return;
+ const table=node('table');values.append(table);
+ const row=(caption,value)=>{const tr=node('tr'),th=node('th',caption),td=node('td');td.textContent=String(value??'—');td.setAttribute('data-i18n-ignore','');tr.append(th,td);table.append(tr);};
+ for(const column of data.column_totals||[])row(t(globalThis.CtlText.source("portal_brake_sheet.text_8849bbb7f2b4"))+' '+column.column+' ['+column.unit+']',fmt(column.total===null?null:Number(column.total)));
+ row('15',data.brake_mode);row('4b / 16b',data.station_to);row('16a',data.station_from);row('17a',data.first_vehicle);row('17b',data.last_vehicle);
+ for(const [caption,key]of [['19b','count'],['20b','length'],['22b','brake'],['23b','weight']])row(caption,data.wagon[key]);
+ if(data.breakdown){
+  for(const [key,label]of [
+   ['g',globalThis.CtlText.source("portal_brake_sheet.text_c5b28e90d147")],
+   ['g_counted',globalThis.CtlText.source("portal_brake_sheet.text_b74d1958a2e0")],
+   ['p',globalThis.CtlText.source("portal_brake_sheet.text_1bfa94302ed8")],
+   ['total',globalThis.CtlText.source("portal_brake_sheet.text_7450b3f6c81a")]
+  ])row(label,data.breakdown[key]);
+ }
+ row(globalThis.CtlText.source("portal_brake_sheet.text_fbe000b7288f"),[data.wagon_import.sheet,data.wagon_import.first_row,data.wagon_import.last_row,data.wagon_import.total_row??'—'].join(' / '));
+ row(globalThis.CtlText.source("portal_brake_sheet.text_845f97a170a6"),fmt(data.wagon_import.rows.reduce((sum,row)=>sum+Number(row.length),0)));
+ if(data.rows){
+  const heading=node('h3',globalThis.CtlText.source("portal_brake_sheet.text_d6e32f0a589b")),wagons=node('table');values.append(heading,wagons);
+  const head=node('tr');for(const label of [globalThis.CtlText.source("portal_brake_sheet.text_c28979148ea3"),globalThis.CtlText.source("portal_brake_sheet.text_983d7a2c51e4"),'G [t]','P [t]'])head.append(node('th',label));wagons.append(head);
+  data.rows.forEach((wagon,index)=>{const tr=node('tr');for(const value of [index+1,wagon.number,wagon.position==='G'?wagon.brake:'—',wagon.position==='P'?wagon.brake:'—']){const td=node('td');td.textContent=String(value);td.setAttribute('data-i18n-ignore','');tr.append(td);}wagons.append(tr);});
+ }
+}
+el('brakeImportChoice').onchange=renderImportPreview;
+el('brakeImportFile').onchange=async()=>{
+ const file=el('brakeImportFile').files?.[0];if(!file||busy||!owner||sectionParent)return;
+ busy=true;ticket++;clearTimeout(timeout);el('brakeFields').disabled=true;el('brakeImport').disabled=true;
+ try{
+  const body=new FormData();body.append('file',file);body.append('mode',mode());
+  pendingImport=await api('/import-wagons',{method:'POST',body});
+  el('brakeImportNotices').textContent=(pendingImport.notices||[]).map(t).join('\n\n');el('brakeImportNotices').hidden=!(pendingImport.notices||[]).length;
+  const mixed=!!pendingImport.choices?.length;
+  el('brakeImportChoiceBox').hidden=el('brakeImportChoiceHint').hidden=!mixed;
+  el('brakeImportChoice').disabled=!mixed;el('brakeImportChoice').value='';
+  for(const option of Array.from(el('brakeImportChoice').options||[])){
+   const choice=pendingImport.choices?.find(row=>row.policy===option.value);
+   option.disabled=!!choice?.error;option.title=choice?.error||'';
+  }
+  renderImportPreview();el('brakeImportDialog').showModal();
+ }catch(error){pendingImport=null;status(error.message,true);}
+ finally{busy=false;el('brakeFields').disabled=!!sectionParent;el('brakeImport').disabled=!!sectionParent;el('brakeImportFile').value='';}
+};
 el('brakeImportCancel').onclick=()=>el('brakeImportDialog').close();
 el('brakeImportDialog').addEventListener('close',()=>{pendingImport=null;});
-el('brakeImportApply').onclick=()=>{if(!pendingImport||busy||!owner)return;const data=pendingImport;wagonImport=data.wagon_import;if(towLines.some(l=>l.vehicle.value))el('final_station').value=data.station_to;for(const field of ['station_from','station_to'])el(field).value=data[field];for(const key of ['first_vehicle','last_vehicle']){let offset=0;for(const field of numberGroups[key]){field.value=data[key].slice(offset,offset+field.maxLength);offset+=field.maxLength;}}for(const key of ['count','length','brake','weight'])wagonFields[key].value=data.wagon[key];for(const radio of document.querySelectorAll('input[name="brake_mode"]'))radio.checked=radio.value===data.brake_mode;el('brakeImportDialog').close();changed();status(globalThis.CtlText.source("portal_brake_sheet.text_9add22f99335"));};
+el('brakeImportApply').onclick=()=>{if(busy||!owner)return;const data=chosenImport();if(!data){el('brakeImportChoice').reportValidity();return;}wagonImport=data.wagon_import;if(towLines.some(l=>l.vehicle.value))el('final_station').value=data.station_to;for(const field of ['station_from','station_to'])el(field).value=data[field];for(const key of ['first_vehicle','last_vehicle']){let offset=0;for(const field of numberGroups[key]){field.value=data[key].slice(offset,offset+field.maxLength);offset+=field.maxLength;}}for(const key of ['count','length','brake','weight'])wagonFields[key].value=data.wagon[key];for(const radio of document.querySelectorAll('input[name="brake_mode"]'))radio.checked=radio.value===data.brake_mode;el('brakeImportDialog').close();changed();status(globalThis.CtlText.source("portal_brake_sheet.text_9add22f99335"));};
 
 el('refreshLocos').onclick=async()=>{if(busy)return;busy=true;try{vehicles=await api('/vehicles');for(const l of towLines)l.revision=vehicles.find(v=>v.id===Number(l.vehicle.value))?.revision||l.revision;for(const l of lines){l.snapshot=null;l.revision=vehicles.find(v=>v.id===Number(l.vehicle.value))?.revision;updateLine(l);}status('');}catch(e){status(e.message,true);}finally{busy=false;changed();}};
 el('addTrainNumber').onclick=()=>{trainNumber();changed();};el('addLoco').onclick=()=>{addLoco();changed();};el('brakeForm').onsubmit=e=>e.preventDefault();el('brakeForm').addEventListener('input',changed);el('brakeForm').addEventListener('change',changed);

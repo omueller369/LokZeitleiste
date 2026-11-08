@@ -53,7 +53,31 @@ def all_text_workbook(count=8,offset=0,total=True):
         for column,value in values.items():sheet.cell(10+offset+count,column,float(Decimal(value.replace(',','.'))*2))
     out=BytesIO();book.save(out);book.close();return out.getvalue()
 
+def mixed_workbook(count=8,length='15.01',zeros=False):
+    book=load_workbook(BytesIO(workbook(count,length=length)))
+    sheet=book.active
+    for index in range(count):
+        sheet.cell(10+index,8 if index<5 else 9).value=0 if zeros else None
+    sheet.cell(10+count,8).value=70*max(0,count-5)
+    sheet.cell(10+count,9).value=59*min(count,5)
+    out=BytesIO();book.save(out);book.close();return out.getvalue()
+
 class WagonImportTest(unittest.TestCase):
+    def test_mixed_import_choices_have_independent_exact_arithmetic(self):
+        for zeros in (False,True):
+            source=parse(mixed_workbook(10,length='51.001',zeros=zeros))['wagon_import']
+            self.assertEqual(source.detected_mode(),'G+P')
+            for policy,mode,expected in [('all_g','G',645),('mixed','G+P',572),('unchanged','G+P',645)]:
+                chosen=source.model_copy(update={'brake_policy':policy})
+                self.assertEqual(chosen.values(mode)['brake'],expected)
+                if policy=='mixed':
+                    self.assertEqual(chosen.brake_components(mode),
+                        dict(g=Decimal(295),g_counted=Decimal('221.25'),p=Decimal(350),p_counted=Decimal(350),total=Decimal('571.25')))
+                restored=type(chosen).model_validate_json(chosen.model_dump_json())
+                self.assertEqual(restored.values(mode),chosen.values(mode))
+            self.assertEqual(source.brake_policy,'standard')
+            self.assertEqual(source.values('G+P')['brake'],554)
+
     def test_numeric_text_formats(self):
         for text in ['2640,08','2640.08','2.640,08','2,640.08','2\u202f640,08']:
             self.assertEqual(number(text),Decimal('2640.08'))
@@ -131,6 +155,26 @@ class WagonImportApiTest(unittest.TestCase):
         draft=self.driver.put(self.base+'/'+str(uuid4()),json={'expected_revision':0,'sheet':data});self.assertEqual(draft.status_code,200,draft.text)
         saved=self.driver.get(self.base+'/'+draft.json()['id']).json();self.assertEqual(saved['sheet']['wagon_import']['sheet'],'Dynamic');self.assertEqual(saved['calculation']['b']['brake'],560)
         response=self.client.post(self.base+'/import-wagons',files={'file':('wagons.xlsx',workbook())});self.assertEqual(response.status_code,403)
+    def test_mixed_choices_are_explicit_and_survive_save_reload(self):
+        from uuid import uuid4
+        response=self.driver.post(self.base+'/import-wagons',files={'file':('mixed.xlsx',mixed_workbook())},data={'mode':'G'})
+        self.assertEqual(response.status_code,200,response.text)
+        choices={choice['policy']:choice for choice in response.json()['choices']}
+        self.assertEqual(set(choices),{'all_g','mixed','unchanged'})
+        for policy,total in [('all_g',505),('mixed',432),('unchanged',505)]:
+            choice=choices[policy]
+            data=self.sheet(wagon_import=choice['wagon_import'],wagon=choice['wagon'],brake_mode=choice['brake_mode'])
+            saved=self.driver.put(self.base+'/'+str(uuid4()),json={'expected_revision':0,'sheet':data})
+            self.assertEqual(saved.status_code,200,saved.text)
+            reread=self.driver.get(self.base+'/'+saved.json()['id']).json()
+            self.assertEqual(reread['sheet']['wagon_import']['brake_policy'],policy)
+            self.assertEqual(reread['calculation']['b']['brake'],total)
+        g=choices['all_g']
+        self.assertTrue(all(row['position']=='G' for row in g['rows']))
+        self.assertEqual([row['brake'] for row in g['rows']][-3:],[70,70,70])
+        self.assertEqual({row['column']:row['total'] for row in g['column_totals']}['I'],505)
+        self.assertEqual({row['column']:row['total'] for row in g['column_totals']}['H'],0)
+
     def test_mode_proposal_and_summary_warnings_do_not_save(self):
         response=self.driver.post(self.base+'/import-wagons',files={'file':('wagons.xlsx',p_text_workbook())},data={'mode':'G'})
         self.assertEqual(response.status_code,200,response.text);data=response.json()

@@ -139,5 +139,17 @@
   "text_c751dda21c5e": "Edytuj źródłową kartę próby hamulca",
   "text_a092f73716ce": "Automatyczna uwaga do pola 9",
   "text_61dff2d93907": "Najpierw zaimportuj listę wagonów. Holowane pojazdy są dodatkowo liczone jak wagony. Podaj unikalne pozycje w całym składzie. Ta sama stacja odczepienia musi mieć ten sam numer kolejności. Zmiany wprowadzaj w źródłowej karcie; zapis ponownie tworzy wersje odcinkowe.",
-  "text_8849bbb7f2b4": "Ponownie obliczona suma kolumny"
+  "text_8849bbb7f2b4": "Ponownie obliczona suma kolumny",
+  "text_05a8b3df94c2": "Zachowaj wartości bez zmian – bez potrącenia",
+  "text_1bfa94302ed8": "Suma P [t]",
+  "text_4367ed02a8c5": "G+P – suma G minus 25%, następnie plus P",
+  "text_59c1287f0b41": "Import listy wagonów G+P",
+  "text_6e7c13b082a4": "Wybierz sposób importu",
+  "text_7450b3f6c81a": "Łączna masa hamująca przed zaokrągleniem w górę [t]",
+  "text_983d7a2c51e4": "Numer wagonu",
+  "text_984f0abcf321": "Wszystkie wagony w G (brakujące G skopiuj z P)",
+  "text_b74d1958a2e0": "Zaliczona suma G [t]",
+  "text_c5b28e90d147": "Suma G przed potrąceniem [t]",
+  "text_d6e32f0a589b": "Wartości wagonów według wybranego importu",
+  "text_d82ab314590c": "Wybierz obliczenie przed zatwierdzeniem. „Wszystkie wagony w G” kopiuje brakującą wartość G bez zmian z P. „G+P” zmniejsza tylko sumę G o 25%. „Bez zmian” używa istniejących wartości bez dodatkowego potrącenia. Sprawdź wartości i nastawienie hamulca przed zatwierdzeniem."
 }

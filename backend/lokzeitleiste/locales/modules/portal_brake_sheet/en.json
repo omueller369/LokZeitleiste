@@ -139,5 +139,17 @@
   "text_c751dda21c5e": "Edit original brake sheet",
   "text_a092f73716ce": "Automatic note for field 9",
   "text_61dff2d93907": "Import the wagon list first. Towed locomotives are counted as additional wagons. Assign unique positions in the entire wagon train. The same drop-off station must use the same order number. Make changes in the original brake sheet; saving regenerates section versions.",
-  "text_8849bbb7f2b4": "Recalculated column total"
+  "text_8849bbb7f2b4": "Recalculated column total",
+  "text_05a8b3df94c2": "Keep values unchanged – no deduction",
+  "text_1bfa94302ed8": "P total [t]",
+  "text_4367ed02a8c5": "G+P – G total minus 25%, then plus P",
+  "text_59c1287f0b41": "Import of a G+P wagon list",
+  "text_6e7c13b082a4": "Choose how to import the list",
+  "text_7450b3f6c81a": "Total brake weight before rounding up [t]",
+  "text_983d7a2c51e4": "Wagon number",
+  "text_984f0abcf321": "All wagons in G (copy missing G from P)",
+  "text_b74d1958a2e0": "Counted G total [t]",
+  "text_c5b28e90d147": "G total before deduction [t]",
+  "text_d6e32f0a589b": "Wagon values for the selected import",
+  "text_d82ab314590c": "Choose the calculation before applying. “All wagons in G” copies a missing G value unchanged from P. “G+P” reduces only the G total by 25%. “Unchanged” uses the existing individual values without another deduction. Check the values and brake position before applying."
 }

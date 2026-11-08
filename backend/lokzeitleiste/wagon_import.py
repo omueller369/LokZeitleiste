@@ -1,6 +1,7 @@
 """Bounded read-only XLSX wagon import; no workbook formulas are executed."""
 import re
 import unicodedata
+from typing import Literal
 from decimal import Decimal, ROUND_CEILING, InvalidOperation
 from io import BytesIO
 from zipfile import ZipFile
@@ -22,6 +23,7 @@ class WagonRow(BaseModel):
     p: Decimal | None = Field(default=None, ge=0, le=1000, decimal_places=3, allow_inf_nan=False)
 
 class WagonImport(BaseModel):
+    brake_policy: Literal['standard','all_g','mixed','unchanged'] = 'standard'
     rows: list[WagonRow] = Field(min_length=1, max_length=50)
     length_total: Decimal | None = Field(default=None, gt=0, le=720, decimal_places=3, allow_inf_nan=False)
     weight_total: Decimal | None = Field(default=None, gt=0, le=5000, decimal_places=3, allow_inf_nan=False)
@@ -40,8 +42,8 @@ class WagonImport(BaseModel):
     total_row: int | None = Field(default=None, ge=1, le=2000)
 
     def detected_mode(self):
-        g_only=lambda row:row.g is not None and row.p is None
-        p_only=lambda row:row.p is not None and row.g is None
+        g_only=lambda row:row.g is not None and row.p in (None,0) and (row.g>0 or row.p is None)
+        p_only=lambda row:row.p is not None and row.g in (None,0) and (row.p>0 or row.g is None)
         if all(g_only(row) for row in self.rows):return 'G'
         if all(p_only(row) for row in self.rows):return 'P'
         if len(self.rows)>5 and all(g_only(row) for row in self.rows[:5]) and all(p_only(row) for row in self.rows[5:]):return 'G+P'
@@ -55,31 +57,55 @@ class WagonImport(BaseModel):
                 differences.append(dict(column=field.upper() if field in ('g','p') else self.columns.get(field,field),unit='m' if field=='length' else 't',reported=reported,computed=computed))
         return differences
 
-    def column_totals(self):
-        return [dict(column=self.columns[field],unit='m' if field=='length' else 't',total=getattr(self,field+'_total'))
+    def active_policy(self, mode):
+        expected='G' if self.brake_policy=='all_g' else 'G+P'
+        return self.brake_policy if mode==expected else 'standard'
+
+    def row_brake(self, row, position, mode):
+        policy=self.active_policy(mode)
+        if policy=='all_g':
+            value=row.g if row.g is not None and (row.g!=0 or row.p is None) else row.p
+            position_mode='G'
+        elif policy=='unchanged':
+            if row.g is not None and row.p in (None,0):position_mode,value='G',row.g
+            elif row.p is not None and row.g in (None,0):position_mode,value='P',row.p
+            else:raise ImportError('format')
+        else:
+            position_mode=('G' if position<5 else 'P') if mode=='G+P' else mode
+            value=getattr(row,position_mode.lower())
+        if value is None:raise ImportError('missing_brake')
+        return position_mode,value
+
+    def brake_components(self, mode):
+        if mode not in ('G','P','G+P'):raise ImportError('mode')
+        g=p=Decimal(0)
+        for index,row in enumerate(self.rows):
+            position,value=self.row_brake(row,index,mode)
+            if position=='G':g+=value
+            else:p+=value
+        policy=self.active_policy(mode)
+        g_counted=g*Decimal('.75') if mode=='G+P' and policy!='unchanged' else g
+        long_train=sum((row.length for row in self.rows),Decimal(0))>500
+        p_counted=p*Decimal('.95') if mode=='G+P' and policy=='standard' and long_train else p
+        return dict(g=g,g_counted=g_counted,p=p,p_counted=p_counted,total=g_counted+p_counted)
+
+    def column_totals(self, mode=None):
+        totals={field:getattr(self,field+'_total') for field in ('length','cargo','weight','p','g')}
+        if mode and self.active_policy(mode)=='all_g':
+            totals.update(g=self.brake_components(mode)['g'],p=Decimal(0))
+        return [dict(column=self.columns[field],unit='m' if field=='length' else 't',total=totals[field])
                 for field in ('length','cargo','weight','p','g') if field in self.columns]
 
     def values(self, mode):
-        if mode not in ('G', 'P', 'G+P'):
-            raise ImportError('mode')
-        raw_length = sum((row.length for row in self.rows), Decimal(0))
-        if mode == 'G+P':
-            g_rows, p_rows = self.rows[:5], self.rows[5:]
-            if any(row.g is None for row in g_rows) or any(row.p is None for row in p_rows):
-                raise ImportError('missing_brake')
-            g = sum((row.g for row in g_rows), Decimal(0))
-            p = sum((row.p for row in p_rows), Decimal(0))
-            brake = g * Decimal('.75') + p * (Decimal('.95') if raw_length > 500 else Decimal(1))
-        else:
-            field = mode.lower()
-            if any(getattr(row, field) is None for row in self.rows):
-                raise ImportError('missing_brake')
-            measured_brake = sum((getattr(row, field) for row in self.rows), Decimal(0))
-            brake = getattr(self, field + '_total')
-            if brake is None:
-                brake = measured_brake
-            elif brake.to_integral_value(rounding=ROUND_CEILING) != measured_brake.to_integral_value(rounding=ROUND_CEILING):
-                raise ImportError('format')
+        components=self.brake_components(mode)
+        raw_length=sum((row.length for row in self.rows),Decimal(0))
+        brake=components['total']
+        if mode in ('G','P') and self.active_policy(mode)=='standard':
+            supplied=getattr(self,mode.lower()+'_total')
+            if supplied is not None:
+                if supplied.to_integral_value(rounding=ROUND_CEILING)!=brake.to_integral_value(rounding=ROUND_CEILING):
+                    raise ImportError('format')
+                brake=supplied
         ceil = lambda v: int(v.to_integral_value(rounding=ROUND_CEILING))
         for supplied, measured in [(self.length_total, raw_length), (self.weight_total, sum((r.weight for r in self.rows), Decimal(0)))]:
             if supplied is not None and ceil(supplied) != ceil(measured): raise ImportError('format')
