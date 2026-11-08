@@ -86,7 +86,7 @@ class WagonImport(BaseModel):
         policy=self.active_policy(mode)
         g_counted=g*Decimal('.75') if mode=='G+P' and policy!='unchanged' else g
         long_train=sum((row.length for row in self.rows),Decimal(0))>500
-        p_counted=p*Decimal('.95') if mode=='G+P' and policy=='standard' and long_train else p
+        p_counted=p*Decimal('.95') if mode=='G+P' and policy!='unchanged' and long_train else p
         return dict(g=g,g_counted=g_counted,p=p,p_counted=p_counted,total=g_counted+p_counted)
 
     def column_totals(self, mode=None):

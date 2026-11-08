@@ -67,16 +67,23 @@ class WagonImportTest(unittest.TestCase):
         for zeros in (False,True):
             source=parse(mixed_workbook(10,length='51.001',zeros=zeros))['wagon_import']
             self.assertEqual(source.detected_mode(),'G+P')
-            for policy,mode,expected in [('all_g','G',645),('mixed','G+P',572),('unchanged','G+P',645)]:
+            for policy,mode,expected in [('all_g','G',645),('mixed','G+P',554),('unchanged','G+P',645)]:
                 chosen=source.model_copy(update={'brake_policy':policy})
                 self.assertEqual(chosen.values(mode)['brake'],expected)
                 if policy=='mixed':
                     self.assertEqual(chosen.brake_components(mode),
-                        dict(g=Decimal(295),g_counted=Decimal('221.25'),p=Decimal(350),p_counted=Decimal(350),total=Decimal('571.25')))
+                        dict(g=Decimal(295),g_counted=Decimal('221.25'),p=Decimal(350),p_counted=Decimal('332.50'),total=Decimal('553.75')))
                 restored=type(chosen).model_validate_json(chosen.model_dump_json())
                 self.assertEqual(restored.values(mode),chosen.values(mode))
             self.assertEqual(source.brake_policy,'standard')
             self.assertEqual(source.values('G+P')['brake'],554)
+
+    def test_selected_mixed_policy_uses_unrounded_500m_threshold(self):
+        for length,p_total in [('50',Decimal(350)),('50.001',Decimal('332.50'))]:
+            source=parse(mixed_workbook(10,length=length))['wagon_import'].model_copy(update={'brake_policy':'mixed'})
+            breakdown=source.brake_components('G+P')
+            self.assertEqual(breakdown['p_counted'],p_total)
+            self.assertEqual(breakdown['total'],Decimal('221.25')+p_total)
 
     def test_numeric_text_formats(self):
         for text in ['2640,08','2640.08','2.640,08','2,640.08','2\u202f640,08']:

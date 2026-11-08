@@ -39,7 +39,7 @@ CHECKS=r'''
  imported={...imported,brake_mode:'G+P',wagon_import:{...imported.wagon_import,rows:imported.wagon_import.rows.map((row,i)=>({...row,g:i<5?'59':null,p:i<5?null:'70'}))}};
  imported.choices=[['all_g','G',505,505,505],['mixed','G+P',432,295,221.25],['unchanged','G+P',505,295,295]].map(([policy,brake_mode,brake,g,g_counted])=>({
   policy,brake_mode,wagon:{...imported.wagon,brake},wagon_import:{...imported.wagon_import,brake_policy:policy},
-  column_totals:imported.column_totals,breakdown:{g,g_counted,p:policy==='all_g'?0:210,total:policy==='mixed'?431.25:505},
+  column_totals:imported.column_totals,breakdown:{g,g_counted,p:policy==='all_g'?0:210,p_counted:policy==='all_g'?0:210,total:policy==='mixed'?431.25:505},
   rows:imported.wagon_import.rows.map((row,i)=>({number:row.number,position:policy==='all_g'||i<5?'G':'P',brake:i<5?59:70}))
  }));
  await pick();

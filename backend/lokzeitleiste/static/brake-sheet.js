@@ -60,6 +60,7 @@ function renderImportPreview(){
    ['g',globalThis.CtlText.source("portal_brake_sheet.text_c5b28e90d147")],
    ['g_counted',globalThis.CtlText.source("portal_brake_sheet.text_b74d1958a2e0")],
    ['p',globalThis.CtlText.source("portal_brake_sheet.text_1bfa94302ed8")],
+   ['p_counted',globalThis.CtlText.source("portal_brake_sheet.text_c6a2b81d093e")],
    ['total',globalThis.CtlText.source("portal_brake_sheet.text_7450b3f6c81a")]
   ])row(label,data.breakdown[key]);
  }

@@ -142,7 +142,7 @@
   "text_8849bbb7f2b4": "Neu berechnete Spaltensumme",
   "text_05a8b3df94c2": "Werte unverändert übernehmen – ohne Abzug",
   "text_1bfa94302ed8": "P-Summe [t]",
-  "text_4367ed02a8c5": "G+P – G-Summe minus 25 %, danach plus P",
+  "text_4367ed02a8c5": "G+P – G minus 25 %, über 500 m P minus 5 %",
   "text_59c1287f0b41": "Übernahme der G+P-Wagenliste",
   "text_6e7c13b082a4": "Bitte eine Übernahmeform wählen",
   "text_7450b3f6c81a": "Gesamtbremsgewicht vor Aufrundung [t]",
@@ -151,5 +151,6 @@
   "text_b74d1958a2e0": "Angerechnete G-Summe [t]",
   "text_c5b28e90d147": "G-Summe vor Abzug [t]",
   "text_d6e32f0a589b": "Wagenwerte nach gewählter Übernahme",
-  "text_d82ab314590c": "Wähle die Berechnung vor der Übernahme. Bei „Alle Wagen in G“ wird ein fehlender G-Wert unverändert aus P kopiert. Bei „G+P“ wird nur die G-Summe um 25 % reduziert. „Unverändert“ übernimmt die vorhandenen Einzelwerte ohne weiteren Abzug. Prüfe die Werte und die Bremsstellung vor der Übernahme."
+  "text_d82ab314590c": "Wähle die Berechnung vor der Übernahme. Bei „Alle Wagen in G“ wird ein fehlender G-Wert unverändert aus P kopiert. Bei „G+P“ wird die G-Summe um 25 % reduziert. Bei mehr als 500 m ungerundeter Wagenzuglänge wird zusätzlich die P-Summe um 5 % reduziert. „Unverändert“ übernimmt die vorhandenen Einzelwerte ohne weiteren Abzug. Prüfe die Werte und die Bremsstellung vor der Übernahme.",
+  "text_c6a2b81d093e": "Angerechnete P-Summe [t]"
 }

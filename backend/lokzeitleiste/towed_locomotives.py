@@ -85,7 +85,7 @@ def compose(db,data,public_vehicle):
         else:mode,brake=imported.row_brake(entry['wagon'],index,data.brake_mode)
         if brake is None:raise TowError('brakes')
         policy=imported.active_policy(data.brake_mode)
-        factor=Decimal('.75') if data.brake_mode=='G+P' and mode=='G' and policy!='unchanged' else Decimal('.95') if data.brake_mode=='G+P' and mode=='P' and raw_length>500 and policy=='standard' else Decimal(1)
+        factor=Decimal('.75') if data.brake_mode=='G+P' and mode=='G' and policy!='unchanged' else Decimal('.95') if data.brake_mode=='G+P' and mode=='P' and raw_length>500 and policy!='unchanged' else Decimal(1)
         total+=brake*factor
         if tow:tows.append(dict(vehicle_id=tow.vehicle_id,number=entry['number'],position=index+1,brake_position=mode,brake_weight=brake*factor,destination=tow.destination))
     ceil=lambda v:int(v.to_integral_value(rounding=ROUND_CEILING))
