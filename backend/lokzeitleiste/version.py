@@ -1,6 +1,6 @@
 """Shared backend/software version used in the API and document imprint."""
 SOFTWARE_TITLE='LokZeitleiste'
-SOFTWARE_VERSION='0.26.28'
+SOFTWARE_VERSION='0.26.29'
 
 # Owner configured centrally for both application footers.
 COPYRIGHT_HOLDER='Rail Software'
