@@ -24,7 +24,7 @@ def fixture():
     page = page.replace('</head>', '<style>' + css + '</style></head>')
     source = (STATIC / 'work-report.js').read_text().split('// Keep collapse buttons')[0]
     source = re.sub(r'\}\)\(\);\s*$', '''window.LayoutReport={fill(editor,day){
-        setupReportToggles();trainEditor=editor;user={id:1};key='layout-test';trips=[];
+        setupReportToggles();limitReportLists(el('workReport'));trainEditor=editor;user={id:1};key='layout-test';trips=[];
         state={kind:'Sonstige Erfassung',client_id:'layout',legacy_pause:30,ausbleibe:[]};
         el('dutyStart').value=day+'T08:00';el('dutyEnd').value=day+'T16:00';totals();
     }};})();''', source)
@@ -84,6 +84,17 @@ def fixture():
  assert((await gps.o.selectedEndpoint('start')).code==='BBB'&&(await gps.o.selectedEndpoint('end')).code==='CCC','Existing journey stations reused');
  gps.o.journeyTime('start',window.GpsRecorder.berlinTime(day+'T08:12'));gps.o.journeyTime('end',window.GpsRecorder.berlinTime(day+'T15:42'));
  assert(item.fields.start_at.value===day+'T08:12'&&item.fields.end_at.value===day+'T15:42','GPS times populate the journey without seconds');
+ const scroll=document.createElement('div');scroll.className='excel-scroll';
+ scroll.innerHTML='<table class="excel"><thead><tr><th>Test</th></tr></thead><tbody>'+Array.from({length:6},(_,i)=>'<tr><td style="height:'+String(24+i*4)+'px">'+(i+1)+'</td></tr>').join('')+'</tbody></table>';
+ document.getElementById('workReport').append(scroll);
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ const listRows=scroll.querySelector('tbody').rows;
+ const viewportBottom=scroll.getBoundingClientRect().top+scroll.clientTop+scroll.clientHeight;
+ assert(Math.abs(viewportBottom-listRows[3].getBoundingClientRect().bottom)<=2,'Exactly four list rows fit with the header');
+ assert(scroll.scrollHeight>scroll.clientHeight,'Additional rows can scroll');
+ scroll.scrollTop=scroll.scrollHeight;
+ assert(listRows[5].getBoundingClientRect().bottom<=viewportBottom+2,'Last row reachable');
+ scroll.remove();
  window.parent.postMessage({layoutStatus:'pass',width:innerWidth},'*');
 })().catch(error=>window.parent.postMessage({layoutStatus:'fail',message:error.stack},'*'));
 '''

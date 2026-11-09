@@ -107,5 +107,9 @@
   "text_f834e3bb911e": "© autorzy OpenStreetMap",
   "text_f90390ecedc2": "GPS zapisano. Można przenieść postoje do jazdy.",
   "text_fae9dd10ec93": "Sterowanie mapą",
-  "text_fe08e27c0231": "Najpierw zakończ rejestrację GPS."
+  "text_fe08e27c0231": "Najpierw zakończ rejestrację GPS.",
+  "text_c99fb71e54ab": "Scal",
+  "text_9da13de7c459": "Scal postoje",
+  "text_3c33cfa89c44": "Wybierz postój do scalenia",
+  "text_d8a2f19e4b61": "Scalić wybrane postoje? Miejsce i przyczyna zostaną zachowane z pierwszego wiersza. Ostatni wiersz określa godzinę końcową. Scalone zostaną tylko zaznaczone wiersze."
 }

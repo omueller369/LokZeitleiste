@@ -107,5 +107,9 @@
   "text_f834e3bb911e": "© OpenStreetMap contributors",
   "text_f90390ecedc2": "GPS saved. Stops can now be copied to the journey.",
   "text_fae9dd10ec93": "Map controls",
-  "text_fe08e27c0231": "Please end GPS recording first."
+  "text_fe08e27c0231": "Please end GPS recording first.",
+  "text_c99fb71e54ab": "Merge",
+  "text_9da13de7c459": "Merge stops",
+  "text_3c33cfa89c44": "Select stop to merge",
+  "text_d8a2f19e4b61": "Merge the selected stops? The first row supplies the location and reason. The last row supplies the end time. Only selected rows are merged."
 }

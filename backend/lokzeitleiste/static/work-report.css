@@ -131,3 +131,30 @@
 .gps-trail-scale span{position:absolute;top:5px;transform:translateX(-50%)}
 .gps-trail-scale span:first-child{transform:none}
 .gps-trail-scale span:last-child{transform:translateX(-100%)}
+
+/* Compact work report and scrollable data lists. */
+#workReport { font-size: 14px; }
+#workReport h1 { font-size: 1.4em; }
+#workReport h2 { font-size: 1.25em; }
+#workReport h3 { font-size: 1.12em; }
+#workReport h4 { font-size: 1em; }
+#workReport button,
+#workReport .excel { font-size: 0.93em; }
+#workReport .excel-scroll,
+#workReport #receiptRows { overflow: auto; }
+#workReport .excel-scroll thead { position: sticky; top: 0; z-index: 1; }
+#workReport .gps-stop-table { font-size: 12px; }
+#workReport .gps-stop-table th,
+#workReport .gps-stop-table td { padding: 4px 6px; }
+#workReport .gps-stop-table input { padding: 5px 6px; }
+#workReport .gps-stop-table input[type="checkbox"] {
+    min-width: 18px;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    vertical-align: middle;
+}
+#workReport .gps-stop-table input[type="time"] { min-width: 88px; }
+#workReport .gps-stop-table :is(th, td):first-child { text-align: center; }
+#workReport .gps-stop-action { width: 36px; min-width: 36px; height: 36px; padding: 6px; }
+#workReport .gps-stop-action svg { width: 20px; height: 20px; border: 0; background: transparent; }

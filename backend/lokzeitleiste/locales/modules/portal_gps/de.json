@@ -107,5 +107,9 @@
   "text_f834e3bb911e": "© OpenStreetMap-Mitwirkende",
   "text_f90390ecedc2": "GPS gespeichert. Standzeiten können jetzt in die Zugfahrt übernommen werden.",
   "text_fae9dd10ec93": "Kartensteuerung",
-  "text_fe08e27c0231": "Bitte zuerst die GPS-Aufzeichnung beenden."
+  "text_fe08e27c0231": "Bitte zuerst die GPS-Aufzeichnung beenden.",
+  "text_c99fb71e54ab": "Zs",
+  "text_9da13de7c459": "Standzeiten zusammenführen",
+  "text_3c33cfa89c44": "Standzeit zum Zusammenführen auswählen",
+  "text_d8a2f19e4b61": "Ausgewählte Standzeiten zusammenführen? Ort und Grund bleiben aus der ersten Zeile erhalten. Die letzte Zeile bestimmt die Bis-Zeit. Nur die ausgewählten Zeilen werden zusammengefasst."
 }

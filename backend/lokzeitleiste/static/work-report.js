@@ -174,7 +174,41 @@ function stations(input,list){
  });
  popular();
 }
-window.startWorkReport=async profile=>{await window.loadTrainJourneyChoices?.();reportFields(false);guestLabels();user=profile;key='lokzeitleiste.work-report.'+user.id;el('reportPeriod').value=today().slice(0,7);try{pending=JSON.parse(localStorage.getItem(key+'.pending')||'[]');state=JSON.parse(localStorage.getItem(key)||'null');}catch(error){state=null;}if(!state)state={pause_policy:2,legacy_pause:0,in_hotel:false,kind:globalThis.CtlText.source("portal_work_report.text_f31b8681bfca"),client_id:uuid(),saved_id:null,values:{dutyStart:today()+'T08:00',dutyEnd:today()+'T16:00',hotelLocation:'',hotelName:'',overrunReason:''}};state.legacy_pause??=Number(state.values?.actualPause||0);state.pause_policy??=1;el('inHotel').checked=!!state.in_hotel;reportViewOnly=!!state.saved_id;trips=state.trips||[];for(const id of fields)el(id).value=state.values?.[id]||'';trainEditor=new window.TrainJourneyEditor({userId:user.id,container:el('trainJourneyEditor'),button:el('newTrainJourney'),uuid,minute,clock,stations,resolve:resolveStation,message,bounds:()=>({start:el('dutyStart').value,end:el('dutyEnd').value}),editingChanged:()=>storeDraft(),viewOnly:()=>reportViewOnly,readonly:()=>busy||reportViewOnly||absence()||!!state.locked||!!state.train_readonly,block:value=>{busy=value;freeze();el('newReport').disabled=value;el('syncReport').disabled=value;el('dutyFields').disabled=value||!!state.saved_id;},changed:data=>{const changed=JSON.stringify(data)!==JSON.stringify(state.train_journeys||[]);state.train_journeys=data;if(state.saved_id&&changed)state.train_dirty=true;storeDraft();totals();}});const restoredTrainEditors=state.train_editors,restoredGuest=state.guest_editor;trainEditor.restore(state.train_journeys||[]);trainEditor.restoreEditing(restoredTrainEditors);state.train_journeys=trainEditor.draft();freeze();resetGuest();if(restoredGuest){edit=restoredGuest.edit??-1;for(const [id,value]of Object.entries(restoredGuest.values||{}))if(el(id))el(id).value=value;guestVisibility();}totals();await readFiles();reportFields(!state.saved_id);
+function limitReportLists(root) {
+ if (!root || typeof ResizeObserver === 'undefined' || typeof MutationObserver === 'undefined') return;
+ let frame = null;
+ let observed = new Set();
+ const schedule = () => {
+  if (frame !== null) return;
+  frame = requestAnimationFrame(() => {
+   frame = null;
+   const next = new Set([root]);
+   for (const list of root.querySelectorAll('.excel-scroll, #receiptRows')) {
+    const table = list.querySelector('table');
+    const rows = table ? [...table.tBodies].flatMap(body => [...body.rows]) : [...list.children];
+    const visibleRows = rows.filter(row => row.getClientRects().length);
+    if (table) next.add(table);
+    else visibleRows.slice(0, 4).forEach(row => next.add(row));
+    if (visibleRows.length <= 4) {
+     if (list.style.maxHeight) list.style.maxHeight = '';
+     continue;
+    }
+    const fourth = visibleRows[3].getBoundingClientRect();
+    const horizontalBarAndBorders = list.offsetHeight - list.clientHeight;
+    const height = Math.ceil(fourth.bottom - list.getBoundingClientRect().top - list.clientTop
+        + list.scrollTop + horizontalBarAndBorders) + 'px';
+    if (list.style.maxHeight !== height) list.style.maxHeight = height;
+   }
+   for (const node of observed) if (!next.has(node)) resize.unobserve(node);
+   for (const node of next) if (!observed.has(node)) resize.observe(node);
+   observed = next;
+  });
+ };
+ const resize = new ResizeObserver(schedule);
+ new MutationObserver(schedule).observe(root, {childList:true, subtree:true, attributes:true, attributeFilter:['hidden']});
+ schedule();
+}
+window.startWorkReport=async profile=>{limitReportLists(el('workReport'));await window.loadTrainJourneyChoices?.();reportFields(false);guestLabels();user=profile;key='lokzeitleiste.work-report.'+user.id;el('reportPeriod').value=today().slice(0,7);try{pending=JSON.parse(localStorage.getItem(key+'.pending')||'[]');state=JSON.parse(localStorage.getItem(key)||'null');}catch(error){state=null;}if(!state)state={pause_policy:2,legacy_pause:0,in_hotel:false,kind:globalThis.CtlText.source("portal_work_report.text_f31b8681bfca"),client_id:uuid(),saved_id:null,values:{dutyStart:today()+'T08:00',dutyEnd:today()+'T16:00',hotelLocation:'',hotelName:'',overrunReason:''}};state.legacy_pause??=Number(state.values?.actualPause||0);state.pause_policy??=1;el('inHotel').checked=!!state.in_hotel;reportViewOnly=!!state.saved_id;trips=state.trips||[];for(const id of fields)el(id).value=state.values?.[id]||'';trainEditor=new window.TrainJourneyEditor({userId:user.id,container:el('trainJourneyEditor'),button:el('newTrainJourney'),uuid,minute,clock,stations,resolve:resolveStation,message,bounds:()=>({start:el('dutyStart').value,end:el('dutyEnd').value}),editingChanged:()=>storeDraft(),viewOnly:()=>reportViewOnly,readonly:()=>busy||reportViewOnly||absence()||!!state.locked||!!state.train_readonly,block:value=>{busy=value;freeze();el('newReport').disabled=value;el('syncReport').disabled=value;el('dutyFields').disabled=value||!!state.saved_id;},changed:data=>{const changed=JSON.stringify(data)!==JSON.stringify(state.train_journeys||[]);state.train_journeys=data;if(state.saved_id&&changed)state.train_dirty=true;storeDraft();totals();}});const restoredTrainEditors=state.train_editors,restoredGuest=state.guest_editor;trainEditor.restore(state.train_journeys||[]);trainEditor.restoreEditing(restoredTrainEditors);state.train_journeys=trainEditor.draft();freeze();resetGuest();if(restoredGuest){edit=restoredGuest.edit??-1;for(const [id,value]of Object.entries(restoredGuest.values||{}))if(el(id))el(id).value=value;guestVisibility();}totals();await readFiles();reportFields(!state.saved_id);
 el('dutyStart').dataset.previous=el('dutyStart').value;
 el('dutyStart').addEventListener('input',()=>{const previous=el('dutyStart').dataset.previous,start=el('dutyStart').value;if(!keepDefaultDutyDate(previous,start)&&(minute(el('dutyEnd').value)<=minute(start)||el('dutyEnd').value===afterHour(previous)))el('dutyEnd').value=afterHour(start);refreshGuestDefaults();el('dutyStart').dataset.previous=start;trainEditor.dutyChanged();});
 el('guestStart').addEventListener('input',()=>{const start=el('guestStart').value,previous=el('guestStart').dataset.previous;if(!el('guestEnd').value||minute(el('guestEnd').value)<=minute(start)||el('guestEnd').value===afterHour(previous))el('guestEnd').value=afterHour(start);el('guestStart').dataset.previous=start;el('guestEnd').min=start;});

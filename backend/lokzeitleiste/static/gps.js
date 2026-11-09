@@ -107,8 +107,30 @@ function lastMovement(points){
 }
 const gpsNotice=message=>/HTTPS|localhost|Standortfreigabe|Standortberechtigung|Standort.*(nicht erlaubt|verweigert|abgelehnt|fehlt)|geolocation|GPS.*(Signal|fehlt|abgelehnt|ausfall|ungenau|einschalten|gestartet|Fix|Dienst|aussetzen|Position)/i.test(message);
 
+function stopAction(label, path) {
+ const button = node('button');
+ button.type = 'button';
+ button.className = 'report-icon-button gps-stop-action';
+ button.title = t(label);
+ button.setAttribute('aria-label', t(label));
+ const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ svg.setAttribute('viewBox', '0 0 24 24');
+ svg.setAttribute('aria-hidden', 'true');
+ svg.setAttribute('focusable', 'false');
+ const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+ line.setAttribute('d', path);
+ line.setAttribute('fill', 'none');
+ line.setAttribute('stroke', 'currentColor');
+ line.setAttribute('stroke-width', '2');
+ line.setAttribute('stroke-linecap', 'round');
+ line.setAttribute('stroke-linejoin', 'round');
+ svg.append(line);
+ button.append(svg);
+ return button;
+}
+
 class Recorder{
- constructor(o){this.o=o;this.key=o.userId+'.'+o.journeyId;this.path='/api/v1/tf/gps/'+o.journeyId;this.record=null;this.analysis=null;this.pending=false;this.loading=false;this.stationInputs=[];this.box=node('section');this.box.className='gps-box';this.heading=node('h3',globalThis.CtlText.source("portal_gps.text_9313f74419cd"));this.box.append(this.heading);
+ constructor(o){this.o=o;this.key=o.userId+'.'+o.journeyId;this.path='/api/v1/tf/gps/'+o.journeyId;this.record=null;this.analysis=null;this.pending=false;this.loading=false;this.stationInputs=[];this.mergeSelection=new Set();this.box=node('section');this.box.className='gps-box';this.heading=node('h3',globalThis.CtlText.source("portal_gps.text_9313f74419cd"));this.box.append(this.heading);
  this.hint=node('p',globalThis.CtlText.source("portal_gps.text_4db3ec741184"));if(window.AndroidPortal){this.heading.textContent=t(globalThis.CtlText.source("portal_gps.text_af2c7de76a15"));this.hint.textContent=t(globalThis.CtlText.source("portal_gps.text_8f6bcc8fd171"));}this.content=node('div');this.content.id='gps-content-'+this.o.userId+'-'+this.o.journeyId;this.content.className='gps-block-content';this.content.hidden=true;this.collapseButton=node('button','+');this.collapseButton.type='button';this.collapseButton.className='report-block-toggle';this.collapseButton.setAttribute('data-i18n-ignore','');this.collapseButton.setAttribute('aria-controls',this.content.id);this.collapseButton.onclick=()=>this.setExpanded(this.content.hidden);this.heading.append(this.collapseButton);this.box.append(this.content);this.updateCollapse();this.content.append(this.hint);const tools=node('div');tools.className='gps-tools';
  const button=(label,fn)=>{const b=node('button',label);b.type='button';b.onclick=()=>this.run(fn);tools.append(b);return b;};
  this.manualButton=button(globalThis.CtlText.source("portal_gps.text_ea7a852a9397"),()=>this.toggleManual());this.manualButton.className='gps-stand-toggle';this.manualDuration=node('strong');this.manualDuration.className='gps-stand-duration';this.manualDuration.setAttribute('role','timer');this.manualDuration.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_a698bdef0fac")));this.manualDuration.setAttribute('data-i18n-ignore','');tools.append(this.manualDuration);
@@ -125,7 +147,7 @@ class Recorder{
  forDay(record){return !!record&&(record.points?.some(p=>berlinDate(p.t)===this.o.dutyDay?.())||record.manual_stops?.some(row=>berlinDate(row.start)===this.o.dutyDay?.()));}
  serverForDay(){return this.forDay(this.serverRecord);}
  async read(){try{const saved=await local(this.key);if(saved){this.record=saved;this.analysis=saved.analysis||null;this.say(saved.manual_stops?.some(row=>!row.end)?globalThis.CtlText.source("portal_gps.text_9e4ff21163f0"):saved.ended?globalThis.CtlText.source("portal_gps.text_ed23cbcf3cb4"):globalThis.CtlText.source("portal_gps.text_3f4e4b5c92b7"));}if(navigator.onLine){const remote=await api(this.path);this.serverRecord=remote;if(this.past()){this.record=this.forDay(saved)?saved:this.serverForDay()?remote:null;this.analysis=this.record?.analysis||null;}else if(remote&&(!saved||(!saved.dirty&&remote.revision>=(saved.revision||0)))){this.record={...remote,dirty:false,reason_drafts:saved?.reason_drafts||{},station_drafts:saved?.station_drafts||{},selection:saved?.selection??remote.selection??[]};this.analysis=remote.analysis;await local(this.key,this.record);}}}catch(error){this.fail(error.message);}if(window.AndroidPortal&&!this.past()){try{await this.nativeRead();}catch(error){this.fail(error.message);}}this.draw();}
- freeze(){for(const row of this.liveInputs||[]){const disabled=this.loading||this.o.readonly();for(const field of [row.station,row.reason,row.detail,row.end,row.take,row.remove])field.disabled=disabled;}this.importButton.hidden=true;this.resolveButton.hidden=this.choiceButton.hidden=true;this.importButton.disabled=this.loading||this.o.readonly()||this.past()||!this.record?.selection?.length;this.updateManual();const running=active===this,hasGps=!!this.record?.points?.length,has=hasGps||!!this.record?.manual_stops?.length,number=this.o.trainNumber().trim();this.box.hidden=!number&&!has;if(this.o.numberField)this.o.numberField.readOnly=running||!!this.manualRunning();this.startButton.hidden=running;this.manualButton.hidden=this.past()&&!this.manualRunning();this.manualButton.disabled=this.loading||this.o.readonly()||(!this.manualRunning()&&(!!active||!!manualActive||(hasGps&&!this.record.ended)))||!/^[A-Za-z0-9]{1,12}$/.test(number);this.startButton.disabled=this.loading||this.o.readonly()||!!active||!!manualActive||!/^[A-Za-z0-9]{1,12}$/.test(number);this.startButton.textContent=t(has&&!this.record.ended?globalThis.CtlText.source("portal_gps.text_f424ce8fdf10"):globalThis.CtlText.source("portal_gps.text_0a08578cb4ee"));this.stopButton.hidden=!(running||(hasGps&&!this.record.ended));this.stopButton.disabled=this.loading;for(const button of [this.syncButton,this.exportButton,this.deleteButton]){button.hidden=!has;button.disabled=this.loading||running||!!this.manualRunning();}this.exportButton.hidden=!hasGps;this.loadButton.disabled=this.loading||running||!!this.manualRunning();this.resolveButton.hidden=this.choiceButton.hidden=true;this.resolveButton.disabled=this.choiceButton.disabled=this.loading||running;if(this.past()){this.box.hidden=!this.recordForDay();for(const button of [this.startButton,this.stopButton,this.syncButton,this.exportButton,this.deleteButton,this.resolveButton,this.choiceButton,this.importButton])button.hidden=true;this.loadButton.hidden=false;this.hint.hidden=true;for(const {input,reason,detail,check} of this.stationInputs)input.disabled=reason.disabled=detail.disabled=check.disabled=true;}else{this.loadButton.hidden=false;this.hint.hidden=false;}}
+ freeze(){for(const row of this.liveInputs||[]){const disabled=this.loading||this.o.readonly();for(const field of [row.station,row.reason,row.end,row.take,row.remove,row.check])field.disabled=disabled;}this.updateMergeButton();this.importButton.hidden=true;this.resolveButton.hidden=this.choiceButton.hidden=true;this.importButton.disabled=this.loading||this.o.readonly()||this.past()||!this.record?.selection?.length;this.updateManual();const running=active===this,hasGps=!!this.record?.points?.length,has=hasGps||!!this.record?.manual_stops?.length,number=this.o.trainNumber().trim();this.box.hidden=!number&&!has;if(this.o.numberField)this.o.numberField.readOnly=running||!!this.manualRunning();this.startButton.hidden=running;this.manualButton.hidden=this.past()&&!this.manualRunning();this.manualButton.disabled=this.loading||this.o.readonly()||(!this.manualRunning()&&(!!active||!!manualActive||(hasGps&&!this.record.ended)))||!/^[A-Za-z0-9]{1,12}$/.test(number);this.startButton.disabled=this.loading||this.o.readonly()||!!active||!!manualActive||!/^[A-Za-z0-9]{1,12}$/.test(number);this.startButton.textContent=t(has&&!this.record.ended?globalThis.CtlText.source("portal_gps.text_f424ce8fdf10"):globalThis.CtlText.source("portal_gps.text_0a08578cb4ee"));this.stopButton.hidden=!(running||(hasGps&&!this.record.ended));this.stopButton.disabled=this.loading;for(const button of [this.syncButton,this.exportButton,this.deleteButton]){button.hidden=!has;button.disabled=this.loading||running||!!this.manualRunning();}this.exportButton.hidden=!hasGps;this.loadButton.disabled=this.loading||running||!!this.manualRunning();this.resolveButton.hidden=this.choiceButton.hidden=true;this.resolveButton.disabled=this.choiceButton.disabled=this.loading||running;if(this.past()){this.box.hidden=!this.recordForDay();for(const button of [this.startButton,this.stopButton,this.syncButton,this.exportButton,this.deleteButton,this.resolveButton,this.choiceButton,this.importButton])button.hidden=true;this.loadButton.hidden=false;this.hint.hidden=true;for(const {input,reason,detail,check} of this.stationInputs)input.disabled=reason.disabled=detail.disabled=check.disabled=true;}else{this.loadButton.hidden=false;this.hint.hidden=false;}}
  manualRunning(){return this.record?.manual_stops?.find(row=>!row.end);}
  rows(){if(!this.record)return [];const edits=this.record.stop_edits||{};return [...liveStops(this.record.points||[],!!this.record.ended),...(this.record.manual_stops||[]).filter(row=>row.end).map(row=>({...row,kind:globalThis.CtlText.source("portal_gps.text_0fd998791d67"),manual:true}))].map(row=>{const keys=row.manual?[row.key]:[row.key,...Object.keys(edits).filter(key=>key.startsWith('live-')&&Number(key.slice(5))>=row.start&&Number(key.slice(5))<=(row.end||row.observed_end)),...(this.o.importedKeys?.()||[]).filter(key=>key.startsWith('live-')&&Number(key.slice(5))>=row.start&&Number(key.slice(5))<=(row.end||row.observed_end))];return {...row,source_keys:[...new Set(keys)]};}).sort((a,b)=>a.start-b.start||String(a.key).localeCompare(String(b.key)));}
  removed(row){return row.source_keys.some(key=>this.record.stop_edits?.[key]?.deleted);}
@@ -135,6 +157,44 @@ class Recorder{
  const previous=JSON.parse(JSON.stringify(this.record.stop_edits||{})),wasDirty=this.record.dirty;this.record.stop_edits||={};for(const key of row.source_keys)this.record.stop_edits[key]={...this.record.stop_edits[key],deleted:true};this.record.dirty=true;
  try{await this.persist();}catch(error){this.record.stop_edits=previous;this.record.dirty=wasDirty;throw error;}
  if(row.source_keys.includes(this.focusedStopKey))this.setFocusedStop(null);this.draw();this.o.changed?.();
+ }
+ updateMergeButton() {
+  if (!this.mergeButton) return;
+  const count = this.mergeSelection.size;
+  this.mergeCaption.hidden = count > 0;
+  this.mergeButton.hidden = count === 0;
+  this.mergeButton.disabled = count < 2 || this.loading || this.o.readonly();
+ }
+ async mergeStops() {
+  if (this.o.readonly()) return;
+  const selected = this.liveInputs.filter(input => this.mergeSelection.has(input.row.key)
+      && !this.removed(input.row) && !this.imported(input.row));
+  if (selected.length < 2) return;
+  const first = selected[0], last = selected.at(-1);
+  const end = last.endTime();
+  if (!end || end <= last.row.start || end <= first.row.start) {
+   throw Error(t(globalThis.CtlText.source("portal_gps.text_3469ecb39054")));
+  }
+  if (!confirm(t(globalThis.CtlText.source("portal_gps.text_d8a2f19e4b61")))) return;
+  const record = this.record;
+  const previous = record.stop_edits, wasDirty = record.dirty;
+  const edits = {...previous};
+  edits[first.row.key] = {...edits[first.row.key], ...first.readEdit(), end, manual_end: true};
+  for (const {row} of selected.slice(1)) {
+   for (const key of row.source_keys) edits[key] = {...edits[key], deleted: true};
+  }
+  record.stop_edits = edits;
+  record.dirty = true;
+  try { await this.persist(); }
+  catch (error) {
+   record.stop_edits = previous;
+   record.dirty = wasDirty;
+   throw error;
+  }
+  this.mergeSelection.clear();
+  this.setFocusedStop(null);
+  this.draw();
+  this.o.changed?.();
  }
  imported(row){return row.source_keys.some(key=>this.record.stop_edits?.[key]?.imported||this.o.hasImported?.(key));}
  updateManual(){const row=this.manualRunning();this.manualButton.textContent=t(row?globalThis.CtlText.source("portal_gps.text_da1612a26c8c"):globalThis.CtlText.source("portal_gps.text_ea7a852a9397"));this.manualButton.setAttribute('aria-pressed',String(!!row));this.manualDuration.hidden=!row;if(row)this.manualDuration.textContent=new Intl.NumberFormat(window.I18n?.locale||'de-DE',{minimumFractionDigits:1,maximumFractionDigits:1}).format(Math.max(0,Date.now()-row.start)/60000)+globalThis.CtlText.source("portal_gps.text_2e75737a6b58");if(row&&!this.manualTimer){manualActive=this;this.manualTimer=setInterval(()=>this.updateManual(),1000);}if(!row)this.clearManual();}
@@ -364,7 +424,11 @@ class Recorder{
  this.map.append(node('small',t(this.mapState.mode==='follow'?globalThis.CtlText.source("portal_gps.text_b2b3a3f2bec3"):globalThis.CtlText.source("portal_gps.text_8e02679954f1"))));if(this.railFailed)this.map.append(node('small',t(globalThis.CtlText.source("portal_gps.text_f1b2882182df"))));
  }
 
- draw(){normaliseRecording(this.record);if(this.liveInputs?.some(row=>[row.tr,row.station,row.reason,row.detail,row.end,row.take,row.remove].includes(document.activeElement))){const rows=this.rows().filter(row=>!this.imported(row)&&!this.removed(row));for(const input of this.liveInputs){const current=rows.find(row=>row.key===input.row.key);if(current){Object.assign(input.row,current);if(current.end&&!this.record.stop_edits?.[current.key]?.manual_end)input.end.value=clock(current.end);}}if(rows.map(row=>row.key).join()===this.liveInputs.map(input=>input.row.key).join()){this.drawMap();this.freeze();return;}}this.drawMap();this.results.replaceChildren();this.stationInputs=[];this.drawStops();this.freeze();}
+ draw(){normaliseRecording(this.record);if((this.mergeButton && document.activeElement === this.mergeButton) || this.liveInputs?.some(row=>[row.tr,row.station,row.reason,row.end,row.take,row.remove,row.check].includes(document.activeElement))){const rows=this.rows().filter(row=>!this.imported(row)&&!this.removed(row));for(const input of this.liveInputs){const current=rows.find(row=>row.key===input.row.key);if(current){Object.assign(input.row,current);if(current.end&&!this.record.stop_edits?.[current.key]?.manual_end)input.end.value=clock(current.end);}}if(rows.map(row=>row.key).join()===this.liveInputs.map(input=>input.row.key).join()){this.drawMap();this.freeze();return;}}this.drawMap();
+ const scrollTop = this.stopScroll?.scrollTop || 0, scrollLeft = this.stopScroll?.scrollLeft || 0;
+ this.results.replaceChildren();this.stationInputs=[];this.drawStops();
+ if (this.stopScroll) {this.stopScroll.scrollTop = scrollTop;this.stopScroll.scrollLeft = scrollLeft;}
+ this.freeze();}
  async checkpoint(){
  if(this.checkpointTask)return this.checkpointTask;
  this.checkpointTask=(async()=>{if(active===this&&window.AndroidPortal)await this.nativeRead();await this.persist();if(!this.record||(!this.record.points?.length&&!this.record.manual_stops?.length)||navigator.onLine===false)return false;
@@ -375,25 +439,136 @@ class Recorder{
  }
  async discard(){if(window.AndroidPortal)await window.AndroidPortal.gps('stop',{key:this.key});this.clear();this.clearManual();await local(this.key,null);this.record=null;this.analysis=null;this.draw();}
  drawStops(){
- if(!this.record)return;const stops=this.rows().filter(row=>!this.imported(row)&&!this.removed(row));
- this.results.append(node('h4',t(globalThis.CtlText.source("portal_gps.text_e461aed646b6"))));this.liveInputs=[];
- if(!stops.length){this.results.append(node('p',t(globalThis.CtlText.source("portal_gps.text_280e8fae6dfe"))));return;}
- const table=node('table');table.className='excel';const head=node('tr');for(const value of [globalThis.CtlText.source("portal_gps.text_792751a9dcdb"),globalThis.CtlText.source("portal_gps.text_640e86cbc244"),globalThis.CtlText.source("portal_gps.text_078a815372af"),globalThis.CtlText.source("portal_gps.text_b45f40c737c3"),globalThis.CtlText.source("portal_gps.text_936378b371b9"),globalThis.CtlText.source("portal_gps.text_6c2d352161df")])head.append(node('th',t(value)));table.append(head);
- for(const row of stops){const old=this.analysis?.rows?.find(item=>item.kind===globalThis.CtlText.source("portal_gps.text_0fd998791d67")&&item.start===row.start),legacy=this.record.locations?.[String(row.start)]||old?.station,draft=row.source_keys.map(key=>this.record.stop_edits?.[key]).find(Boolean)||(legacy?{station:legacy,station_input:(legacy.code?legacy.code+' · ':'')+legacy.name,reason:old?.reason?.reason||'',detail:old?.reason?.detail||''}:{}),tr=node('tr'),station=node('input'),list=node('datalist'),reason=node('select'),detail=node('input'),end=node('input'),take=node('button',t(globalThis.CtlText.source("portal_gps.text_8956021eae0e"))),remove=node('button',t(globalThis.CtlText.source("portal_gps.text_6c2d352161df")));
- station.maxLength=270;station.value=draft.station_input??(draft.station?placeLabel(draft.station):'');station.placeholder=t(globalThis.CtlText.source("portal_gps.text_3ac37da56214"));station.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_792751a9dcdb")));list.id='gps-live-'+this.o.journeyId+'-'+row.key;station.setAttribute('list',list.id);this.o.stations(station,list);
- const empty=node('option',t(globalThis.CtlText.source("portal_gps.text_4112179c8995")));empty.value='';reason.append(empty);for(const value of window.TrainJourneyReasons||[]){const option=node('option',t(window.TrainJourneyReasonLabel?.(value)||value));option.value=value;reason.append(option);}reason.value=draft.reason||'';reason.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_820c55eb8960")));detail.maxLength=256;detail.value=draft.detail||'';detail.placeholder=t(globalThis.CtlText.source("portal_gps.text_d2373f70bb27"));detail.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_e73e1be46ebb")));
- let endTouched=false,editedEnd=null;const previousEnd=()=>draft.manual_end&&draft.end?draft.end:row.end;const endTime=()=>endTouched?editedEnd:!end.value?null:!endTouched&&previousEnd()&&end.value===clock(previousEnd())?previousEnd():stopEnd(row,end.value,previousEnd());
- end.type='time';end.step='60';end.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_ea90c8a580d4")));end.value=previousEnd()?clock(previousEnd()):'';take.type='button';take.title=t(globalThis.CtlText.source("portal_gps.text_6781a6571713"));take.disabled=this.o.readonly();
- const remember=()=>{this.record.stop_edits||={};this.record.stop_edits[row.key]={...this.record.stop_edits[row.key],station_input:station.value,station:draft.station&&station.value===placeLabel(draft.station)?draft.station:null,reason:reason.value,detail:detail.value,end:endTime(),manual_end:endTouched||!!draft.manual_end,imported:false};this.record.dirty=true;this.persist().catch(error=>this.fail(error.message));};
- tr.tabIndex=0;tr.onclick=event=>{if(!event.target?.closest?.('button,details,summary'))this.setFocusedStop(row.key,true);};tr.addEventListener('focusin',()=>this.setFocusedStop(row.key));tr.addEventListener('focusout',event=>{if(!tr.contains(event.relatedTarget))this.setFocusedStop(null);});
- station.oninput=remember;reason.onchange=remember;detail.oninput=()=>{if(detail.value.trim())reason.value=globalThis.CtlText.source("portal_gps.text_69384a6be550");remember();};end.oninput=()=>{editedEnd=stopEnd(row,end.value,editedEnd||previousEnd());endTouched=true;remember();};
- take.onclick=async()=>{if(this.o.readonly())return;take.disabled=true;try{const until=endTime();if(!until||until<=row.start)throw Error(t(globalThis.CtlText.source("portal_gps.text_3469ecb39054")));if(!reason.value)throw Error(t(globalThis.CtlText.source("portal_gps.text_f2df21cce73d")));if(reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")&&!detail.value.trim())throw Error(t(globalThis.CtlText.source("portal_gps.text_58f91be54d8a")));const choice=draft.station&&station.value===placeLabel(draft.station)?draft.station:await this.o.resolve(station);const imported=await this.o.importStops([{...row,end:until,station:choice,reason:{reason:reason.value,detail:reason.value===globalThis.CtlText.source("portal_gps.text_69384a6be550")?detail.value.trim():'',label:window.TrainJourneyReasonLabel?.(reason.value)||reason.value}}]);if(imported===false)return;
- this.record.stop_edits||={};this.record.stop_edits[row.key]={station_input:placeLabel(choice),station:choice,reason:reason.value,detail:detail.value,end:until,manual_end:endTouched||!!draft.manual_end,imported:true};this.record.dirty=true;await this.persist();this.draw();}catch(error){this.fail(error.message);}finally{take.disabled=this.o.readonly();}};
- remove.type='button';remove.setAttribute('aria-label',t(globalThis.CtlText.source("portal_gps.text_ee3fb0eb114c"))+' · '+stamp(row.start));remove.onclick=()=>this.run(()=>this.deleteStop(row));
- const history=node('details'),historyRows=row.source_keys.map(key=>({key,edit:this.record.stop_edits?.[key]})).filter(item=>item.edit);if(historyRows.length>1){history.append(node('summary',t(globalThis.CtlText.source("portal_gps.text_557314f9ed76"))));for(const {key,edit}of historyRows)history.append(node('p',stamp(Number(key.slice(5)))+' · '+(edit.station_input||edit.station?.name||'')+' · '+(edit.reason||'')+(edit.detail?' · '+edit.detail:'')));}history.hidden=historyRows.length<2;
- for(const elements of [[station,list,history],[node('span',stamp(row.start))],[end],[reason,detail],[take],[remove]]){const td=node('td');td.append(...elements);tr.append(td);}table.append(tr);this.liveInputs.push({row,tr,station,reason,detail,end,take,remove});
- }
- this.results.append(table);
+  this.mergeButton = null;
+  if (!this.record) return;
+  const stops = this.rows().filter(row => !this.imported(row) && !this.removed(row));
+  const visibleKeys = new Set(stops.map(row => row.key));
+  for (const key of this.mergeSelection) if (!visibleKeys.has(key)) this.mergeSelection.delete(key);
+  this.results.append(node('h4',t(globalThis.CtlText.source("portal_gps.text_e461aed646b6"))));
+  this.liveInputs = [];
+  if (!stops.length) {
+   this.results.append(node('p',t(globalThis.CtlText.source("portal_gps.text_280e8fae6dfe"))));
+   return;
+  }
+  const scroll = this.stopScroll ||= node('div');
+  const table = node('table'), thead = node('thead'), head = node('tr'), body = node('tbody');
+  scroll.className = 'excel-scroll gps-stop-scroll';
+  table.className = 'excel gps-stop-table';
+  const mergeHead = node('th');
+  this.mergeCaption = node('span', t(globalThis.CtlText.source("portal_gps.text_c99fb71e54ab")));
+  this.mergeButton = stopAction(globalThis.CtlText.source("portal_gps.text_9da13de7c459"), 'M3 5h3c4 0 4 7 8 7h6M3 19h3c4 0 4-7 8-7m2-4 4 4-4 4');
+  this.mergeButton.onclick = () => this.run(() => this.mergeStops());
+  mergeHead.append(this.mergeCaption, this.mergeButton);
+  head.append(mergeHead);
+  for (const label of [globalThis.CtlText.source("portal_gps.text_792751a9dcdb"), globalThis.CtlText.source("portal_gps.text_640e86cbc244"), globalThis.CtlText.source("portal_gps.text_078a815372af"), globalThis.CtlText.source("portal_gps.text_b45f40c737c3"), globalThis.CtlText.source("portal_gps.text_936378b371b9"), globalThis.CtlText.source("portal_gps.text_6c2d352161df")]) {
+   head.append(node('th', t(label)));
+  }
+  thead.append(head);
+  table.append(thead, body);
+  const other = globalThis.CtlText.source("portal_gps.text_69384a6be550");
+  const choices = new Map((window.TrainJourneyReasons || []).filter(value => value !== other)
+      .map(value => [t(window.TrainJourneyReasonLabel?.(value) || value), value]));
+  for (const row of stops) {
+   const old = this.analysis?.rows?.find(item => item.kind === globalThis.CtlText.source("portal_gps.text_0fd998791d67") && item.start === row.start);
+   const legacy = this.record.locations?.[String(row.start)] || old?.station;
+   const draft = row.source_keys.map(key => this.record.stop_edits?.[key]).find(Boolean)
+       || (legacy ? {station: legacy, station_input: placeLabel(legacy), reason: old?.reason?.reason || '', detail: old?.reason?.detail || ''} : {});
+   const tr = node('tr'), station = node('input'), list = node('datalist');
+   const reason = node('input'), reasonList = node('datalist'), end = node('input'), check = node('input');
+   const take = stopAction(globalThis.CtlText.source("portal_gps.text_936378b371b9"), 'M12 16V4m-5 5 5-5 5 5M4 15v5h16v-5');
+   const remove = stopAction(globalThis.CtlText.source("portal_gps.text_6c2d352161df"), 'M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5');
+   check.type = 'checkbox';
+   check.checked = this.mergeSelection.has(row.key);
+   check.setAttribute('aria-label', t(globalThis.CtlText.source("portal_gps.text_3c33cfa89c44")) + ' · ' + stamp(row.start));
+   check.onchange = () => {
+    if (check.checked) this.mergeSelection.add(row.key);
+    else this.mergeSelection.delete(row.key);
+    this.updateMergeButton();
+   };
+   station.maxLength = 270;
+   station.value = draft.station_input ?? placeLabel(draft.station);
+   station.placeholder = t(globalThis.CtlText.source("portal_gps.text_3ac37da56214"));
+   station.setAttribute('aria-label', t(globalThis.CtlText.source("portal_gps.text_792751a9dcdb")));
+   list.id = 'gps-live-' + this.o.journeyId + '-' + row.key;
+   station.setAttribute('list', list.id);
+   this.o.stations(station, list);
+   reasonList.id = list.id + '-reason';
+   for (const label of choices.keys()) {
+    const option = node('option');
+    option.value = label;
+    reasonList.append(option);
+   }
+   reason.setAttribute('list', reasonList.id);
+   reason.setAttribute('aria-label', t(globalThis.CtlText.source("portal_gps.text_820c55eb8960")));
+   reason.placeholder = t(globalThis.CtlText.source("portal_gps.text_f2df21cce73d"));
+   reason.maxLength = 256;
+   reason.value = draft.reason === other ? draft.detail || '' : t(window.TrainJourneyReasonLabel?.(draft.reason) || draft.reason || '');
+   let reasonEdited = false;
+   const reasonData = () => {
+    if (!reasonEdited && draft.reason) return {reason: draft.reason, detail: draft.detail || ''};
+    const value = reason.value.trim(), choice = choices.get(value);
+    return {reason: choice || (value ? other : ''), detail: choice ? '' : value};
+   };
+   let endTouched = false, editedEnd = null;
+   const previousEnd = () => draft.manual_end && draft.end ? draft.end : row.end;
+   const endTime = () => endTouched ? editedEnd : previousEnd();
+   end.type = 'time';
+   end.step = '60';
+   end.setAttribute('aria-label', t(globalThis.CtlText.source("portal_gps.text_ea90c8a580d4")));
+   end.value = previousEnd() ? clock(previousEnd()) : '';
+   const readEdit = () => ({
+    station_input: station.value,
+    station: draft.station && station.value === placeLabel(draft.station) ? draft.station : null,
+    ...reasonData(), end: endTime(), manual_end: endTouched || !!draft.manual_end, imported: false,
+   });
+   const remember = () => {
+    this.record.stop_edits ||= {};
+    this.record.stop_edits[row.key] = {...this.record.stop_edits[row.key], ...readEdit()};
+    this.record.dirty = true;
+    this.persist().catch(error => this.fail(error.message));
+   };
+   tr.tabIndex = 0;
+   tr.onclick = event => {if (!event.target?.closest?.('button,details,summary,input[type=checkbox]')) this.setFocusedStop(row.key,true);};
+   tr.addEventListener('focusin', () => this.setFocusedStop(row.key));
+   tr.addEventListener('focusout', event => {if (!tr.contains(event.relatedTarget)) this.setFocusedStop(null);});
+   station.oninput = remember;
+   reason.oninput = () => {reasonEdited = true;remember();};
+   end.oninput = () => {editedEnd = stopEnd(row,end.value,editedEnd || previousEnd());endTouched = true;remember();};
+   take.onclick = () => this.run(async () => {
+    if (this.o.readonly()) return;
+    const edit = readEdit(), until = edit.end;
+    if (!until || until <= row.start) throw Error(t(globalThis.CtlText.source("portal_gps.text_3469ecb39054")));
+    if (!edit.reason) throw Error(t(globalThis.CtlText.source("portal_gps.text_f2df21cce73d")));
+    if (edit.reason === other && !edit.detail) throw Error(t(globalThis.CtlText.source("portal_gps.text_58f91be54d8a")));
+    const choice = edit.station || await this.o.resolve(station);
+    const imported = await this.o.importStops([{...row,end:until,station:choice,reason:{reason:edit.reason,detail:edit.detail,label:window.TrainJourneyReasonLabel?.(edit.reason)||edit.reason}}]);
+    if (imported === false) return;
+    this.record.stop_edits ||= {};
+    this.record.stop_edits[row.key] = {...edit,station_input:placeLabel(choice),station:choice,imported:true};
+    this.record.dirty = true;
+    await this.persist();
+    this.draw();
+   });
+   remove.setAttribute('aria-label', t(globalThis.CtlText.source("portal_gps.text_ee3fb0eb114c")) + ' · ' + stamp(row.start));
+   remove.onclick = () => this.run(() => this.deleteStop(row));
+   const history = node('details');
+   const historyRows = row.source_keys.map(key => ({key,edit:this.record.stop_edits?.[key]})).filter(item => item.edit);
+   if (historyRows.length > 1) {
+    history.append(node('summary', t(globalThis.CtlText.source("portal_gps.text_557314f9ed76"))));
+    for (const {key,edit} of historyRows) history.append(node('p',stamp(Number(key.slice(5)))+' · '+(edit.station_input||edit.station?.name||'')+' · '+(edit.reason||'')+(edit.detail?' · '+edit.detail:'')));
+   }
+   history.hidden = historyRows.length < 2;
+   for (const elements of [[check],[station,list,history],[node('span',stamp(row.start))],[end],[reason,reasonList],[take],[remove]]) {
+    const td = node('td');
+    td.append(...elements);
+    tr.append(td);
+   }
+   body.append(tr);
+   this.liveInputs.push({row,tr,station,reason,end,take,remove,check,endTime,readEdit});
+  }
+  scroll.replaceChildren(table);
+  this.results.append(scroll);
+  this.updateMergeButton();
  }
 
 }
