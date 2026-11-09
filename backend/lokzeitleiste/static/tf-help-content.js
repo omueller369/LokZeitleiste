@@ -1,5 +1,5 @@
 /* Gemeinsamer Hilfekatalog für alle TF-Module. Internationaler Bremszettel: editierbare Vorschläge bei DE/G in Spalte 1. */
-window.TfHelpRevision="2026-11-08";
+window.TfHelpRevision="2026-11-09";
 window.TfHelpPages=globalThis.CtlText.restore([
   {
     "id": "start",
@@ -931,6 +931,23 @@ window.TfHelpPages=globalThis.CtlText.restore([
           "{{portal_tf_help_content.text_46c17a534c9c}}"
         ],
         "steps": []
+      }
+    ]
+  },
+  {
+    "id": "digi-befehle",
+    "group": "{{portal_tf_help_content.text_f65c79ef7d2c}}",
+    "title": "{{portal_tf_help_content.text_8401b6977318}}",
+    "short": "{{portal_tf_help_content.text_6e222a33b3c1}}",
+    "path": "https://db.de/dibe",
+    "aliases": [],
+    "sections": [
+      {
+        "title": "{{portal_tf_help_content.text_8401b6977318}}",
+        "paragraphs": [],
+        "steps": [
+          "{{portal_tf_help_content.text_13ca97136d6d}}"
+        ]
       }
     ]
   },
