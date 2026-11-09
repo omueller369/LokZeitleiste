@@ -158,3 +158,20 @@
 #workReport .gps-stop-table :is(th, td):first-child { text-align: center; }
 #workReport .gps-stop-action { width: 36px; min-width: 36px; height: 36px; padding: 6px; }
 #workReport .gps-stop-action svg { width: 20px; height: 20px; border: 0; background: transparent; }
+
+.report-row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+#reportSendCancel {
+    color: #173d52;
+    background: #edf3f7;
+    border: 1px solid #899ca8;
+}
+html[data-theme="dark"] #reportSendCancel {
+    color: var(--night-text);
+    background: var(--night-raised);
+    border-color: var(--night-border);
+}

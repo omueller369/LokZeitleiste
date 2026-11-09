@@ -197,5 +197,9 @@
   "text_fe1afa505aea": "Annual schedule",
   "text_fef2639e464c": "Import selected",
   "text_8401b6977318": "Digital orders",
-  "text_6e222a33b3c1": "Open the official DB application for digital orders."
+  "text_6e222a33b3c1": "Open the official DB application for digital orders.",
+  "text_394a47886497": "Send work reports?",
+  "text_524aac8618a1": "The selected work reports will be sent to the server now. You can no longer edit them after synchronization.",
+  "text_f36a9441dc22": "Do not send",
+  "text_d7e8a01d49de": "Send"
 }

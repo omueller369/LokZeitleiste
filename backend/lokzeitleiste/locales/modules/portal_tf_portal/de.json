@@ -197,5 +197,9 @@
   "text_fe1afa505aea": "Jahresplan",
   "text_fef2639e464c": "Ausgewählte übernehmen",
   "text_8401b6977318": "Digi-Befehle",
-  "text_6e222a33b3c1": "Öffne die offizielle DB-Anwendung für digitale Befehle."
+  "text_6e222a33b3c1": "Öffne die offizielle DB-Anwendung für digitale Befehle.",
+  "text_394a47886497": "Arbeitsberichte senden?",
+  "text_524aac8618a1": "Die ausgewählten Arbeitsberichte werden jetzt an den Server gesendet. Nach der Synchronisierung kannst Du sie nicht mehr bearbeiten.",
+  "text_f36a9441dc22": "Nicht senden",
+  "text_d7e8a01d49de": "Senden"
 }

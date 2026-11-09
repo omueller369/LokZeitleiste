@@ -197,5 +197,9 @@
   "text_fe1afa505aea": "Plan roczny",
   "text_fef2639e464c": "Importuj wybrane",
   "text_8401b6977318": "Polecenia cyfrowe",
-  "text_6e222a33b3c1": "Otwórz oficjalną aplikację DB do obsługi poleceń cyfrowych."
+  "text_6e222a33b3c1": "Otwórz oficjalną aplikację DB do obsługi poleceń cyfrowych.",
+  "text_394a47886497": "Wysłać raporty pracy?",
+  "text_524aac8618a1": "Wybrane raporty pracy zostaną teraz wysłane na serwer. Po synchronizacji nie będzie można ich edytować.",
+  "text_f36a9441dc22": "Nie wysyłaj",
+  "text_d7e8a01d49de": "Wyślij"
 }
