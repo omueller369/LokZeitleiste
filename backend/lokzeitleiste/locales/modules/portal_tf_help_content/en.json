@@ -183,7 +183,7 @@
   "text_8bd470989d7f": "Passenger journeys can be before, during or after duty. The app distinguishes time within and outside duty. Edit changes an added journey. Delete removes it from an editable report. Cancel closes the current entry; journeys already added remain.",
   "text_8c6159198db7": "Record a journey",
   "text_8dc188120a13": "Open Locomotive handover log.",
-  "text_8f14c925c120": "Select an existing row to view it in the input area. If editable, change and save or remove it. For a break, choose the appropriate reason. Also add as break is offered only when its conditions are met.",
+  "text_8f14c925c120": "Select an existing row to view it in the input area. If editable, change and save or remove it. For a break, choose the appropriate reason. For a stop of at least 15 minutes, use Also add as break to record a break with the same times.",
   "text_8ffa3c7d41b4": "Open a task",
   "text_91ddd8284f36": "Your device determines its position. Browser recording requires HTTPS, location permission and a visible browser tab. A tab is the open page in the browser. The Android app uses a location service with a persistent notification.",
   "text_91e1c8d77518": "Open the portal address.",

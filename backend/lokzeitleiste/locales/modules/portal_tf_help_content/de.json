@@ -183,7 +183,7 @@
   "text_8bd470989d7f": "Gastfahrten können vor, während oder nach dem Dienst liegen. Die Anwendung unterscheidet die Zeit im Dienst von der Zeit außerhalb. Über Bearbeiten änderst Du eine hinzugefügte Gastfahrt. Löschen entfernt sie aus dem noch bearbeitbaren Bericht. Abbrechen schließt die laufende Eingabe; bereits hinzugefügte Fahrten bleiben erhalten.",
   "text_8c6159198db7": "Eine Fahrt aufzeichnen",
   "text_8dc188120a13": "Öffne Lokübergabebuch.",
-  "text_8f14c925c120": "Wähle eine vorhandene Zeile, um ihre Angaben im Eingabebereich zu sehen. Wenn der Bericht bearbeitbar ist, kannst Du sie ändern und speichern oder entfernen. Wähle für eine Pause den passenden Pausengrund. Die Schaltfläche Auch als Pause Hinzuf. wird nur angeboten, wenn die Voraussetzungen dafür erfüllt sind.",
+  "text_8f14c925c120": "Wähle eine vorhandene Zeile, um ihre Angaben im Eingabebereich zu sehen. Wenn der Bericht bearbeitbar ist, kannst Du sie ändern und speichern oder entfernen. Wähle für eine Pause den passenden Pausengrund. Bei einer Standzeit von mindestens 15 Minuten kannst Du über Auch als Pause Hinzuf. zusätzlich eine Pause mit denselben Zeiten eintragen.",
   "text_8ffa3c7d41b4": "Eine Aufgabe öffnen",
   "text_91ddd8284f36": "Dein Gerät ermittelt dabei seine Position. Für die Browser-Aufzeichnung werden eine sichere Verbindung (HTTPS), eine Standortfreigabe und ein sichtbarer Tab benötigt. Ein Tab ist die geöffnete Seite im Browser. Die Android-App nutzt einen Standortdienst und zeigt eine dauerhafte Benachrichtigung.",
   "text_91e1c8d77518": "Öffne die Adresse des Portals.",

@@ -183,7 +183,7 @@
   "text_8bd470989d7f": "Przejazdy pasażerskie mogą być przed służbą, podczas niej lub po niej. Aplikacja rozróżnia czas w służbie i poza nią. Edytuj zmienia dodany przejazd. Usuń usuwa go z edytowalnego raportu. Anuluj zamyka bieżący wpis; dodane przejazdy pozostają.",
   "text_8c6159198db7": "Rejestrowanie przejazdu",
   "text_8dc188120a13": "Otwórz Książkę przekazania lokomotywy.",
-  "text_8f14c925c120": "Wybierz istniejący wiersz, aby zobaczyć dane w polach. Jeśli raport jest edytowalny, zmień i zapisz lub usuń wpis. Dla przerwy wybierz właściwy powód. Opcja Dodaj również jako przerwę pojawia się tylko po spełnieniu warunków.",
+  "text_8f14c925c120": "Wybierz istniejący wiersz, aby zobaczyć dane w polach. Jeśli raport jest edytowalny, zmień i zapisz lub usuń wpis. Dla przerwy wybierz właściwy powód. Przy postoju trwającym co najmniej 15 minut wybierz Dodaj również jako przerwę, aby zapisać przerwę w tych samych godzinach.",
   "text_8ffa3c7d41b4": "Otwieranie zadania",
   "text_91ddd8284f36": "Urządzenie ustala swoją pozycję. Zapis w przeglądarce wymaga HTTPS, zgody na lokalizację i widocznej karty. Karta to otwarta strona przeglądarki. Aplikacja Android korzysta z usługi lokalizacji ze stałym powiadomieniem.",
   "text_91e1c8d77518": "Otwórz adres portalu.",
