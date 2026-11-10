@@ -35,7 +35,7 @@ def fixture():
         }]};
         renderMonth();
     }};})();''', source)
-    controllers = (STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC / name).read_text() for name in ['train-journeys.js', 'gps.js'])
+    controllers = (STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC / name).read_text() for name in ['plan-colors.js', 'train-journeys.js', 'gps.js'])
     checks = r'''
 (async()=>{
  const assert=(condition,message)=>{if(!condition)throw Error(message);};
