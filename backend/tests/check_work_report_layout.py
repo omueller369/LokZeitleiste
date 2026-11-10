@@ -104,7 +104,8 @@ def fixture():
  scroll.remove();
  window.LayoutReport.monthly(day);
  const monthly=document.querySelector('.report-list');
- assert(monthly.getBoundingClientRect().width<620,'Monthly table fits its compact content');
+ const monthlyWidth=monthly.getBoundingClientRect().width;
+ assert(monthlyWidth<620,'Monthly table fits its compact content: '+monthlyWidth+'px');
  assert(monthly.querySelectorAll('thead .report-heading-icon').length===4,'Four icon headers');
  assert(monthly.rows[1].cells[12].textContent==='RBS','Duty abbreviation matches editor');
  const actions=[...monthly.querySelectorAll('.report-row-actions button')];

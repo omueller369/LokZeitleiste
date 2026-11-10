@@ -161,7 +161,7 @@
 .report-row-actions {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     white-space: nowrap;
 }
 #reportSendCancel {
@@ -182,7 +182,7 @@ html[data-theme="dark"] #reportSendCancel {
     font-size: 12px;
 }
 #workReport .report-list :is(th, td) {
-    padding: 3px 5px;
+    padding: 3px;
     text-align: center;
     white-space: nowrap;
 }
@@ -192,6 +192,7 @@ html[data-theme="dark"] #reportSendCancel {
     min-width: 32px;
     height: 32px;
     padding: 5px;
+    margin: 0;
 }
 .report-table-symbol, .report-heading-icon {
     display: inline-block;
