@@ -150,17 +150,28 @@ async function loadCurrentMonth(force=false){const current=today().slice(0,7),[y
 function renderCurrentPlan(){if(!key)return;const current=today().slice(0,7),[year,month]=current.split('-').map(Number),days=new Date(Date.UTC(year,month,0)).getUTCDate(),plan=plans[current],data=mergeLocal(monthCache[current]||{days:[],reports:[],work_minutes:0,guest_minutes:0,pause_minutes:0},current),grid=el('monthPlanDays');grid.replaceChildren();grid.style.setProperty('--month-days',days);el('monthPlanCaption').textContent=new Intl.DateTimeFormat(window.I18n?.locale||'de-DE',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(year,month-1,1)))+(plan?'':globalThis.CtlText.source("portal_work_report.text_def985e5bf78"));for(let n=1;n<=days;n++){const date=current+'-'+String(n).padStart(2,'0'),scheduled=plan?.days.find(d=>d.date===date),kind=scheduled?.kind||globalThis.CtlText.source("portal_work_report.text_52e37a639da5"),worked=data.days.find(d=>d.date===date),minutes=worked?.performed_minutes??worked?.work_minutes??0,cell=document.createElement('button');cell.type='button';cell.className='month-plan-day';cell.dataset.kind=({[globalThis.CtlText.source("portal_work_report.text_eb8f579b6931")]:'work',[globalThis.CtlText.source("portal_work_report.text_e79aa42d7d18")]:'rest',[globalThis.CtlText.source("portal_work_report.text_35d3a889824d")]:'vacation',[globalThis.CtlText.source("portal_work_report.text_be1600b499c6")]:'sick'})[kind]||'unplanned';cell.classList.toggle('is-holiday',!!scheduled?.is_holiday);window.PlanColors.apply(cell,{date,kind,is_holiday:!!scheduled?.is_holiday});const full=date+' · '+kind+' · '+clock(minutes)+(scheduled?.holiday_name?' · '+scheduled.holiday_name:'');cell.title=full;cell.setAttribute('aria-label',full);cell.append(text('span',String(n),true),text('span',({[globalThis.CtlText.source("portal_work_report.text_eb8f579b6931")]:'A',[globalThis.CtlText.source("portal_work_report.text_e79aa42d7d18")]:'R',[globalThis.CtlText.source("portal_work_report.text_35d3a889824d")]:'U',[globalThis.CtlText.source("portal_work_report.text_be1600b499c6")]:'K'})[kind]||'?',true),text('strong',Number.isFinite(minutes)?String(Math.round(minutes/6)/10).replace('.',','):'—',true));cell.onclick=()=>{el('monthPlanDetail').textContent=full;};grid.append(cell);}}
 async function month(){const selected=el('reportPeriod').value;if(!/^\d{4}-\d{2}$/.test(selected))throw Error(globalThis.CtlText.source("portal_work_report.text_329a7ba8a06e"));const [year,m]=selected.split('-').map(Number),version=++monthVersion;try{const data=await api(`/api/v1/tf/work-reports/month/${year}/${m}`);await fetchPlan(selected);if(version!==monthVersion)return;monthCache[selected]=data;try{localStorage.setItem(key+'.month.duty-kinds-v1.'+selected,JSON.stringify(data));}catch(error){}}catch(error){if(version!==monthVersion)return;message(globalThis.CtlText.source("portal_work_report.text_dc1180061ea4"),false);}if(version===monthVersion)renderMonth();}
 function reportDay(value){const date=value.slice(0,10),weekday=new Intl.DateTimeFormat(window.I18n?.locale||'de-DE',{weekday:'long',timeZone:'UTC'}).format(new Date(date+'T12:00:00Z')).slice(0,2);return date.slice(8,10)+'/'+weekday;}
-function reportActionIcon(label, path) {
- const button = document.createElement('button');
- button.type = 'button';
- button.className = 'report-icon-button';
- button.title = window.I18n?.t(label) || label;
- button.setAttribute('aria-label', button.title);
- button.onkeydown = event => event.stopPropagation();
+const reportSymbols = {
+ delete: {label: globalThis.CtlText.source("portal_work_report.text_6c2d352161df"), path: 'M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5'},
+ send: {label: globalThis.CtlText.source("portal_work_report.text_9c3fb354f079"), path: 'm3 11 18-8-8 18-2-8-8-2Zm8 2L21 3'},
+ reload: {label: globalThis.CtlText.source("portal_work_report.text_dcd88dc49e2b"), path: 'M20 8a8 8 0 1 0 1 7M20 3v5h-5'},
+ synced: {label: globalThis.CtlText.source("portal_work_report.text_da7f91ee2818"), path: 'm5 12 4 4L19 6'},
+ local: {label: globalThis.CtlText.source("portal_work_report.text_ffae35806a74"), path: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 15h2'},
+ draft: {label: globalThis.CtlText.source("portal_work_report.text_e53ce353023e"), path: 'M6 18a4 4 0 1 1 0-8h1a5 5 0 0 1 10-1h1a4 4 0 0 1 0 9Z'},
+ attachments: {label: globalThis.CtlText.source("portal_work_report.text_79580f70336c"), path: 'm9 12 5-5a2 2 0 0 1 3 3l-7 7a4 4 0 0 1-6-6l8-8a5 5 0 0 1 7 7l-8 8'},
+ conflict: {label: globalThis.CtlText.source("portal_work_report.text_a70a0785c02d"), path: 'M12 3 2 20h20L12 3Zm0 6v4m0 3h.01'},
+};
+const reportKinds = {
+ [globalThis.CtlText.source("portal_work_report.text_f31b8681bfca")]: globalThis.CtlText.source("portal_tf_portal.text_0b88c9d59ad1"),
+ [globalThis.CtlText.source("portal_work_report.text_a88b0d6dfef3")]: globalThis.CtlText.source("portal_tf_portal.text_1980e84621c5"),
+ [globalThis.CtlText.source("portal_work_report.text_bfe022ddd1f8")]: globalThis.CtlText.source("portal_tf_portal.text_fc457e7f7a6a"),
+ [globalThis.CtlText.source("portal_work_report.text_98a9c4972272")]: globalThis.CtlText.source("portal_tf_portal.text_de148153b07d"),
+ [globalThis.CtlText.source("portal_work_report.text_35d3a889824d")]: globalThis.CtlText.source("portal_tf_portal.text_a25513c7e0f6"),
+ [globalThis.CtlText.source("portal_work_report.text_be1600b499c6")]: globalThis.CtlText.source("portal_tf_portal.text_86be9a55762d"),
+};
+function reportSymbol({path}) {
  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ svg.setAttribute('class', 'report-table-symbol');
  svg.setAttribute('viewBox', '0 0 24 24');
- svg.setAttribute('width', '20');
- svg.setAttribute('height', '20');
  svg.setAttribute('aria-hidden', 'true');
  svg.setAttribute('focusable', 'false');
  const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -171,8 +182,47 @@ function reportActionIcon(label, path) {
  line.setAttribute('stroke-linecap', 'round');
  line.setAttribute('stroke-linejoin', 'round');
  svg.append(line);
- button.append(svg);
+ return svg;
+}
+function reportActionIcon(symbol) {
+ const button = document.createElement('button');
+ button.type = 'button';
+ button.className = 'report-icon-button';
+ button.title = window.I18n?.t(symbol.label) || symbol.label;
+ button.setAttribute('aria-label', button.title);
+ button.onkeydown = event => event.stopPropagation();
+ button.append(reportSymbol(symbol));
  return button;
+}
+function reportStatusCell(report) {
+ let status = 'synced';
+ if (report.local) {
+  if (report._cloud_conflict) status = 'conflict';
+  else if (report._cloud_incomplete) status = 'attachments';
+  else if (report._cloud_dirty === false) status = 'draft';
+  else status = 'local';
+ }
+ const symbol = reportSymbols[status], cell = document.createElement('td');
+ cell.title = window.I18n?.t(symbol.label) || symbol.label;
+ cell.setAttribute('aria-label', cell.title);
+ cell.append(reportSymbol(symbol));
+ return cell;
+}
+function reportKindCell(report) {
+ const defaultKind = globalThis.CtlText.source("portal_work_report.text_f31b8681bfca");
+ const kind = report.kind || defaultKind;
+ const label = kind === defaultKind ? globalThis.CtlText.source("portal_work_report.text_d6b95aa24371") : kind;
+ const cell = text('td', Object.hasOwn(reportKinds, kind) ? reportKinds[kind] : kind, true);
+ cell.title = window.I18n?.t(label) || label;
+ cell.setAttribute('aria-label', cell.title);
+ return cell;
+}
+function renderReportLegend() {
+ el('reportTableLegend').replaceChildren(...Object.values(reportSymbols).map(symbol => {
+  const entry = document.createElement('li');
+  entry.append(reportSymbol(symbol), text('span', window.I18n?.t(symbol.label) || symbol.label));
+  return entry;
+ }));
 }
 let monthSyncPending = false;
 async function confirmMonthSync(clientIds, trigger) {
@@ -200,14 +250,12 @@ function monthReportActions(report) {
  const icons = document.createElement('div');
  icons.className = 'report-row-actions';
  if (!report.saved_id) {
-  const remove = reportActionIcon(globalThis.CtlText.source("portal_work_report.text_6c2d352161df"),
-      'M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5');
+  const remove = reportActionIcon(reportSymbols.delete);
   remove.disabled = busy;
   remove.onclick = event => {event.stopPropagation();deleteLocalDraft(report.client_id);};
   icons.append(remove);
  }
- const sync = reportActionIcon(globalThis.CtlText.source("portal_work_report.text_9c3fb354f079"),
-     'm3 11 18-8-8 18-2-8-8-2Zm8 2L21 3');
+ const sync = reportActionIcon(reportSymbols.send);
  sync.disabled = busy || !!report._cloud_conflict;
  sync.onclick = event => {
   event.stopPropagation();
@@ -216,17 +264,15 @@ function monthReportActions(report) {
  icons.append(sync);
  cell.append(icons);
  if (report._cloud_conflict) {
-  const load = text('button', globalThis.CtlText.source("portal_work_report.text_dcd88dc49e2b"));
-  load.type = 'button';
+  const load = reportActionIcon(reportSymbols.reload);
   load.disabled = busy;
   load.onclick = event => {event.stopPropagation();useServerDraft(report.client_id);};
-  load.onkeydown = event => event.stopPropagation();
-  cell.append(load);
+  icons.append(load);
  }
  return cell;
 }
 function renderMonth(){renderCurrentPlan();const selected=el('reportPeriod').value,[year,m]=selected.split('-').map(Number);let cached=monthCache[selected];if(!cached){try{cached=JSON.parse(localStorage.getItem(key+'.month.duty-kinds-v1.'+selected)||'null');}catch(error){}}const data=mergeLocal(cached||{days:[],reports:[],work_minutes:0,guest_minutes:0,pause_minutes:0},selected);
-el('syncMonthReports').disabled=busy||!pending.some(r=>r.start_at.slice(0,7)===selected);el('reportListRows').replaceChildren();el('emptyReportList').hidden=data.reports.length!==0;for(const r of [...data.reports].sort((a,b)=>a.start_at.localeCompare(b.start_at)||String(a.id).localeCompare(String(b.id)))){const row=document.createElement('tr');row.dataset.reportId=String(r.id);row.dataset.clientId=r.client_id;row.dataset.syncState=r.local?'local':'synced';row.tabIndex=0;row.setAttribute('aria-label',(window.I18n?.t(globalThis.CtlText.source("portal_work_report.text_363b42b18514"))||globalThis.CtlText.source("portal_work_report.text_363b42b18514"))+' '+r.id+' · '+stamp(r.start_at));for(const [column,value] of [r.local?globalThis.CtlText.source("portal_work_report.text_f69c25b51b80"):String(r.id),reportDay(r.start_at),stamp(r.start_at,r.start_at,r.end_at),stamp(r.end_at,r.start_at,r.end_at,r.start_at),clock(r.credited_minutes??r.duration_minutes),clock(r.documented_pause_minutes??pauseFor(r)),clock(r.trips.reduce((sum,t)=>sum+span(t.start_at,t.end_at),0)),...['8h','24h',"8'h","24'h"].map(value=>(r.ausbleibe||[]).includes(value)?'X':''),r.local?(r._cloud_conflict?globalThis.CtlText.source("portal_work_report.text_a70a0785c02d"):r._cloud_incomplete?globalThis.CtlText.source("portal_work_report.text_79580f70336c"):r._cloud_dirty===false?globalThis.CtlText.source("portal_work_report.text_e53ce353023e"):globalThis.CtlText.source("portal_work_report.text_ffae35806a74")):globalThis.CtlText.source("portal_work_report.text_da7f91ee2818"),!r.kind||r.kind===globalThis.CtlText.source("portal_work_report.text_f31b8681bfca")?globalThis.CtlText.source("portal_work_report.text_d6b95aa24371"):r.kind].entries()){const cell=text('td',value,column!==11&&column!==12&&!(r.local&&column===0));if(column>=7&&column<=10)cell.classList.add('report-allowance');if(column===4&&!absence(r.kind)&&r.duration_minutes>720)cell.classList.add('report-overrun');row.append(cell);}row.append(monthReportActions(r));row.onclick=()=>loadReport(r.id).catch(error=>message(error.message));row.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();loadReport(r.id).catch(error=>message(error.message));}};el('reportListRows').append(row);}selectedReport();}
+el('syncMonthReports').disabled=busy||!pending.some(r=>r.start_at.slice(0,7)===selected);el('reportListRows').replaceChildren();el('emptyReportList').hidden=data.reports.length!==0;renderReportLegend();for(const r of [...data.reports].sort((a,b)=>a.start_at.localeCompare(b.start_at)||String(a.id).localeCompare(String(b.id)))){const row=document.createElement('tr');row.dataset.reportId=String(r.id);row.dataset.clientId=r.client_id;row.dataset.syncState=r.local?'local':'synced';row.tabIndex=0;row.setAttribute('aria-label',(window.I18n?.t(globalThis.CtlText.source("portal_work_report.text_363b42b18514"))||globalThis.CtlText.source("portal_work_report.text_363b42b18514"))+' '+r.id+' · '+stamp(r.start_at));for(const [column,value] of [r.local?globalThis.CtlText.source("portal_work_report.text_f69c25b51b80"):String(r.id),reportDay(r.start_at),stamp(r.start_at,r.start_at,r.end_at),stamp(r.end_at,r.start_at,r.end_at,r.start_at),clock(r.credited_minutes??r.duration_minutes),clock(r.documented_pause_minutes??pauseFor(r)),clock(r.trips.reduce((sum,t)=>sum+span(t.start_at,t.end_at),0)),...['8h','24h',"8'h","24'h"].map(value=>(r.ausbleibe||[]).includes(value)?'X':'')].entries()){const cell=text('td',value,!(r.local&&column===0));if(column>=7&&column<=10)cell.classList.add('report-allowance');if(column===4&&!absence(r.kind)&&r.duration_minutes>720)cell.classList.add('report-overrun');row.append(cell);}row.append(reportStatusCell(r),reportKindCell(r),monthReportActions(r));row.onclick=()=>loadReport(r.id).catch(error=>message(error.message));row.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();loadReport(r.id).catch(error=>message(error.message));}};el('reportListRows').append(row);}selectedReport();}
 async function loadReport(id,discard=false){if(window.GpsRecorder?.isActive()){message(globalThis.CtlText.source("portal_work_report.text_d7de5daaf6c9"));return;}if(busy)return;if(state.saved_id&&(state.train_dirty||trainEditor?.hasPending?.())){message(globalThis.CtlText.source("portal_work_report.text_48037db8833f"));return;}if(!discard&&queue.length&&!canLeave()){message(globalThis.CtlText.source("portal_work_report.text_bd2883391bf3"));return;}if(!discard&&hasDraft()&&!confirm(globalThis.CtlText.source("portal_work_report.text_7b0908113f1b")))return;busy=true;el('saveReport').disabled=true;el('syncReport').disabled=true;el('newReport').disabled=true;el('receiptFiles').disabled=true;el('dutyFields').disabled=true;el('guestFields').disabled=true;renderTrips();try{const local=pending.find(r=>r.client_id===id||r.saved_id===id),r=local||await api('/api/v1/tf/work-reports/'+id);if(local?._cloud_revision)await hydrateDraftFiles(local);state={cloud_revision:local?._cloud_revision||0,in_hotel:!!r.in_hotel,pause_policy:r.pause_policy??1,legacy_pause:Number(r.actual_pause||0),ausbleibe:r.ausbleibe||[],kind:r.kind||globalThis.CtlText.source("portal_work_report.text_f31b8681bfca"),client_id:r.client_id,saved_id:local?local.saved_id||null:r.id,train_revision:r.train_revision||0,train_dirty:false,locked:r.locked||false,train_readonly:r.train_editable===false,train_journeys:r.train_journeys||[],values:{dutyStart:r.start_at.slice(0,16),dutyEnd:r.end_at.slice(0,16),hotelLocation:r.hotel_location||'',hotelName:r.hotel_name||'',overrunReason:r.overrun_reason}};reportViewOnly=!!state.saved_id;trips=r.trips.map(t=>({...t}));for(const field of fields)el(field).value=state.values[field];el('inHotel').checked=!!state.in_hotel;trainEditor.restore(state.train_journeys);state.train_journeys=trainEditor.draft();queue=[];renderLocalFiles();resetGuest();if(trips.length)showGuest(trips[0]);if(absence())await fetchPlan(r.start_at.slice(0,7));totals();await readFiles();await renderServerFiles();selectedReport();message('');reportFields(true);el('reportForm').scrollIntoView?.({behavior:'smooth',block:'start'});}catch(error){message(error.message);}finally{busy=false;freeze();el('syncReport').disabled=false;el('newReport').disabled=false;el('receiptFiles').disabled=reportViewOnly;}}
 
 async function newDuty(force=false){if(window.GpsRecorder?.isActive()){message(globalThis.CtlText.source("portal_work_report.text_d7de5daaf6c9"));return;}if(busy)return;if(state.saved_id&&(state.train_dirty||trainEditor?.hasPending?.())){message(globalThis.CtlText.source("portal_work_report.text_48037db8833f"));return;}if(!force&&queue.length&&!canLeave()){message(globalThis.CtlText.source("portal_work_report.text_bd2883391bf3"));return;}if(!force&&hasDraft()&&!confirm(globalThis.CtlText.source("portal_work_report.text_7b0908113f1b")))return;reportViewOnly=false;state={in_hotel:false,pause_policy:2,legacy_pause:0,ausbleibe:[],kind:globalThis.CtlText.source("portal_work_report.text_f31b8681bfca"),client_id:uuid(),saved_id:null};trainEditor.restore([]);trips=[];queue=[];renderLocalFiles();for(const id of fields)el(id).value='';el('inHotel').checked=false;el('dutyStart').value=today()+'T08:00';el('dutyEnd').value=today()+'T16:00';freeze();resetGuest();totals();message('');selectedReport();await readFiles();reportFields(true);el('dutyStart').focus();el('reportForm').scrollIntoView?.({behavior:'smooth',block:'start'});}

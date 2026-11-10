@@ -16,6 +16,11 @@ vm.runInNewContext(source,{window,document:{getElementById:el,createElement:()=>
  assert.equal(group.className,'report-row-actions');
  assert.deepEqual(group.children.map(button=>button.attrs['aria-label']),['Löschen','Synchronisieren']);
  assert(group.children.every(button=>button.children[0].attrs['aria-hidden']==='true'));
+ const conflict=api.monthReportActions({...rows[1],local:true,_cloud_conflict:true});
+ assert.equal(conflict.children.length,1,'Conflict actions stay in the icon group');
+ assert.equal(conflict.children[0].children[2].attrs['aria-label'],'Serverstand laden');
+ assert.equal(conflict.children[0].children[1].disabled,true);
+
  const send=group.children[1],dialog=el('reportSendDialog'),event={stopPropagation(){}};
  const cancelled=send.onclick(event);assert.equal(dialog.open,true);assert(el('reportSendCancel').focused);assert.deepEqual(sent,[]);
  dialog.close('cancel');await cancelled;assert.deepEqual(sent,[]);assert.equal(api.pending().length,3);assert(send.focused);

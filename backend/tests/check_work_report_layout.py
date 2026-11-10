@@ -27,6 +27,13 @@ def fixture():
         setupReportToggles();limitReportLists(el('workReport'));trainEditor=editor;user={id:1};key='layout-test';trips=[];
         state={kind:'Sonstige Erfassung',client_id:'layout',legacy_pause:30,ausbleibe:[]};
         el('dutyStart').value=day+'T08:00';el('dutyEnd').value=day+'T16:00';totals();
+    },monthly(day){
+        const period=day.slice(0,7);el('reportPeriod').value=period;
+        monthCache[period]={days:[],work_minutes:450,guest_minutes:30,pause_minutes:30,reports:[{
+            id:'draft',client_id:'draft',start_at:day+'T08:00',end_at:day+'T16:00',duration_minutes:480,
+            kind:'Rufbereitschaft',trips:[],ausbleibe:['8h'],local:true,_cloud_conflict:true
+        }]};
+        renderMonth();
     }};})();''', source)
     controllers = (STATIC/'messages.js').read_text()+'\n'+'\n'.join((STATIC / name).read_text() for name in ['train-journeys.js', 'gps.js'])
     checks = r'''
@@ -95,6 +102,16 @@ def fixture():
  scroll.scrollTop=scroll.scrollHeight;
  assert(listRows[5].getBoundingClientRect().bottom<=viewportBottom+2,'Last row reachable');
  scroll.remove();
+ window.LayoutReport.monthly(day);
+ const monthly=document.querySelector('.report-list');
+ assert(monthly.getBoundingClientRect().width<620,'Monthly table fits its compact content');
+ assert(monthly.querySelectorAll('thead .report-heading-icon').length===4,'Four icon headers');
+ assert(monthly.rows[1].cells[12].textContent==='RBS','Duty abbreviation matches editor');
+ const actions=[...monthly.querySelectorAll('.report-row-actions button')];
+ assert(actions.length===3&&actions.every(button=>button.querySelector('svg')&&!button.textContent),'Action icons only, including conflict reload');
+ assert(actions[0].getBoundingClientRect().top===actions[2].getBoundingClientRect().top,'Actions stay on one row');
+ assert(document.querySelectorAll('#reportTableLegend li').length===8,'Status and action legend beneath table');
+
  window.parent.postMessage({layoutStatus:'pass',width:innerWidth},'*');
 })().catch(error=>window.parent.postMessage({layoutStatus:'fail',message:error.stack},'*'));
 '''
