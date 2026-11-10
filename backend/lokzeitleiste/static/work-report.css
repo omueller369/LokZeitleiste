@@ -183,6 +183,7 @@ html[data-theme="dark"] #reportSendCancel {
 }
 #workReport .report-list :is(th, td) {
     padding: 3px;
+    min-width: 0;
     text-align: center;
     white-space: nowrap;
 }
